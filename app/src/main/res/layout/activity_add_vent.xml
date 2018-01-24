@@ -70,12 +70,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="10dp">
         <TextView
@@ -104,17 +98,18 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_button"
         android:textColor="#ffffff"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#7b7b7b"
         android:layout_marginTop="4dp" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="5dp"
-        android:id="@+id/list_vent">
+        android:id="@+id/list_vent"/>
 
-    </ListView>
 </LinearLayout>
 

@@ -11,7 +11,7 @@
         <TextView
             android:id="@+id/c_date"
             android:layout_width="1dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:minLines="2"
             android:gravity="center|left"
             android:layout_margin="1dip"/>
@@ -19,7 +19,7 @@
         <TextView
             android:id="@+id/c_fio"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="1dip"
             android:layout_span="2"
             android:minLines="2"
@@ -29,7 +29,7 @@
         <TextView
             android:id="@+id/c_phone"
             android:layout_width="40dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="1dip"
             android:layout_span="1"
             android:minLines="2"

@@ -70,15 +70,5 @@
     </LinearLayout>
 
     </ScrollView>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="test1      "
-            android:layout_alignParentBottom="true"
-            android:gravity="right|bottom"/>
-    </RelativeLayout>
 
 </LinearLayout>

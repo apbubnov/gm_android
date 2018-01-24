@@ -33,67 +33,56 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Кол-во"
-            android:gravity="center"
             style="@style/text_style_spisok"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Вид"
-            android:gravity="center"
+            style="@style/text_style_spisok"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Диаметр"
             style="@style/text_style_spisok"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/kol_vo_svetiln"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_weight="1"
             android:background="@drawable/edit_text_style"
             android:hint="Кол-во"
             android:inputType="number"
-            android:paddingLeft="5dp" />
+            android:paddingLeft="5dp"/>
 
         <Spinner
             android:id="@+id/spinner_vid"
             style="@style/spinner_style"
             android:layout_height="40dp"
             android:layout_width="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="10dp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="5dp"
-            android:text="Диаметр"
-            style="@style/text_style_spisok"/>
+            android:layout_weight="1"/>
 
         <Spinner
             android:id="@+id/spinner_diametr"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"
-            style="@style/spinner_style"/>
+            style="@style/spinner_style"
+            android:layout_weight="1"/>
+
     </LinearLayout>
 
     <Button

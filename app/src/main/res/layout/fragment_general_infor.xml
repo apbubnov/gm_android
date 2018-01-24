@@ -403,7 +403,7 @@
                     style="@style/text_style_spisok"
                     android:gravity="center|left"
                     android:textSize="15dp"
-                    android:text="Примечание"
+                    android:text="Примечание клиента"
                     android:layout_weight="1"/>
 
                 <EditText
@@ -415,7 +415,7 @@
                     android:textSize="15dp"
                     android:inputType="textMultiLine"
                     android:id="@+id/notes_cl"
-                    android:hint="Примечание"
+                    android:hint="Примечание клиента"
                     android:layout_weight="1"/>
             </LinearLayout>
 
@@ -776,6 +776,35 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/lin_m3"
+                android:visibility="gone">
+                <TextView
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:gravity="center|left"
+                    android:textSize="15dp"
+                    android:text="Примечание к договору"
+                    android:layout_weight="1"/>
+
+                <EditText
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:background="@drawable/edit_text_style"
+                    android:textSize="15dp"
+                    android:inputType="textMultiLine"
+                    android:id="@+id/notes_gm_calc"
+                    android:hint="Примечание к договору"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
             <TextView
                 android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
@@ -784,8 +813,8 @@
                 style="@style/text_style_spisok"
                 android:textSize="17dp"
                 android:id="@+id/text1"
-                android:visibility="gone"
-                android:text="Выберите дату монтажа"/>
+                android:text="Выберите дату монтажа"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -935,6 +964,35 @@
                 style="@style/spinner_style"
                 android:visibility="gone">
             </Spinner>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal"
+                android:id="@+id/lin_m4">
+                <TextView
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:gravity="center|left"
+                    android:textSize="15dp"
+                    android:text="Примечание к монтажу"
+                    android:layout_weight="1"/>
+
+                <EditText
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:background="@drawable/edit_text_style"
+                    android:textSize="15dp"
+                    android:inputType="textMultiLine"
+                    android:id="@+id/notes_gm_chief"
+                    android:hint="Примечание к монтажу"
+                    android:layout_weight="1"/>
+            </LinearLayout>
 
             <Button android:id="@+id/save_proj"
                 android:layout_width="match_parent"

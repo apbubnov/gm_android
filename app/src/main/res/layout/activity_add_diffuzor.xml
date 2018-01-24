@@ -81,16 +81,15 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_button"
         android:textColor="#ffffff"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:id="@+id/list_diff"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#7b7b7b"
         android:layout_marginTop="4dp" />
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
-        android:id="@+id/list_diff">
-
-    </ListView>
 </LinearLayout>

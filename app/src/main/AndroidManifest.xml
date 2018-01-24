@@ -55,8 +55,8 @@
         <activity
             android:name=".Gager_office"
             android:label="@string/title_activity_gager_office"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Manager_office"
             android:label="@string/title_activity_manager_office"
@@ -67,9 +67,6 @@
             android:label="@string/title_activity_chief_office"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity_add_brigade"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity_upd_brigade"
             android:screenOrientation="portrait" />
@@ -140,8 +137,9 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Crew.Activity_crew"
-            android:label="Кабинет монтажника"/>
+        <activity
+            android:name=".Crew.Activity_crew"
+            android:label="Кабинет монтажника" />
         <activity
             android:name=".Crew.Activity_calendar"
             android:label="Календарь работ"
@@ -152,7 +150,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Crew.Activity_mounting_info"
-            android:screenOrientation="portrait" ></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".Dealer.Activity_client" />
+        <activity android:name=".Dealer.Activity_empty" />
+        <activity android:name=".Dealer.Activity_spisok_brigade"></activity>
     </application>
 
 </manifest>
