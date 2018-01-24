@@ -1,0 +1,98 @@
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link href="/templates/gantry/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+	<link rel="stylesheet" href="/templates/gantry/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<link rel="stylesheet" href="styles.css">
+
+	<script type="text/javascript" src="jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="decimal.js"></script>
+	<script type="text/javascript" src="paper-full.js"></script>
+	<script type="text/javascript" src="delaunay.js"></script>
+	<script type="text/javascript" src="sketch.js"></script>
+
+	<title>Построение чертежа</title>
+	<style type="text/css">
+		.grid_check{
+			position:absolute;
+			top:5px;
+			left:10px;
+			width:24px;
+			height:24px;
+			background: rgba(242, 238, 255, 0.57);
+		}
+
+		.grid_check input[type="checkbox"] + span{
+			position:absolute;
+			left:5px;
+			top:5px;
+			width:24px;
+			height:24px;
+			background:url('grid.png') no-repeat;
+			cursor:pointer;
+		}
+		.grid_check input[type="checkbox"]{
+			display:none;
+		}
+		.grid_check input[type="checkbox"]:checked + span{
+			background:url('grid.png') no-repeat;
+			background-position:0px -24px;
+		}
+	</style>
+</head>
+<body>
+
+<div id="preloader" style="display: none;" class="PRELOADER_GM PRELOADER_GM_OPACITY">
+    <div class="PRELOADER_BLOCK"></div>
+    <img src="GM_R_HD.png" class="PRELOADER_IMG">
+</div>
+
+<form method="POST" action="" style="display: none" id="form1">
+	<input name="jform[n4]" id="jform_n4" value="" placeholder="Площадь" type="hidden">
+	<input name="jform[n5]" id="jform_n5" value="" placeholder="Периметр" type="hidden">
+	<input name="jform[n9]" id="jform_n9" value="" placeholder="Углы" type="hidden">
+</form>
+<div id="popup">
+	<center>
+	<p>
+		Внимательно проверьте построенный чертеж, после отправки редактирование недоступно.
+	</p>
+	<button class="sketch_hud btn btn-primary" id ="close_popup" ><i class="fa fa-reply" aria-hidden="true"></i> Назад</button>
+	<button id="close_sketch" class="sketch_hud btn btn-success"><img src="save.png">Отправить</button>
+	</center>
+</div>
+
+<div id="sketch_editor" class="sketch_window">
+	<label class = "grid_check"><input type = "checkbox" id="useGrid" checked="true"/><span></span></label>
+	<button class="sketch_hud btn btn-primary" id ="cancelLastAction" ><i class="fa fa-reply" aria-hidden="true"><img src="cancel.png"></i> Отмена</button>
+	<button class="sketch_hud btn btn-warning" id ="reset" ><i class="fa fa-undo" aria-hidden="true"><img src="clean.png"></i> Очистить</button>
+	<button class="sketch_hud btn btn-danger" id ="back" ><i class="fa fa-times" aria-hidden="true"><img src="back.png"></i></button>
+	<center><canvas id="myCanvas" resize></canvas></center>
+</div>
+
+<div id="window">
+	<center>
+		<label>Введите длину:</label>
+		<input name="newLength" id="newLength" value="" placeholder="Длина" type="text" readonly>
+		<button class="ok_back" id="numback"><i class="fa fa-long-arrow-left" aria-hidden="true"><img src="no.png"></i></button>
+		<button class="ok_back" id="ok"><i class="fa fa-check" aria-hidden="true"><img src="save.png"></i></button><br>
+		<button class="but_num" id="num1">1</button>
+		<button class="but_num" id="num2">2</button>
+		<button class="but_num" id="num3">3</button>
+		<button class="but_num" id="num4">4</button>
+		<button class="but_num" id="num5">5</button>
+		<button class="but_num" id="num6">6</button>
+		<button class="but_num" id="num7">7</button>
+		<button class="but_num" id="num8">8</button>
+		<button class="but_num" id="num9">9</button>
+		<button class="but_num" id="num0">0</button>
+	</center>
+</div>
+<center><button id="open_popup" class="sketch_hud btn btn-success"><i class="fa fa-check" aria-hidden="true"><img src="save.png"></i> Сохранить и закрыть</button></center>
+
+</body>
+</html>

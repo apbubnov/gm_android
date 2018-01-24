@@ -1,0 +1,45 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:stretchColumns="*"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TableRow>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:textSize="12dp"
+            android:id="@+id/c_id"
+            android:gravity="center|top"
+            android:minLines="2"
+            android:textColor="#000000"
+            android:visibility="gone"
+            />
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/c_time"
+            android:gravity="center"
+            android:textSize="13dp"
+            android:layout_span="3"
+            />
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/c_address"
+            android:gravity="center"
+            android:textSize="13dp"
+            android:layout_span="3"
+            />
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/c_name"
+            android:gravity="center|top"
+            android:textSize="13dp"
+            android:layout_span="3"
+            android:minLines="2"
+            android:layout_marginLeft="5dp"
+            />
+    </TableRow>
+
+</TableLayout>

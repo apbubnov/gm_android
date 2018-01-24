@@ -1,0 +1,139 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/backgroun"
+    tools:context="ru.ejevikaapp.authorization.Fragments.Fragment_inform_proj">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:id="@+id/id_cl"/>
+
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:id="@+id/id_pagenumber"/>
+
+    <Button
+        android:id="@+id/upd_calc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_button"
+        android:text=" Изменить чертёж "
+        android:textColor="#ffffff" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/id_image"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Материал"
+        style="@style/text_style_spisok"
+        android:textStyle="bold"
+        android:textSize="15dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Тип потолка:"
+        style="@style/text_style_spisok"
+        android:id="@+id/mat_1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Тип фактуры:"
+        style="@style/text_style_spisok"
+        android:id="@+id/mat_2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Производитель, ширина:"
+        style="@style/text_style_spisok"
+        android:id="@+id/mat_3"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/color_lin"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            style="@style/text_style_spisok"
+            android:text="ЦВЕТ:"
+            android:layout_weight="5"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_weight="1"
+        android:layout_marginRight="30dp"
+        android:layout_gravity="center"
+        android:id="@+id/id_polotna"/>
+    </LinearLayout>
+
+    <TextView
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Размеры помещения"
+        style="@style/text_style_spisok"
+        android:textSize="15dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Площадь, м2:"
+        style="@style/text_style_spisok"
+        android:id="@+id/raz_1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Периметр, м:"
+        style="@style/text_style_spisok"
+        android:id="@+id/raz_2"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/linear_main"
+            android:layout_marginBottom="10dp">
+        </LinearLayout>
+    <Button
+        android:id="@+id/delete_ceiling"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_button_red"
+        android:text=" Удалить потолок "
+        android:textColor="#ffffff" />
+
+</LinearLayout>
+</ScrollView>
+</FrameLayout>

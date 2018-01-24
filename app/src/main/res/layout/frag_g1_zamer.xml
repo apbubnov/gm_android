@@ -1,0 +1,176 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ru.ejevikaapp.authorization.Fragments.Frag_g1_zamer">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ФИО клиента"
+            android:textColor="#000000"
+            android:id="@+id/c_search"/>
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="    Найти    "
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ФИО клиента *"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:textSize="17dp"
+            android:textColor="#000000" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ФИО клиента"
+            android:text="андроид Тест"
+            android:inputType="textCapWords"
+            android:textColor="#000000"
+            android:id="@+id/c_fio"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Телефон клиента *"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:textColor="#000000" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="+7xxxxxxxxxx"
+            android:maxLength="12"
+            android:text="0101010101010"
+            android:inputType="phone"
+            android:id="@+id/c_phone"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Адрес клиента *"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:textColor="#000000" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Адрес клиента"
+            android:text="андроид тест"
+            android:inputType="textMultiLine"
+            android:id="@+id/c_address"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Примечание"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:textColor="#000000" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Примечание"
+            android:inputType="textMultiLine"
+            android:id="@+id/c_note"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Удобная дата \nзамера "
+                android:layout_marginLeft="5dp"
+                android:textSize="17dp"
+                android:textColor="#000000" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp">
+                <TextView android:id="@+id/currentDateTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="#000000" />
+
+                <Button android:id="@+id/dateButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Изменить дату"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/rounded_button"
+                    android:textColor="#ffffff"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Удобное время замера"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:textColor="#000000"
+            android:textSize="17dp"
+            />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sp_date"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"
+            style="@style/spinner_style"/>
+
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Выберите замерщика * "
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17dp"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/btn_add_zamer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Записать"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="2dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"
+            android:layout_marginBottom="20dp"/>
+
+    </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ru.ejevikaapp.authorization.MainActivity"
+    style="@style/backgroun"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gm_logo"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"/>
+
+        <cn.zhaiyifan.rememberedittext.RememberEditText
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:layout_margin="10dp"
+            android:ems="10"
+            android:hint="Логин"
+            android:inputType="textPersonName"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c"
+            app:autoSave="true"
+            app:rememberCount="1"/>
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:ems="10"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c" />
+
+        <Button
+            android:id="@+id/btn_vhod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:elevation="0dp"
+            android:text="Войти"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#edeaea"
+            android:textSize="18dp"
+            android:background="@drawable/rounded_button"
+            />
+
+    </LinearLayout>
+
+    </ScrollView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="test1      "
+            android:layout_alignParentBottom="true"
+            android:gravity="right|bottom"/>
+    </RelativeLayout>
+
+</LinearLayout>

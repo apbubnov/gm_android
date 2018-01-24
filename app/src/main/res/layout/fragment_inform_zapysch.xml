@@ -1,0 +1,112 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+    style="@style/backgroun"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:id="@+id/linear_main"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:id="@+id/id_cl"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:id="@+id/id_pagenumber"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/id_image"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Материал"
+                    style="@style/text_style_columns_name"
+                    android:textSize="15dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Тип потолка:"
+                    style="@style/text_style_spisok"
+                    android:id="@+id/mat_1" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Тип фактуры:"
+                    style="@style/text_style_spisok"
+                    android:id="@+id/mat_2"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Производитель, ширина:"
+                    style="@style/text_style_spisok"
+                    android:id="@+id/mat_3"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/color_lin"
+                    android:visibility="gone">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        style="@style/text_style_spisok"
+                        android:text="ЦВЕТ:"
+                        android:layout_weight="5"/>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+
+                        android:layout_marginRight="30dp"
+                        android:layout_gravity="center"
+                        android:id="@+id/id_polotna"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Размеры помещения"
+                    android:textSize="15dp"
+                    style="@style/text_style_columns_name"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Площадь, м2:"
+                    style="@style/text_style_spisok"
+                    android:id="@+id/raz_1" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Периметр, м:"
+                    style="@style/text_style_spisok"
+                    android:id="@+id/raz_2"/>
+
+
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>

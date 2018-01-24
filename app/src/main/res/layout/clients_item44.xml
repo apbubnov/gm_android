@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*">
+
+    <TableRow>
+        <TextView
+            android:id="@+id/c_number"
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:minLines="2"
+            android:layout_span="2"
+            android:gravity="center|left"
+            android:layout_margin="1dip"/>
+
+        <TextView
+            android:id="@+id/c_address"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dip"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:layout_span="2"
+            android:gravity="center|left"/>
+
+        <TextView
+            android:id="@+id/c_price"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dip"
+            android:layout_span="2"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:minLines="2"
+            android:paddingLeft="10dp" />
+
+        <TextView
+            android:id="@+id/c_income"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dip"
+            android:layout_span="2"
+            android:minLines="2"
+            android:gravity="center|left"
+            android:paddingLeft="12dp"
+            android:paddingRight="10dp" />
+    </TableRow>
+</TableLayout>

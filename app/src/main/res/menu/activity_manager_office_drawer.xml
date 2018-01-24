@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/in_production"
+        android:title="В производстве" />
+    <item
+        android:id="@+id/started_projects"
+        android:title="Запущенные проекты" />
+    <item
+        android:id="@+id/customer_orders"
+        android:title="Клиентские заказы" />
+    <item
+        android:id="@+id/application_site"
+        android:title="Заявки с сайта" />
+    <item
+        android:id="@+id/clients"
+        android:title="Клиенты" />
+    <item
+        android:id="@+id/calls"
+        android:title="Звонки" />
+    <item
+        android:id="@+id/entry_for_metering"
+        android:title="Запись на замер" />
+    <item
+        android:id="@+id/prices"
+        android:title="Прайсы" />
+    <item
+        android:id="@+id/colors_of_canvases"
+        android:title="Цвета полотен"/>
+    <item
+        android:id="@+id/exit"
+        android:title="Выход" />
+
+</menu>

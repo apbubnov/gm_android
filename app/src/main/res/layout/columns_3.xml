@@ -1,0 +1,66 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*"
+    android:layout_margin="10dp">
+
+    <android.support.constraint.ConstraintLayout
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp">
+
+        <TextView
+            android:id="@+id/c_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:minLines="2"
+            android:maxWidth="70dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:id="@+id/c_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:minLines="2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintLeft_toRightOf="@+id/c_number"
+            android:layout_marginLeft="8dp" />
+
+        <TextView
+            android:id="@+id/c_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:minLines="2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/c_income"
+            android:layout_marginRight="8dp"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintLeft_toRightOf="@+id/c_address"
+            android:layout_marginLeft="8dp" />
+
+        <TextView
+            android:id="@+id/c_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:minLines="2"
+            android:layout_marginRight="16dp"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:layout_editor_absoluteY="0dp"
+            tools:ignore="MissingConstraints" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</TableLayout>

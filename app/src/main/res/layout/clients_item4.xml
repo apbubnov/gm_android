@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*">
+
+    <TableRow
+        android:layout_marginLeft="1dp">
+
+        <TextView
+            android:id="@+id/c_date"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:minLines="2"
+            android:gravity="center|left"
+            android:layout_margin="1dip"/>
+
+        <TextView
+            android:id="@+id/c_fio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dip"
+            android:layout_span="2"
+            android:minLines="2"
+            android:gravity="center|left"
+            android:paddingLeft="11dp" />
+
+        <TextView
+            android:id="@+id/c_phone"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_margin="1dip"
+            android:layout_span="1"
+            android:minLines="2"
+            android:gravity="center|left"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"/>
+    </TableRow>
+</TableLayout>

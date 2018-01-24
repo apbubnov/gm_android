@@ -1,0 +1,77 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*"
+    android:layout_margin="10dp">
+
+<Button
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:text="Добaвить клиента"
+    android:id="@+id/add_client"
+    android:background="@drawable/rounded_button"
+    android:textColor="#ffffff"/>
+
+    <android.support.constraint.ConstraintLayout
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Создан"
+            android:gravity="bottom"
+            android:minLines="2"
+            android:maxWidth="70dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ФИО, название"
+            android:gravity="bottom"
+            android:minLines="2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintLeft_toRightOf="@+id/textView5"
+            android:layout_marginLeft="35dp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Телефоны"
+            android:gravity="bottom"
+            android:minLines="2"
+            android:layout_marginRight="32dp"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:ignore="MissingConstraints"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:background="#000000"
+        android:layout_height="2dp" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_client"
+        android:layout_marginLeft="5dp">
+
+    </ListView>
+
+</TableLayout>

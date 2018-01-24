@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffffff">
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="ru.ejevikaapp.authorization.Crew.Activity_calendar"
+    android:orientation="vertical"
+    android:layout_margin="10dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/calendar_month"
+        android:text="месяц год"
+        android:gravity="center"
+        style="@style/text_style_spisok"
+        android:background="@drawable/calendar_btn" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ПН"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ВТ"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="СР"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ЧТ"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ПТ"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="СБ"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ВС"
+            android:gravity="center"
+            style="@style/text_style_spisok"
+            android:background="@drawable/calendar_btn"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:textColor="#ffffff"
+            android:background="@drawable/rounded_button"
+            android:id="@+id/calendar_minus"
+            android:src="@drawable/left_arrow"
+            android:textSize="25dp"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"
+            android:id="@+id/calendar_plus"
+            android:src="@drawable/right_arrow"
+            android:textSize="25dp" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#ff0000"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                style="@style/text_style_spisok"
+                android:text="Новый монтаж. Не просмотрен" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#ffd500"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                style="@style/text_style_spisok"
+                android:text="Новый монтаж. Просмотрен"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#0008ff"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                style="@style/text_style_spisok"
+                android:text="Монтаж в работе"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#4d1f00"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                style="@style/text_style_spisok"
+                android:text="Монтаж недовыполнен"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="#0dff00"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                style="@style/text_style_spisok"
+                android:text="Монтаж выполнен"/>
+        </LinearLayout>
+</LinearLayout>
+</LinearLayout>
+</ScrollView>

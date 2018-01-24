@@ -1,0 +1,72 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*"
+    style="@style/backgroun"
+    android:layout_margin="10dp">
+
+    <TableRow>
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Номер"
+            android:gravity="bottom"
+            style="@style/text_style_columns_name"
+            android:minLines="2"/>
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Адрес"
+            android:gravity="bottom"
+            style="@style/text_style_columns_name"
+            android:minLines="2"
+            android:layout_span="3" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Клиент"
+            android:gravity="bottom"
+            style="@style/text_style_columns_name"
+            android:minLines="2"
+            android:layout_span="3"/>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Статус"
+            android:gravity="center"
+            style="@style/text_style_columns_name"
+            android:minLines="2"
+            android:layout_span="3"/>
+
+    </TableRow>
+
+    <View
+        android:layout_width="wrap_content"
+        android:background="#000000"
+        android:layout_height="2dp" />
+
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_client">
+    </ListView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</TableLayout>

@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name"> Гильдия мастеров </string>
+    <string name="title_activity_calcul">Размеры помещения</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_activity_dealer_office">Офис дилера</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_gager_office">Офис замерщик</string>
+    <string name="title_activity_manager_office">Офис менеджера</string>
+    <string name="title_activity_chief_office">Офис начальника МС</string>
+
+
+    <string name="sendImagesToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.sendImagesToAndroid</string>
+
+    <string name="sendMountersToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api2.sendMountersToAndroid</string>
+    <string name="sendDealerInfoToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api2.sendDealerInfoToAndroid</string>
+
+    <string name="addDataFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid</string>
+    <string name="CheckDataFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid</string>
+    <string name="addImagesFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addImagesFromAndroid</string>
+
+    <string name="title_activity_draft">Activity_draft</string>
+    <string name="title_activity_inform_proj">Activity_inform_proj</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_mounting_info">Activity_mounting_info</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+
+</resources>
