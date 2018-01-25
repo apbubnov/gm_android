@@ -19,22 +19,15 @@
             android:layout_marginTop="10dp"
             android:scaleType="centerCrop"
             android:background="#ffffff"/>
-        <TextView
+
+        <EditText
+            android:id="@+id/name_org"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Название организации"
-            android:layout_marginLeft="20dp"
+            android:hint="Название организации"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="5dp"
             android:layout_gravity="center"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="exit"
-            android:id="@+id/exit"
-            android:textSize="10dp"
-            android:layout_marginRight="5dp"
-            android:layout_gravity="top" />
 
     </LinearLayout>
 
@@ -51,23 +44,42 @@
         android:gravity="center|top"
         android:layout_marginTop="40dp">
         <Button
+            android:layout_marginTop="10dp"
             android:id="@+id/btn_client"
-            android:layout_width="150dp"
+            android:text="Клиенты"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Клиенты"/>
+            android:textSize="12dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"/>
         <Button
-            android:id="@+id/btn_zamer"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:id="@+id/btn_zamer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"
             android:text="Замеры"/>
         <Button
-            android:id="@+id/btn_install"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:id="@+id/btn_install"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"
             android:text="Монтажи"/>
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:id="@+id/exit"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="выход"
+            android:textSize="10dp"
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"  />
     </LinearLayout>
 
 </LinearLayout>

@@ -34,11 +34,11 @@
                 android:id="@+id/c_search"/>
             <Button
                 android:id="@+id/btn_search"
+                android:text="    Найти    "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
-                android:text="    Найти    "
                 android:background="@drawable/rounded_button"
                 android:textColor="#ffffff"/>
 
