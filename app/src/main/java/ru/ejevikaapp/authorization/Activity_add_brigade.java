@@ -19,7 +19,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_brigade);
+        //setContentView(R.layout.activity_add_brigade);
 
         name = (EditText)findViewById(R.id.name);
         fio = (EditText)findViewById(R.id.fio);
