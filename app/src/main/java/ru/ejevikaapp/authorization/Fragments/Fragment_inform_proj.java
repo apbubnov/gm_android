@@ -561,7 +561,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     if (k != null) {
 
                         if (k.moveToFirst()) {
-                            textt("Обвод трубы");
+                            textt("Диффузор");
                             do {
 
                                 String str = k.getString(k.getColumnIndex(k.getColumnName(0)));
@@ -596,7 +596,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     if (k != null) {
 
                         if (k.moveToFirst()) {
-                            textt("Профиль");
+                            textt("Переход уровня");
                             do {
 
                                 String str = k.getString(k.getColumnIndex(k.getColumnName(0)));
@@ -723,8 +723,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
             case R.id.upd_calc:
                 Intent intent;
                 intent = new Intent(getActivity(), Activity_calcul.class);
-                intent.putExtra("id_cl", select_id_project);
-                intent.putExtra("calc", String.valueOf(id_pagenumber.getText()));
+                intent.putExtra("id_project", select_id_project);
+                intent.putExtra("id_calculation", String.valueOf(id_pagenumber.getText()));
                 startActivity(intent);
                 break;
             case R.id.delete_ceiling:

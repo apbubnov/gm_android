@@ -22,7 +22,6 @@ import com.amigold.fundapter.extractors.StringExtractor;
 
 import java.util.ArrayList;
 
-import ru.ejevikaapp.authorization.Activity_inform_proj;
 import ru.ejevikaapp.authorization.Activity_inform_zapysch;
 import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.authorization.DBHelper;
@@ -41,6 +40,11 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
     String SAVED_ID="", gager_id="";
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
+
+
+    public static Frag_g3_zapusch newInstance() {
+        return new Frag_g3_zapusch();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,7 +89,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
     void clients (){
 
-        SP = this.getActivity().getSharedPreferences("gager_id", MODE_PRIVATE);
+        SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         gager_id = SP.getString("", "");
 
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
@@ -112,8 +116,8 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         for (int g = 0; g<client.size(); g++) {
             sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
-                    " WHERE project_status <> ? and project_status <> ? and client_id = ? " +
-                    "order by _id desc";
+                    " WHERE project_status <> ? and project_status <> ? and client_id = ?" +
+                    " order by _id desc";
             c = db.rawQuery(sqlQuewy, new String[]{"1", "0", String.valueOf(client.get(g))});
             if (c != null) {
                 if (c.moveToFirst()) {

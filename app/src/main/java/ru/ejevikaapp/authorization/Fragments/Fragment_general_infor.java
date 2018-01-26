@@ -80,8 +80,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     TextView id_proj, dealer_cl, components_sum_total, mounting_sum, total_sum, final_amount, final_amount_disc, final_transport, final_transport_sum, text2, text3;
     Calendar dateAndTime = Calendar.getInstance();
     Calendar dateAndTime2 = Calendar.getInstance();
-    EditText name_cl, contact_cl, address_cl, notes_cl, ed_discount, edit_transport_0, edit_transport_1, edit_transport_21, edit_transport_22, c_address, c_house, с_body,
-            c_porch, c_floor, c_room, c_code;
+    EditText name_cl, contact_cl, address_cl, notes_cl, notes_gm_chief, notes_gm_calc, ed_discount, edit_transport_0, edit_transport_1, edit_transport_21,
+            edit_transport_22, c_address, c_house, с_body, c_porch, c_floor, c_room, c_code;
 
     ScrollView view_general_inform;
     String id_cl;
@@ -234,6 +234,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         contact_cl = (EditText) view.findViewById(R.id.contact_cl);
         ed_discount = (EditText) view.findViewById(R.id.ed_discount);
         notes_cl = (EditText) view.findViewById(R.id.notes_cl);
+        notes_gm_chief = (EditText) view.findViewById(R.id.notes_gm_chief);
+        notes_gm_calc = (EditText) view.findViewById(R.id.notes_gm_calc);
 
         c_address = (EditText) view.findViewById(R.id.c_address);
         c_house = (EditText) view.findViewById(R.id.c_house);
@@ -771,7 +773,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             final_amount_disc.setText("Итого/ \n" + "  - %");
             final_amount.setText(String.valueOf((Math.round(total_d) * 100.0) / 100) + "/ \n" + String.valueOf((Math.round(total) * 100.0) / 100));
         } else {
-            final_amount.setText(String.valueOf(total_d));
+            final_amount.setText(String.valueOf(Math.round(total_d * 100)/100));
         }
 
         if (total_d == 0) {
@@ -871,7 +873,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             dateAndTime2.set(Calendar.MONTH, monthOfYear);
             dateAndTime2.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             setInitialDateTime2();
-
 
             list_work.setVisibility(View.VISIBLE);
             sp_brigade_free.setVisibility(View.VISIBLE);
@@ -1011,7 +1012,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     } while (c.moveToNext());
                 }  else {
 
-                    time_free.add(date_mount1);
+                    time_free.add("  " + i + ":00");
 
                 }
                 c.close();
@@ -1247,7 +1248,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
 
                 Intent intent = new Intent(getActivity(), Activity_calcul.class);
-                intent.putExtra("id_cl", id_project);
+                intent.putExtra("id_project", id_project);
                 startActivity(intent);
                 break;
 
@@ -1260,6 +1261,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 break;
 
             case R.id.dateButton_mount:
+
+                LinearLayout lin_m4 = (LinearLayout) view.findViewById(R.id.lin_m4);
+                lin_m4.setVisibility(View.VISIBLE);
+
                 new DatePickerDialog(Fragment_general_infor.this.getActivity(), d2,
                         dateAndTime2.get(Calendar.YEAR),
                         dateAndTime2.get(Calendar.MONTH),
@@ -1336,9 +1341,14 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                 break;
             case R.id.contract:
+
+                LinearLayout lin_m3 = (LinearLayout) view.findViewById(R.id.lin_m3);
+                lin_m3.setVisibility(View.VISIBLE);
+
                 db = dbHelper.getWritableDatabase();
                 TextView text1 = (TextView) view.findViewById(R.id.text1);
                 text1.setVisibility(View.VISIBLE);
+                notes_gm_calc.setVisibility(View.VISIBLE);
                 TextView text2 = (TextView) view.findViewById(R.id.text2);
 
                 alert();
@@ -1363,194 +1373,197 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     void dog(){
         SQLiteDatabase db;
         db = dbHelper.getWritableDatabase();
-        for (int k = 0; id_calcul.size() > k; k++) {
-            String id = String.valueOf(id_calcul.get(k));
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, id);
-            values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
-            values.put(DBHelper.KEY_SYNC, "0");
-            values.put(DBHelper.KEY_TYPE, "send");
-            values.put(DBHelper.KEY_STATUS, "1");
-            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+       //for (int k = 0; id_calcul.size() > k; k++) {
+       //    String id = String.valueOf(id_calcul.get(k));
+       //    ContentValues values = new ContentValues();
+       //    values.put(DBHelper.KEY_ID_OLD, id);
+       //    values.put(DBHelper.KEY_ID_NEW, "0");
+       //    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
+       //    values.put(DBHelper.KEY_SYNC, "0");
+       //    values.put(DBHelper.KEY_TYPE, "send");
+       //    values.put(DBHelper.KEY_STATUS, "1");
+       //    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-            values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, id);
-            values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cal");
-            values.put(DBHelper.KEY_SYNC, "0");
-            values.put(DBHelper.KEY_TYPE, "send");
-            values.put(DBHelper.KEY_STATUS, "1");
-            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-            values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, id);
-            values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cut");
-            values.put(DBHelper.KEY_SYNC, "0");
-            values.put(DBHelper.KEY_TYPE, "send");
-            values.put(DBHelper.KEY_STATUS, "1");
-            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-        }
+       //    values = new ContentValues();
+       //    values.put(DBHelper.KEY_ID_OLD, id);
+       //    values.put(DBHelper.KEY_ID_NEW, "0");
+       //    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cal");
+       //    values.put(DBHelper.KEY_SYNC, "0");
+       //    values.put(DBHelper.KEY_TYPE, "send");
+       //    values.put(DBHelper.KEY_STATUS, "1");
+       //    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+       //    values = new ContentValues();
+       //    values.put(DBHelper.KEY_ID_OLD, id);
+       //    values.put(DBHelper.KEY_ID_NEW, "0");
+       //    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cut");
+       //    values.put(DBHelper.KEY_SYNC, "0");
+       //    values.put(DBHelper.KEY_TYPE, "send");
+       //    values.put(DBHelper.KEY_STATUS, "1");
+       //    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+       //}
+
+       //ContentValues values = new ContentValues();
+       //values.put(DBHelper.KEY_ID_OLD, id_cl);
+       //values.put(DBHelper.KEY_ID_NEW, "0");
+       //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+       //values.put(DBHelper.KEY_SYNC, "0");
+       //values.put(DBHelper.KEY_TYPE, "send");
+       //values.put(DBHelper.KEY_STATUS, "1");
+       //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+       //String sqlQuewy = "select _id, phone " + "FROM rgzbn_gm_ceiling_clients_contacts " + "where client_id = ?";
+       //Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_cl)});
+       //if (c != null) {
+       //    if (c.moveToFirst()) {
+       //        do {
+       //            String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+       //            values = new ContentValues();
+       //            values.put(DBHelper.KEY_ID_OLD, id);
+       //            values.put(DBHelper.KEY_ID_NEW, "0");
+       //            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+       //            values.put(DBHelper.KEY_SYNC, "0");
+       //            values.put(DBHelper.KEY_TYPE, "send");
+       //            values.put(DBHelper.KEY_STATUS, "1");
+       //            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+       //        } while (c.moveToNext());
+       //    }
+       //}
+
+       //values = new ContentValues();
+       //values.put(DBHelper.KEY_ID_OLD, id_project);
+       //values.put(DBHelper.KEY_ID_NEW, 0);
+       //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+       //values.put(DBHelper.KEY_SYNC, "0");
+       //values.put(DBHelper.KEY_TYPE, "send");
+       //values.put(DBHelper.KEY_STATUS, "1");
+       //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+       //sqlQuewy = "select _id " + "FROM rgzbn_gm_ceiling_calculations " + "where project_id = ?";
+       //c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_project)});
+       //if (c != null) {
+       //    if (c.moveToFirst()) {
+       //        do {
+       //            String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //            values = new ContentValues();
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_cornice " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String cornice = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{cornice, "rgzbn_gm_ceiling_cornice"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_diffusers " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String dif = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{dif, "rgzbn_gm_ceiling_diffusers"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_profil " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String prof = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{prof, "rgzbn_gm_ceiling_profil"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_ecola " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String ecola = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{ecola, "rgzbn_gm_ceiling_ecola"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_fixtures " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String fixtures = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{fixtures, "rgzbn_gm_ceiling_fixtures"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_hoods " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String hoods = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{hoods, "rgzbn_gm_ceiling_hoods"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+
+       //            sqlQuewy = "select _id "
+       //                    + "FROM rgzbn_gm_ceiling_pipes " +
+       //                    "where calculation_id = ?";
+       //            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+       //            if (c != null) {
+       //                if (c.moveToFirst()) {
+       //                    do {
+       //                        String pipes = c.getString(c.getColumnIndex(c.getColumnName(0)));
+       //                        values = new ContentValues();
+       //                        values.put(DBHelper.KEY_STATUS, "1");
+       //                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
+       //                                new String[]{pipes, "rgzbn_gm_ceiling_pipes"});
+       //                    } while (c.moveToNext());
+       //                }
+       //            }
+       //        } while (c.moveToNext());
+       //    }
+       //}
 
         ContentValues values = new ContentValues();
-        values.put(DBHelper.KEY_ID_OLD, id_cl);
-        values.put(DBHelper.KEY_ID_NEW, "0");
-        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-        values.put(DBHelper.KEY_SYNC, "0");
-        values.put(DBHelper.KEY_TYPE, "send");
-        values.put(DBHelper.KEY_STATUS, "1");
-        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-        String sqlQuewy = "select _id, phone " + "FROM rgzbn_gm_ceiling_clients_contacts " + "where client_id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_cl)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
-                    values = new ContentValues();
-                    values.put(DBHelper.KEY_ID_OLD, id);
-                    values.put(DBHelper.KEY_ID_NEW, "0");
-                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
-                    values.put(DBHelper.KEY_SYNC, "0");
-                    values.put(DBHelper.KEY_TYPE, "send");
-                    values.put(DBHelper.KEY_STATUS, "1");
-                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                } while (c.moveToNext());
-            }
-        }
-
-        values = new ContentValues();
-        values.put(DBHelper.KEY_ID_OLD, id_project);
-        values.put(DBHelper.KEY_ID_NEW, 0);
-        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-        values.put(DBHelper.KEY_SYNC, "0");
-        values.put(DBHelper.KEY_TYPE, "send");
-        values.put(DBHelper.KEY_STATUS, "1");
-        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-        sqlQuewy = "select _id " + "FROM rgzbn_gm_ceiling_calculations " + "where project_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_project)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    values = new ContentValues();
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_cornice " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String cornice = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{cornice, "rgzbn_gm_ceiling_cornice"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_diffusers " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String dif = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{dif, "rgzbn_gm_ceiling_diffusers"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_profil " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String prof = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{prof, "rgzbn_gm_ceiling_profil"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_ecola " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String ecola = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{ecola, "rgzbn_gm_ceiling_ecola"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_fixtures " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String fixtures = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{fixtures, "rgzbn_gm_ceiling_fixtures"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_hoods " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String hoods = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{hoods, "rgzbn_gm_ceiling_hoods"});
-                            } while (c.moveToNext());
-                        }
-                    }
-
-                    sqlQuewy = "select _id "
-                            + "FROM rgzbn_gm_ceiling_pipes " +
-                            "where calculation_id = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String pipes = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_STATUS, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=?",
-                                        new String[]{pipes, "rgzbn_gm_ceiling_pipes"});
-                            } while (c.moveToNext());
-                        }
-                    }
-                } while (c.moveToNext());
-            }
-        }
-        values = new ContentValues();
         values.put(DBHelper.KEY_CLIENT_NAME, String.valueOf(name_cl.getText()));
         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{id_cl});
         if (contact_cl.getText().length() > 0) {
@@ -1609,6 +1622,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, time_brig);
         values.put(DBHelper.KEY_PROJECT_MOUNTER, id_b);
         values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(notes_cl.getText()));
+        values.put(DBHelper.KEY_GM_CALCULATOR_NOTE, String.valueOf(notes_gm_calc.getText()));
+        values.put(DBHelper.KEY_GM_CHIEF_NOTE, String.valueOf(notes_gm_chief.getText()));
         values.put(DBHelper.KEY_PROJECT_DISCOUNT, String.valueOf(ed_discount.getText()));
         values.put(DBHelper.KEY_PROJECT_VERDICT, "1");
         values.put(DBHelper.KEY_READ_BY_MOUNTER, "0");
@@ -1620,10 +1635,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         toast.show();
 
         getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-        getActivity().stopService((new Intent(getActivity(), Service_Sync_Import.class)));
 
         getActivity().finish();
-
     }
 
     void alert() {
@@ -1646,26 +1659,21 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         }, 1);
     }
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
+    public void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
+        if (listAdapter == null) {
             return;
-
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
+        }
+        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0)
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
+            View listItem = listAdapter.getView(i, null, listView);
+            if (listItem instanceof ViewGroup)
+                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 
     void btn(String title) {
@@ -1691,8 +1699,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         txt.setTextColor(Color.parseColor("#000000"));
         mainL2.addView(txt);
 
-        //txt = new TextView(getActivity());
-        //phone_hor.addView(txt);
     }
 
     void radiob(String calc_title, String n4, String n5, String id) {
@@ -1782,7 +1788,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             String tot2 = Math.round(totall) * 100.0 / 100 + "/ \n" + String.valueOf((Math.round(totall - (totall / 100 * Integer.valueOf(dis))) * 100.0) / 100);
             tx1.setText(tot1 + "     \n" + tot2);
         } else {
-            tx1.setText("Итого     " + totall);
+            tx1.setText("Итого     " + Math.round(totall) * 100.0 / 100);
         }
 
         tx1.setLayoutParams(lin_calc);

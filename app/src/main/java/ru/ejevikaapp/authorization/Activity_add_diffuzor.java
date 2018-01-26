@@ -64,7 +64,6 @@ public class Activity_add_diffuzor extends AppCompatActivity implements View.OnC
         gager_id = SP.getString("", "");
         gager_id_int = Integer.parseInt(gager_id) * 1000000;
 
-
         dbHelper = new DBHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

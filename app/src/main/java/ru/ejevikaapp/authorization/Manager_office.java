@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import ru.ejevikaapp.authorization.Fragments.Frag_g3_client;
 import ru.ejevikaapp.authorization.Manager.Frag_in_production;
 import ru.ejevikaapp.authorization.Manager.Frag_started_projects;
 
@@ -112,14 +111,6 @@ public class Manager_office extends AppCompatActivity
        //             Frag_g2_k.getTag()
        //     ).commit();
        // }
-       else if (id == R.id.clients) {
-           Frag_g3_client frag = new Frag_g3_client();
-           FragmentManager manager = getSupportFragmentManager();
-           manager.beginTransaction().replace(R.id.relativelayout_fragment_blank3,
-                   frag,
-                   frag.getTag()
-           ).commit();
-       }
        // else if (id == R.id.calls) {
        //     Frag_g3_client Frag_g3_c = new Frag_g3_client();
        //     FragmentManager manager = getSupportFragmentManager();

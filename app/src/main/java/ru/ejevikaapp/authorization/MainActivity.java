@@ -41,14 +41,10 @@ import ru.ejevikaapp.authorization.Dealer.Dealer_office;
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     EditText login, password;
-    Button btn_vhod, btn_vhod_vhod;
+    Button btn_vhod;
 
     DBHelper dbHelper;
     SQLiteDatabase db;
-
-    ProgressDialog progressDialog;
-
-    int total = 1155, count_mat;
 
     SharedPreferences SP_end;
     final String SAVED_end = "";
@@ -63,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     String jsonAuth = "", change_time_project = "";
 
     static org.json.simple.JSONObject jsonMaterial = new org.json.simple.JSONObject();
-
-    TextView image;
 
     static String domen = "test1";
 
@@ -168,7 +162,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     MainActivity.this.finish();
 
                     break;
-                } else if (group_id.get(g).equals("14")) {
+                }
+                else if (group_id.get(g).equals("14")) {
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -474,9 +469,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     jsonAuth = String.valueOf(jsonObjectAuth);
                     Log.d("responce", jsonAuth);
 
-                    jsonObjectProject = new org.json.simple.JSONObject();
-                    jsonObjectProject.put("change_time", "2000-01-01");
-                    change_time_project = String.valueOf(jsonObjectProject);
+                   //jsonObjectProject = new org.json.simple.JSONObject();
+                   //jsonObjectProject.put("change_time", "2000-01-01");
+                   //change_time_project = String.valueOf(jsonObjectProject);
 
                     mProgressDialog = new ProgressDialog(MainActivity.this);
                     mProgressDialog.setMessage("Проверяем...");
@@ -686,8 +681,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             finish();
 
                             bool = false;
-                        } else if (group_id.get(g).equals("22") || group_id.get(g).equals("21") || group_id.get(g).equals("21")) {
-
+                        } else if (group_id.get(g).equals("22") || group_id.get(g).equals("21")) {
                             try {
                                 JSONObject jsonObject = new JSONObject(res);
                                 user_id = jsonObject.getJSONObject("user").getString("id");
@@ -753,7 +747,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                 Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
                                 startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
-
                                 mProgressDialog.dismiss();
 
                                 final Toast toast = Toast.makeText(getApplicationContext(),
@@ -776,7 +769,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             }
 
                             bool = false;
-                        } else if (group_id.get(g).equals("14")) {
+                        }
+                        else if (group_id.get(g).equals("14")) {
                             try {
                                 JSONObject jsonObject = new JSONObject(res);
                                 user_id = jsonObject.getJSONObject("user").getString("id");

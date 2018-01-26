@@ -38,11 +38,10 @@ public class Activity_add_svetiln extends AppCompatActivity implements View.OnCl
 
     DBHelper dbHelper;
     EditText kol_vo_svetiln;
-    Spinner spinner_vid, spinner_diametr;
     Button btn_add_svetilnik;
     ListView list_svetilnik;
 
-    String select_vid, select_diam, c_id = "";
+    String select_vid, select_diam, c_id = "", gager_id="", id_calc;
 
     Integer type_id, comp_opt;
 
@@ -50,15 +49,10 @@ public class Activity_add_svetiln extends AppCompatActivity implements View.OnCl
     ArrayList s_d = new ArrayList();
     ArrayAdapter<String> adapter;
 
-    ArrayAdapter<String> adapter1;
-
     Cursor c = null;
 
     final ArrayList<Svetiln_class> svet_mas = new ArrayList<>();
 
-    String k_vid, diametr, id_calc;
-
-    String gager_id="";
     Integer gager_id_int = 0;
 
     @Override

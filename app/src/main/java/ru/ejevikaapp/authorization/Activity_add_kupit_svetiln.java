@@ -70,7 +70,7 @@ public class Activity_add_kupit_svetiln extends AppCompatActivity implements Vie
         dbHelper = new DBHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        String item_content1 = null;
+        String item_content1 = "";
 
         s_c.clear();
 

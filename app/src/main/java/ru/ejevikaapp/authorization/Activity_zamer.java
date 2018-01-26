@@ -220,23 +220,15 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 if (c.moveToFirst()) {
                     do {
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        sqlQuewy = "select group_id "
+                        Log.d("mLog","id = " +  id);
+                        sqlQuewy = "select * "
                                 + "FROM rgzbn_user_usergroup_map " +
-                                "where user_id = ?";
+                                "where user_id = ? and group_id = 22";
                         Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
-                                do {
-                                    String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                    if (group_id.equals("22")) {
-                                        count++;
-                                        name_zamer_id.add(id);
-                                    }
-                                    //else if (group_id.equals("21")) {
-                                    //    count++;
-                                    //    name_zamer_id.add(id);
-                                    //}
-                                } while (cc.moveToNext());
+                                count++;
+                                name_zamer_id.add(id);
                             }
                         }
                         cc.close();
@@ -253,6 +245,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
             for (int i = 9; i < 21; i++) {
                 for (int j = 0; count > j; j++) {
+
                     String date_zamera1 = date_zamera + " " + i + ":00:00";
                     sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
                             + "FROM rgzbn_gm_ceiling_projects " +
@@ -286,7 +279,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 cc.close();
 
                             } while (c.moveToNext());
-                        } else {
+                        }
+                        else {
 
                             String name = "";
                             String id = "";
@@ -394,26 +388,21 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
+    public void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
+        if (listAdapter == null) {
             return;
-
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
+        }
+        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0)
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
+            View listItem = listAdapter.getView(i, null, listView);
+            if (listItem instanceof ViewGroup)
+                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 
     @Override

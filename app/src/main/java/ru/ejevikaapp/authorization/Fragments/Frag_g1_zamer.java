@@ -3,19 +3,13 @@ package ru.ejevikaapp.authorization.Fragments;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.text.format.DateFormat;
 import android.text.format.DateUtils;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,25 +32,18 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import ru.ejevikaapp.authorization.Activity_add_svetiln;
-import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.R;
 
 import static android.content.Context.MODE_PRIVATE;
-import static ru.ejevikaapp.authorization.R.id.currentDateTime;
 
 public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
 
@@ -130,21 +116,6 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_date.setAdapter(adapter);
 
-        //RadioGroup radGrp = (RadioGroup)getActivity().findViewById(R.id.radios);
-        //radGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-        //    @Override
-        //    public void onCheckedChanged(RadioGroup arg0, int id) {
-        //        switch(id) {
-        //            case R.id.zamer_gm:
-
-        //                break;
-        //            case R.id.zamer_dealer:
-
-        //                break;
-        //        }
-        //    }});
-
-
         date_created = DateUtils.formatDateTime(getActivity(),                  //дата создания
                 dateAndTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_YEAR);
@@ -194,7 +165,6 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_search:
-
 
                 break;
 
@@ -427,440 +397,6 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                     toast.show();
                 }
                 break;
-        }
-    }
-
-    class SendClientData extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://test1.gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.addDataFromAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d("responce","SendClientData "+ res);
-                    if (res == "") {
-                        Log.d("responce", "SendClientData пусто");
-                    } else {
-                        SQLiteDatabase db;
-                        db = dbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        String new_id="";
-                        try {
-                            org.json.JSONObject dat = new org.json.JSONObject(res);
-                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_clients");
-                            for (int i = 0; i < dat.length(); i++) {
-                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
-                                String old_id = client_contact.getString("old_id");
-                                new_id = client_contact.getString("new_id");
-
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM history_send_to_server " +
-                                        "where id_old = ? and type=? and sync=? and name_table=?";
-                                Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_clients"});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID, new_id);
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{old_id});
-
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_SYNC, "1");
-                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ?",
-                                                    new String[]{old_id, "rgzbn_gm_ceiling_clients", "0"});
-
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_OLD, old_id);
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                                            values.put(DBHelper.KEY_SYNC, "0");
-                                            values.put(DBHelper.KEY_TYPE, "check");
-                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                            jsonObjectClient.put("id", new_id);
-
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                        "where client_id = ? ";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
-                                if (cursor != null) {
-                                    cursor.moveToFirst();
-                                    do {
-
-                                        Log.d("responce", "перезапись контактов " + new_id + " " + old_id);
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_CLIENT_ID, new_id);
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "client_id = ?", new String[]{old_id});
-
-                                    } while (cursor.moveToNext());
-                                }
-                                cursor.close();
-
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_projects " +
-                                        "where client_id = ? ";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
-                                if (cursor != null) {
-                                    cursor.moveToFirst();
-                                    do {
-
-                                        Log.d("responce", "перезапись проектов " + new_id + " " + old_id);
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_CLIENT_ID, new_id);
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "client_id = ?", new String[]{old_id});
-
-                                    } while (cursor.moveToNext());
-                                }
-                                cursor.close();
-                            }
-
-                        } catch (Exception e) {
-                            Log.d("responce", "send error " + String.valueOf(e));
-                        }
-
-                        JSONObject jsonObjectClient_Contacts = new JSONObject();
-
-                        String sqlQuewy = "SELECT * "
-                                + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                "where client_id = ?";
-                        Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id)});
-                        if (cursor != null) {
-                            if (cursor.moveToFirst()) {
-                                do {
-                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                    String status = "android_id";
-                                    jsonObjectClient_Contacts.put(status, status1);
-
-                                    status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                    status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                    jsonObjectClient_Contacts.put(status, status1);
-
-                                    status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                    status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                    jsonObjectClient_Contacts.put(status, status1);
-
-                                } while (cursor.moveToNext());
-                            }
-                        }
-
-                        jsonClient_Contacts = String.valueOf(jsonObjectClient_Contacts);
-
-                        global_results = String.valueOf(jsonObjectClient);
-                    }
-                    new CheckClientsData().execute();
-                }
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Проверьте подключение к интернету, или возможны работы на сервере", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("rgzbn_gm_ceiling_clients", "[" + jsonClient + "]");
-
-                    return parameters;
-                }
-            };
-
-            requestQueue.add(request);
-
-            return null;
-        }
-    }
-
-    class CheckClientsData extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://test1.gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.CheckDataFromAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d("responce", "CheckClientsData " + res);
-
-                    if (res.equals("")) {
-                        Log.d("responce", "CheckClientsData пусто");
-                    }
-                    SQLiteDatabase db;
-                    db = dbHelper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    try {
-                        org.json.JSONObject dat = new org.json.JSONObject(res);
-                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_clients");
-                        for (int i = 0; i < dat.length(); i++) {
-
-                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
-                            String new_id = client_contact.getString("new_android_id");
-
-                            String sqlQuewy = "SELECT * "
-                                    + "FROM history_send_to_server " +
-                                    "where id_new = ? and type=? and sync=?";
-                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check","0"});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_SYNC, "1");
-                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and sync=?",
-                                                new String[]{new_id,"0"});
-
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-
-                        }
-
-                    } catch (Exception e) {
-                    }
-
-                    //Log.d("responce", "send_client_contacts " + jsonObjectClient_Contacts);
-                    //jsonClient_Contacts = String.valueOf(jsonObjectClient_Contacts);
-
-                    Log.d("responce", "-------------------------------------------------------");
-                    new SendClientsContactsData().execute();
-                }
-
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    //Log.d("responce",jsonClient);
-                    parameters.put("rgzbn_gm_ceiling_clients", "[" + global_results + "]");
-
-                    return parameters;
-                }
-            };
-
-            requestQueue.add(request);
-
-            return null;
-        }
-    }
-
-    class SendClientsContactsData extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://test1.gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.addDataFromAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d("responce", "SendClientsContactsData " + res);
-                    if (res == "") {
-                        Log.d("responce", "SendClientsContactsData пусто ");
-                    } else {
-                        SQLiteDatabase db;
-                        db = dbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        try {
-                            org.json.JSONObject dat = new org.json.JSONObject(res);
-                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_clients_contacts");
-                            for (int i = 0; i < id_array.length(); i++) {
-                                Log.d("responce", String.valueOf(id_array.length()));
-
-                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
-                                String old_id = client_contact.getString("old_id");
-                                String new_id = client_contact.getString("new_id");
-
-                                Log.d("responce", old_id + " " + new_id);
-
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM history_send_to_server " +
-                                        "where id_old = ? and type=? and sync = ? and name_table=?";
-                                Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_clients_contacts"});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-
-                                            Log.d("responce", old_id + " " + new_id);
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID, new_id);
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values,
-                                                    "_id = ?", new String[]{old_id});
-
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_SYNC, "1");
-                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ?",
-                                                    new String[]{old_id,"rgzbn_gm_ceiling_clients_contacts", "0"});
-
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_OLD, old_id);
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
-                                            values.put(DBHelper.KEY_SYNC, "0");
-                                            values.put(DBHelper.KEY_TYPE, "check");
-                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                            jsonObjectClient_Contacts.put("id", new_id);
-
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            }
-                            global_results = String.valueOf(jsonObjectClient_Contacts);
-
-                            new CheckClientsContactsData().execute();
-                        } catch (Exception e) {
-                            Log.d("responce", "Exception sendclient_contacts " + String.valueOf(e));
-                        }
-                    }
-                }
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("responce", "error sendclient_contacts " + error);
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Log.d("responce", "contacts 1 " + jsonClient_Contacts);
-                    parameters.put("rgzbn_gm_ceiling_clients_contacts", "[" + jsonClient_Contacts + "]");
-                    return parameters;
-                }
-            };
-            requestQueue.add(request);
-            return null;
-        }
-
-    }
-
-    class CheckClientsContactsData extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://test1.gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.CheckDataFromAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d("responce", "CheckClientsContactsData " + res);
-                    if(res.equals("")) {
-                        Log.d("responce", "CheckClientsContactsData пусто ");
-                    }
-                    SQLiteDatabase db;
-                    db = dbHelper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    try {
-                        org.json.JSONObject dat = new org.json.JSONObject(res);
-                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_clients_contacts");
-                        for (int i = 0; i < dat.length(); i++) {
-
-                            Log.d("responce", String.valueOf(id_array));
-
-                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
-                            String new_id = client_contact.getString("new_android_id");
-
-                            Log.d("responce", new_id);
-
-                            String sqlQuewy = "SELECT * "
-                                    + "FROM history_send_to_server " +
-                                    "where id_new = ? and type=? and name_table=? and sync = ?";
-                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check", "rgzbn_gm_ceiling_clients_contacts","0"});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_SYNC, "1");
-                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=? and sync=?",
-                                                new String[]{new_id,"rgzbn_gm_ceiling_clients_contacts","0"});
-
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-                        }
-
-                    } catch (Exception e) {
-                    }
-                }
-
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    //Log.d("responce",jsonClient);
-                    parameters.put("rgzbn_gm_ceiling_clients_contacts", "[" + global_results + "]");
-
-                    return parameters;
-                }
-            };
-
-            requestQueue.add(request);
-
-            return null;
         }
     }
 }

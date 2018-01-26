@@ -13,15 +13,14 @@
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:minLines="2"
-            android:gravity="center|left"
-            android:layout_margin="1dip"/>
+            android:gravity="center|left"/>
 
         <TextView
             android:id="@+id/c_fio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="1dip"
-            android:layout_span="2"
+            android:layout_span="3"
             android:minLines="2"
             android:gravity="center|left"
             android:paddingLeft="11dp" />
@@ -31,7 +30,7 @@
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_margin="1dip"
-            android:layout_span="1"
+            android:layout_span="3"
             android:minLines="2"
             android:gravity="center|left"
             android:paddingLeft="10dp"

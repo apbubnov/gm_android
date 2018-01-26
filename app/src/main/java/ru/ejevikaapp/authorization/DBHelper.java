@@ -21,7 +21,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 13;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     String SAVED_end = "";
@@ -629,5 +629,20 @@ public class DBHelper extends SQLiteOpenHelper {
            onCreate(db);
 
        }
+
+        if (oldVersion < 13) {
+
+            Toast toast = Toast.makeText(mContext.getApplicationContext(),
+                    "Данные обновляются... \n дождетесь пока исчезнет эта надпись", Toast.LENGTH_SHORT);
+            toast.show();
+
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"mount"});
+
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+            onCreate(db);
+
+        }
     }
 }

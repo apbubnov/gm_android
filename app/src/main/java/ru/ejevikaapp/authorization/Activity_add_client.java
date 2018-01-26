@@ -2,7 +2,6 @@ package ru.ejevikaapp.authorization;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,9 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.text.format.Time;
 import android.widget.Toast;
-
-import ru.ejevikaapp.authorization.Fragments.Frag_g3_buhgalt;
-import ru.ejevikaapp.authorization.Fragments.Frag_g3_client;
 
 
 public class Activity_add_client extends AppCompatActivity implements View.OnClickListener{

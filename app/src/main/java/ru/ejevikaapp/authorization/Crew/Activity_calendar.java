@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -17,20 +19,28 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amigold.fundapter.BindDictionary;
+import com.amigold.fundapter.FunDapter;
+import com.amigold.fundapter.extractors.StringExtractor;
+
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.joda.time.DateTime;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.R;
 
@@ -48,6 +58,10 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
     String user_id;
 
     DBHelper dbHelper;
+
+    ArrayList<Frag_client_schedule_class> installers_mas = new ArrayList<>();
+
+    ListView list_installers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +85,129 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP_end.getString("", "");
 
+        user_id = getIntent().getStringExtra("id_brigade");
+
+        list_installers = (ListView) findViewById(R.id.list_installers);
+
+        info();
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         cal_preview();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    void info() {
+        TextView name_brigade = (TextView) findViewById(R.id.name_brigade);
+        TextView number_brigade = (TextView) findViewById(R.id.number_brigade);
+
+        dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String sqlQuewy = "select name, username "
+                + "FROM rgzbn_users " +
+                "where _id = ? ";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                name_brigade.setText("Бригада: " + c.getString(c.getColumnIndex(c.getColumnName(0))));
+                number_brigade.setText("Телефон: " + c.getString(c.getColumnIndex(c.getColumnName(0))));
+            }
+        }
+        c.close();
+
+        int count = 0;
+
+        sqlQuewy = "select id_mounter "
+                + "FROM rgzbn_gm_ceiling_mounters_map " +
+                "where id_brigade = ? ";
+        c = db.rawQuery(sqlQuewy, new String[]{user_id});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    String id_mounter = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    sqlQuewy = "select name, phone "
+                            + "FROM rgzbn_gm_ceiling_mounters " +
+                            "where _id = ? ";
+                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_mounter});
+                    if (cc != null) {
+                        if (cc.moveToFirst()) {
+                            Log.d("mLog", id_mounter);
+                            count++;
+                            String number = "Монтажник " + count + ":";
+                            String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                            String phone = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                            Frag_client_schedule_class fc = new Frag_client_schedule_class(id_mounter,
+                                    name, null, number, phone);
+                            installers_mas.add(fc);
+                        }
+                    }
+                    cc.close();
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        //Frag_client_schedule_class fc = new Frag_client_schedule_class("1",
+        //        "pop", null, "12313", "123132");
+        //installers_mas.add(fc);
+        //installers_mas.add(fc);
+
+        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+
+        dict.addStringField(R.id.c_time, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getId_client();
+            }
+        });
+
+        dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getFio();
+            }
+        });
+
+        dict.addStringField(R.id.c_name, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getPhone();
+            }
+        });
+
+        FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
+        list_installers.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(list_installers);
+
+    }
+
+    public void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            if (listItem instanceof ViewGroup)
+                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
     void cal_preview() {

@@ -84,6 +84,10 @@ public class Gager_office extends AppCompatActivity
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 
+                            Toast toast = Toast.makeText(getApplicationContext(),
+                                    "Идёт перезагрузка проектов... ", Toast.LENGTH_SHORT);
+                            toast.show();
+
                             DBHelper dbHelper = new DBHelper(getApplicationContext());
                             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -94,10 +98,6 @@ public class Gager_office extends AppCompatActivity
                             db.delete(DBHelper.HISTORY_SEND_TO_SERVER, null, null);
 
                             startService(new Intent(getApplicationContext(), Service_Sync_Import.class));
-
-                            Toast toast = Toast.makeText(getApplicationContext(),
-                                    "Идёт перезагрузка проектов... ", Toast.LENGTH_SHORT);
-                            toast.show();
 
                         }
                     })

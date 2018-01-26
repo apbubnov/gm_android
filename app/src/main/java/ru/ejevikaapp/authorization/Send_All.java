@@ -40,7 +40,10 @@ public class Send_All extends Service {
     static org.json.simple.JSONObject jsonDealer = new org.json.simple.JSONObject();
 
     static RequestQueue requestQueue;
+
     static String domen = "test1";
+
+    static String dealer_id = "";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -54,7 +57,7 @@ public class Send_All extends Service {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         SharedPreferences SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
-        String dealer_id = SP.getString("", "");
+        dealer_id = SP.getString("", "");
 
         dbHelper = new DBHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -702,6 +705,7 @@ public class Send_All extends Service {
 
                             values = new ContentValues();
                             values.put(DBHelper.KEY_ID, id);
+                            values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                             values.put(DBHelper.KEY_NAME, name);
 
                             String sqlQuewy = "SELECT * "
@@ -1063,8 +1067,8 @@ public class Send_All extends Service {
 
                                 String sqlQuewy = "SELECT * "
                                         + "FROM rgzbn_gm_ceiling_mount" +
-                                        " WHERE _id = ?";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                                        " WHERE user_id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {

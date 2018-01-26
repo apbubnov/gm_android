@@ -12,9 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import ru.ejevikaapp.authorization.Fragments.Frag_brigade;
 import ru.ejevikaapp.authorization.Fragments.Frag_g1_zamer;
-import ru.ejevikaapp.authorization.Fragments.Frag_montazh;
 
 public class Chief_office extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -80,22 +78,6 @@ public class Chief_office extends AppCompatActivity
             manager.beginTransaction().replace(R.id.relativelayout_fragment_blank4,
                     Frag_g1_z,
                     Frag_g1_z.getTag()
-            ).commit();
-        }
-        else if (id == R.id.montazh) {
-            Frag_montazh Frag_m = new Frag_montazh();
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.relativelayout_fragment_blank4,
-                    Frag_m,
-                    Frag_m.getTag()
-            ).commit();
-        }
-        else if (id == R.id.brigade) {
-            Frag_brigade Frag_b = new Frag_brigade();
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.relativelayout_fragment_blank4,
-                    Frag_b,
-                    Frag_b.getTag()
             ).commit();
         }
         else if (id == R.id.exit) {

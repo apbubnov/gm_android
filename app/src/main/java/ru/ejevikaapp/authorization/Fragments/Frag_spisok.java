@@ -1,7 +1,6 @@
 package ru.ejevikaapp.authorization.Fragments;
 
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -19,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
@@ -27,15 +24,12 @@ import com.amigold.fundapter.extractors.StringExtractor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
-import ru.ejevikaapp.authorization.Activity_draft;
 import ru.ejevikaapp.authorization.Activity_inform_proj;
 import ru.ejevikaapp.authorization.Activity_zamer;
 import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.authorization.DBHelper;
-import ru.ejevikaapp.authorization.MainActivity;
 import ru.ejevikaapp.authorization.R;
 import ru.ejevikaapp.authorization.Service_Sync_Import;
 
@@ -112,7 +106,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
     void clients (){
 
-        SP = this.getActivity().getSharedPreferences("gager_id", MODE_PRIVATE);
+        SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         gager_id = SP.getString("", "");
 
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);

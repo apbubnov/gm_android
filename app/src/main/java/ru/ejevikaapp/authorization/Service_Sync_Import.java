@@ -55,6 +55,7 @@ public class Service_Sync_Import extends Service {
     static Context ctx;
 
     static String domen = "test1";
+
     public Service_Sync_Import() {
     }
 
@@ -255,25 +256,6 @@ public class Service_Sync_Import extends Service {
                     Log.d(TAG, res);
                     if (res.equals("null")) {
                     } else {
-
-                       //Intent resultIntent = new Intent(ctx, MainActivity.class);
-                       //PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
-                       //        PendingIntent.FLAG_UPDATE_CURRENT);
-
-                       //NotificationCompat.Builder builder =
-                       //        new NotificationCompat.Builder(ctx)
-                       //                .setAutoCancel(true)
-                       //                .setWhen(System.currentTimeMillis())
-                       //                .setSmallIcon(R.mipmap.ic_launcher)
-                       //                .setContentIntent(resultPendingIntent)
-                       //                .setContentTitle("ГМ")
-                       //                .setContentText("Загружаются проекты... ");
-
-                       //Notification notification = builder.build();
-
-                       //NotificationManager notificationManager = (NotificationManager) ctx
-                       //        .getSystemService(Context.NOTIFICATION_SERVICE);
-                       //notificationManager.notify(2, notification);
 
                         int count = 0;
 
@@ -540,11 +522,9 @@ public class Service_Sync_Import extends Service {
                                     c.close();
 
                                     if (count == 0) {
-                                        values.put(DBHelper.KEY_ID, id);
-                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
                                         if (project_status.equals("0")){
-                                        } else {
+                                        } else  if (project_status.equals("1")){
                                             Intent resultIntent = new Intent(ctx, MainActivity.class);
                                             PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
                                                     PendingIntent.FLAG_UPDATE_CURRENT);
@@ -565,6 +545,13 @@ public class Service_Sync_Import extends Service {
                                             NotificationManager notificationManager = (NotificationManager) ctx
                                                     .getSystemService(Context.NOTIFICATION_SERVICE);
                                             notificationManager.notify(1, notification);
+
+                                            values.put(DBHelper.KEY_ID, id);
+                                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
+
+                                        } else {
+                                            values.put(DBHelper.KEY_ID, id);
+                                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
                                         }
 
                                     }
@@ -1084,7 +1071,8 @@ public class Service_Sync_Import extends Service {
 
             SQLiteDatabase db = dbHelper.getReadableDatabase();
             String sqlQuewy = "SELECT calc_image, cut_image, _id "
-                    + "FROM rgzbn_gm_ceiling_calculations ";
+                    + "FROM rgzbn_gm_ceiling_calculations " +
+                    "order by _id desc";
             Cursor c = db.rawQuery(sqlQuewy, new String[]{});
             if (c != null) {
                 if (c.moveToFirst()) {
@@ -1094,6 +1082,7 @@ public class Service_Sync_Import extends Service {
                         String cut_image = c.getString(c.getColumnIndex(c.getColumnName(1)));
                         String id = c.getString(c.getColumnIndex(c.getColumnName(2)));
                         if (calc_image.equals("empty")){
+                            Log.d(TAG, id);
                             jsonImage_Import.put("id", id);
                             sync_image = String.valueOf(jsonImage_Import);
                             try{
