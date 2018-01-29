@@ -3,7 +3,6 @@ package ru.ejevikaapp.authorization.Class;
 /**
  * Created by Дмитрий on 13.09.2017.
  */
-
 public class Diffuzor_class {
     String id;
     String calculation_id;
