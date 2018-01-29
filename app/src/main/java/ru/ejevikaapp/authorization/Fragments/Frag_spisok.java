@@ -206,10 +206,18 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 } catch (Exception e) {
                                 }
 
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex),
-                                        String.valueOf(out_format.format(change_max) + "\n" + out_format_time.format(change_max))
-                                                + " - " + hours + ":00",
-                                        p_info, String.valueOf(client.get(g)), project_note);
+                                String tempId = k.getString(kdIndex);
+                                String tempDate =
+                                        String.valueOf(out_format.format(change_max)
+                                                + "\n" + out_format_time.format(change_max))
+                                                + " - " + hours + ":00";
+                                String tempIdClient = String.valueOf(client.get(g));
+
+                                /* Обработка адреса */
+                                p_info = p_info.replace("Воронеж, ", "");
+
+                                Frag_client_schedule_class fc = new Frag_client_schedule_class(
+                                        tempId, tempDate, p_info, tempIdClient, project_note);
                                 client_mas.add(fc);
 
                             } while (k.moveToNext());
