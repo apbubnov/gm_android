@@ -159,9 +159,10 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 String project_calculation_date = "";
                                 String id_client = "";
                                 String fio = "";
+                                String project_note = "";
                                 i++;
 
-                                sqlQuewy = "SELECT project_info, client_id, project_calculation_date "
+                                sqlQuewy = "SELECT project_info, client_id, project_calculation_date, project_note "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id = ?";
 
@@ -173,6 +174,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                             p_info = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(0)));
                                             id_client = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
                                             project_calculation_date = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(2)));
+                                            project_note = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(3)));
 
                                             Log.d("count_client", p_info + " " + id_client);
 
@@ -207,7 +209,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex),
                                         String.valueOf(out_format.format(change_max) + "\n" + out_format_time.format(change_max))
                                                 + " - " + hours + ":00",
-                                        p_info, String.valueOf(client.get(g)), null);
+                                        p_info, String.valueOf(client.get(g)), project_note);
                                 client_mas.add(fc);
 
                             } while (k.moveToNext());
@@ -229,20 +231,27 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                 return nc.getId();
             }
         });
-        dict.addStringField(R.id.c_fio, new StringExtractor<Frag_client_schedule_class>() {
+        dict.addStringField(R.id.c_price, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
                 return nc.getAddress();
             }
         });
-        dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
+        dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
                 return nc.getFio();
             }
         });
 
-        FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item, dict);
+        dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getPhone();
+            }
+        });
+
+        FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item3, dict);
         list_clients.setAdapter(adapter);
 
         list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
