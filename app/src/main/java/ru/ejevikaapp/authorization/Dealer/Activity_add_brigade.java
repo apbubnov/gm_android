@@ -1,6 +1,7 @@
 package ru.ejevikaapp.authorization.Dealer;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.IntegerRes;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -46,6 +49,11 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
     int count = 0;
 
     EditText mail, phone, name, phone_mount, fio_mount;
+
+    String user_id ="";
+
+    int user_id_int = 0, max_id_brigade;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,42 +75,169 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-       //list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-       //    @Override
-       //    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
+        user_id_int = Integer.parseInt(user_id) * 1000000;
 
-       //        SQLiteDatabase db = dbHelper.getReadableDatabase();
-       //        Frag_client_schedule_class selectedid = client_mas.get(position);
-       //        String p_id = selectedid.getId();
+        list_mount = (ListView) findViewById(R.id.list_mount);
 
-       //        SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
-       //        SharedPreferences.Editor ed = SP.edit();
-       //        ed.putString("", String.valueOf(p_id));
-       //        ed.commit();
+        list_mount.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-       //        String c_id = "";
+                Frag_client_schedule_class selectedid = mount_mas.get(position);
+                final String s_id = selectedid.getId_client();
 
-       //        String sqlQuewy = "SELECT client_id "
-       //                + "FROM rgzbn_gm_ceiling_projects" +
-       //                " WHERE _id = ?";
+                Log.d("mLog", s_id);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Activity_add_brigade.this);
+                builder.setTitle("Удалить выбранного монтажника?")
+                        .setMessage(null)
+                        .setIcon(null)
+                        .setCancelable(false)
+                        .setPositiveButton("Да",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
 
-       //        Cursor cursor = db.rawQuery(sqlQuewy, new String[]{p_id});
-       //        if (cursor != null) {
-       //            if (cursor.moveToFirst()) {
-       //                do {
-       //                    c_id = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-       //                } while (cursor.moveToNext());
-       //            }
-       //        }
-       //        cursor.close();
+                                        DBHelper dbHelper = new DBHelper(Activity_add_brigade.this);
+                                        SQLiteDatabase db = dbHelper.getReadableDatabase();
+                                        Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, null, null, null, null, null, null);
 
-       //        SP = getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
-       //        ed = SP.edit();
-       //        ed.putString("", String.valueOf(c_id));
-       //        ed.commit();
+                                        if (cursor.moveToFirst()) {
+                                            int kd_Index = cursor.getColumnIndex(DBHelper.KEY_ID);
+                                            do {
+                                                if (s_id.equals(cursor.getString(kd_Index))) {
+                                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, "_id = ?", new String[]{String.valueOf(s_id)});
+                                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, "id_mounter = ?", new String[]{String.valueOf(s_id)});
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER, "id_old = ? and name_table = ?",
+                                                            new String[]{String.valueOf(s_id), "rgzbn_gm_ceiling_mounters"});
 
-       //    }
-       //});
+                                                }
+                                            }
+                                            while (cursor.moveToNext());
+                                        }
+                                        cursor.close();
+
+                                        list();
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+            }
+        });
+
+        DBHelper dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        max_id_brigade = 0;
+        try {
+            String sqlQuewy = "select MAX(_id) "
+                    + "FROM rgzbn_users " +
+                    "where _id>? and _id<?";
+            ;
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        max_id_brigade = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        max_id_brigade++;
+
+                    } while (c.moveToNext());
+                }
+            }
+        } catch (Exception e) {
+            max_id_brigade = user_id_int + 1;
+        }
+
+        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+        FunDapter adapter = new FunDapter(this, mount_mas, R.layout.clients_item4, dict);
+        list_mount.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(list_mount);
+
+    }
+
+    void list(){
+
+        mount_mas.clear();
+
+        DBHelper dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int max_id_mounter = 0;
+        try {
+            String sqlQuewy = "select id_mounter "
+                    + "FROM rgzbn_gm_ceiling_mounters_map " +
+                    "where id_brigade = ? ";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(max_id_brigade)});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        max_id_mounter = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+
+                        sqlQuewy = "select * "
+                                + "FROM rgzbn_gm_ceiling_mounters " +
+                                "where _id = ? ";
+                        Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(max_id_mounter)});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    String name = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
+                                    String phone = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
+
+                                    Log.d("mLog", "123  " + id + " " + name + " " + phone);
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            name, null, id, phone);
+                                    mount_mas.add(fc);
+
+                                } while (cursor.moveToNext());
+                            }
+                        }
+
+                    } while (c.moveToNext());
+                }
+            }
+        } catch (Exception e) {
+            max_id_mounter = user_id_int + 1;
+
+        }
+
+        Log.d("mLog", String.valueOf(max_id_mounter));
+
+        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+
+        dict.addStringField(R.id.c_date, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getAddress();
+            }
+        });
+
+        dict.addStringField(R.id.c_fio, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getFio();
+            }
+        });
+
+        dict.addStringField(R.id.c_phone, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getPhone();
+            }
+        });
+
+        FunDapter adapter = new FunDapter(this, mount_mas, R.layout.clients_item4, dict);
+
+        list_mount.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(list_mount);
+
     }
 
     @Override
@@ -122,111 +257,15 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                 if (fio_mount.length() > 1 && phone_mount.length() > 1) {
                     count++;
 
-                    Frag_client_schedule_class fc = new Frag_client_schedule_class(String.valueOf(count),
-                            fio_mount.getText().toString(),
-                            null, null, phone_mount.getText().toString());
-                    mount_mas.add(fc);
-
-                    BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
-
-                    dict.addStringField(R.id.c_date, new StringExtractor<Frag_client_schedule_class>() {
-                        @Override
-                        public String getStringValue(Frag_client_schedule_class nc, int position) {
-                            return nc.getAddress();
-                        }
-                    });
-
-                    dict.addStringField(R.id.c_fio, new StringExtractor<Frag_client_schedule_class>() {
-                        @Override
-                        public String getStringValue(Frag_client_schedule_class nc, int position) {
-                            return nc.getFio();
-                        }
-                    });
-
-                    dict.addStringField(R.id.c_phone, new StringExtractor<Frag_client_schedule_class>() {
-                        @Override
-                        public String getStringValue(Frag_client_schedule_class nc, int position) {
-                            return nc.getPhone();
-                        }
-                    });
-
-                    FunDapter adapter = new FunDapter(this, mount_mas, R.layout.clients_item4, dict);
-
-                    list_mount = (ListView) findViewById(R.id.list_mount);
-                    list_mount.setAdapter(adapter);
-                    setListViewHeightBasedOnChildren(list_mount);
-
-                    fio_mount.setText("");
-                    phone_mount.setText("");
-
-                } else {
-
-                    Toast toast = Toast.makeText(this,
-                            "Вы что-то не ввели", Toast.LENGTH_SHORT);
-                    toast.show();
-
-                }
-
-                break;
-            case R.id.btn_add_brigade:
-                if (mail.length() > 0 || phone.length() > 0 || name.length() > 0) {
-
-                    SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
-                    String user_id = SP.getString("", "");
-                    int user_id_int = Integer.parseInt(user_id) * 1000000;
-
-
-                    SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
-                    String dealer_id = SP.getString("", "");
-
                     DBHelper dbHelper = new DBHelper(this);
                     SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                    int max_id_brigade = 0;
-                    try {
-                        String sqlQuewy = "select MAX(_id) "
-                                + "FROM rgzbn_users " +
-                                "where _id>? and _id<?";
-                        ;
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    max_id_brigade = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                    max_id_brigade++;
-
-                                } while (c.moveToNext());
-                            }
-                        }
-                    } catch (Exception e) {
-                        max_id_brigade = user_id_int + 1;
-                    }
-
-                    Log.d("mLog", String.valueOf(max_id_brigade));
-
-                    //ContentValues values = new ContentValues();
-                    //values.put(DBHelper.KEY_ID, max_id_brigade);
-                    //values.put(DBHelper.KEY_NAME, name.getText().toString());
-                    //values.put(DBHelper.KEY_USERNAME, phone.getText().toString());
-                    //values.put(DBHelper.KEY_EMAIL, mail.getText().toString());
-                    //values.put(DBHelper.KEY_DEALER_ID, dealer_id);
-                    //db.insert(DBHelper.TABLE_USERS, null, values);
-
-                    //values = new ContentValues();
-                    //values.put(DBHelper.KEY_ID_OLD, max_id_brigade);
-                    //values.put(DBHelper.KEY_ID_NEW, "0");
-                    //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
-                    //values.put(DBHelper.KEY_SYNC, "0");
-                    //values.put(DBHelper.KEY_TYPE, "send");
-                    //values.put(DBHelper.KEY_STATUS, "1");
-                    //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     int max_id_mounter = 0;
                     try {
                         String sqlQuewy = "select MAX(_id) "
                                 + "FROM rgzbn_gm_ceiling_mounters " +
                                 "where _id>? and _id<?";
-                        ;
+
                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
                         if (c != null) {
                             if (c.moveToFirst()) {
@@ -241,37 +280,122 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                         max_id_mounter = user_id_int + 1;
                     }
 
-                    for (int m = 0; mount_mas.size() > m; m++) {
+                    Log.d("mLog", String.valueOf(max_id_mounter));
 
-                        Frag_client_schedule_class selectedid = mount_mas.get(m);
-                        String fio = selectedid.getFio();
-                        String phone = selectedid.getPhone();
+                    ContentValues values = new ContentValues();
+                    values.put(DBHelper.KEY_ID, max_id_mounter);
+                    values.put(DBHelper.KEY_NAME, fio_mount.getText().toString());
+                    values.put(DBHelper.KEY_PHONE, phone_mount.getText().toString());
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, null, values);
 
-                        Log.d("mLog", fio + " " + phone);
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_MOUNTER, max_id_mounter);
+                    values.put(DBHelper.KEY_ID_BRIGADE, max_id_brigade);
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, null, values);
 
-                        ContentValues values = new ContentValues();
-                        values.put(DBHelper.KEY_ID, max_id_mounter + m);
-                        values.put(DBHelper.KEY_NAME, fio);
-                        values.put(DBHelper.KEY_PHONE, phone);
-                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, null, values);
+                    //values = new ContentValues();
+                    //values.put(DBHelper.KEY_ID_OLD, max_id_mounter);
+                    //values.put(DBHelper.KEY_ID_NEW, "0");
+                    //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
+                    //values.put(DBHelper.KEY_SYNC, "0");
+                    //values.put(DBHelper.KEY_TYPE, "send");
+                    //values.put(DBHelper.KEY_STATUS, "1");
+                    //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                        values = new ContentValues();
-                        values.put(DBHelper.KEY_ID_OLD, max_id_mounter + m);
-                        values.put(DBHelper.KEY_ID_NEW, "0");
-                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
-                        values.put(DBHelper.KEY_SYNC, "0");
-                        values.put(DBHelper.KEY_TYPE, "send");
-                        values.put(DBHelper.KEY_STATUS, "1");
-                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-                    }
+                    list();
 
-                    finish();
+                    fio_mount.setText("");
+                    phone_mount.setText("");
+
+                } else {
+
+                    Toast toast = Toast.makeText(this,
+                            "Вы что-то не ввели", Toast.LENGTH_SHORT);
+                    toast.show();
 
                 }
 
                 break;
+
+            case R.id.btn_add_brigade:
+                if (mail.length() > 0 || phone.length() > 0 || name.length() > 0) {
+
+                    SharedPreferences SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
+                    String dealer_id = SP.getString("", "");
+
+                    DBHelper dbHelper = new DBHelper(this);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                    Log.d("mLog", String.valueOf(max_id_brigade));
+
+                    ContentValues values = new ContentValues();
+                    values.put(DBHelper.KEY_ID, max_id_brigade);
+                    values.put(DBHelper.KEY_NAME, name.getText().toString());
+                    values.put(DBHelper.KEY_USERNAME, phone.getText().toString());
+                    values.put(DBHelper.KEY_EMAIL, mail.getText().toString());
+                    values.put(DBHelper.KEY_DEALER_ID, dealer_id);
+                    db.insert(DBHelper.TABLE_USERS, null, values);
+
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_USER_ID, max_id_brigade);
+                    values.put(DBHelper.KEY_GROUP_ID, "11");
+                    db.insert(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, null, values);
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_OLD, max_id_brigade);
+                    values.put(DBHelper.KEY_ID_NEW, "0");
+                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                    values.put(DBHelper.KEY_SYNC, "0");
+                    values.put(DBHelper.KEY_TYPE, "send");
+                    values.put(DBHelper.KEY_STATUS, "1");
+                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                    finish();
+                }
+                break;
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        DBHelper dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String sqlQuewy = "select * "
+                + "FROM rgzbn_users " +
+                "where _id = ? ";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(max_id_brigade)});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+
+                } while (c.moveToNext());
+            } else {
+
+                sqlQuewy = "select id_mounter "
+                        + "FROM rgzbn_gm_ceiling_mounters_map " +
+                        "where id_brigade = ? ";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(max_id_brigade)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            int id_m = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+
+                            db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, "id_mounter = ?", new String[]{String.valueOf(id_m)});
+                            db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, "_id = ?", new String[]{String.valueOf(id_m)});
+
+                        } while (c.moveToNext());
+                    }
+                }
+
+            }
+        }
+
+    }
+
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();

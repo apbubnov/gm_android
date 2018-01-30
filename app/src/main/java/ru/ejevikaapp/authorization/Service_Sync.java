@@ -2101,29 +2101,32 @@ public class Service_Sync extends Service {
 
                         //клиент check
 
-                       //check_users = "[";
-                       //sqlQuewy = "SELECT id_new "
-                       //        + "FROM history_send_to_server " +
-                       //        "where ((id_old>? and id_old<?) or (id_old<?)) and type=? and sync=? and name_table=?";
-                       //cursor = db.rawQuery(sqlQuewy,
-                       //        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
-                       //                "check", "0", "rgzbn_users"});
-                       //if (cursor != null) {
-                       //    if (cursor.moveToFirst()) {
-                       //        do {
-                       //            jsonObjectUsers = new org.json.simple.JSONObject();
-                       //            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                       //            jsonObjectUsers.put("id", id_new);
-                       //            check_users += String.valueOf(jsonObjectUsers) + ",";
-                       //        } while (cursor.moveToNext());
-                       //    }
-                       //}
-                       //check_users = check_users.substring(0, check_users.length() - 1) + "]";
-                       //if (check_users.equals("]")){
-                       //}else {
-                       //    new CheckUsersData().execute();
-                       //}
-                       //cursor.close();
+                       check_users = "[";
+                       sqlQuewy = "SELECT id_new "
+                               + "FROM history_send_to_server " +
+                               "where ((id_old>? and id_old<?) or (id_old<?)) and type=? and sync=? and name_table=?";
+                       cursor = db.rawQuery(sqlQuewy,
+                               new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                       "check", "0", "rgzbn_users"});
+                       if (cursor != null) {
+                           if (cursor.moveToFirst()) {
+                               do {
+                                   try {
+                                       jsonObjectUsers = new JSONObject();
+                                       String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                       jsonObjectUsers.put("id", id_new);
+                                       check_users += String.valueOf(jsonObjectUsers) + ",";
+                                   } catch (Exception e){
+                                   }
+                               } while (cursor.moveToNext());
+                           }
+                       }
+                       check_users = check_users.substring(0, check_users.length() - 1) + "]";
+                       if (check_users.equals("]")){
+                       }else {
+                           new CheckUsersData().execute();
+                       }
+                       cursor.close();
                     }
                 }, 5000);
 
@@ -2466,6 +2469,59 @@ public class Service_Sync extends Service {
 
                     Log.d(TAG, "SendUsersData " + res);
 
+                    if (res.equals("")){
+                    } else {
+
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        String new_id = "";
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_users");
+                            for (int i = 0; i < dat.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                new_id = client_contact.getString("new_id");
+
+                                Log.d(TAG, new_id + " " + old_id);
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ? ",
+                                        new String[]{old_id, "rgzbn_users","0"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_BRIGADE, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, values, "id_brigade = ?",
+                                        new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_USER_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, values, "user_id = ?",
+                                        new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update("rgzbn_users", values, "_id = ?",
+                                        new String[]{old_id});
+
+                            }
+                        } catch (Exception e) {
+                        }
+
+
+                    }
+
                 }
 
             }, new Response.ErrorListener() {
@@ -2479,6 +2535,86 @@ public class Service_Sync extends Service {
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("rgzbn_users", jsonUsers );
                     Log.d(TAG, String.valueOf(parameters));
+                    return parameters;
+                }
+            };
+
+            requestQueue.add(request);
+
+            return null;
+        }
+    }
+
+    static class CheckUsersData extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "check " + res);
+                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
+                        Log.d("sync_app", "CheckClientsData пусто");
+                    }
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_users");
+                        for (int i = 0; i < dat.length(); i++) {
+
+                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                            String new_id = client_contact.getString("new_android_id");
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM history_send_to_server " +
+                                    "where id_new = ? and type=? and sync=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check","0"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_SYNC, "1");
+                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and sync=? and name_table = ?",
+                                                new String[]{new_id, "0", "rgzbn_users"});
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                        }
+
+                    } catch (Exception e) {
+                    }
+
+                }
+
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_users", check_users);
+
                     return parameters;
                 }
             };
@@ -3625,7 +3761,7 @@ public class Service_Sync extends Service {
                                 values = new ContentValues();
                                 values.put(DBHelper.KEY_ID_NEW, new_id);
                                 values.put(DBHelper.KEY_SYNC, "1");
-                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and ync = ? ",
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ? ",
                                         new String[]{old_id, table_name,"0"});
 
                                 values = new ContentValues();

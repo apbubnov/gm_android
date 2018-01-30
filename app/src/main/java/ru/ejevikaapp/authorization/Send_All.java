@@ -702,11 +702,15 @@ public class Send_All extends Service {
 
                             String id = user.getString("id");
                             String name = user.getString("name");
+                            String username = user.getString("username");
+                            String email = user.getString("email");
 
                             values = new ContentValues();
                             values.put(DBHelper.KEY_ID, id);
                             values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                             values.put(DBHelper.KEY_NAME, name);
+                            values.put(DBHelper.KEY_USERNAME, username);
+                            values.put(DBHelper.KEY_EMAIL, email);
 
                             String sqlQuewy = "SELECT * "
                                     + "FROM rgzbn_users" +
@@ -798,8 +802,6 @@ public class Send_All extends Service {
 
                             if (count_m == 0) {
                                 try {
-
-                                    values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, null, values);
 
                                 } catch (Exception e) {

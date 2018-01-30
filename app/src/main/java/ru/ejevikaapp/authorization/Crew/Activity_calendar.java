@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -76,18 +77,23 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         calendar_month = (TextView)findViewById(R.id.calendar_month);
         tableLayout = (TableLayout) findViewById(R.id.tableLayout);
 
+        list_installers = (ListView) findViewById(R.id.list_installers);
+
         Calendar cl = Calendar.getInstance();
         day_week = cl.get(Calendar.DAY_OF_WEEK);
         year = cl.get(Calendar.YEAR);
         day = cl.get(Calendar.DAY_OF_MONTH);
         month = cl.get(Calendar.MONTH);
 
-        SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
-        user_id = SP_end.getString("", "");
+        //SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
+        //user_id = SP_end.getString("", "");
 
         user_id = getIntent().getStringExtra("id_brigade");
 
-        list_installers = (ListView) findViewById(R.id.list_installers);
+        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+        FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
+        list_installers.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(list_installers);
 
         info();
 
@@ -113,14 +119,14 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
 
         dbHelper = new DBHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String sqlQuewy = "select name, username "
+        String sqlQuewy = "select name, username, email "
                 + "FROM rgzbn_users " +
                 "where _id = ? ";
         Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
         if (c != null) {
             if (c.moveToFirst()) {
                 name_brigade.setText("Бригада: " + c.getString(c.getColumnIndex(c.getColumnName(0))));
-                number_brigade.setText("Телефон: " + c.getString(c.getColumnIndex(c.getColumnName(0))));
+                number_brigade.setText("Телефон: " + c.getString(c.getColumnIndex(c.getColumnName(1)))+"; E-mail: " + c.getString(c.getColumnIndex(c.getColumnName(2))));
             }
         }
         c.close();
@@ -158,11 +164,6 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         }
         c.close();
 
-        //Frag_client_schedule_class fc = new Frag_client_schedule_class("1",
-        //        "pop", null, "12313", "123132");
-        //installers_mas.add(fc);
-        //installers_mas.add(fc);
-
         BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
 
         dict.addStringField(R.id.c_time, new StringExtractor<Frag_client_schedule_class>() {
@@ -187,23 +188,27 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         });
 
         FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
+
         list_installers.setAdapter(adapter);
         setListViewHeightBasedOnChildren(list_installers);
 
     }
 
-    public void setListViewHeightBasedOnChildren(ListView listView) {
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
+        if (listAdapter == null)
             return;
-        }
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            if (listItem instanceof ViewGroup)
-                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
@@ -434,6 +439,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
                 if (c.moveToFirst()) {
                     Intent intent = new Intent(Activity_calendar.this, Activity_mounting_day.class);
                     intent.putExtra("day_mount", mount_day);
+                    intent.putExtra("user_id", user_id);
                     startActivity(intent);
                 } else {
 
@@ -453,7 +459,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         switch (view.getId()) {
             case R.id.calendar_minus:
                 month--;
-                if (month<1) {
+                if (month<0) {
                     month = 11;
                     year--;
                 }

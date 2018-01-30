@@ -17,6 +17,8 @@ import com.amigold.fundapter.extractors.StringExtractor;
 
 import java.util.ArrayList;
 
+import ru.ejevikaapp.authorization.Activity_inform_proj;
+import ru.ejevikaapp.authorization.Activity_inform_zapysch;
 import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.R;
@@ -29,7 +31,7 @@ public class Activity_mounting_day extends AppCompatActivity {
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID = "", gager_id = "";
+    String SAVED_ID = "", gager_id = "", id = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +50,11 @@ public class Activity_mounting_day extends AppCompatActivity {
 
     void clients() {
 
-        SP = getSharedPreferences("user_id", MODE_PRIVATE);
-        String user_id = SP.getString("", "");
+        //SP = getSharedPreferences("user_id", MODE_PRIVATE);
+        //String user_id = SP.getString("", "");
 
         String day_mount = getIntent().getStringExtra("day_mount");
+        String user_id = getIntent().getStringExtra("user_id");
 
         dbHelper = new DBHelper(this);
 
@@ -64,12 +67,15 @@ public class Activity_mounting_day extends AppCompatActivity {
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    id = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     String project_mounting_date = "";
                     String project_info = "";
                     String project_status = "";
                     String read_by_mounter = "";
                     Double n5 = 0.0;
+
+
+                    Log.d("mLog", id);
 
                     sqlQuewy = "SELECT project_mounting_date, project_info, project_status, read_by_mounter "
                             + "FROM rgzbn_gm_ceiling_projects" +
@@ -175,8 +181,37 @@ public class Activity_mounting_day extends AppCompatActivity {
                 ed.putString("", String.valueOf(p_id));
                 ed.commit();
 
-                Intent intent = new Intent(Activity_mounting_day.this, Activity_mounting_info.class);
-                startActivity(intent);
+                String project_status = "";
+                String client = "";
+
+                String sqlQuewy = "select project_status, client_id "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where _id = ?";
+                Cursor cc = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+                if (cc != null) {
+                    if (cc.moveToFirst()) {
+                        do {
+                            project_status = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                            client = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                        } while (cc.moveToNext());
+                    }
+                }
+                cc.close();
+
+
+                SP = getSharedPreferences("id_client_spisok", MODE_PRIVATE);
+                ed = SP.edit();
+                ed.putString("", String.valueOf(client));
+                ed.commit();
+
+                if (project_status.equals("1")) {
+                    Intent intent = new Intent(Activity_mounting_day.this, Activity_inform_proj.class);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(Activity_mounting_day.this, Activity_inform_zapysch.class);
+                    startActivity(intent);
+                }
             }
         });
     }

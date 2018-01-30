@@ -104,6 +104,15 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         clients();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+        SharedPreferences.Editor ed = SP.edit();
+        ed.putString("", "");
+        ed.commit();
+    }
+
     void clients (){
 
         SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
@@ -112,32 +121,50 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
 
+        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+        String activity_client = SP.getString("", "");
+
         dbHelper = new DBHelper(getActivity());
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         ArrayList client = new ArrayList();
 
-        String sqlQuewy = "SELECT _id "
-                + "FROM rgzbn_gm_ceiling_clients " +
-                "where dealer_id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                } while (c.moveToNext());
+        if (activity_client.equals("")) {
+            String sqlQuewy = "SELECT _id "
+                    + "FROM rgzbn_gm_ceiling_clients " +
+                    "where dealer_id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    } while (c.moveToNext());
+                }
             }
+            c.close();
+        } else {
+            String sqlQuewy = "SELECT _id "
+                    + "FROM rgzbn_gm_ceiling_clients " +
+                    "where dealer_id = ? and _id = ? ";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id, activity_client});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
         }
-        c.close();
 
         for (int g = 0; g<client.size(); g++) {
-            sqlQuewy = "SELECT _id "
+            String sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
                     " WHERE project_status = ? and client_id = ? " +
                     "order by project_calculation_date";
 
-            c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
 
             int i = 0;
             if (c != null) {

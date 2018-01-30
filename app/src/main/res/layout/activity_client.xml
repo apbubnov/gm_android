@@ -10,38 +10,33 @@
     android:background="#ffffff"
     tools:context="ru.ejevikaapp.authorization.Fragments.Frag_spisok">
 
-    <TableRow>
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:text="Номер"
-            android:gravity="bottom|center"
-            style="@style/text_style_columns_name"
-            android:minLines="2"
-            android:layout_span="2"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="ФИО клиента"
+        android:textColor="#000000"
+        android:id="@+id/c_search"/>
+    <Button
+        android:id="@+id/btn_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:text="    Найти    "
+        android:background="@drawable/rounded_button"
+        android:textColor="#ffffff"/>
 
+    <TableRow>
         <TextView
             android:id="@+id/textView2"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:text="ФИО"
-            android:gravity="bottom|center"
+            android:gravity="bottom"
             style="@style/text_style_columns_name"
             android:minLines="2"
             android:layout_span="3"/>
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Прибыль"
-            android:gravity="bottom|center"
-            android:minLines="2"
-            style="@style/text_style_columns_name"
-            android:layout_span="2"/>
 
     </TableRow>
 
@@ -57,6 +52,7 @@
         android:layout_height="match_parent">
 
         <ListView
+            android:layout_marginLeft="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/list_client">
