@@ -156,7 +156,7 @@
         <activity android:name=".Dealer.Activity_empty" />
         <activity android:name=".Dealer.Activity_spisok_brigade" />
         <activity android:name=".Dealer.Activity_add_brigade" />
-        <activity android:name=".Dealer.Activity_for_spisok"></activity>
+        <activity android:name=".Dealer.Activity_for_spisok" />
     </application>
 
 </manifest>

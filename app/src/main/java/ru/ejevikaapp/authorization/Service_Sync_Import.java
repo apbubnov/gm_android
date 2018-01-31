@@ -114,16 +114,41 @@ public class Service_Sync_Import extends Service {
             }
             c.close();
 
-            jsonSync_Import.put("change_time", change_time_global);
-            jsonSync_Import.put("dealer_id", dealer_id);
+            String usergroup = "";
+            sqlQuewy = "SELECT group_id "
+                    + "FROM rgzbn_user_usergroup_map" +
+                    " WHERE user_id = ?";
+            c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-            sync_import = String.valueOf(jsonSync_Import);
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
 
-            if (dealer_id.equals("")) {
-            } else {
-                new ImportDate().execute();
+            if (usergroup.equals("14")) {
+                jsonSync_Import.put("change_time", change_time_global);
+                jsonSync_Import.put("dealer_id", user_id);
+                sync_import = String.valueOf(jsonSync_Import);
 
-                image();
+                if (user_id.equals("")) {
+                } else {
+                    new ImportDate().execute();
+                    image();
+                }
+            } else if (usergroup.equals("22") || usergroup.equals("21")){
+                jsonSync_Import.put("change_time", change_time_global);
+                jsonSync_Import.put("project_calculator", user_id);
+                sync_import = String.valueOf(jsonSync_Import);
+
+                if (user_id.equals("")) {
+                } else {
+                    new ImportDate().execute();
+                    image();
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId);
@@ -191,9 +216,7 @@ public class Service_Sync_Import extends Service {
                 sqlQuewy = "SELECT change_time "
                         + "FROM history_import_to_server" +
                         " WHERE user_id = ?";
-
                 c = db.rawQuery(sqlQuewy, new String[]{user_id});
-
                 if (c != null) {
                     if (c.moveToFirst()) {
                         do {
@@ -204,16 +227,41 @@ public class Service_Sync_Import extends Service {
                 }
                 c.close();
 
-                jsonSync_Import.put("change_time", change_time_global);
-                jsonSync_Import.put("dealer_id", dealer_id);
+                String usergroup = "";
+                sqlQuewy = "SELECT group_id "
+                        + "FROM rgzbn_user_usergroup_map" +
+                        " WHERE user_id = ?";
+                c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                sync_import = String.valueOf(jsonSync_Import);
+                        } while (c.moveToNext());
+                    }
+                }
+                c.close();
 
-                if (dealer_id.equals("")){
-                } else {
-                    new ImportDate().execute();
+                if (usergroup.equals("14")) {
+                    jsonSync_Import.put("change_time", change_time_global);
+                    jsonSync_Import.put("dealer_id", user_id);
+                    sync_import = String.valueOf(jsonSync_Import);
 
-                    image();
+                    if (user_id.equals("")) {
+                    } else {
+                        new ImportDate().execute();
+                        image();
+                    }
+                } else if (usergroup.equals("22") || usergroup.equals("21")){
+                    jsonSync_Import.put("change_time", change_time_global);
+                    jsonSync_Import.put("project_calculator", user_id);
+                    sync_import = String.valueOf(jsonSync_Import);
+
+                    if (user_id.equals("")) {
+                    } else {
+                        new ImportDate().execute();
+                        image();
+                    }
                 }
 
             }

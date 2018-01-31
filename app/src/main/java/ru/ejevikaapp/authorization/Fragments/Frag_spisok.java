@@ -45,7 +45,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID="", gager_id;
+    String SAVED_ID="", user_id;
     View view;
 
     Button btn_add_zamer;
@@ -116,12 +116,12 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     void clients (){
 
         SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-        gager_id = SP.getString("", "");
+        user_id = SP.getString("", "");
 
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
 
-        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE); // если зашёл после выбора клиента (Дилер)
         String activity_client = SP.getString("", "");
 
         dbHelper = new DBHelper(getActivity());
@@ -130,41 +130,72 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
         ArrayList client = new ArrayList();
 
-        if (activity_client.equals("")) {
-            String sqlQuewy = "SELECT _id "
-                    + "FROM rgzbn_gm_ceiling_clients " +
-                    "where dealer_id = ?";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-        } else {
-            String sqlQuewy = "SELECT _id "
-                    + "FROM rgzbn_gm_ceiling_clients " +
-                    "where dealer_id = ? and _id = ? ";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id, activity_client});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-        }
+        String usergroup = "";
+        String sqlQuewy = "SELECT group_id "
+                + "FROM rgzbn_user_usergroup_map" +
+                " WHERE user_id = ?";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        if (usergroup.equals("21") || usergroup.equals("22")){ // замерщик
+
+            sqlQuewy = "SELECT client_id "
+                    + "FROM rgzbn_gm_ceiling_projects " +
+                    "where project_calculator = ? and project_status = 1 ";
+            c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+        } else if (usergroup.equals("14")) {    // дилер
+            if (activity_client.equals("")) {
+                sqlQuewy = "SELECT _id "
+                        + "FROM rgzbn_gm_ceiling_clients " +
+                        "where dealer_id = ?";
+                c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        } while (c.moveToNext());
+                    }
+                }
+                c.close();
+            } else {
+                sqlQuewy = "SELECT _id "
+                        + "FROM rgzbn_gm_ceiling_clients " +
+                        "where dealer_id = ? and _id = ? ";
+                c = db.rawQuery(sqlQuewy, new String[]{user_id, activity_client});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        } while (c.moveToNext());
+                    }
+                }
+                c.close();
+            }
+        }
         for (int g = 0; g<client.size(); g++) {
-            String sqlQuewy = "SELECT _id "
+            sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
                     " WHERE project_status = ? and client_id = ? " +
                     "order by project_calculation_date";
 
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
+            c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
 
             int i = 0;
             if (c != null) {
@@ -172,7 +203,6 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                     do {
 
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
                         sqlQuewy = "SELECT * "
                                 + "FROM rgzbn_gm_ceiling_projects" +
                                 " WHERE _id = ?";

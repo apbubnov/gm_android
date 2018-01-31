@@ -30,8 +30,8 @@
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Клиент"
+            android:layout_height="match_parent"
+            android:text="Дата создания"
             android:gravity="bottom"
             style="@style/text_style_columns_name"
             android:minLines="2"

@@ -1,12 +1,10 @@
 package ru.ejevikaapp.authorization.Dealer;
 
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import ru.ejevikaapp.authorization.Fragments.Frag_spisok;
 import ru.ejevikaapp.authorization.R;
 
 public class Activity_empty extends AppCompatActivity {

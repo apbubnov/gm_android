@@ -35,7 +35,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID="", gager_id;
+    String SAVED_ID="", user_id;
     View view;
 
     Button btn_add_brigade;
@@ -64,8 +64,8 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
 
     void clients (){
 
-        SP = getSharedPreferences("gager_id", MODE_PRIVATE);
-        gager_id = SP.getString("", "");
+        SP = getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
 
         SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
@@ -77,6 +77,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
         ArrayList brigade = new ArrayList();
         ArrayList mounters = new ArrayList();
 
+        int count = 0;
         String sqlQuewy = "SELECT _id "
                 + "FROM rgzbn_users " +
                 "where dealer_id = ?";
@@ -92,6 +93,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
                     if (cc != null) {
                         if (cc.moveToFirst()) {
                             do {
+                                count++;
                                 brigade.add(br);
                             } while (cc.moveToNext());
                         }
@@ -102,6 +104,10 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
             }
         }
         c.close();
+
+        if (count == 0){
+            brigade.add(user_id);
+        }
 
         for (int g = 0; g<brigade.size(); g++) {
 

@@ -55,6 +55,13 @@ public class Gager_office extends AppCompatActivity
         View navHeader = navigationView.getHeaderView(0);
         TextView twNavBarName = (TextView) navHeader.findViewById(R.id.nav_header1);
         twNavBarName.setText(user_name);
+
+        Frag_spisok Frag_c = new Frag_spisok();
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction().replace(R.id.relativelayout_fragment_blank2,
+                Frag_c,
+                Frag_c.getTag()
+        ).commit();
     }
 
     @Override
@@ -117,12 +124,6 @@ public class Gager_office extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Frag_spisok Frag_c = new Frag_spisok();
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction().replace(R.id.relativelayout_fragment_blank2,
-                Frag_c,
-                Frag_c.getTag()
-        ).commit();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

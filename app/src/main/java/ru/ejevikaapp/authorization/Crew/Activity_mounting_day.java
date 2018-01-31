@@ -50,9 +50,6 @@ public class Activity_mounting_day extends AppCompatActivity {
 
     void clients() {
 
-        //SP = getSharedPreferences("user_id", MODE_PRIVATE);
-        //String user_id = SP.getString("", "");
-
         String day_mount = getIntent().getStringExtra("day_mount");
         String user_id = getIntent().getStringExtra("user_id");
 
@@ -73,7 +70,6 @@ public class Activity_mounting_day extends AppCompatActivity {
                     String project_status = "";
                     String read_by_mounter = "";
                     Double n5 = 0.0;
-
 
                     Log.d("mLog", id);
 

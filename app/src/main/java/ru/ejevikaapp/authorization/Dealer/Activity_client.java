@@ -47,7 +47,7 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID = "", gager_id;
+    String SAVED_ID = "", user_id;
     View view;
 
     Button btn_search;
@@ -119,8 +119,8 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
 
         client_mas.clear();
 
-        SP = getSharedPreferences("gager_id", MODE_PRIVATE);
-        gager_id = SP.getString("", "");
+        SP = getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
 
         SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
@@ -136,7 +136,7 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
                     + "FROM rgzbn_gm_ceiling_clients " +
                     "where dealer_id = ? " +
                     "group by client_name";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
@@ -156,7 +156,7 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
                     + "FROM rgzbn_gm_ceiling_clients " +
                     "where dealer_id = ? and client_name LIKE '%" + client_name + "%' " +
                     "group by client_name ";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {

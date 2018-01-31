@@ -52,6 +52,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
+            android:maxLength="12"
             android:inputType="phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,6 +71,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
+            android:inputType="textEmailAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="введите адрес элетронной почты"/>

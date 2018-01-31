@@ -2,41 +2,32 @@ package ru.ejevikaapp.authorization.Dealer;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.support.annotation.IntegerRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
+import ru.ejevikaapp.authorization.Class.phone_edit;
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.R;
 
@@ -50,7 +41,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
 
     EditText mail, phone, name, phone_mount, fio_mount;
 
-    String user_id ="";
+    String user_id = "";
 
     int user_id_int = 0, max_id_brigade;
 
@@ -162,7 +153,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
 
     }
 
-    void list(){
+    void list() {
 
         mount_mas.clear();
 
@@ -293,14 +284,14 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_ID_BRIGADE, max_id_brigade);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, null, values);
 
-                    //values = new ContentValues();
-                    //values.put(DBHelper.KEY_ID_OLD, max_id_mounter);
-                    //values.put(DBHelper.KEY_ID_NEW, "0");
-                    //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
-                    //values.put(DBHelper.KEY_SYNC, "0");
-                    //values.put(DBHelper.KEY_TYPE, "send");
-                    //values.put(DBHelper.KEY_STATUS, "1");
-                    //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_OLD, max_id_mounter);
+                    values.put(DBHelper.KEY_ID_NEW, "0");
+                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
+                    values.put(DBHelper.KEY_SYNC, "0");
+                    values.put(DBHelper.KEY_TYPE, "send");
+                    values.put(DBHelper.KEY_STATUS, "1");
+                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     list();
 
@@ -318,7 +309,8 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                 break;
 
             case R.id.btn_add_brigade:
-                if (mail.length() > 0 || phone.length() > 0 || name.length() > 0) {
+
+                if (mail.length() > 0 && phone.length() > 0 && name.length() > 0) {
 
                     SharedPreferences SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
                     String dealer_id = SP.getString("", "");
@@ -331,11 +323,14 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     ContentValues values = new ContentValues();
                     values.put(DBHelper.KEY_ID, max_id_brigade);
                     values.put(DBHelper.KEY_NAME, name.getText().toString());
-                    values.put(DBHelper.KEY_USERNAME, phone.getText().toString());
+                    try {
+                        phone_edit pe = new phone_edit();
+                        values.put(DBHelper.KEY_USERNAME, pe.edit(phone.getText().toString()));
+                    } catch (Exception e){
+                    }
                     values.put(DBHelper.KEY_EMAIL, mail.getText().toString());
                     values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                     db.insert(DBHelper.TABLE_USERS, null, values);
-
 
                     values = new ContentValues();
                     values.put(DBHelper.KEY_USER_ID, max_id_brigade);
@@ -351,8 +346,19 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_STATUS, "1");
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
+                    Toast toast = Toast.makeText(this,
+                            "Бригада создана", Toast.LENGTH_SHORT);
+                    toast.show();
+
                     finish();
+                } else {
+
+                    Toast toast = Toast.makeText(this,
+                            "Вы что-то не ввели", Toast.LENGTH_SHORT);
+                    toast.show();
+
                 }
+
                 break;
         }
     }

@@ -1,5 +1,7 @@
 package ru.ejevikaapp.authorization;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.Time;
@@ -37,6 +40,7 @@ import java.util.Map;
 
 import ru.ejevikaapp.authorization.Crew.Activity_crew;
 import ru.ejevikaapp.authorization.Dealer.Dealer_office;
+import ru.ejevikaapp.authorization.Fragments.Activity_calcul;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -126,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         }
         c.close();
 
+        Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+        startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+
         if (user_id.equals("")) {
         } else
             for (int g = 0; group_id.size() > g; g++) {
@@ -136,9 +143,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
-
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                     Intent intent = new Intent(MainActivity.this, Activity_crew.class);
                     startActivity(intent);
@@ -154,9 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
 
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
-
                     Intent intent = new Intent(MainActivity.this, Gager_office.class);
                     startActivity(intent);
                     MainActivity.this.finish();
@@ -167,9 +168,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
-
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                     Service_Sync.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Service_Sync.class));
@@ -309,8 +307,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_COMPONENTS_OPTION, null, values);
                         }
-
-
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_type");
                         Log.d("send_all__", "rgzbn_gm_ceiling_type " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
@@ -411,13 +407,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         values.put(DBHelper.KEY_TITLE, "dealer");
                         db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
 
-
                     } catch (Exception e) {
                         Log.d("send_all__", "send error " + String.valueOf(e));
                     }
-
                 }
-
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -450,7 +443,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
             return null;
         }
-
     }
 
     @Override
@@ -468,10 +460,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     jsonObjectAuth.put("password", password.getText().toString());
                     jsonAuth = String.valueOf(jsonObjectAuth);
                     Log.d("responce", jsonAuth);
-
-                   //jsonObjectProject = new org.json.simple.JSONObject();
-                   //jsonObjectProject.put("change_time", "2000-01-01");
-                   //change_time_project = String.valueOf(jsonObjectProject);
 
                     mProgressDialog = new ProgressDialog(MainActivity.this);
                     mProgressDialog.setMessage("Проверяем...");
@@ -604,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     boolean bool = true;
                     for (int g = 0; group_id.size() > g; g++) {
-                        if (group_id.get(g).equals("11")) {
+                        if (group_id.get(g).equals("11")) { // монтажная бригада
 
                             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
                             SharedPreferences.Editor ed = SP.edit();
@@ -637,6 +625,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                 if (c.moveToFirst()) {
                                     do {
                                         time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
 
                                     } while (c.moveToNext());
                                 }
@@ -681,7 +673,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             finish();
 
                             bool = false;
-                        } else if (group_id.get(g).equals("22") || group_id.get(g).equals("21")) {
+                        } else if (group_id.get(g).equals("22") || group_id.get(g).equals("21")) { // замерщик
                             try {
                                 JSONObject jsonObject = new JSONObject(res);
                                 user_id = jsonObject.getJSONObject("user").getString("id");
@@ -723,6 +715,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                         do {
                                             time = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
+                                            ContentValues values = new ContentValues();
+                                            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                                            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -770,7 +765,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                             bool = false;
                         }
-                        else if (group_id.get(g).equals("14")) {
+                        else if (group_id.get(g).equals("14")) {    // дилер
                             try {
                                 JSONObject jsonObject = new JSONObject(res);
                                 user_id = jsonObject.getJSONObject("user").getString("id");
@@ -812,6 +807,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                         do {
                                             time = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
+                                            ContentValues values = new ContentValues();
+                                            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                                            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
                                         } while (c.moveToNext());
                                     }
                                 }

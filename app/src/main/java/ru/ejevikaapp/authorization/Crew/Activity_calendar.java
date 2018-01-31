@@ -53,13 +53,9 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
     int day_week, year, day, dday, month, max_day;
 
     TextView calendar_month;
-
     TableLayout tableLayout;
-
     String user_id;
-
     DBHelper dbHelper;
-
     ArrayList<Frag_client_schedule_class> installers_mas = new ArrayList<>();
 
     ListView list_installers;
@@ -85,15 +81,12 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         day = cl.get(Calendar.DAY_OF_MONTH);
         month = cl.get(Calendar.MONTH);
 
-        //SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
-        //user_id = SP_end.getString("", "");
-
         user_id = getIntent().getStringExtra("id_brigade");
 
-        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
-        FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
-        list_installers.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(list_installers);
+        // BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+        // FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
+        // list_installers.setAdapter(adapter);
+        // setListViewHeightBasedOnChildren(list_installers);
 
         info();
 
@@ -194,21 +187,17 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
 
     }
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
+    public void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
+        if (listAdapter == null) {
             return;
-
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
+        }
+        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0)
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
+            View listItem = listAdapter.getView(i, null, listView);
+            if (listItem instanceof ViewGroup)
+                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));

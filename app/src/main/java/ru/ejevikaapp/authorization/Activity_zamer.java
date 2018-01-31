@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -47,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.ejevikaapp.authorization.Class.Select_work;
+import ru.ejevikaapp.authorization.Class.phone_edit;
 
 public class Activity_zamer extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
@@ -62,9 +62,9 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     TextView t_fio, t_phone, text;
 
-    String date_zam, date_created,jsonClient = "", gager_id = "",time_h = "", dealer_id = "", id_z;
+    String date_zam, date_created,jsonClient = "", user_id = "",time_h = "", dealer_id = "", id_z;
 
-    Integer gager_id_int = 0, max_id = 0;
+    Integer user_id_int = 0, max_id = 0;
 
     String[] time_zam = {"- Выберите время замера -", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
             "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"};
@@ -112,9 +112,9 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         dbHelper = new DBHelper(this);
         db = dbHelper.getReadableDatabase();
 
-        SharedPreferences SP = this.getSharedPreferences("gager_id", MODE_PRIVATE);
-        gager_id = SP.getString("", "");
-        gager_id_int = Integer.parseInt(gager_id);
+        SharedPreferences SP = this.getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
+        user_id_int = Integer.parseInt(user_id);
 
         SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id = SP.getString("", "");
@@ -147,7 +147,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         c_floor = (EditText) findViewById(R.id.c_floor);
         c_room = (EditText) findViewById(R.id.c_room);
         c_code = (EditText) findViewById(R.id.c_code);
-
 
         t_fio = (TextView) findViewById(R.id.t_fio);
         t_phone = (TextView) findViewById(R.id.t_phone);
@@ -223,7 +222,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                         Log.d("mLog","id = " +  id);
                         sqlQuewy = "select * "
                                 + "FROM rgzbn_user_usergroup_map " +
-                                "where user_id = ? and group_id = 22";
+                                "where user_id = ? and group_id = 22 ";
                         Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
@@ -237,15 +236,13 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
             }
             c.close();
 
-            boolean bool = false;
-            if (count == 0) {
-                count = 1;
-                bool = true;
+            if (count == 0){
+                count++;
+                name_zamer_id.add(user_id);
             }
 
             for (int i = 9; i < 21; i++) {
                 for (int j = 0; count > j; j++) {
-
                     String date_zamera1 = date_zamera + " " + i + ":00:00";
                     sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
                             + "FROM rgzbn_gm_ceiling_projects " +
@@ -284,21 +281,21 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
                             String name = "";
                             String id = "";
-                            if (bool) {
-                                sqlQuewy = "select name "
-                                        + "FROM rgzbn_users " +
-                                        "where _id = ?";
-                                Cursor cc = db.rawQuery(sqlQuewy, new String[]{gager_id});
-                                if (cc != null) {
-                                    if (cc.moveToFirst()) {
-                                        do {
-                                            name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                           //if (bool) {
+                           //    sqlQuewy = "select name "
+                           //            + "FROM rgzbn_users " +
+                           //            "where _id = ?";
+                           //    Cursor cc = db.rawQuery(sqlQuewy, new String[]{gager_id});
+                           //    if (cc != null) {
+                           //        if (cc.moveToFirst()) {
+                           //            do {
+                           //                name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
 
-                                        } while (cc.moveToNext());
-                                    }
-                                }
-                                cc.close();
-                            } else {
+                           //            } while (cc.moveToNext());
+                           //        }
+                           //    }
+                           //    cc.close();
+                           //} else {
                                 sqlQuewy = "select name, _id "
                                         + "FROM rgzbn_users " +
                                         "where _id = ?";
@@ -313,7 +310,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                                 cc.close();
-                            }
+                           // }
 
                             sel_work.add(new Select_work(id, i + ":00 - " + (i + 1) + ":00",
                                     "", name, null));
@@ -587,7 +584,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 sqlQuewy = "select MAX(_id) "
                                         + "FROM rgzbn_gm_ceiling_clients " +
                                         "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 999999)});
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {
@@ -598,7 +595,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                             } catch (Exception e) {
-                                max_id = gager_id_int * 1000000 + 1;
+                                max_id = user_id_int * 1000000 + 1;
                                 Log.d("gager_id", "client 12 " + String.valueOf(max_id));
                             }
 
@@ -628,7 +625,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 sqlQuewy = "select MAX(_id) "
                                         + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                         "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 999999)});
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {
@@ -638,13 +635,17 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                             } catch (Exception e) {
-                                max_id_contac = gager_id_int * 1000000 + 1;
+                                max_id_contac = user_id_int * 1000000 + 1;
                             }
 
                             Log.d("responce", "max_id_contac " + max_id);
                             values.put(DBHelper.KEY_ID, max_id_contac);
                             values.put(DBHelper.KEY_CLIENT_ID, max_id);
-                            values.put(DBHelper.KEY_PHONE, phone);
+                            try {
+                                phone_edit pe = new phone_edit();
+                                values.put(DBHelper.KEY_PHONE, pe.edit(phone));
+                            }catch (Exception e){
+                            }
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
 
                             String dealer_canvases_margin = "";
@@ -677,7 +678,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 sqlQuewy = "select MAX(_id) "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 99999)});
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {
@@ -688,7 +689,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                             } catch (Exception e) {
-                                max_id_proj = gager_id_int * 1000000 + 1;
+                                max_id_proj = user_id_int * 1000000 + 1;
                             }
 
                             values = new ContentValues();
@@ -703,8 +704,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
                             values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
                             values.put(DBHelper.KEY_CREATED, date);
-                            values.put(DBHelper.KEY_CREATED_BY, gager_id_int);
-                            values.put(DBHelper.KEY_MODIFIED_BY, gager_id_int);
+                            values.put(DBHelper.KEY_CREATED_BY, user_id_int);
+                            values.put(DBHelper.KEY_MODIFIED_BY, user_id_int);
                             values.put(DBHelper.KEY_PROJECT_STATUS, "1");
                             values.put(DBHelper.KEY_WHO_CALCULATE, "1");
                             values.put(DBHelper.KEY_GM_CANVASES_MARGIN, gm_canvases_margin);
@@ -800,7 +801,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 sqlQuewy = "select MAX(_id) "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 99999)});
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {
@@ -810,7 +811,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                             } catch (Exception e) {
-                                max_id_proj = gager_id_int * 1000000 + 1;
+                                max_id_proj = user_id_int * 1000000 + 1;
                             }
 
                             values = new ContentValues();
@@ -826,8 +827,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
                             values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
                             values.put(DBHelper.KEY_CREATED, full_address);
-                            values.put(DBHelper.KEY_CREATED_BY, gager_id_int);
-                            values.put(DBHelper.KEY_MODIFIED_BY, gager_id_int);
+                            values.put(DBHelper.KEY_CREATED_BY, user_id_int);
+                            values.put(DBHelper.KEY_MODIFIED_BY, user_id_int);
                             values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                             values.put(DBHelper.KEY_PROJECT_STATUS, "1");
                             values.put(DBHelper.KEY_PROJECT_DISCOUNT, "0");
