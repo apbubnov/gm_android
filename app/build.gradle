@@ -59,4 +59,5 @@ dependencies {
 
     compile 'net.danlew:android.joda:2.9.9.1'
 
+    compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
 }

@@ -263,8 +263,9 @@ public class Service_Sync_Import extends Service {
                         image();
                     }
                 }
-
             }
+
+
         }
 
         public static void setAlarm(Context context) {
@@ -1246,4 +1247,67 @@ public class Service_Sync_Import extends Service {
             return null;
         }
     }
+
+    static class UpdateProgram extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendImagesToAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    SQLiteDatabase db;
+                    db = dbHelper.getReadableDatabase();
+                    res = res.replaceAll("\\\\", "");
+                    res = res.substring(1, res.length() - 1);
+                    res = "{image:[{" + res + "}]}";
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(res);
+
+                        JSONArray rgzbn_gm_ceiling_clients = jsonObject.getJSONArray("image");
+
+                        for (int i = 0; i < rgzbn_gm_ceiling_clients.length(); i++) {
+
+                            ContentValues values = new ContentValues();
+                            org.json.JSONObject cleint = rgzbn_gm_ceiling_clients.getJSONObject(i);
+
+                            String id = cleint.getString("id");
+                            String calc_image = cleint.getString("calc_image");
+                            String cut_image = cleint.getString("cut_image");
+
+                            values.put(DBHelper.KEY_CALC_IMAGE, calc_image);
+                            values.put(DBHelper.KEY_CUT_IMAGE, cut_image);
+                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id});
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("calculation_images", sync_image);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
 }

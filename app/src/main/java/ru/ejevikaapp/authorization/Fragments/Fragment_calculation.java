@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -30,6 +31,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
 import ru.ejevikaapp.authorization.Activity_add_diffuzor;
 import ru.ejevikaapp.authorization.Activity_color;
 import ru.ejevikaapp.authorization.Activity_draft;
+import ru.ejevikaapp.authorization.Activity_zamer;
 import ru.ejevikaapp.authorization.Class.Diffuzor_class;
 import ru.ejevikaapp.authorization.Class.Kupit_Svetlin_class;
 import ru.ejevikaapp.authorization.Class.Kupit_cornice;
@@ -66,7 +69,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             btn_add_kupit_svetiln, btn_karniz, btn_rb_v;
     Button btn_add_truby, btn_fire, btn_add_vent, btn_add_diff, btn_color_canvases, btn_save, btn_add_cornice,
             btn_add_comp, btn_add_other_work, btn_cancel, btn_calculate, btn_add_profile,
-            btn_wall, btn_fasteners, btn_in_cut, btn_diff_acc, btn_separator, btn_soaring_ceiling, btn_mount_wall, btn_mount_granite, btn_cabling, btn_bond_beam;
+            btn_wall, btn_fasteners, btn_in_cut, btn_diff_acc, btn_separator, btn_soaring_ceiling, btn_mount_wall, btn_mount_granite, btn_cabling, btn_bond_beam,
+            btn_in_cut_shop, btn_drain_the_water;
 
     TextView area, perimetr, corners, text_calculate;
 
@@ -81,7 +85,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     String texture, canvases, texture_id, s_setMessage, s_setMessage1, s_setTitle, s_setdrawable, s_setdrawable1, square_obr, s_sp5 = "", s_spa = "", id_project, id_calculation;
     String width_final = "", imag_cut = "", imag = "", rb_vstavka = "0", n2, n3, lines_length, user_id = "", dealer_id_str = "",
-            rb_baget = "", original_sketch = "";
+            rb_baget = "", original_sketch = "", rb_h ="0";
 
     SharedPreferences sPref, SP4, SP5, SP9, SPI, SPSO, SP, SPW;
 
@@ -111,7 +115,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     CheckBox RB_karniz;
 
     EditText lustr, ed_fire, karniz, name_project, ed_wall, ed_cabling, ed_separator, ed_fasteners, ed_curved, ed_in_cut, mount_wall,
-            mount_granite, ed_diff_acc, ed_discount, distance, distance_kol, bond_beam, soaring_ceiling;
+            mount_granite, ed_diff_acc, ed_discount, distance, distance_kol, bond_beam, soaring_ceiling, ed_in_cut_shop, ed_drain_the_water;
 
     boolean rb_k = false, calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true;
 
@@ -161,13 +165,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     int[] n29_count;
     int[] n29_type;
 
-    RadioButton rb_v_white, rb_v_color, rb_v_no, rb_m_yes, rb_m_no, rb_b_no, rb_b_potol, rb_b_all;
+    RadioButton rb_v_white, rb_v_color, rb_v_no, rb_m_yes, rb_m_no, rb_b_no, rb_b_potol, rb_b_all, rb_h_no, rb_h_yes;
 
     // fixtures
     Button btn_add_svetilnik;
     ListView list_svetilnik;
 
     View view;
+
+    ScrollView scroll_calc;
 
     boolean bool_resume = false;
 
@@ -189,6 +195,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         SP = getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id_str = SP.getString("", "");
+
+        scroll_calc = (ScrollView) view.findViewById(R.id.scroll_calc);
 
         chertezh = (Button) view.findViewById(R.id.chertezh);
         btn_texture = (Button) view.findViewById(R.id.btn_texture);
@@ -222,6 +230,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_mount_granite = (Button) view.findViewById(R.id.btn_mount_granite);
         btn_cabling = (Button) view.findViewById(R.id.btn_cabling);
         btn_bond_beam = (Button) view.findViewById(R.id.btn_bond_beam);
+        btn_in_cut_shop = (Button) view.findViewById(R.id.btn_in_cut_shop);
+        btn_drain_the_water = (Button) view.findViewById(R.id.btn_drain_the_water);
 
         chertezh.setOnClickListener(this);
         btn_texture.setOnClickListener(this);
@@ -255,6 +265,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_mount_granite.setOnClickListener(this);
         btn_cabling.setOnClickListener(this);
         btn_bond_beam.setOnClickListener(this);
+        btn_in_cut_shop.setOnClickListener(this);
+        btn_drain_the_water.setOnClickListener(this);
 
         lustr = (EditText) view.findViewById(R.id.lustr);
         karniz = (EditText) view.findViewById(R.id.karniz);
@@ -271,6 +283,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ed_discount = (EditText) view.findViewById(R.id.ed_discount);
         bond_beam = (EditText) view.findViewById(R.id.bond_beam);
         soaring_ceiling = (EditText) view.findViewById(R.id.soaring_ceiling);
+        ed_in_cut_shop = (EditText) view.findViewById(R.id.ed_in_cut_shop);
+        ed_drain_the_water = (EditText) view.findViewById(R.id.ed_drain_the_water);
 
         SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
         String dealer_calc = SP.getString("", "");
@@ -297,6 +311,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         });
 
+        // вставка
         rb_v_white = (RadioButton) view.findViewById(R.id.rb_v_white);
         rb_v_color = (RadioButton) view.findViewById(R.id.rb_v_color);
         rb_v_no = (RadioButton) view.findViewById(R.id.rb_v_no);
@@ -337,6 +352,29 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
             }
         });
+
+        // высота
+        rb_h_no = (RadioButton) view.findViewById(R.id.rb_h_no);
+        rb_h_yes = (RadioButton) view.findViewById(R.id.rb_h_yes);
+
+        rb_h_no.setChecked(true);
+        rb_h = "0";
+
+        RadioGroup radios_height = (RadioGroup) view.findViewById(R.id.radios_height);
+        radios_height.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int id) {
+                switch (id) {
+                    case R.id.rb_h_no:
+                        rb_h = "0";
+                        break;
+                    case R.id.rb_h_yes:
+                        rb_h = "1";
+                        break;
+                }
+            }
+        });
+
 
         rb_m_yes = (RadioButton)view.findViewById(R.id.rb_m_yes);
         rb_m_no = (RadioButton) view.findViewById(R.id.rb_m_no);
@@ -422,7 +460,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db = dbHelper.getReadableDatabase();
             String sqlQuewy = "SELECT calculation_title, n1, n2, n3, n4, n5, n6, n7, n8, n9," +
                     " n10, n11, n12, n16, n17, n18, n19, n20, n21, n24," +
-                    " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch "
+                    " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch, n31, n32, height "
                     + "FROM rgzbn_gm_ceiling_calculations" +
                     " WHERE _id = ?";
 
@@ -461,6 +499,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String n28 = k.getString(k.getColumnIndex(k.getColumnName(27)));
                         String n30 = k.getString(k.getColumnIndex(k.getColumnName(28)));
                         original_sketch = k.getString(k.getColumnIndex(k.getColumnName(29)));
+                        String n31 = k.getString(k.getColumnIndex(k.getColumnName(30)));
+                        String n32 = k.getString(k.getColumnIndex(k.getColumnName(31)));
+                        String height = k.getString(k.getColumnIndex(k.getColumnName(32)));
 
                         name_project.setText(calculation_title);
                         area.setText(" S = " + n4 + " м2");
@@ -481,6 +522,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         corners.setText(" Количество углов =   " + n9);
                         Angle = Double.valueOf(n9);
                         ed_in_cut.setText(n11);
+                        ed_in_cut_shop.setText(n31);
+                        ed_drain_the_water.setText(n32);
                         lustr.setText(n12);
                         if (n16 == "1") {
                             rb_k = true;
@@ -521,6 +564,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             }
                         }
                         c.close();
+
+                        if (height.equals("0")){
+                            rb_h_no.setChecked(true);
+                        } else if (height.equals("1")){
+                            rb_h_yes.setChecked(true);
+                        }
 
                         if (n6.equals("0")) {
                             rb_v_no.setChecked(true);
@@ -3186,8 +3235,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 String old_n2 = "";
                 String old_n3 = "";
+                String old_n4 = "";
+                String old_n5 = "";
                 try {
-                    String sqlQuewy = "select n2, n3 "
+                    String sqlQuewy = "select n2, n3, n4, n5 "
                             + "FROM rgzbn_gm_ceiling_calculations " +
                             "where _id=? ";
                     Cursor c = db.rawQuery(sqlQuewy, new String[]{id_calculation});
@@ -3196,6 +3247,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             do {
                                 old_n2 = c.getString(c.getColumnIndex(c.getColumnName(0)));
                                 old_n3 = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                old_n4 = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                old_n5 = c.getString(c.getColumnIndex(c.getColumnName(3)));
                             } while (c.moveToNext());
                         }
                     }
@@ -3231,7 +3284,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     c.close();
                 }
 
-                if (old_n3.equals("") || old_n2.equals("")) {
+                if (old_n3.equals("") || old_n2.equals("") || old_n4.equals("0.0") || old_n5.equals("0.0") || old_n4.equals("0") || old_n5.equals("0")) {
                     calculat = false;
                     calculation();
                 } else {
@@ -3555,7 +3608,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         db.delete(DBHelper.TABLE_MOUNTING_DATA, null, null);
         db.delete(DBHelper.TABLE_COMPONENT_ITEM, null, null);
 
-        int cou =0;
+        int cou = 0;
         String sqlQuewy = "select _id "
                 + "FROM rgzbn_gm_ceiling_components_option";
         Cursor c = db.rawQuery(sqlQuewy, new String[]{});         // заполняем массивы из таблицы
@@ -3567,7 +3620,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         c.close();
 
         component_count.clear();
-        for (int i = 0; i < cou+10; i++) {
+        for (int i = 0; i < cou + 10; i++) {
             component_count.add(Double.valueOf(0));
         }
 
@@ -3684,7 +3737,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         items_vstavka_bel = 0;                                      // Вставка белая
         sqlQuewy = "select _id "
                 + "FROM rgzbn_gm_ceiling_components_option " +
-                "where title LIKE('%303%') and component_id = 15";
+                "where title LIKE('%303 белая%') and component_id = 15";
         c = db.rawQuery(sqlQuewy, new String[]{});
         if (c != null) {
             if (c.moveToFirst()) {
@@ -3694,6 +3747,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
         c.close();
+
+        Log.d("mLog", "items_vstavka_bel " + String.valueOf(items_vstavka_bel));
 
         items_vstavka = 0;
         if (colorIndex > 0) {                               // Вставка цветная
@@ -3994,7 +4049,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
         c.close();
 
-
         if (n1.equals("28") && P == 0.0) {
         } else {
             component_count.set(items_9, component_count.get(items_9) + P * 10);
@@ -4008,21 +4062,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-
-        Log.d("mLog","items_11 " + String.valueOf(component_count.get(items_11)));
-
-        // внутренний вырез
+        // внутренний вырез(на месте)
         if (ed_in_cut.getText().toString().equals("") || ed_in_cut.getText().toString().equals("0") || ed_in_cut.getText().toString().equals("0.0")) {
         } else {
-            Double cut = Double.valueOf(ed_in_cut.getText().toString());
+            double cut = Double.valueOf(ed_in_cut.getText().toString());
+            component_count.set(items_1, component_count.get(items_1) + cut);
             if (n1.equals("29")) {
-                component_count.set(items_1, component_count.get(items_1) + cut);
+                component_count.set(items_233, component_count.get(items_233) + cut);
             } else if (n1.equals("28") && rb_baget.equals("0")) {
-                component_count.set(items_11, component_count.get(items_11) + P);
+                component_count.set(items_11, component_count.get(items_11) + cut);
             } else if (n1.equals("28") && rb_baget.equals("1")) {
-                component_count.set(items_236, component_count.get(items_236) + P);
+                component_count.set(items_236, component_count.get(items_236) + cut);
             } else if (n1.equals("28") && rb_baget.equals("2")) {
-                component_count.set(items_239, component_count.get(items_239) + P);
+                component_count.set(items_239, component_count.get(items_239) + cut);
             }
             component_count.set(items_430, component_count.get(items_430) + cut * 3);
             component_count.set(items_8, component_count.get(items_8) + cut * 22);
@@ -4030,11 +4082,41 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             component_count.set(items_360, component_count.get(items_360) + cut);
         }
 
+        // внутренний вырез(в цеху)
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0") || ed_in_cut_shop.getText().toString().equals("0.0")) {
+        } else {
+            Double cut = Double.valueOf(ed_in_cut_shop.getText().toString());
+            double n31_count = Math.ceil(cut);
+
+            try {
+                String id_color_vs = "0";
+                SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
+                id_color_vs = SPSO.getString("", "");
+                if (id_color_vs.equals("0")) {
+                    component_count.set(items_vstavka_bel, n31_count);
+                } else {
+                    component_count.set(Integer.parseInt(id_color_vs), n31_count);
+                }
+            } catch (Exception e) {
+            }
+
+            if (n1.equals("28") && rb_baget.equals("0")) {
+                component_count.set(items_11, component_count.get(items_11) + cut);
+            } else if (n1.equals("28") && rb_baget.equals("1")) {
+                component_count.set(items_236, component_count.get(items_236) + cut);
+            } else if (n1.equals("28") && rb_baget.equals("2")) {
+                component_count.set(items_239, component_count.get(items_239) + cut);
+            }
+            component_count.set(items_9, component_count.get(items_9) + cut * 10);
+            component_count.set(items_5, component_count.get(items_5) + cut * 10);
+        }
+
         String id_color_vs = "0";
         try {
             SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
             id_color_vs = SPSO.getString("", "");
 
+            Log.d("mLog", "id_color_vs " + id_color_vs);
             double n5_count = Math.ceil(P + 0.5);
             component_count.set(Integer.parseInt(id_color_vs), n5_count + 0.5);
         } catch (Exception e) {
@@ -4054,7 +4136,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             component_count.set(items_58, component_count.get(items_58) + count_lustr);
             component_count.set(items_3, component_count.get(items_3) + count_lustr * 4);
         }
-
 
         if (count_lustr > 0) {
             component_count.set(items_2, component_count.get(items_2) + 2);
@@ -4081,8 +4162,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         n13_size_id = new int[i];
         n13_size = new String[i];
         count_svet = 0;
-
-        Log.d("mLog", "fixtures = " + id_calculation);
 
         i = 0;
         sqlQuewy = "select * "
@@ -4132,9 +4211,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         component_count.set(items_4, component_count.get(items_4) + count_svet * 0.5);
         component_count.set(items_2, component_count.get(items_2) + count_svet * 1);
 
-
-        Log.d("mLog","items_11 " + String.valueOf(component_count.get(items_11)));
-
         //профиль
         i = 0;
         sqlQuewy = "select * "
@@ -4170,16 +4246,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
         c.close();
 
-        for (j=0; i>j; j++){
-            if ((n29_type[j] == 12) || (n29_type[j] == 13)){
+        for (j = 0; i > j; j++) {
+            if ((n29_type[j] == 12) || (n29_type[j] == 13)) {
                 component_count.set(items_659, component_count.get(items_659) + n29_count[j]);
-            } else if ((n29_type[j] == 15) || (n29_type[j] == 16)){
+            } else if ((n29_type[j] == 15) || (n29_type[j] == 16)) {
                 component_count.set(items_660, component_count.get(items_660) + n29_count[j]);
             }
 
         }
-
-
 
         // вентиляция
         i = 0;
@@ -4258,10 +4332,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         component_count.set(items_3, component_count.get(items_3) + count_electr * 2);
         component_count.set(items_4, component_count.get(items_4) + count_electr * 0.5);
         component_count.set(items_2, component_count.get(items_2) + count_electr * 1);
-
-
-
-        Log.d("mLog","items_11 " + String.valueOf(component_count.get(items_11)));
 
         //труба
         sqlQuewy = "select * "
@@ -4406,8 +4476,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-        Log.d("mLog", "2 " + component_count.get(42));
-
         //экола
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_ecola " +
@@ -4511,7 +4579,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             component_count.set(items_9, component_count.get(items_9) + count_cabling * 2);
             component_count.set(items_5, component_count.get(items_5) + count_cabling * 2);
         }
-        Log.d("mLog","items_11 " + String.valueOf(component_count.get(items_11)));
+
         //разделитель только для ПВХ
         double count_separator = 0;
         if (ed_separator.getText().toString().equals("") || ed_separator.getText().toString().equals("0")) {
@@ -4525,13 +4593,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 component_count.set(items_14, component_count.get(items_14) + count_separator);
 
                 int n20_count = (int) (count_separator / 2.5);
-
                 if ((count_separator % 2.5) > 0) {
                     n20_count++;
                 }
-
                 component_count.set(items_35, component_count.get(items_35) + n20_count * 2.5);
-                Log.d("mLog", " раздел 4 " + component_count.get(items_35));
             }
         }
 
@@ -4541,7 +4606,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         } else {
             count_fasteners = Double.parseDouble(ed_fasteners.getText().toString());
             component_count.set(items_9, component_count.get(items_9) + count_fasteners * 10);
-            if (n1.equals("29")){
+            if (n1.equals("29")) {
                 component_count.set(items_233, component_count.get(items_233) + (count_fasteners / 2));
             } else if (n1.equals("28") && rb_baget.equals("0")) {
                 component_count.set(items_11, component_count.get(items_11) + (count_fasteners / 2));
@@ -4567,9 +4632,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             component_count.set(items_2, component_count.get(items_2) + count_fire * 2);
         }
 
-        Log.d("mLog","items_11 " + String.valueOf(component_count.get(items_11)));
         //стеновой багет 2.5м считается кусками, которые потребуются выложить весь периметр
-
         if (rb_baget.equals("0")) {
             rouding(items_11, component_count.get(items_11), 2.5);
         } else if (rb_baget.equals("1")) {
@@ -4577,6 +4640,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         } else if (rb_baget.equals("2")) {
             rouding(items_239, component_count.get(items_239), 2.5);
         }
+
+        Log.d("mLog", "items11 4 " + component_count.get(items_11));
 
         rouding(items_559, component_count.get(items_559), 2.5);
         rouding(items_233, component_count.get(items_233), 2.5);
@@ -4636,6 +4701,21 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
         }
 
+        double count_ed_in_cut_shop = 0;
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        } else {
+            count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_TITLE, "Внутренний вырез(в цеху)");
+            values.put(DBHelper.KEY_QUANTITY, count_ed_in_cut_shop);
+            values.put(DBHelper.KEY_STACK, "0");
+            values.put(DBHelper.KEY_GM_PRICE, results.get(21));
+            values.put(DBHelper.KEY_GM_TOTAL, count_ed_in_cut_shop * results.get(21));
+            values.put(DBHelper.KEY_DEALER_PRICE, results.get(21));
+            values.put(DBHelper.KEY_DEALER_TOTAL, count_ed_in_cut_shop * results.get(21));
+            db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+        }
+
         sqlQuewy = "select * " +
                 "FROM component_item";
         c = db.rawQuery(sqlQuewy, new String[]{});         // заполняем массивы из табли
@@ -4674,7 +4754,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         id_n3 = 0;
 
         //Сюда считаем итоговую сумму полотна
-        Log.d("mLog asdsssssss", String.valueOf(width_final));
         if (width_final.equals("")) {
             if (n3 == null) { //если новый расчёт
             } else {
@@ -4693,6 +4772,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
                 c.close();
 
+                if (rb_h.equals("1")){
+                    price += 10;
+                }
+
                 //price = double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40;
                 canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
                 canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -4700,7 +4783,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 canvases_data.set(3, price * Double.valueOf(S));                                     // Кол-во * Себестоимость
                 canvases_data.set(4, margin(price, gm_can_marg));                                    //Стоимость с маржой ГМ (для дилера)
                 canvases_data.set(5, Math.rint(100.0 * (margin(price, gm_can_marg)) * S) / 100.0);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-                canvases_data.set(6, double_margin(price, gm_can_marg, dealer_can_marg) );            //Стоимость с маржой ГМ и дилера (для клиента)
+                canvases_data.set(6, double_margin(price, gm_can_marg, dealer_can_marg));            //Стоимость с маржой ГМ и дилера (для клиента)
                 canvases_data.set(7, Math.rint(100 * (double_margin(price, gm_can_marg, dealer_can_marg)) * S) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
                 can_sum = Double.parseDouble(String.valueOf(canvases_data.get(3)));
@@ -4717,8 +4800,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
                 db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
 
+                if (rb_h.equals("1")){
+                    price -= 10;
+                }
+
                 //Сюда считаем итоговую сумму обрезков
-                Log.d("mLog", "square_obr " + square_obr );
                 canvases_data.set(0, "Количесво обрезков");                 // название
                 canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
                 canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
@@ -4729,17 +4815,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 canvases_data.set(7, Math.rint(100 * (Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
                 can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
-
-
-                Log.d("mLog", "0 = " + square_obr + " " + price);
-                Log.d("mLog", "0 = " + canvases_data.get(0));
-                Log.d("mLog", "1 = " + canvases_data.get(1));
-                Log.d("mLog", "2 = " + canvases_data.get(2));
-                Log.d("mLog", "3 = " + canvases_data.get(3));
-                Log.d("mLog", "4 = " + canvases_data.get(4));
-                Log.d("mLog", "5 = " + canvases_data.get(5));
-                Log.d("mLog", "6 = " + canvases_data.get(6));
-                Log.d("mLog", "7 = " + canvases_data.get(7));
 
                 values = new ContentValues();
                 values.put(DBHelper.KEY_COMP_ID, "canv");
@@ -4769,7 +4844,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
             c.close();
 
-            Log.d("mLog", String.valueOf(gm_can_marg));
+            if (rb_h.equals("1")){
+                price += 10;
+            }
 
             canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
             canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -4781,17 +4858,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             canvases_data.set(7, Math.rint(100 * (double_margin(price, gm_can_marg, dealer_can_marg)) * S) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
             can_sum = Double.parseDouble(String.valueOf(canvases_data.get(3)));
-
-
-            Log.d("mLog", "0 = " + square_obr + " " + price);
-            Log.d("mLog", "0 = " + canvases_data.get(0));
-            Log.d("mLog", "1 = " + canvases_data.get(1));
-            Log.d("mLog", "2 = " + canvases_data.get(2));
-            Log.d("mLog", "3 = " + canvases_data.get(3));
-            Log.d("mLog", "4 = " + canvases_data.get(4));
-            Log.d("mLog", "5 = " + canvases_data.get(5));
-            Log.d("mLog", "6 = " + canvases_data.get(6));
-            Log.d("mLog", "7 = " + canvases_data.get(7));
 
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_COMP_ID, "canv");
@@ -4824,6 +4890,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 //    }
                 //}
                 //c.close();
+
+                if (rb_h.equals("1")){
+                    price -= 10;
+                }
 
                 canvases_data.set(0, "Количесво обрезков");                 // название
                 canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
@@ -5042,6 +5112,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(0));
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
+
         if (n1.equals("28") && P > 0 && rb_baget.equals("1")) {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_TITLE, "Периметр");
@@ -5052,6 +5123,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(30));
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
+
         if (n1.equals("28") && P > 0 && rb_baget.equals("2")) {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_TITLE, "Периметр");
@@ -5063,18 +5135,76 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
-        //вставка
-        if (rb_vstavka.equals("1")) {
+        count_ed_in_cut_shop = 0;
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        } else {
+            count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
             ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Вставка");
-            values.put(DBHelper.KEY_QUANTITY, P);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(9));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(9));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(9));
+            values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
+            values.put(DBHelper.KEY_QUANTITY, count_ed_in_cut_shop);
+            values.put(DBHelper.KEY_GM_SALARY, results.get(0));
+            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_ed_in_cut_shop * results.get(0));
+            values.put(DBHelper.KEY_DEALER_SALARY, results.get(0));
+            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_ed_in_cut_shop * results.get(0));
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        } else {
+            count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
+            values.put(DBHelper.KEY_QUANTITY, count_ed_in_cut_shop);
+            values.put(DBHelper.KEY_GM_SALARY, results.get(21));
+            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
+            values.put(DBHelper.KEY_DEALER_SALARY, results.get(21));
+            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
+            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+        }
+
+        SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
+        Log.d("mLog", "vstav = " + SPSO.getString("", ""));
+
+        //вставка
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        } else {
+            try {
+                String id_color = "0";
+                ContentValues values = new ContentValues();
+
+                SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
+                id_color = SPSO.getString("", "");
+                if (id_color.equals("0")) {
+                    values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез)");
+                } else {
+                    values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез), цвет: " + id_color);
+                }
+                double cut_shop = Double.parseDouble(ed_in_cut_shop.getText().toString());
+                values.put(DBHelper.KEY_QUANTITY, cut_shop);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(9));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, cut_shop * results.get(9));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, cut_shop * results.get(9));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+
+            } catch (Exception e) {
+            }
+        }
+
+        //Слив воды
+        int drain = 0;
+        if (ed_drain_the_water.equals("0") || ed_drain_the_water.equals("0.0") || ed_drain_the_water.equals("")) {
+        } else {
+            drain = Integer.valueOf(ed_drain_the_water.getText().toString());
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_TITLE, "Слив воды");
+            values.put(DBHelper.KEY_QUANTITY, drain);
+            values.put(DBHelper.KEY_GM_SALARY, results.get(26));
+            values.put(DBHelper.KEY_GM_SALARY_TOTAL, drain * results.get(26));
+            values.put(DBHelper.KEY_DEALER_SALARY, results.get(26));
+            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, drain * results.get(26));
+            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+        }
 
         double mount_w = 0;
         if (mount_wall.getText().toString().equals("") || mount_wall.getText().toString().equals("0")) {
@@ -5251,7 +5381,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-        double count_s =0;
+        double count_s = 0;
         if (soaring_ceiling.getText().toString().equals("")) {
         } else {
             count_s = Double.parseDouble(soaring_ceiling.getText().toString());
@@ -5508,10 +5638,43 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         } catch (Exception e) {
         }
 
+        SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
+        String dealer_calc = SP.getString("", "");
+        if (dealer_calc.equals("true")) {
+            btn_save.setVisibility(View.VISIBLE);
+            name_project.setVisibility(View.VISIBLE);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    scroll_calc.scrollTo(0, 30000);
+
+                }
+            }, 1);
+
+            int max_id_proj = 0;
+            try {
+                sqlQuewy = "select MAX(_id) "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where _id>? and _id<?";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 99999)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                            max_id_proj++;
+                        } while (c.moveToNext());
+                    }
+                }
+            } catch (Exception e) {
+                max_id_proj = user_id_int + 1;
+            }
+            id_project = String.valueOf(max_id_proj);
+        }
+
         if (calculat) {
             int id_color = 0;
             int id_color_vs_int = 0;
-
             try {
                 SPSO = getActivity().getSharedPreferences("color_title", MODE_PRIVATE);
                 id_color = Integer.valueOf(SPSO.getString("", ""));
@@ -5523,286 +5686,285 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             } catch (Exception e) {
 
             }
-
-            Log.d("mLog", "imag " + imag );
-
             if (name_project.getText().toString().equals("")) {
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                        "Укажите название потолка ", Toast.LENGTH_SHORT);
-                toast.show();
-            } else if (imag.equals("")) {
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                        "Постройте чертёж ", Toast.LENGTH_SHORT);
-                toast.show();
-            } else {
-                if (square_obr == null) {
-                    square_obr = "0";
-                }
+                name_project.setText("Потолок");
+            }
+            if (square_obr == null) {
+                square_obr = "0";
+            }
 
-                String original_sk = "";
-                String cut_d = "";
+            String original_sk = "";
+            String cut_d = "";
 
-                if (SAVED_KP.equals("")) {
-                    if (id_calculation != null){
-                        original_sk = original_sketch;
-                    }
-                } else {
-                    String save = "{" + SAVED_KP.substring(1, SAVED_KP.length() - 1) + "}";
-                    StringBuffer sbb = new StringBuffer();
-                    cou = 0;
-
-                    for (i = 0; i < save.length(); ) {
-                        if (save.startsWith("[", i) && save.startsWith("{", i + 1)) {
-                            cou++;
-                            sbb.append("\"kp" + cou + "\"").append(':').append('[');
-                        } else {
-                            sbb.append(save.charAt(i));
-                        }
-                        i++;
-                    }
-
-                    save = String.valueOf(sbb);
-
-                    Log.d("mLog", save);
-
-                    for (i = 1; i < cou + 1; i++) {
-
-                        cut_d += "Полотно" + i + ": ";
-
-                        try {
-
-                            JSONObject jsonObject = new JSONObject(save);
-
-                            JSONArray kp = jsonObject.getJSONArray("kp" + i);
-
-                            for (int y = 0; y < kp.length(); y++) {
-
-                                org.json.JSONObject kp1 = kp.getJSONObject(y);
-
-                                String name = kp1.getString("name");
-                                String koordinats = kp1.getString("koordinats");
-
-                                cut_d += " " + name + koordinats + ",";
-                            }
-                        } catch (Exception e) {
-                        }
-
-                        cut_d = cut_d.substring(0, cut_d.length() - 1);
-                        cut_d += "; ";
-                    }
-
-                    try {
-                        save = "{wp:" + SAVED_WP + "}";
-                        JSONObject jsonObject = new JSONObject(save);
-
-                        JSONArray wp = jsonObject.getJSONArray("wp");
-
-                        for (int y = 0; y < wp.length(); y++) {
-
-                            org.json.JSONObject wp1 = wp.getJSONObject(y);
-
-                            String s0_x = wp1.getString("s0_x");
-                            String s0_y = wp1.getString("s0_y");
-                            String s1_x = wp1.getString("s1_x");
-                            String s1_y = wp1.getString("s1_y");
-
-                            original_sk += s0_x + ";" + s0_y + ";" + s1_x + ";" + s1_y + ";";
-                        }
-                    } catch (Exception e) {
-                    }
-
-                    original_sk += "||";
-                    try {
-                        save = "{dp:" + SAVED_DP + "}";
-
-                        JSONObject jsonObject = new JSONObject(save);
-
-                        JSONArray dp = jsonObject.getJSONArray("dp");
-
-                        for (int y = 0; y < dp.length(); y++) {
-
-                            org.json.JSONObject dp1 = dp.getJSONObject(y);
-
-                            String s0_x = dp1.getString("s0_x");
-                            String s0_y = dp1.getString("s0_y");
-                            String s1_x = dp1.getString("s1_x");
-                            String s1_y = dp1.getString("s1_y");
-
-                            original_sk += s0_x + ";" + s0_y + ";" + s1_x + ";" + s1_y + ";";
-                        }
-                    } catch (Exception e) {
-                    }
-
-                    original_sk += "||";
-                    try {
-                        save = "{pt_p:" + SAVED_PT_P + "}";
-
-                        JSONObject jsonObject = new JSONObject(save);
-
-                        JSONArray pt_p = jsonObject.getJSONArray("pt_p");
-
-                        for (int y = 0; y < pt_p.length(); y++) {
-
-                            org.json.JSONObject pt_p1 = pt_p.getJSONObject(y);
-
-                            String x = pt_p1.getString("x");
-                            String yy = pt_p1.getString("y");
-
-                            original_sk += x + ";" + yy + ";";
-                        }
-                    } catch (Exception e) {
-                    }
-
-                    original_sk += "||" + SAVED_CODE + "||" + SAVED_ALFAVIT;
-                }
-
-                int ordering = 0;
-                int state = 1;
-                int checked_out = 0;
-                String checked_out_time = "0000-00-00 00:00:00";
-                int created_by = Integer.parseInt(user_id);
-                int modified_by = Integer.parseInt(user_id);
-                String calculation_title = name_project.getText().toString();
-                int project_id = Integer.parseInt(id_project);
-                int n1 = 28;
-                int n2 = Integer.valueOf(texture_id);
-                int n3 = id_n3;
-                String n4 = String.valueOf(S);
-                String n5 = String.valueOf(P);
-                int n6 = id_color_vs_int;
-                String n7 = String.valueOf(mount_w);
-                String n8 = String.valueOf(mount_g);
-                String n9 = String.valueOf(Angle);
-                String n10 = "0";
-                String n11 = String.valueOf(cut);
-                int n12 = Integer.valueOf(count_lustr);
-                String n16 = String.valueOf(int_rb_k);
-                String n17 = String.valueOf(count_bond_beam);
-                String n18 = String.valueOf(count_wall);
-                String n19 = String.valueOf(count_cabling);
-                String n20 = String.valueOf(count_separator);
-                String n21 = String.valueOf(count_fire);
-                String n24 = String.valueOf(count_diff);
-                int n25 = 0;
-                String n27 = String.valueOf(length_karniz);
-                String n28 = String.valueOf(rb_baget);
-                String n30 = String.valueOf(count_s);
-                String components_sum_total = String.valueOf(Math.round((components_sum - canvases_sum_total) * 100.0) / 100.0);
-                String canvases_sum = String.valueOf(Math.round(can_sum * 100.0) / 100.0);
-                int mounting_sum = (int) Math.ceil(Math.round(total_gm_mounting * 100.0) / 100.0);
-                String dop_krepezh = String.valueOf(count_fasteners);
-                String extra_components = "";
-                String extra_mounting = "";
-                int color = id_color;
-                String details = "";
-                String calc_image = String.valueOf(imag);
-                String calc_data = ll;
-                String calc_point = "";
-                String cut_image = String.valueOf(imag_cut);
-                String cut_data = cut_d;
-                String offcut_square = square_obr;
-                String original_sketch = original_sk;
-                String discount = dis;
-
-                ContentValues values = new ContentValues();
-                values.put(DBHelper.KEY_ORDERING, ordering);
-                values.put(DBHelper.KEY_STATE, state);
-                values.put(DBHelper.KEY_CHECKED_OUT, checked_out);
-                values.put(DBHelper.KEY_CHECKED_OUT_TIME, checked_out_time);
-                values.put(DBHelper.KEY_CREATED_BY, created_by);
-                values.put(DBHelper.KEY_MODIFIED_BY, modified_by);
-                values.put(DBHelper.KEY_CALCULATION_TITLE, calculation_title);
-                values.put(DBHelper.KEY_PROJECT_ID, project_id);
-                values.put(DBHelper.KEY_N1, n1);
-                values.put(DBHelper.KEY_N2, n2);
-                values.put(DBHelper.KEY_N3, n3);
-                values.put(DBHelper.KEY_N4, n4);
-                values.put(DBHelper.KEY_N5, n5);
-                values.put(DBHelper.KEY_N6, n6);
-                values.put(DBHelper.KEY_N7, n7);
-                values.put(DBHelper.KEY_N8, n8);
-                values.put(DBHelper.KEY_N9, n9);
-                values.put(DBHelper.KEY_N10, n10);
-                values.put(DBHelper.KEY_N11, n11);
-                values.put(DBHelper.KEY_N12, n12);
-                values.put(DBHelper.KEY_N16, n16);
-                values.put(DBHelper.KEY_N17, n17);
-                values.put(DBHelper.KEY_N18, n18);
-                values.put(DBHelper.KEY_N19, n19);
-                values.put(DBHelper.KEY_N20, n20);
-                values.put(DBHelper.KEY_N21, n21);
-                values.put(DBHelper.KEY_N24, n24);
-                values.put(DBHelper.KEY_N25, n25);
-                values.put(DBHelper.KEY_N27, n27);
-                values.put(DBHelper.KEY_N28, n28);
-                values.put(DBHelper.KEY_N30, n30);
-                values.put(DBHelper.KEY_COMPONENTS_SUM, components_sum_total);
-                values.put(DBHelper.KEY_CANVASES_SUM, canvases_sum);
-                values.put(DBHelper.KEY_MOUNTING_SUM, mounting_sum);
-                values.put(DBHelper.KEY_DOP_KREPEZH, dop_krepezh);
-                values.put(DBHelper.KEY_EXTRA_COMPONENTS, extra_components);
-                values.put(DBHelper.KEY_EXTRA_MOUNTING, extra_mounting);
-                values.put(DBHelper.KEY_COLOR, color);
-                values.put(DBHelper.KEY_DETAILS, details);
-                values.put(DBHelper.KEY_CALC_IMAGE, calc_image);
-                values.put(DBHelper.KEY_CALC_DATA, calc_data);
-                values.put(DBHelper.KEY_CALC_POINT, calc_point);
-                values.put(DBHelper.KEY_CUT_IMAGE, cut_image);
-                values.put(DBHelper.KEY_CUT_DATA, cut_data);
-                values.put(DBHelper.KEY_OFFCUT_SQUARE, offcut_square);
-                values.put(DBHelper.KEY_ORIGINAL_SKETCH, original_sketch);
-                values.put(DBHelper.KEY_DISCOUNT, discount);
-
-                id_calculation = getActivity().getIntent().getStringExtra("id_calculation");  // id_calculation
+            if (SAVED_KP.equals("")) {
                 if (id_calculation != null) {
-                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+                    original_sk = original_sketch;
+                }
+            } else {
+                String save = "{" + SAVED_KP.substring(1, SAVED_KP.length() - 1) + "}";
+                StringBuffer sbb = new StringBuffer();
+                cou = 0;
 
-                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                            "Расчёт обновлён ", Toast.LENGTH_SHORT);
-                    toast.show();
+                for (i = 0; i < save.length(); ) {
+                    if (save.startsWith("[", i) && save.startsWith("{", i + 1)) {
+                        cou++;
+                        sbb.append("\"kp" + cou + "\"").append(':').append('[');
+                    } else {
+                        sbb.append(save.charAt(i));
+                    }
+                    i++;
+                }
 
-                    sync(Integer.parseInt(id_calculation));
-                } else {
-                    //values.put(DBHelper.KEY_ID, max_id);
-                    db = dbHelper.getReadableDatabase();
-                    //values = new ContentValues();
-                    int max_id_contac = 0;
+                save = String.valueOf(sbb);
+
+                Log.d("mLog", save);
+
+                for (i = 1; i < cou + 1; i++) {
+
+                    cut_d += "Полотно" + i + ": ";
+
                     try {
-                        sqlQuewy = "select MAX(_id) "
-                                + "FROM rgzbn_gm_ceiling_calculations " +
-                                "where _id>? and _id<?";
-                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                    max_id_contac++;
-                                } while (c.moveToNext());
-                            }
+
+                        JSONObject jsonObject = new JSONObject(save);
+
+                        JSONArray kp = jsonObject.getJSONArray("kp" + i);
+
+                        for (int y = 0; y < kp.length(); y++) {
+
+                            org.json.JSONObject kp1 = kp.getJSONObject(y);
+
+                            String name = kp1.getString("name");
+                            String koordinats = kp1.getString("koordinats");
+
+                            cut_d += " " + name + koordinats + ",";
                         }
                     } catch (Exception e) {
-                        max_id_contac = user_id_int + 1;
                     }
-                    Log.d("mLog", "calc1 = " + max_id_contac);
 
-                    values.put(DBHelper.KEY_ID, max_id_contac);
-                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-
-                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                            "Расчёт добавлен ", Toast.LENGTH_SHORT);
-                    toast.show();
-
-                    sync(max_id_contac);
+                    cut_d = cut_d.substring(0, cut_d.length() - 1);
+                    cut_d += "; ";
                 }
 
-                if (id_project != null) {
-                    SharedPreferences SP = getActivity().getSharedPreferences("end_activity_inform_proj", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
-                    ed.putString("", "1");
-                    ed.commit();
+                try {
+                    save = "{wp:" + SAVED_WP + "}";
+                    JSONObject jsonObject = new JSONObject(save);
+
+                    JSONArray wp = jsonObject.getJSONArray("wp");
+
+                    for (int y = 0; y < wp.length(); y++) {
+
+                        org.json.JSONObject wp1 = wp.getJSONObject(y);
+
+                        String s0_x = wp1.getString("s0_x");
+                        String s0_y = wp1.getString("s0_y");
+                        String s1_x = wp1.getString("s1_x");
+                        String s1_y = wp1.getString("s1_y");
+
+                        original_sk += s0_x + ";" + s0_y + ";" + s1_x + ";" + s1_y + ";";
+                    }
+                } catch (Exception e) {
                 }
 
-                delete_comp = false;
+                original_sk += "||";
+                try {
+                    save = "{dp:" + SAVED_DP + "}";
+
+                    JSONObject jsonObject = new JSONObject(save);
+
+                    JSONArray dp = jsonObject.getJSONArray("dp");
+
+                    for (int y = 0; y < dp.length(); y++) {
+
+                        org.json.JSONObject dp1 = dp.getJSONObject(y);
+
+                        String s0_x = dp1.getString("s0_x");
+                        String s0_y = dp1.getString("s0_y");
+                        String s1_x = dp1.getString("s1_x");
+                        String s1_y = dp1.getString("s1_y");
+
+                        original_sk += s0_x + ";" + s0_y + ";" + s1_x + ";" + s1_y + ";";
+                    }
+                } catch (Exception e) {
+                }
+
+                original_sk += "||";
+                try {
+                    save = "{pt_p:" + SAVED_PT_P + "}";
+
+                    JSONObject jsonObject = new JSONObject(save);
+
+                    JSONArray pt_p = jsonObject.getJSONArray("pt_p");
+
+                    for (int y = 0; y < pt_p.length(); y++) {
+
+                        org.json.JSONObject pt_p1 = pt_p.getJSONObject(y);
+
+                        String x = pt_p1.getString("x");
+                        String yy = pt_p1.getString("y");
+
+                        original_sk += x + ";" + yy + ";";
+                    }
+                } catch (Exception e) {
+                }
+
+                original_sk += "||" + SAVED_CODE + "||" + SAVED_ALFAVIT;
+            }
+
+            int ordering = 0;
+            int state = 1;
+            int checked_out = 0;
+            String checked_out_time = "0000-00-00 00:00:00";
+            int created_by = Integer.parseInt(user_id);
+            int modified_by = Integer.parseInt(user_id);
+            String calculation_title = name_project.getText().toString();
+            int project_id = Integer.parseInt(id_project);
+            int n1 = 28;
+            int n2 = Integer.valueOf(texture_id);
+            int n3 = id_n3;
+            String n4 = String.valueOf(S);
+            String n5 = String.valueOf(P);
+            int n6 = id_color_vs_int;
+            String n7 = String.valueOf(mount_w);
+            String n8 = String.valueOf(mount_g);
+            String n9 = String.valueOf(Angle);
+            String n10 = "0";
+            String n11 = String.valueOf(cut);
+            int n12 = Integer.valueOf(count_lustr);
+            String n16 = String.valueOf(int_rb_k);
+            String n17 = String.valueOf(count_bond_beam);
+            String n18 = String.valueOf(count_wall);
+            String n19 = String.valueOf(count_cabling);
+            String n20 = String.valueOf(count_separator);
+            String n21 = String.valueOf(count_fire);
+            String n24 = String.valueOf(count_diff);
+            int n25 = 0;
+            String n27 = String.valueOf(length_karniz);
+            String n28 = String.valueOf(rb_baget);
+            String n30 = String.valueOf(count_s);
+            String n31 = String.valueOf(count_ed_in_cut_shop);
+            String n32 = String.valueOf(drain);
+            String components_sum_total = String.valueOf(Math.round((components_sum - canvases_sum_total) * 100.0) / 100.0);
+            String canvases_sum = String.valueOf(Math.round(can_sum * 100.0) / 100.0);
+            int mounting_sum = (int) Math.ceil(Math.round(total_gm_mounting * 100.0) / 100.0);
+            String dop_krepezh = String.valueOf(count_fasteners);
+            String extra_components = "";
+            String extra_mounting = "";
+            int color = id_color;
+            String details = "";
+            String calc_image = String.valueOf(imag);
+            String calc_data = ll;
+            String calc_point = "";
+            String cut_image = String.valueOf(imag_cut);
+            String cut_data = cut_d;
+            String offcut_square = square_obr;
+            String original_sketch = original_sk;
+            String discount = dis;
+
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_ORDERING, ordering);
+            values.put(DBHelper.KEY_STATE, state);
+            values.put(DBHelper.KEY_CHECKED_OUT, checked_out);
+            values.put(DBHelper.KEY_CHECKED_OUT_TIME, checked_out_time);
+            values.put(DBHelper.KEY_CREATED_BY, created_by);
+            values.put(DBHelper.KEY_MODIFIED_BY, modified_by);
+            values.put(DBHelper.KEY_CALCULATION_TITLE, calculation_title);
+            values.put(DBHelper.KEY_PROJECT_ID, project_id);
+            values.put(DBHelper.KEY_N1, n1);
+            values.put(DBHelper.KEY_N2, n2);
+            values.put(DBHelper.KEY_N3, n3);
+            values.put(DBHelper.KEY_N4, n4);
+            values.put(DBHelper.KEY_N5, n5);
+            values.put(DBHelper.KEY_N6, n6);
+            values.put(DBHelper.KEY_N7, n7);
+            values.put(DBHelper.KEY_N8, n8);
+            values.put(DBHelper.KEY_N9, n9);
+            values.put(DBHelper.KEY_N10, n10);
+            values.put(DBHelper.KEY_N11, n11);
+            values.put(DBHelper.KEY_N12, n12);
+            values.put(DBHelper.KEY_N16, n16);
+            values.put(DBHelper.KEY_N17, n17);
+            values.put(DBHelper.KEY_N18, n18);
+            values.put(DBHelper.KEY_N19, n19);
+            values.put(DBHelper.KEY_N20, n20);
+            values.put(DBHelper.KEY_N21, n21);
+            values.put(DBHelper.KEY_N24, n24);
+            values.put(DBHelper.KEY_N25, n25);
+            values.put(DBHelper.KEY_N27, n27);
+            values.put(DBHelper.KEY_N28, n28);
+            values.put(DBHelper.KEY_N30, n30);
+            values.put(DBHelper.KEY_N31, n31);
+            values.put(DBHelper.KEY_N32, n32);
+            values.put(DBHelper.KEY_COMPONENTS_SUM, components_sum_total);
+            values.put(DBHelper.KEY_CANVASES_SUM, canvases_sum);
+            values.put(DBHelper.KEY_MOUNTING_SUM, mounting_sum);
+            values.put(DBHelper.KEY_DOP_KREPEZH, dop_krepezh);
+            values.put(DBHelper.KEY_EXTRA_COMPONENTS, extra_components);
+            values.put(DBHelper.KEY_EXTRA_MOUNTING, extra_mounting);
+            values.put(DBHelper.KEY_COLOR, color);
+            values.put(DBHelper.KEY_DETAILS, details);
+            values.put(DBHelper.KEY_CALC_IMAGE, calc_image);
+            values.put(DBHelper.KEY_CALC_DATA, calc_data);
+            values.put(DBHelper.KEY_CALC_POINT, calc_point);
+            values.put(DBHelper.KEY_CUT_IMAGE, cut_image);
+            values.put(DBHelper.KEY_CUT_DATA, cut_data);
+            values.put(DBHelper.KEY_OFFCUT_SQUARE, offcut_square);
+            values.put(DBHelper.KEY_ORIGINAL_SKETCH, original_sketch);
+            values.put(DBHelper.KEY_DISCOUNT, discount);
+
+            int max_id_contac = 0;
+            id_calculation = getActivity().getIntent().getStringExtra("id_calculation");  // id_calculation
+            if (id_calculation != null) {
+                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                        "Расчёт обновлён ", Toast.LENGTH_SHORT);
+                toast.show();
+
+                sync(Integer.parseInt(id_calculation));
+            } else {
+                //values.put(DBHelper.KEY_ID, max_id);
+                db = dbHelper.getReadableDatabase();
+                //values = new ContentValues();
+                try {
+                    sqlQuewy = "select MAX(_id) "
+                            + "FROM rgzbn_gm_ceiling_calculations " +
+                            "where _id>? and _id<?";
+                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                max_id_contac++;
+                            } while (c.moveToNext());
+                        }
+                    }
+                } catch (Exception e) {
+                    max_id_contac = user_id_int + 1;
+                }
+                Log.d("mLog", "calc1 = " + max_id_contac);
+
+                values.put(DBHelper.KEY_ID, max_id_contac);
+                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
+
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                        "Расчёт добавлен ", Toast.LENGTH_SHORT);
+                toast.show();
+
+            }
+
+            if (id_project != null) {
+                SharedPreferences SP = getActivity().getSharedPreferences("end_activity_inform_proj", MODE_PRIVATE);
+                SharedPreferences.Editor ed = SP.edit();
+                ed.putString("", "1");
+                ed.commit();
+            }
+
+            delete_comp = false;
+            if (dealer_calc.equals("true")) {
+                Intent intent = new Intent(getActivity(), Activity_zamer.class);
+                startActivity(intent);
+            } else {
+                sync(max_id_contac);
                 getActivity().finish();
             }
         }
@@ -5975,7 +6137,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         return (val * 100 / (100 - mar)) * 100 / (100 - mar2);
     }
-
     //кольцо
     void components_circle(int j, int id, int id2, int[] count, String[] sizes) {
 
@@ -6102,7 +6263,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
 
     }
-
     //квадрат
     void components_square(int j, int id, int id2, int[] count, String[] sizes) {
 
@@ -6596,5 +6756,4 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         });
     }
-
 }

@@ -743,7 +743,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             sum_transport = dist * dist_col * 11 + 250;
 
-            if (sum_transport < 624) {
+            if (sum_transport < 625) {
                 sum_transport = 625;
             }
         }

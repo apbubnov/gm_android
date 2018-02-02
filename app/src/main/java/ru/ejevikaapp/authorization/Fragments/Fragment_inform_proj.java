@@ -28,6 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+
 import org.w3c.dom.Text;
 
 import java.util.Calendar;
@@ -80,6 +82,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         pageNumber = getArguments() != null ? getArguments().getInt("num") : 1; //id_calculation
 
         mainL = (LinearLayout) view.findViewById(R.id.linear_main);
+        LinearLayout linear_head = (LinearLayout) view.findViewById(R.id.linear_head);
 
         textViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -123,11 +126,15 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
             if (c.moveToFirst()) {
                 do {
                     imag = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    Log.d("imageeeee", "1 " +  imag);
+
                 } while (c.moveToNext());
             }
         }
         c.close();
+
+        if (imag.equals("")){
+            linear_head.setVisibility(View.GONE);
+        }
 
         try {
             StringBuffer sb = new StringBuffer(imag.subSequence(0, imag.length()));
@@ -139,7 +146,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         }
 
         sqlQuewy = "SELECT n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n16, n17, n18, n19, n20, n21, n24, n25, " +
-                "dop_krepezh, n27, color, n28, n30 "
+                "dop_krepezh, n27, color, n28, n30, n31, n32 "
                 + "FROM rgzbn_gm_ceiling_calculations" +
                 " WHERE _id = ?";
 
@@ -162,8 +169,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                         if (k.moveToFirst()) {
                             do {
                                 String title = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                                TextView mat_1 = (TextView)view.findViewById(R.id.mat_1);
-                                mat_1.setText(mat_1.getText()+ "  " + title);
+                                TextView mat_1 = (TextView) view.findViewById(R.id.mat_1);
+                                mat_1.setText(mat_1.getText() + "  " + title);
                             } while (k.moveToNext());
                         }
                     }
@@ -178,8 +185,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                         if (k.moveToFirst()) {
                             do {
                                 String title = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                                TextView mat_2 = (TextView)view.findViewById(R.id.mat_2);
-                                mat_2.setText(mat_2.getText()+ "  " + title);
+                                TextView mat_2 = (TextView) view.findViewById(R.id.mat_2);
+                                mat_2.setText(mat_2.getText() + "  " + title);
                             } while (k.moveToNext());
                         }
                     }
@@ -194,15 +201,15 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     if (k != null) {
                         if (k.moveToFirst()) {
                             do {
-                                TextView mat_3 = (TextView)view.findViewById(R.id.mat_3);
+                                TextView mat_3 = (TextView) view.findViewById(R.id.mat_3);
 
 
                                 String title = k.getString(k.getColumnIndex(k.getColumnName(0))) + " " +
-                                        k.getString(k.getColumnIndex(k.getColumnName(1))) + " " +k.getString(k.getColumnIndex(k.getColumnName(2)));
+                                        k.getString(k.getColumnIndex(k.getColumnName(1))) + " " + k.getString(k.getColumnIndex(k.getColumnName(2)));
 
                                 Log.d("mLog1", title);
 
-                                mat_3.setText(mat_3.getText()+ "  " + title);
+                                mat_3.setText(mat_3.getText() + "  " + title);
 
                                 Log.d("mLog2", title);
                             } while (k.moveToNext());
@@ -221,10 +228,10 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     if (k != null) {
                         if (k.moveToFirst()) {
                             do {
-                                LinearLayout color_lin = (LinearLayout)view.findViewById(R.id.color_lin);
+                                LinearLayout color_lin = (LinearLayout) view.findViewById(R.id.color_lin);
                                 color_lin.setVisibility(View.VISIBLE);
                                 String hex = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                                id_polotna.setBackgroundColor(Color.parseColor("#"+hex));
+                                id_polotna.setBackgroundColor(Color.parseColor("#" + hex));
 
                             } while (k.moveToNext());
                         }
@@ -232,29 +239,27 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     k.close();
 
                     String n4 = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                    TextView raz_1 = (TextView)view.findViewById(R.id.raz_1);
-                    raz_1.setText(raz_1.getText()+ "  " + n4);
+                    TextView raz_1 = (TextView) view.findViewById(R.id.raz_1);
+                    raz_1.setText(raz_1.getText() + "  " + n4);
 
                     String n5 = c.getString(c.getColumnIndex(c.getColumnName(4)));
-                    TextView raz_2 = (TextView)view.findViewById(R.id.raz_2);
-                    raz_2.setText(raz_2.getText()+ "  " + n5);
+                    TextView raz_2 = (TextView) view.findViewById(R.id.raz_2);
+                    raz_2.setText(raz_2.getText() + "  " + n5);
 
                     String n28 = c.getString(c.getColumnIndex(c.getColumnName(23)));
 
-                    if (n28 == null){
-                        n28="0";
+                    if (n28 == null) {
+                        n28 = "0";
                     }
 
-
-                    if (n28.equals("0")){
+                    if (imag.equals("")) {
+                    } else if (n28.equals("0")) {
                         textt("Багет");
                         textv("Обычный багет");
-                    } else
-                    if (n28.equals("1")){
+                    } else if (n28.equals("1")) {
                         textt("Багет");
                         textv("Потолочный багет");
-                    } else
-                    if (n28.equals("2")){
+                    } else if (n28.equals("2")) {
                         textt("Багет");
                         textv("Аллюминиевый багет");
                     }
@@ -400,7 +405,11 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     if (Double.valueOf(n16) == 1){
                         textv("Скрытый");
                     }
-                    textv(n27);
+
+                    if (n27.equals("0.0") || n27.equals("0")){
+                    } else {
+                        textv(n27);
+                    }
 
                     sqlQuewy = "SELECT n15_count, n15_type, n15_size "
                             + "FROM rgzbn_gm_ceiling_cornice" +
@@ -626,11 +635,12 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     k.close();
 
                     if ((Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(6)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(7)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(8)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(9)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(10)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(17)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(20)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0))
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(8)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(9)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(10)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(17)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(20)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(24)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(26)))) > 0))
                     {
                         textt("Прочее");
 
@@ -663,6 +673,11 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                         if (Double.valueOf(n11) > 0){
                             n11 = "Внутренний вырез, м: " + n11;
                             textv(n11);
+                        }
+                        String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(25)));
+                        if (Double.valueOf(cut_in_shop ) > 0){
+                            cut_in_shop  = "Внутренний вырез(в цеху): " + cut_in_shop ;
+                            textv(cut_in_shop );
                         }
                         String n18 = c.getString(c.getColumnIndex(c.getColumnName(14)));
                         if (Double.valueOf(n18) > 0){
@@ -705,6 +720,11 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                         if (Double.valueOf(dop_krep) > 0){
                             dop_krep = "Дополнительный крепеж: " + dop_krep;
                             textv(dop_krep);
+                        }
+                        String drain = c.getString(c.getColumnIndex(c.getColumnName(26)));
+                        if (Double.valueOf(drain) > 0){
+                            drain = "Слив воды, кол-во комнат: " + drain;
+                            textv(drain);
                         }
 
                     }

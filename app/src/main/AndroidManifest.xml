@@ -27,8 +27,7 @@
         <activity
             android:name=".Dealer.Dealer_office"
             android:label="@string/title_activity_dealer_office"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity_add_svetiln"
             android:screenOrientation="portrait" />
@@ -157,6 +156,7 @@
         <activity android:name=".Dealer.Activity_spisok_brigade" />
         <activity android:name=".Dealer.Activity_add_brigade" />
         <activity android:name=".Dealer.Activity_for_spisok" />
+        <activity android:name=".Dealer.Activity_margin"></activity>
     </application>
 
 </manifest>

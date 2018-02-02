@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#ffffff">
 
@@ -9,16 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/avatar"
+        <com.github.siyamed.shapeimageview.CircularImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="10dp"
-            android:scaleType="centerCrop"
-            android:background="#ffffff"/>
+            android:id="@+id/ava"
+            app:siBorderWidth="2dp"/>
 
         <EditText
             android:id="@+id/name_org"
@@ -42,20 +41,22 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center|top"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="20dp">
+
         <Button
             android:layout_marginTop="10dp"
             android:id="@+id/btn_client"
             android:text="Клиенты"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="12dp"
             android:background="@drawable/rounded_button"
             android:textColor="#ffffff"/>
+
         <Button
             android:layout_marginTop="10dp"
             android:id="@+id/btn_zamer"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="12dp"
             android:background="@drawable/rounded_button"
@@ -64,22 +65,13 @@
         <Button
             android:layout_marginTop="10dp"
             android:id="@+id/btn_install"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:textSize="12dp"
             android:background="@drawable/rounded_button"
             android:textColor="#ffffff"
             android:text="Монтажи"/>
 
-        <Button
-            android:layout_marginTop="10dp"
-            android:id="@+id/exit"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:text="выход"
-            android:textSize="10dp"
-            android:background="@drawable/rounded_button"
-            android:textColor="#ffffff"  />
     </LinearLayout>
 
 </LinearLayout>

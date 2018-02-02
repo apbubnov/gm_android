@@ -5,6 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,16 +65,17 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
         }
 
-        imageButton = (ImageButton) view.findViewById(R.id.avatar);
+        ImageView ava = (ImageView) view.findViewById(R.id.ava);
+
         Bitmap bitmap = null;
         try {
             bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(avatar_user));
-            imageButton.setImageBitmap(bitmap);
+            ava.setImageBitmap(bitmap);
         } catch (IOException e) {
-            imageButton.setImageResource(R.mipmap.ic_app);
+            ava.setImageResource(R.mipmap.ic_app);
         }
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        ava.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
@@ -78,7 +86,6 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         Button btn_client = (Button) view.findViewById(R.id.btn_client);
         Button btn_zamer = (Button) view.findViewById(R.id.btn_zamer);
         Button btn_install = (Button) view.findViewById(R.id.btn_install);
-        Button exit = (Button) view.findViewById(R.id.exit);
 
         name_org = (EditText) view.findViewById(R.id.name_org);
         SharedPreferences SP_end = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
@@ -88,7 +95,6 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         btn_client.setOnClickListener(this);
         btn_zamer.setOnClickListener(this);
         btn_install.setOnClickListener(this);
-        exit.setOnClickListener(this);
 
         return view;
     }
@@ -120,32 +126,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                 startActivity(intent);
                 break;
 
-            case R.id.exit:
-                getActivity().stopService(new Intent(getActivity(), Service_Sync.class));
-                getActivity().stopService(new Intent(getActivity(), Service_Sync_Import.class));
-                SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-                SharedPreferences.Editor ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
-
-                SP = getActivity().getSharedPreferences("avatar_user", MODE_PRIVATE);
-                ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
-
-                intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
-                getActivity().finish();
-                break;
         }
-    }
-
-    public void fromBase64(String imag) {
-        byte[] decodedString = Base64.decode(imag, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        Bitmap bmHalf = Bitmap.createScaledBitmap(decodedByte, decodedByte.getWidth(),
-                decodedByte.getHeight(), false);
-        imageButton.setImageBitmap(bmHalf);
     }
 
     @Override
@@ -153,7 +134,8 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
         Bitmap bitmap = null;
-        ImageButton imageView = (ImageButton) view.findViewById(R.id.avatar);
+
+        ImageView ava = (ImageView) view.findViewById(R.id.ava);
         switch (requestCode) {
             case 1:
                 if (resultCode == RESULT_OK) {
@@ -164,7 +146,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    imageView.setImageBitmap(bitmap);
+                    ava.setImageBitmap(bitmap);
 
                      SharedPreferences SP = getActivity().getSharedPreferences("avatar_user", MODE_PRIVATE);
                      SharedPreferences.Editor ed = SP.edit();

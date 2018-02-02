@@ -2261,7 +2261,6 @@ public class Service_Sync extends Service {
 
             }
 
-
             //NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             //// Намерение для запуска второй активности
             //Intent intent = new Intent(this, Activity_zamer.class);

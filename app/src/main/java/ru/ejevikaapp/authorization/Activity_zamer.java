@@ -219,7 +219,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 if (c.moveToFirst()) {
                     do {
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        Log.d("mLog","id = " +  id);
+                        Log.d("mLog", "id = " + id);
                         sqlQuewy = "select * "
                                 + "FROM rgzbn_user_usergroup_map " +
                                 "where user_id = ? and group_id = 22 ";
@@ -236,7 +236,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
             }
             c.close();
 
-            if (count == 0){
+            if (count == 0) {
                 count++;
                 name_zamer_id.add(user_id);
             }
@@ -247,7 +247,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                     sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
                             + "FROM rgzbn_gm_ceiling_projects " +
                             "where project_calculation_date = '" + date_zamera1 + "' and project_calculator =?";
-                    c = db.rawQuery(sqlQuewy, new String[]{ name_zamer_id.get(j)});
+                    c = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
                     if (c != null) {
                         if (c.moveToFirst()) {
                             do {
@@ -256,7 +256,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 String project_calculation_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
                                 String project_calculator = c.getString(c.getColumnIndex(c.getColumnName(3)));
 
-                                Log.d("mLog",idd + " " + project_calculation_date + " " + project_calculator);
+                                Log.d("mLog", idd + " " + project_calculation_date + " " + project_calculator);
                                 sqlQuewy = "select name, _id "
                                         + "FROM rgzbn_users " +
                                         "where _id = ?";
@@ -268,7 +268,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                             String id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
 
                                             sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
-                                                              project_info, name, null));
+                                                    project_info, name, null));
 
                                         } while (cc.moveToNext());
                                     }
@@ -276,41 +276,24 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 cc.close();
 
                             } while (c.moveToNext());
-                        }
-                        else {
+                        } else {
 
                             String name = "";
                             String id = "";
-                           //if (bool) {
-                           //    sqlQuewy = "select name "
-                           //            + "FROM rgzbn_users " +
-                           //            "where _id = ?";
-                           //    Cursor cc = db.rawQuery(sqlQuewy, new String[]{gager_id});
-                           //    if (cc != null) {
-                           //        if (cc.moveToFirst()) {
-                           //            do {
-                           //                name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                            sqlQuewy = "select name, _id "
+                                    + "FROM rgzbn_users " +
+                                    "where _id = ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                        id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
 
-                           //            } while (cc.moveToNext());
-                           //        }
-                           //    }
-                           //    cc.close();
-                           //} else {
-                                sqlQuewy = "select name, _id "
-                                        + "FROM rgzbn_users " +
-                                        "where _id = ?";
-                                Cursor cc = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
-                                if (cc != null) {
-                                    if (cc.moveToFirst()) {
-                                        do {
-                                            name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                            id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
-
-                                        } while (cc.moveToNext());
-                                    }
+                                    } while (cc.moveToNext());
                                 }
-                                cc.close();
-                           // }
+                            }
+                            cc.close();
 
                             sel_work.add(new Select_work(id, i + ":00 - " + (i + 1) + ":00",
                                     "", name, null));
@@ -590,18 +573,12 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                         do {
                                             max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
                                             max_id++;
-                                            Log.d("gager_id", "client 11 " + String.valueOf(max_id));
                                         } while (c.moveToNext());
                                     }
                                 }
                             } catch (Exception e) {
                                 max_id = user_id_int * 1000000 + 1;
-                                Log.d("gager_id", "client 12 " + String.valueOf(max_id));
                             }
-
-                            Log.d("gager_id", "client 1 " + String.valueOf(max_id));
-
-                            Log.d("responce", "max_id " + max_id);
 
                             values.put(DBHelper.KEY_ID, max_id);
                             values.put(DBHelper.KEY_CLIENT_NAME, fio);
@@ -638,13 +615,12 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 max_id_contac = user_id_int * 1000000 + 1;
                             }
 
-                            Log.d("responce", "max_id_contac " + max_id);
                             values.put(DBHelper.KEY_ID, max_id_contac);
                             values.put(DBHelper.KEY_CLIENT_ID, max_id);
                             try {
                                 phone_edit pe = new phone_edit();
                                 values.put(DBHelper.KEY_PHONE, pe.edit(phone));
-                            }catch (Exception e){
+                            } catch (Exception e) {
                             }
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
 
@@ -659,7 +635,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     "gm_components_margin, gm_mounting_margin "
                                     + "FROM rgzbn_gm_ceiling_dealer_info " +
                                     "where dealer_id = ?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -684,7 +660,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                         do {
                                             max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
                                             max_id_proj++;
-                                            Log.d("gager_id", "client 31 " + String.valueOf(max_id_proj));
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -719,33 +694,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_DISTANCE, "0");
                             values.put(DBHelper.KEY_DISTANCE_COL, "1");
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
-
-                            JSONObject jsonObjectClient = new JSONObject();
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_clients " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_cl)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        for (int j = 0; j < 7; j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-                                            if (status1.equals("")) {
-                                            } else {
-                                                jsonObjectClient.put(status, status1);
-                                            }
-                                        }
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            jsonClient = String.valueOf(jsonObjectClient);
-                            cursor.close();
-
-                            //new SendClientData().execute();
 
                             Toast toast = Toast.makeText(this,
                                     "Замер добавлен", Toast.LENGTH_SHORT);
@@ -782,7 +730,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     "gm_components_margin, gm_mounting_margin "
                                     + "FROM rgzbn_gm_ceiling_dealer_info " +
                                     "where dealer_id = ?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -814,24 +762,44 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 max_id_proj = user_id_int * 1000000 + 1;
                             }
 
+                            String usergroup = "";
+                            String who_calc = "";
+                            sqlQuewy = "SELECT group_id "
+                                    + "FROM rgzbn_user_usergroup_map" +
+                                    " WHERE user_id = ?";
+                            c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (usergroup.equals("21") || usergroup.equals("22")){ // замерщик
+                                who_calc = "1";
+                            } else if (usergroup.equals("14")) {    // дилер
+                                who_calc = "0";
+                            }
+
                             values = new ContentValues();
                             values.put(DBHelper.KEY_ID, max_id_proj);
                             values.put(DBHelper.KEY_STATE, "1");
                             values.put(DBHelper.KEY_CLIENT_ID, max_id);
-                            values.put(DBHelper.KEY_PROJECT_INFO, address);
+                            values.put(DBHelper.KEY_PROJECT_INFO, full_address);
                             values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
                             values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
-
                             values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, "0000-00-00 00:00:00");
                             values.put(DBHelper.KEY_PROJECT_MOUNTING_START, "0000-00-00 00:00:00");
                             values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
                             values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
-                            values.put(DBHelper.KEY_CREATED, full_address);
+                            values.put(DBHelper.KEY_CREATED, date);
                             values.put(DBHelper.KEY_CREATED_BY, user_id_int);
                             values.put(DBHelper.KEY_MODIFIED_BY, user_id_int);
-                            values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                             values.put(DBHelper.KEY_PROJECT_STATUS, "1");
-                            values.put(DBHelper.KEY_PROJECT_DISCOUNT, "0");
+                            values.put(DBHelper.KEY_WHO_CALCULATE, who_calc);
                             values.put(DBHelper.KEY_GM_CANVASES_MARGIN, gm_canvases_margin);
                             values.put(DBHelper.KEY_GM_COMPONENTS_MARGIN, gm_components_margin);
                             values.put(DBHelper.KEY_GM_MOUNTING_MARGIN, gm_mounting_margin);
@@ -839,9 +807,9 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_DEALER_COMPONENTS_MARGIN, dealer_components_margin);
                             values.put(DBHelper.KEY_DEALER_MOUNTING_MARGIN, dealer_mounting_margin);
                             values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(c_note.getText()));
-                            values.put(DBHelper.KEY_TRANSPORT, "0");
+                            values.put(DBHelper.KEY_TRANSPORT, "1");
                             values.put(DBHelper.KEY_DISTANCE, "0");
-                            values.put(DBHelper.KEY_DISTANCE_COL, "0");
+                            values.put(DBHelper.KEY_DISTANCE_COL, "1");
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
                             Toast toast = Toast.makeText(this,

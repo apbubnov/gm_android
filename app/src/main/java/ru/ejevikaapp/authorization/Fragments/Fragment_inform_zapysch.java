@@ -61,6 +61,7 @@ public class Fragment_inform_zapysch extends Fragment {
         pageNumber = getArguments() != null ? getArguments().getInt("num") : 1;
 
         mainL = (LinearLayout) view.findViewById(R.id.linear_main);
+        LinearLayout linear_head = (LinearLayout) view.findViewById(R.id.linear_head);
 
         textViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -100,14 +101,19 @@ public class Fragment_inform_zapysch extends Fragment {
         }
         c.close();
 
+        if (imag.equals("")){
+            linear_head.setVisibility(View.GONE);
+        }
+
         StringBuffer sb = new StringBuffer(imag.subSequence(0, imag.length()));
         sb.delete(0, 22);
 
         if (imag.length() < 30) {
         } else fromBase64(sb.toString()); // декодируем текст в картинку
 
-        sqlQuewy = "SELECT n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n16, n17, n18, n19, n20, n21, n24, n25, dop_krepezh, " +
-                "n27, color, n28, n30 "
+        sqlQuewy = "SELECT n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11," +
+                " n12, n16, n17, n18, n19, n20, n21, n24, n25, dop_krepezh, " +
+                "n27, color, n28, n30, n31, n32 "
                 + "FROM rgzbn_gm_ceiling_calculations" +
                 " WHERE _id = ?";
 
@@ -206,15 +212,14 @@ public class Fragment_inform_zapysch extends Fragment {
                         n28="0";
                     }
 
-                    if (n28.equals("0")){
+                    if (imag.equals("")) {
+                    } else if (n28.equals("0")) {
                         textt("Багет");
                         textv("Обычный багет");
-                    } else
-                    if (n28.equals("1")){
+                    } else if (n28.equals("1")) {
                         textt("Багет");
                         textv("Потолочный багет");
-                    } else
-                    if (n28.equals("2")){
+                    } else if (n28.equals("2")) {
                         textt("Багет");
                         textv("Аллюминиевый багет");
                     }
@@ -550,7 +555,8 @@ public class Fragment_inform_zapysch extends Fragment {
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(10)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(17)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(20)))) > 0) ||
-                    (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0))
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(24)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(26)))) > 0))
                     {
                         textt("Прочее");
 
@@ -573,6 +579,16 @@ public class Fragment_inform_zapysch extends Fragment {
                         if (Double.valueOf(n10) > 0){
                             n10 = "Криволинейный вырез, м: " + n10;
                             textv(n10);
+                        }
+                        String n11 = c.getString(c.getColumnIndex(c.getColumnName(10)));
+                        if (Double.valueOf(n11) > 0){
+                            n11 = "Внутренний вырез, м: " + n11;
+                            textv(n11);
+                        }
+                        String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(25)));
+                        if (Double.valueOf(cut_in_shop ) > 0){
+                            cut_in_shop  = "Внутренний вырез(в цеху): " + cut_in_shop ;
+                            textv(cut_in_shop );
                         }
                         String n19 = c.getString(c.getColumnIndex(c.getColumnName(15)));
                         if (Double.valueOf(n19) > 0){
@@ -609,6 +625,11 @@ public class Fragment_inform_zapysch extends Fragment {
                         if (Double.valueOf(dop_krep) > 0){
                             dop_krep = "Дополнительный крепеж: " + dop_krep;
                             textv(dop_krep);
+                        }
+                        String drain = c.getString(c.getColumnIndex(c.getColumnName(26)));
+                        if (Double.valueOf(drain) > 0){
+                            drain = "Слив воды, кол-во комнат: " + drain;
+                            textv(drain);
                         }
 
                     }
