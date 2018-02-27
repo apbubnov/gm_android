@@ -190,12 +190,20 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
             }
         }
         for (int g = 0; g<client.size(); g++) {
-            sqlQuewy = "SELECT _id "
-                    + "FROM rgzbn_gm_ceiling_projects" +
-                    " WHERE project_status = ? and client_id = ? " +
-                    "order by project_calculation_date";
 
-            c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
+            if (activity_client.equals("")) {
+                sqlQuewy = "SELECT _id "
+                        + "FROM rgzbn_gm_ceiling_projects" +
+                        " WHERE project_status = ? and client_id = ? " +
+                        "order by project_calculation_date";
+                c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
+            } else {
+                sqlQuewy = "SELECT _id "
+                        + "FROM rgzbn_gm_ceiling_projects" +
+                        " WHERE client_id = ? " +
+                        "order by project_calculation_date";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(client.get(g))});
+            }
 
             int i = 0;
             if (c != null) {
@@ -273,8 +281,11 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 /* Обработка адреса */
                                 p_info = p_info.replace("Воронеж, ", "");
 
+                                if (project_note.equals("null")){
+                                    project_note = "-";
+                                }
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(
-                                        tempId, tempDate, p_info, tempIdClient, project_note);
+                                        tempId, tempDate, p_info, tempIdClient, project_note, null);
                                 client_mas.add(fc);
 
                             } while (k.moveToNext());
@@ -312,7 +323,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
 

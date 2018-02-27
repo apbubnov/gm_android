@@ -3,7 +3,7 @@
     <item
 
         android2:id="@+id/repeat_project"
-        android2:icon="@drawable/clean"
+        android2:icon="@raw/clean"
         android2:title=""
         android:showAsAction="always"></item>
 </menu>

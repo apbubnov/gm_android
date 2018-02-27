@@ -48,6 +48,8 @@ public class Activity_color extends Activity{
         String color = getIntent().getStringExtra("texture_id");
         String component_id = getIntent().getStringExtra("component_id");
 
+        Log.d("mLog", color + " " +component_id);
+
         if (color != null){
             if (color.equals("2")){
                 text_title = "mat";

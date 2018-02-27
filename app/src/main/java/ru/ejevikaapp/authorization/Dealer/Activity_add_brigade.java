@@ -184,7 +184,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
 
                                     Log.d("mLog", "123  " + id + " " + name + " " + phone);
                                     Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                            name, null, id, phone);
+                                            name, null, id, phone, null);
                                     mount_mas.add(fc);
 
                                 } while (cursor.moveToNext());
@@ -220,7 +220,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
         dict.addStringField(R.id.c_phone, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
 

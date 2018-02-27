@@ -5,15 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_empty">
+    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_empty_mounting">
 
     <fragment
         android:layout_margin="10dp"
         android:id="@+id/fragment_empty_activity"
-        android:name="ru.ejevikaapp.authorization.Fragments.Frag_spisok"
+        android:name="ru.ejevikaapp.authorization.Fragments.Frag_g3_zapusch"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/frag_spisok">
+        tools:layout="@layout/frag_g3_zapusch">
     </fragment>
 
 </android.support.constraint.ConstraintLayout>

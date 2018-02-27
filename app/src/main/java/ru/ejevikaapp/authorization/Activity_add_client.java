@@ -1,14 +1,25 @@
 package ru.ejevikaapp.authorization;
 
 import android.content.ContentValues;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.text.format.Time;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import ru.ejevikaapp.authorization.Class.phone_edit;
 
 
 public class Activity_add_client extends AppCompatActivity implements View.OnClickListener{
@@ -30,8 +41,20 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
         btn_save.setOnClickListener(this);
 
         dbHelper = new DBHelper(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onClick(View v) {
@@ -43,9 +66,8 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
 
             case R.id.save:
 
-                if (name.getText().length() > 0)
+                if (name.getText().length() > 0 && phone.length() > 0)
                 {
-
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
                     ContentValues values = new ContentValues();
@@ -53,23 +75,92 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                     String fio = name.getText().toString().trim();
                     String number = phone.getText().toString().trim();
 
-                    Time time = new Time(Time.getCurrentTimezone());
-                    time.setToNow();
-                    int mon = time.month+1;
+                    Calendar date_cr = new GregorianCalendar();
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    String date = df.format(date_cr.getTime());
 
-                    String date = String.valueOf(time.monthDay + "." + mon + "." + time.year);
+                    SharedPreferences SP = this.getSharedPreferences("user_id", MODE_PRIVATE);
+                    String user_id = SP.getString("", "");
+                    int user_id_int = Integer.parseInt(user_id);
 
-                 //  values.put(DBHelper.KEY_CLIENT_NAME, fio);
-                 //  values.put(DBHelper.KEY_CLIENT_DATA_ID, );
-                 //  values.put(DBHelper.KEY_TYPE_ID, );
-                 //  values.put(DBHelper.KEY_DEALER_ID, );
-                 //  values.put(DBHelper.KEY_MANAGER_ID, );
-                 //  values.put(DBHelper.KEY_CREATED, );
-                 //  db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
+                    int max_id = 0;
+                    try {
+                        String sqlQuewy = "select MAX(_id) "
+                                + "FROM rgzbn_gm_ceiling_clients " +
+                                "where _id>? and _id<?";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                    max_id++;
+                                } while (c.moveToNext());
+                            }
+                        }
+                    } catch (Exception e) {
+                        max_id = user_id_int * 1000000 + 1;
+                    }
+
+                    values.put(DBHelper.KEY_ID, max_id);
+                    values.put(DBHelper.KEY_CLIENT_NAME, fio);
+                    values.put(DBHelper.KEY_CLIENT_DATA_ID, "");
+                    values.put(DBHelper.KEY_TYPE_ID, "1");
+                    values.put(DBHelper.KEY_DEALER_ID, user_id);
+                    values.put(DBHelper.KEY_MANAGER_ID, "");
+                    values.put(DBHelper.KEY_CREATED, date);
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_OLD, max_id);
+                    values.put(DBHelper.KEY_ID_NEW, "0");
+                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                    values.put(DBHelper.KEY_SYNC, "0");
+                    values.put(DBHelper.KEY_TYPE, "send");
+                    values.put(DBHelper.KEY_STATUS, "1");
+                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                    values = new ContentValues();
+                    int max_id_contac = 0;
+                    try {
+                        String sqlQuewy = "select MAX(_id) "
+                                + "FROM rgzbn_gm_ceiling_clients_contacts " +
+                                "where _id>? and _id<?";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                    max_id_contac++;
+                                } while (c.moveToNext());
+                            }
+                        }
+                    } catch (Exception e) {
+                        max_id_contac = user_id_int * 1000000 + 1;
+                    }
+
+                    values.put(DBHelper.KEY_ID, max_id_contac);
+                    values.put(DBHelper.KEY_CLIENT_ID, max_id);
+                    try {
+                        phone_edit pe = new phone_edit();
+                        values.put(DBHelper.KEY_PHONE, pe.edit(number));
+                    } catch (Exception e) {
+                    }
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_OLD, max_id_contac);
+                    values.put(DBHelper.KEY_ID_NEW, "0");
+                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                    values.put(DBHelper.KEY_SYNC, "0");
+                    values.put(DBHelper.KEY_TYPE, "send");
+                    values.put(DBHelper.KEY_STATUS, "1");
+                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     Toast toast = Toast.makeText(getApplicationContext(),
                             "Клиент добавлен", Toast.LENGTH_SHORT);
                     toast.show();
+
+                    startService(new Intent(this, Service_Sync.class));
 
                     finish();
 

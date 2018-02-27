@@ -3,6 +3,7 @@ package ru.ejevikaapp.authorization;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -51,7 +52,6 @@ import ru.ejevikaapp.authorization.Class.phone_edit;
 public class Activity_zamer extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
     TextView DateTime;
-    Calendar today = Calendar.getInstance();
     Calendar dateAndTime = new GregorianCalendar();
     Calendar date_cr = new GregorianCalendar();
 
@@ -589,6 +589,15 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_CREATED, date);
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, max_id);
+                            values.put(DBHelper.KEY_ID_NEW, 0);
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
                             Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, null, null,
                                     null, null, null);
                             cursor.moveToLast();
@@ -623,6 +632,15 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             } catch (Exception e) {
                             }
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, max_id_contac);
+                            values.put(DBHelper.KEY_ID_NEW, 0);
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                             String dealer_canvases_margin = "";
                             String dealer_components_margin = "";
@@ -695,9 +713,20 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_DISTANCE_COL, "1");
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, max_id_proj);
+                            values.put(DBHelper.KEY_ID_NEW, 0);
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
                             Toast toast = Toast.makeText(this,
                                     "Замер добавлен", Toast.LENGTH_SHORT);
                             toast.show();
+
+                            startService(new Intent(this, Service_Sync.class));
 
                             finish();
 
@@ -811,6 +840,17 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             values.put(DBHelper.KEY_DISTANCE, "0");
                             values.put(DBHelper.KEY_DISTANCE_COL, "1");
                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, max_id_proj);
+                            values.put(DBHelper.KEY_ID_NEW, 0);
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                            startService(new Intent(this, Service_Sync.class));
 
                             Toast toast = Toast.makeText(this,
                                     "Замер добавлен", Toast.LENGTH_SHORT);

@@ -4,12 +4,25 @@
 
     <item
         android:id="@+id/margin"
-        android:title="маржинальность"
+        android:title="Маржинальность"
         app:showAsAction="never">
     </item>
+
+    <item
+        android:id="@+id/min_sum"
+        android:title="Минимальная сумма"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/profile"
+        android:title="Изменение данных"
+        app:showAsAction="never">
+    </item>
+
     <item
         android:id="@+id/exit"
-        android:title="выход"
+        android:title="Выход"
         app:showAsAction="never">
     </item>
 

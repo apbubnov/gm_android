@@ -139,7 +139,7 @@ public class Frag_started_projects extends Fragment {
                             cursor.close();
 
                             Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
-                                    p_info, id_client, phone);
+                                    p_info, id_client, phone, null);
                             client_mas.add(fc);
 
                         } while (k.moveToNext());
@@ -169,7 +169,7 @@ public class Frag_started_projects extends Fragment {
         dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
         dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {

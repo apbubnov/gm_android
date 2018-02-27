@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -33,28 +34,29 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import ru.ejevikaapp.authorization.Dealer.Activity_empty;
+
 public class Service_Sync_Import extends Service {
     private static final String TAG = "responce_import";
     static DBHelper dbHelper;
 
-    static String sync_import = "", user_id = "", sync_image="", change_time_global;
+    static String sync_import = "", user_id = "", change_time_global, version_send = "";
 
     static org.json.simple.JSONObject jsonSync_Import = new org.json.simple.JSONObject();
-    static org.json.simple.JSONObject jsonImage_Import = new org.json.simple.JSONObject();
+    static org.json.simple.JSONObject jsonVersion = new org.json.simple.JSONObject();
 
     static RequestQueue requestQueue;
 
-    static MyThread myThread;
-
     static Context ctx;
 
-    static String domen = "test1";
+    static String domen;
 
     public Service_Sync_Import() {
     }
@@ -68,6 +70,8 @@ public class Service_Sync_Import extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service started!");
+
+        domen = getResources().getString(R.string.link);
 
         int count = 0;
 
@@ -137,7 +141,6 @@ public class Service_Sync_Import extends Service {
                 if (user_id.equals("")) {
                 } else {
                     new ImportDate().execute();
-                    image();
                 }
             } else if (usergroup.equals("22") || usergroup.equals("21")){
                 jsonSync_Import.put("change_time", change_time_global);
@@ -147,9 +150,28 @@ public class Service_Sync_Import extends Service {
                 if (user_id.equals("")) {
                 } else {
                     new ImportDate().execute();
-                    image();
                 }
             }
+
+            String version = "";
+            sqlQuewy = "SELECT change_time "
+                    + "FROM history_import_to_server" +
+                    " WHERE title = ?";
+
+            c = db.rawQuery(sqlQuewy, new String[]{"version"});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        version = "GM("+c.getString(c.getColumnIndex(c.getColumnName(0)))+")";
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+            jsonVersion.put("version", version);
+            version_send = String.valueOf(jsonVersion);
+            new Send_Version().execute();
+
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -180,6 +202,8 @@ public class Service_Sync_Import extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "Alarm received: " + intent.getAction());
+
+            domen = context.getResources().getString(R.string.link);
 
             ctx = context;
 
@@ -250,7 +274,6 @@ public class Service_Sync_Import extends Service {
                     if (user_id.equals("")) {
                     } else {
                         new ImportDate().execute();
-                        image();
                     }
                 } else if (usergroup.equals("22") || usergroup.equals("21")){
                     jsonSync_Import.put("change_time", change_time_global);
@@ -260,12 +283,30 @@ public class Service_Sync_Import extends Service {
                     if (user_id.equals("")) {
                     } else {
                         new ImportDate().execute();
-                        image();
                     }
                 }
+
+                String version = "";
+                sqlQuewy = "SELECT change_time "
+                        + "FROM history_import_to_server" +
+                        " WHERE title = ?";
+
+                c = db.rawQuery(sqlQuewy, new String[]{"version"});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            version = "GM("+c.getString(c.getColumnIndex(c.getColumnName(0)))+")";
+                        } while (c.moveToNext());
+                    }
+                }
+                c.close();
+
+                jsonVersion.put("version", version);
+                version_send = String.valueOf(jsonVersion);
+                new Send_Version().execute();
+
+
             }
-
-
         }
 
         public static void setAlarm(Context context) {
@@ -334,10 +375,6 @@ public class Service_Sync_Import extends Service {
                                 String created = cleint.getString("created");
                                 String sex = cleint.getString("sex");
                                 String change_time = cleint.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CLIENT_NAME, client_name);
                                 values.put(DBHelper.KEY_CLIENT_DATA_ID, client_data_id);
@@ -356,6 +393,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -364,10 +405,13 @@ public class Service_Sync_Import extends Service {
 
                                 if (count == 0) {
                                     try {
-
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
+                                        Date change = ft.parse(change_time);
+                                        if (change_max.getTime()<change.getTime()){
+                                            change_max = change;
+                                        }
                                     } catch (Exception e) {
                                     }
                                 }
@@ -386,11 +430,6 @@ public class Service_Sync_Import extends Service {
                                 String client_id = client_contact.getString("client_id");
                                 String phone = client_contact.getString("phone");
                                 String change_time = client_contact.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
-
 
                                 values.put(DBHelper.KEY_ID, id);
                                 values.put(DBHelper.KEY_CLIENT_ID, client_id);
@@ -405,6 +444,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -414,6 +457,10 @@ public class Service_Sync_Import extends Service {
                                     try {
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+                                        Date change = ft.parse(change_time);
+                                        if (change_max.getTime()<change.getTime()){
+                                            change_max = change;
+                                        }
                                     } catch (Exception e) {
                                     }
                                 }
@@ -491,10 +538,6 @@ public class Service_Sync_Import extends Service {
                                     String distance = porject_tmp.getString("distance");
                                     String distance_col = porject_tmp.getString("distance_col");
                                     String change_time = porject_tmp.getString("change_time");
-                                    Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
-                                        change_max = change;
-                                    }
 
                                     values.put(DBHelper.KEY_ORDERING, ordering);
                                     values.put(DBHelper.KEY_STATE, state);
@@ -565,6 +608,10 @@ public class Service_Sync_Import extends Service {
                                             do {
                                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id});
                                                 count++;
+                                                Date change = ft.parse(change_time);
+                                                if (change_max.getTime()<change.getTime()){
+                                                    change_max = change;
+                                                }
                                             } while (c.moveToNext());
                                         }
                                     }
@@ -574,17 +621,53 @@ public class Service_Sync_Import extends Service {
 
                                         if (project_status.equals("0")){
                                         } else  if (project_status.equals("1")){
-                                            Intent resultIntent = new Intent(ctx, MainActivity.class);
+
+                                            Intent resultIntent = new Intent(ctx, Activity_empty.class);
+                                            ArrayList group_id = new ArrayList();
+
+                                            sqlQuewy = "SELECT group_id "
+                                                    + "FROM rgzbn_user_usergroup_map" +
+                                                    " WHERE user_id = ?";
+
+                                            c = db.rawQuery(sqlQuewy, new String[]{user_id});
+
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        group_id.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+
+                                                    } while (c.moveToNext());
+                                                }
+                                            }
+                                            c.close();
+
+                                            if (user_id.equals("")) {
+                                            } else
+                                                for (int g = 0; group_id.size() > g; g++) {
+                                                    if (group_id.get(g).equals("11")) {
+                                                        resultIntent = new Intent(ctx, MainActivity.class);
+                                                        break;
+
+                                                    } else if (group_id.get(g).equals("21") || group_id.get(g).equals("22")) {
+                                                        resultIntent = new Intent(ctx, MainActivity.class);
+                                                        break;
+                                                    }
+                                                    else if (group_id.get(g).equals("14")) {
+                                                        resultIntent = new Intent(ctx, Activity_empty.class);
+                                                        break;
+                                                    }
+                                                }
+
+
                                             PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
                                                     PendingIntent.FLAG_UPDATE_CURRENT);
-
                                             NotificationCompat.Builder builder =
                                                     new NotificationCompat.Builder(ctx)
                                                             .setAutoCancel(true)
                                                             .setTicker("У Вас новый замер")
                                                             .setWhen(System.currentTimeMillis())
                                                             .setDefaults(Notification.DEFAULT_ALL)
-                                                            .setSmallIcon(R.drawable.gm_ico2)
+                                                            .setSmallIcon(R.raw.gm_ico2)
                                                             .setContentIntent(resultPendingIntent)
                                                             .setContentTitle("ГМ")
                                                             .setContentText("У Вас новый замер (" + (i + 1) + ")");
@@ -597,10 +680,18 @@ public class Service_Sync_Import extends Service {
 
                                             values.put(DBHelper.KEY_ID, id);
                                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
 
                                         } else {
                                             values.put(DBHelper.KEY_ID, id);
                                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         }
 
                                     }
@@ -610,6 +701,8 @@ public class Service_Sync_Import extends Service {
                             }
 
                             JSONArray rgzbn_gm_ceiling_calculations = jsonObject.getJSONArray("rgzbn_gm_ceiling_calculations");
+
+                            Log.d(TAG, String.valueOf(rgzbn_gm_ceiling_calculations));
 
                             for (int i = 0; i < rgzbn_gm_ceiling_calculations.length(); i++) {
 
@@ -661,16 +754,13 @@ public class Service_Sync_Import extends Service {
                                     String extra_mounting = porject_tmp.getString("extra_mounting");
                                     String color = porject_tmp.getString("color");
                                     String details = porject_tmp.getString("details");
+                                    String image = porject_tmp.getString("image");
                                     String calc_data = porject_tmp.getString("calc_data");
                                     String cut_data = porject_tmp.getString("cut_data");
                                     String offcut_square = porject_tmp.getString("offcut_square");
                                     String original_sketch = porject_tmp.getString("original_sketch");
                                     String discount = porject_tmp.getString("discount");
                                     String change_time = porject_tmp.getString("change_time");
-                                    Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
-                                        change_max = change;
-                                    }
 
                                     values.put(DBHelper.KEY_ORDERING, ordering);
                                     values.put(DBHelper.KEY_STATE, state);
@@ -714,9 +804,8 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_EXTRA_MOUNTING, extra_mounting);
                                     values.put(DBHelper.KEY_COLOR, color);
                                     values.put(DBHelper.KEY_DETAILS, details);
-                                    values.put(DBHelper.KEY_CALC_IMAGE, "empty");
+                                    values.put(DBHelper.KEY_CALC_IMAGE, image);
                                     values.put(DBHelper.KEY_CALC_DATA, calc_data);
-                                    values.put(DBHelper.KEY_CUT_IMAGE, "empty");
                                     values.put(DBHelper.KEY_CUT_DATA, cut_data);
                                     values.put(DBHelper.KEY_OFFCUT_SQUARE, offcut_square);
                                     values.put(DBHelper.KEY_ORIGINAL_SKETCH, original_sketch);
@@ -731,6 +820,10 @@ public class Service_Sync_Import extends Service {
                                             do {
                                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id});
                                                 count++;
+                                                Date change = ft.parse(change_time);
+                                                if (change_max.getTime()<change.getTime()){
+                                                    change_max = change;
+                                                }
                                             } while (c.moveToNext());
                                         }
                                     }
@@ -739,6 +832,10 @@ public class Service_Sync_Import extends Service {
                                     if (count == 0) {
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
+                                        Date change = ft.parse(change_time);
+                                        if (change_max.getTime()<change.getTime()){
+                                            change_max = change;
+                                        }
                                     }
                                 }catch (Exception e){
                                 }
@@ -758,10 +855,6 @@ public class Service_Sync_Import extends Service {
                                 String n15_type = porject_tmp.getString("n15_type");
                                 String n15_size = porject_tmp.getString("n15_size");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 String sqlQuewy = "SELECT * "
                                         + "FROM rgzbn_gm_ceiling_cornice" +
@@ -777,6 +870,10 @@ public class Service_Sync_Import extends Service {
                                             values.put(DBHelper.KEY_N15_SIZE, n15_size);
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -790,8 +887,11 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_N15_TYPE, n15_type);
                                     values.put(DBHelper.KEY_N15_SIZE, n15_size);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
-
                             }
 
                             JSONArray rgzbn_gm_ceiling_diffusers = jsonObject.getJSONArray("rgzbn_gm_ceiling_diffusers");
@@ -807,10 +907,6 @@ public class Service_Sync_Import extends Service {
                                 String n23_count = porject_tmp.getString("n23_count");
                                 String n23_size = porject_tmp.getString("n23_size");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N23_COUNT, n23_count);
@@ -825,6 +921,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -833,6 +933,10 @@ public class Service_Sync_Import extends Service {
                                 if (count == 0) {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
 
                             }
@@ -851,10 +955,6 @@ public class Service_Sync_Import extends Service {
                                 String n26_illuminator = porject_tmp.getString("n26_illuminator");
                                 String n26_lamp = porject_tmp.getString("n26_lamp");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N26_COUNT, n26_count);
@@ -870,6 +970,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -878,6 +982,10 @@ public class Service_Sync_Import extends Service {
                                 if (count == 0) {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
                             }
 
@@ -895,10 +1003,6 @@ public class Service_Sync_Import extends Service {
                                 String n13_type = porject_tmp.getString("n13_type");
                                 String n13_size = porject_tmp.getString("n13_size");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N13_COUNT, n13_count);
@@ -914,6 +1018,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -922,6 +1030,10 @@ public class Service_Sync_Import extends Service {
                                 if (count == 0) {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
                             }
 
@@ -939,10 +1051,6 @@ public class Service_Sync_Import extends Service {
                                 String n22_type = porject_tmp.getString("n22_type");
                                 String n22_size = porject_tmp.getString("n22_size");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N22_COUNT, n22_count);
@@ -958,6 +1066,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -966,6 +1078,10 @@ public class Service_Sync_Import extends Service {
                                 if (count == 0) {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
                             }
 
@@ -982,10 +1098,6 @@ public class Service_Sync_Import extends Service {
                                 String n14_count = porject_tmp.getString("n14_count");
                                 String n14_size = porject_tmp.getString("n14_size");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N14_COUNT, n14_count);
@@ -1000,6 +1112,10 @@ public class Service_Sync_Import extends Service {
                                         do {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -1008,6 +1124,10 @@ public class Service_Sync_Import extends Service {
                                 if (count == 0) {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
                             }
 
@@ -1026,10 +1146,6 @@ public class Service_Sync_Import extends Service {
                                 String n29_type = porject_tmp.getString("n29_type");
                                 String n29_profil = porject_tmp.getString("n29_profil");
                                 String change_time = porject_tmp.getString("change_time");
-                                Date change = ft.parse(change_time);
-                                if (change_max.getTime()<change.getTime()){
-                                    change_max = change;
-                                }
 
                                 values.put(DBHelper.KEY_CALCULATION_ID, calculation_id);
                                 values.put(DBHelper.KEY_N29_COUNT, n29_count);
@@ -1046,6 +1162,10 @@ public class Service_Sync_Import extends Service {
 
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, values, "_id = ?", new String[]{id});
                                             count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime()<change.getTime()){
+                                                change_max = change;
+                                            }
                                         } while (c.moveToNext());
                                     }
                                 }
@@ -1055,6 +1175,10 @@ public class Service_Sync_Import extends Service {
 
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime()<change.getTime()){
+                                        change_max = change;
+                                    }
                                 }
                             }
 
@@ -1069,9 +1193,6 @@ public class Service_Sync_Import extends Service {
 
                         int i = 0;
 
-                        image();
-
-                        //notificationManager.cancel(2);
                     }
                 }
 
@@ -1096,91 +1217,9 @@ public class Service_Sync_Import extends Service {
         }
     }
 
-    public static class MyThread extends Thread {
-        public void run() {
+    static class Send_Version extends AsyncTask<Integer, String, String> {
 
-           //Intent resultIntent = new Intent(ctx, MainActivity.class);
-           //PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
-           //        PendingIntent.FLAG_UPDATE_CURRENT);
-
-           //NotificationCompat.Builder builder =
-           //        new NotificationCompat.Builder(ctx)
-           //                .setAutoCancel(true)
-           //                .setWhen(System.currentTimeMillis())
-           //                .setSmallIcon(R.mipmap.ic_launcher)
-           //                .setContentIntent(resultPendingIntent)
-           //                .setContentTitle("ГМ")
-           //                .setContentText("Загружаются раскрои... ");
-
-           //Notification notification = builder.build();
-
-           //NotificationManager notificationManager = (NotificationManager) ctx
-           //        .getSystemService(Context.NOTIFICATION_SERVICE);
-           //notificationManager.notify(3, notification);
-
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            String sqlQuewy = "SELECT calc_image, cut_image, _id "
-                    + "FROM rgzbn_gm_ceiling_calculations " +
-                    "order by _id desc";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        jsonImage_Import =  new org.json.simple.JSONObject();
-                        String calc_image = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        String cut_image = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        String id = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                        if (calc_image.equals("empty")){
-                            Log.d(TAG, id);
-                            jsonImage_Import.put("id", id);
-                            sync_image = String.valueOf(jsonImage_Import);
-                            try{
-                                new ImportImage().execute();
-                                Thread.sleep(500);
-                            }catch (InterruptedException e){
-                            }
-
-                        }
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-
-            //notificationManager.cancel(3);
-        }
-    }
-
-    static void image(){
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        int i = 0;
-
-        String sqlQuewy = "SELECT calc_image, cut_image, _id "
-                + "FROM rgzbn_gm_ceiling_calculations ";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    jsonImage_Import =  new org.json.simple.JSONObject();
-                    String calc_image = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    if (calc_image.equals("empty")){
-                        i++;
-                    }
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        if (i>0) {
-            myThread = new MyThread();
-            myThread.start();
-        }
-
-    }
-
-    static class ImportImage extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendImagesToAndroid";
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.check_update";
         Map<String, String> parameters = new HashMap<String, String>();
 
         @Override
@@ -1189,125 +1228,59 @@ public class Service_Sync_Import extends Service {
         }
 
         @Override
-        protected Void doInBackground(final Void... params) {
+        protected String doInBackground(final Integer... integers) {
             // try {
 
             StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String res) {
 
-                    SQLiteDatabase db;
-                    db = dbHelper.getReadableDatabase();
-                    res = res.replaceAll("\\\\", "");
-                    res = res.substring(1, res.length() - 1);
-                    res = "{image:[{" + res + "}]}";
+                    Log.d(TAG, "------------------ VERSION = " + res);
+                    if (res.equals("false")){
+                    }   else {
 
-                    try {
-                        JSONObject jsonObject = new JSONObject(res);
+                        SharedPreferences SP = ctx.getSharedPreferences("new_version", MODE_PRIVATE);
+                        SharedPreferences.Editor ed = SP.edit();
+                        ed.putString("", res);
+                        ed.commit();
 
-                        JSONArray rgzbn_gm_ceiling_clients = jsonObject.getJSONArray("image");
+                        Intent intent = new Intent(ctx, Service_update.class);
+                        PendingIntent pendingIntent = PendingIntent.getService(ctx, 0, intent, 0);
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
 
-                        for (int i = 0; i < rgzbn_gm_ceiling_clients.length(); i++) {
+                        Notification builder = new Notification.Builder(ctx)
+                                .setTicker("Доступно обновление")
+                                .setContentTitle("ГМ")
+                                .setContentText(
+                                        "Доступно обновление")
+                                .setSmallIcon(R.mipmap.ic_logo)
+                                .addAction(R.mipmap.ic_logo, "Скачать", pendingIntent)
+                                .setAutoCancel(true)
+                                .build();
 
-                            ContentValues values = new ContentValues();
-                            org.json.JSONObject cleint = rgzbn_gm_ceiling_clients.getJSONObject(i);
-
-                            String id = cleint.getString("id");
-                            String calc_image = cleint.getString("calc_image");
-                            String cut_image = cleint.getString("cut_image");
-
-                            values.put(DBHelper.KEY_CALC_IMAGE, calc_image);
-                            values.put(DBHelper.KEY_CUT_IMAGE, cut_image);
-                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id});
-                        }
-                    } catch (Exception e) {
-
-                    }
-
-                }
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-
-                    parameters.put("calculation_images", sync_image);
-
-                    return parameters;
-                }
-            };
-
-            requestQueue.add(request);
-
-            return null;
-        }
-    }
-
-    static class UpdateProgram extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendImagesToAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    SQLiteDatabase db;
-                    db = dbHelper.getReadableDatabase();
-                    res = res.replaceAll("\\\\", "");
-                    res = res.substring(1, res.length() - 1);
-                    res = "{image:[{" + res + "}]}";
-
-                    try {
-                        JSONObject jsonObject = new JSONObject(res);
-
-                        JSONArray rgzbn_gm_ceiling_clients = jsonObject.getJSONArray("image");
-
-                        for (int i = 0; i < rgzbn_gm_ceiling_clients.length(); i++) {
-
-                            ContentValues values = new ContentValues();
-                            org.json.JSONObject cleint = rgzbn_gm_ceiling_clients.getJSONObject(i);
-
-                            String id = cleint.getString("id");
-                            String calc_image = cleint.getString("calc_image");
-                            String cut_image = cleint.getString("cut_image");
-
-                            values.put(DBHelper.KEY_CALC_IMAGE, calc_image);
-                            values.put(DBHelper.KEY_CUT_IMAGE, cut_image);
-                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id});
-                        }
-                    } catch (Exception e) {
+                        builder.flags |= Notification.FLAG_AUTO_CANCEL;
+                        notificationManager.notify(0, builder);
                     }
                 }
 
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.d("send_all__", "send error 2 " + String.valueOf(error));
                 }
             }) {
+
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("calculation_images", sync_image);
+                    parameters.put("sync_data", version_send);
+                    Log.d("send_all__", "version = " + String.valueOf(parameters));
                     return parameters;
                 }
             };
             requestQueue.add(request);
             return null;
         }
+
     }
 
 }

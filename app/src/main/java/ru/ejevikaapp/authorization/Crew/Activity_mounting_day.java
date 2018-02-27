@@ -124,7 +124,7 @@ public class Activity_mounting_day extends AppCompatActivity {
                     }
 
                     Frag_client_schedule_class fc = new Frag_client_schedule_class(id, project_mounting_date,
-                            project_info, String.valueOf(n5), project_status);
+                            project_info, String.valueOf(n5), project_status,null);
                     client_mas.add(fc);
 
 
@@ -157,7 +157,7 @@ public class Activity_mounting_day extends AppCompatActivity {
         dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
 

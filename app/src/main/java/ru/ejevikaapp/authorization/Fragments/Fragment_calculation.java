@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -40,6 +41,9 @@ import android.widget.Toast;
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGParser;
+import com.pixplicity.sharp.Sharp;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,9 +55,11 @@ import ru.ejevikaapp.authorization.Activity_color;
 import ru.ejevikaapp.authorization.Activity_draft;
 import ru.ejevikaapp.authorization.Activity_zamer;
 import ru.ejevikaapp.authorization.Class.Diffuzor_class;
+import ru.ejevikaapp.authorization.Class.Extra_class;
 import ru.ejevikaapp.authorization.Class.Kupit_Svetlin_class;
 import ru.ejevikaapp.authorization.Class.Kupit_cornice;
 import ru.ejevikaapp.authorization.Class.Profile_class;
+import ru.ejevikaapp.authorization.Class.Select_work;
 import ru.ejevikaapp.authorization.Class.Svetiln_class;
 import ru.ejevikaapp.authorization.Class.Truby_class;
 import ru.ejevikaapp.authorization.Class.Ventil_class;
@@ -67,10 +73,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     Button chertezh, btn_texture, btn_width, btn_vstavka, btn_light, btn_lustr, btn_add_svetiln,
             btn_add_kupit_svetiln, btn_karniz, btn_rb_v;
+
     Button btn_add_truby, btn_fire, btn_add_vent, btn_add_diff, btn_color_canvases, btn_save, btn_add_cornice,
-            btn_add_comp, btn_add_other_work, btn_cancel, btn_calculate, btn_add_profile,
+            btn_add_other_work, btn_calculate, btn_add_profile,
             btn_wall, btn_fasteners, btn_in_cut, btn_diff_acc, btn_separator, btn_soaring_ceiling, btn_mount_wall, btn_mount_granite, btn_cabling, btn_bond_beam,
-            btn_in_cut_shop, btn_drain_the_water;
+            btn_in_cut_shop, btn_drain_the_water, btn_add_other_comp;
 
     TextView area, perimetr, corners, text_calculate;
 
@@ -83,8 +90,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     ArrayList s_c = new ArrayList();
     ArrayList s_t = new ArrayList();
 
-    String texture, canvases, texture_id, s_setMessage, s_setMessage1, s_setTitle, s_setdrawable, s_setdrawable1, square_obr, s_sp5 = "", s_spa = "", id_project, id_calculation;
-    String width_final = "", imag_cut = "", imag = "", rb_vstavka = "0", n2, n3, lines_length, user_id = "", dealer_id_str = "",
+    String texture, canvases, texture_id, s_setMessage, s_setMessage1, s_setdrawable, s_setdrawable1, square_obr, s_sp5 = "", s_spa = "", id_project, id_calculation;
+    String width_final = "", imag_cut = "", imag = "", rb_vstavka = "0", n2, n3, lines_length, user_id = "", dealer_id_str = "", final_comp = "", final_mount = "",
             rb_baget = "", original_sketch = "", rb_h ="0";
 
     SharedPreferences sPref, SP4, SP5, SP9, SPI, SPSO, SP, SPW;
@@ -114,8 +121,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     CheckBox RB_karniz;
 
-    EditText lustr, ed_fire, karniz, name_project, ed_wall, ed_cabling, ed_separator, ed_fasteners, ed_curved, ed_in_cut, mount_wall,
-            mount_granite, ed_diff_acc, ed_discount, distance, distance_kol, bond_beam, soaring_ceiling, ed_in_cut_shop, ed_drain_the_water;
+    EditText lustr, ed_fire, karniz, name_project, ed_wall, ed_cabling, ed_separator, ed_fasteners, ed_in_cut, mount_wall,
+            mount_granite, ed_diff_acc, ed_discount, bond_beam, soaring_ceiling, ed_in_cut_shop, ed_drain_the_water,
+            count_comp, price_comp;
 
     boolean rb_k = false, calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true;
 
@@ -126,7 +134,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     ArrayList component_item = new ArrayList();
 
     int items_9, items_5, items_11, items_vstavka_bel, items_vstavka, items_10, items_16, items_556, items_4, items_58, items_3,
-            items_2, items_1, items_8, items_6, items_14, items_430, items_35, items_360, int_rb_v, int_rb_k, items_236,
+            items_2, items_1, items_8, items_6, items_14, items_430, items_35, items_360, int_rb_k, items_236,
             items_239, items_559, items_38, items_495, items_233, items_659, items_660;
 
     int[] n13_count;
@@ -140,7 +148,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     String[] n22_size;
 
     int[] n14_count;
-    String[] n14_type;
     int[] n14_size_id;
     String[] n14_size;
 
@@ -214,8 +221,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_color_canvases = (Button) view.findViewById(R.id.color_canvases);
         btn_save = (Button) view.findViewById(R.id.btn_save);
         btn_add_cornice = (Button) view.findViewById(R.id.btn_add_cornice);
-        //btn_add_comp = (Button) findViewById(R.id.btn_add_other_comp);
-        //btn_add_other_work = (Button) findViewById(R.id.btn_add_other_work);
         //btn_cancel = (Button) findViewById(R.id.btn_cancel);
         btn_rb_v = (Button) view.findViewById(R.id.btn_rb_v);
         btn_calculate = (Button) view.findViewById(R.id.btn_calculate);
@@ -249,8 +254,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_color_canvases.setOnClickListener(this);
         btn_save.setOnClickListener(this);
         btn_add_cornice.setOnClickListener(this);
-        //btn_add_comp.setOnClickListener(this);
-        //btn_add_other_work.setOnClickListener(this);
         //btn_cancel.setOnClickListener(this);
         btn_rb_v.setOnClickListener(this);
         btn_calculate.setOnClickListener(this);
@@ -375,6 +378,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         });
 
+        extra_comp("{}");
+        extra_mount("{}");
 
         rb_m_yes = (RadioButton)view.findViewById(R.id.rb_m_yes);
         rb_m_no = (RadioButton) view.findViewById(R.id.rb_m_no);
@@ -404,7 +409,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         rb_b_all = (RadioButton) view.findViewById(R.id.rb_b_all);
 
         rb_baget = "0";
-        Log.d("mLog", rb_baget);
 
         RadioGroup radios_b = (RadioGroup) view.findViewById(R.id.radios_b);
         radios_b.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -413,17 +417,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 switch (id) {
                     case R.id.rb_b_no:
                         rb_baget = "0";
-                        Log.d("mLog", rb_baget);
                         break;
 
                     case R.id.rb_b_potol:
                         rb_baget = "1";
-                        Log.d("mLog", rb_baget);
                         break;
 
                     case R.id.rb_b_all:
                         rb_baget = "2";
-                        Log.d("mLog", rb_baget);
                         break;
                 }
             }
@@ -460,7 +461,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db = dbHelper.getReadableDatabase();
             String sqlQuewy = "SELECT calculation_title, n1, n2, n3, n4, n5, n6, n7, n8, n9," +
                     " n10, n11, n12, n16, n17, n18, n19, n20, n21, n24," +
-                    " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch, n31, n32, height "
+                    " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch, n31, n32, height, " +
+                    " extra_components, extra_mounting "
                     + "FROM rgzbn_gm_ceiling_calculations" +
                     " WHERE _id = ?";
 
@@ -502,15 +504,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String n31 = k.getString(k.getColumnIndex(k.getColumnName(30)));
                         String n32 = k.getString(k.getColumnIndex(k.getColumnName(31)));
                         String height = k.getString(k.getColumnIndex(k.getColumnName(32)));
+                        String extra_components = k.getString(k.getColumnIndex(k.getColumnName(33)));
+                        String extra_mounting = k.getString(k.getColumnIndex(k.getColumnName(34)));
+
+                        extra_comp(extra_components);
+                        extra_mount(extra_mounting);
 
                         name_project.setText(calculation_title);
                         area.setText(" S = " + n4 + " м2");
                         S = Double.valueOf(n4);
                         perimetr.setText(" P = " + n5 + " м");
                         P = Double.valueOf(n5);
-                        // if (n6 == "1"){
-                        //     rb_v=true;
-                        // }
 
                         SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
                         ed = SPSO.edit();
@@ -538,8 +542,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         StringBuffer sb = new StringBuffer(imag.subSequence(0, imag.length()));
                         sb.delete(0, 22);
                         Log.d("mLog", "imag = " + imag.length());
-                        if (imag.length() < 30) {
-                        } else fromBase64(sb.toString());
+
+                        try {
+                            Sharp.loadString(imag).into(image);
+                        }catch (Exception e){
+                        }
+
                         karniz.setText(n27);
 
                         db = dbHelper.getWritableDatabase();
@@ -615,27 +623,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                         soaring_ceiling.setText(n30);
                         ed_discount.setText(discount);
-
-                        Log.d("all_calc", "n1 " + n1);
-                        Log.d("all_calc", "n2 " + n2);
-                        Log.d("all_calc", "n3 " + n3);
-                        Log.d("all_calc", "n4 " + n4);
-                        Log.d("all_calc", "n5 " + n5);
-                        Log.d("all_calc", "n7 " + n7);
-                        Log.d("all_calc", "n8 " + n8);
-                        Log.d("all_calc", "n9 " + n9);
-                        Log.d("all_calc", "n11 " + n11);
-                        Log.d("all_calc", "n12 " + n12);
-                        Log.d("all_calc", "n16 " + n16);
-                        Log.d("all_calc", "n17 " + n17);
-                        Log.d("all_calc", "n18 " + n18);
-                        Log.d("all_calc", "n19 " + n19);
-                        Log.d("all_calc", "n21 " + n20);
-                        Log.d("all_calc", "n21 " + n21);
-                        Log.d("all_calc", "n24 " + n24);
-                        Log.d("all_calc", "n25 " + n25);
-                        Log.d("all_calc", "n27 " + n27);
-                        Log.d("all_calc", "original " + original_sketch);
 
                     } while (k.moveToNext());
                 }
@@ -802,14 +789,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             SAVED_ALFAVIT = SPI.getString("", "");
             Log.d("mLog", SAVED_ALFAVIT);
 
-            StringBuffer sb = new StringBuffer(imag.subSequence(0, imag.length()));
-            sb.delete(0, 22);
-
-            Log.d("mLog", "imag = " + imag.length());
-
-            if (imag.length() < 34) {
-
-            } else fromBase64(sb.toString()); // декодируем текст в картинку
+            try {
+                Sharp.loadString(imag).into(image);
+            }catch (Exception e){
+            }
 
         } else bool_resume = true;
     }
@@ -1019,6 +1002,344 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ed = SP.edit();
         ed.putString("", "");
         ed.commit();
+    }
+
+    void extra_comp(String extra_components) {
+
+        final ArrayList<Extra_class> extra_mas = new ArrayList<>();
+        final int[] i = {0};
+
+        Log.d("extra_components", String.valueOf(extra_components));
+        if (extra_components.equals("{}")){
+
+        } else {
+            try {
+                org.json.JSONObject dat = new org.json.JSONObject(extra_components);
+                do {
+                    try {
+                        JSONObject id_array = dat.getJSONObject(String.valueOf(i[0]));
+                        String title = id_array.getString("title");
+                        String value = id_array.getString("value");
+
+                        Log.d("extra_comp", String.valueOf(i[0]) + " " + title + " " + value);
+                        Extra_class fix_class = new Extra_class(String.valueOf(i[0]), title, value);
+                        extra_mas.add(fix_class);
+
+                    } catch (Exception e) {
+                        Log.d("extra_comp", String.valueOf(e));
+                    }
+
+                    i[0]++;
+                } while (dat.length() != i[0]);
+            } catch (Exception e) {
+                Log.d("extra_comp", String.valueOf(e));
+            }
+        }
+
+        BindDictionary<Extra_class> dict = new BindDictionary<>();
+
+        dict.addStringField(R.id.tv_count, new StringExtractor<Extra_class>() {
+            @Override
+            public String getStringValue(Extra_class nc, int position) {
+                return nc.getTitle();
+            }
+        });
+        dict.addStringField(R.id.tv_diam, new StringExtractor<Extra_class>() {
+            @Override
+            public String getStringValue(Extra_class nc, int position) {
+                return nc.getValue();
+            }
+        });
+
+        FunDapter Fun_adapter = new FunDapter(getActivity(), extra_mas, R.layout.list_2column, dict);
+
+        ListView list_comp = (ListView) view.findViewById(R.id.list_comp);
+        list_comp.setAdapter(Fun_adapter);
+        setListViewHeightBasedOnChildren(list_comp);
+
+        final int[] j = {0};
+        final String final_extra_comp = extra_components;
+        list_comp.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                Extra_class selectedid = extra_mas.get(position);
+                final int s_id = Integer.valueOf(selectedid.getId());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Удалить выбранный элемент?")
+                        .setMessage(null)
+                        .setIcon(null)
+                        .setCancelable(false)
+                        .setPositiveButton("Да",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        org.json.simple.JSONObject json_extra = new org.json.simple.JSONObject();
+                                        String extra = "{";
+
+                                        int key=0;
+                                        Log.d("extra_comp1", String.valueOf(s_id));
+
+                                        try {
+                                            JSONObject dat = new JSONObject(final_extra_comp);
+                                            do {
+                                                if (s_id == j[0]){
+                                                } else {
+                                                    JSONObject id_array = dat.getJSONObject(String.valueOf(j[0]));
+                                                    String title = id_array.getString("title");
+                                                    String value = id_array.getString("value");
+
+                                                    extra += "\""+key+"\":{\"title\":\""+title+"\",\"value\":\""+value+"\"},";
+
+                                                    key++;
+                                                    Log.d("extra_comp2", String.valueOf(extra));
+                                                }
+                                                j[0]++;
+                                            } while (dat.length() != j[0]);
+                                            extra = extra.substring(0,extra.length()-1)+"}";
+
+                                        } catch (Exception e) {
+                                        }
+
+                                        Log.d("extra_comp3", String.valueOf(extra));
+                                        extra_comp(extra);
+
+                                        Toast toast = Toast.makeText(getActivity(),
+                                                "Удалён ", Toast.LENGTH_SHORT);
+                                        toast.show();
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        Button btn_add_comp = (Button) view.findViewById(R.id.btn_add_comp);
+        final EditText count_comp = (EditText) view.findViewById(R.id.count_comp);
+        final EditText price_comp = (EditText) view.findViewById(R.id.price_comp);
+
+        // создаем обработчик нажатия
+        final int finalI = i[0];
+        final String[] finalExtra_comp = {extra_components};
+        View.OnClickListener on_click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast toast;
+                String kol_vo = count_comp.getText().toString().trim();
+                String price = price_comp.getText().toString().trim();
+
+                if (kol_vo.equals("") && price.equals("")) {
+
+                    toast = Toast.makeText(getActivity(),
+                            "Введите что-то", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                } else {
+
+                    org.json.simple.JSONObject json_extra = new org.json.simple.JSONObject();
+                    String add_extra;
+
+                    json_extra.put("value", price);
+                    json_extra.put("title", kol_vo);
+                    add_extra = String.valueOf(json_extra);
+
+                    if (finalI == 0){
+                        finalExtra_comp[0] = finalExtra_comp[0].substring(0, finalExtra_comp[0].length() - 1)
+                                + "\"" + finalI + "\":" + json_extra + "}";
+                    } else {
+                        finalExtra_comp[0] = finalExtra_comp[0].substring(0, finalExtra_comp[0].length() - 1)
+                                + ",\"" + finalI + "\":" + json_extra + "}";
+                    }
+
+                    Log.d("extra_comp", String.valueOf(finalExtra_comp[0]));
+
+                    extra_comp(finalExtra_comp[0]);
+                    count_comp.setText("");
+                    price_comp.setText("");
+
+                }
+            }
+        };
+
+        btn_add_comp.setOnClickListener(on_click);
+
+        if (extra_components.equals("null")){
+            extra_components = "{}";
+        }
+        final_comp = extra_components;
+    }
+
+    void extra_mount(String extra_mounting) {
+
+        final ArrayList<Extra_class> extra_mas = new ArrayList<>();
+        final int[] i = {0};
+
+        if (extra_mounting.equals("{}")){
+
+        } else {
+            try {
+                org.json.JSONObject dat = new org.json.JSONObject(extra_mounting);
+                Log.d("extra_mount", String.valueOf(dat));
+                do {
+                    JSONObject id_array = dat.getJSONObject(String.valueOf(i[0]));
+                    String title = id_array.getString("title");
+                    String value = id_array.getString("value");
+
+                    Extra_class fix_class = new Extra_class(String.valueOf(i[0]), title, value);
+                    extra_mas.add(fix_class);
+
+                    i[0]++;
+                } while (dat.length() != i[0]);
+            } catch (Exception e) {
+                Log.d("extra_mount", String.valueOf(e));
+            }
+        }
+
+        BindDictionary<Extra_class> dict = new BindDictionary<>();
+
+        dict.addStringField(R.id.tv_count, new StringExtractor<Extra_class>() {
+            @Override
+            public String getStringValue(Extra_class nc, int position) {
+                return nc.getTitle();
+            }
+        });
+        dict.addStringField(R.id.tv_diam, new StringExtractor<Extra_class>() {
+            @Override
+            public String getStringValue(Extra_class nc, int position) {
+                return nc.getValue();
+            }
+        });
+
+        FunDapter Fun_adapter = new FunDapter(getActivity(), extra_mas, R.layout.list_2column, dict);
+
+        ListView list_mount = (ListView) view.findViewById(R.id.list_mount);
+        list_mount.setAdapter(Fun_adapter);
+        setListViewHeightBasedOnChildren(list_mount);
+
+        final int[] j = {0};
+        final String final_extra_comp = extra_mounting;
+        list_mount.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                Extra_class selectedid = extra_mas.get(position);
+                final int s_id = Integer.valueOf(selectedid.getId());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Удалить выбранный элемент?")
+                        .setMessage(null)
+                        .setIcon(null)
+                        .setCancelable(false)
+                        .setPositiveButton("Да",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        org.json.simple.JSONObject json_extra = new org.json.simple.JSONObject();
+                                        String extra = "{";
+
+                                        int key=0;
+                                        Log.d("extra_mount1", String.valueOf(s_id));
+
+                                        try {
+                                            JSONObject dat = new JSONObject(final_extra_comp);
+                                            do {
+                                                if (s_id == j[0]){
+                                                } else {
+                                                    JSONObject id_array = dat.getJSONObject(String.valueOf(j[0]));
+                                                    String title = id_array.getString("title");
+                                                    String value = id_array.getString("value");
+
+                                                    extra += "\""+key+"\":{\"title\":\""+title+"\",\"value\":\""+value+"\"},";
+
+                                                    key++;
+                                                    Log.d("extra_mount2", String.valueOf(extra));
+                                                }
+                                                j[0]++;
+                                            } while (dat.length() != j[0]);
+                                            extra = extra.substring(0,extra.length()-1)+"}";
+
+                                        } catch (Exception e) {
+                                        }
+
+                                        Log.d("extra_mount3", String.valueOf(extra));
+                                        extra_mount(extra);
+
+                                        Toast toast = Toast.makeText(getActivity(),
+                                                "Удалён ", Toast.LENGTH_SHORT);
+                                        toast.show();
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        Button btn_add_mount = (Button) view.findViewById(R.id.btn_add_mount);
+        final EditText count_mount = (EditText) view.findViewById(R.id.count_mount);
+        final EditText price_mount = (EditText) view.findViewById(R.id.price_mount);
+
+        // создаем обработчик нажатия
+        final int finalI = i[0];
+        final String[] finalExtra_comp = {extra_mounting};
+        View.OnClickListener on_click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast toast;
+                String kol_vo = count_mount.getText().toString().trim();
+                String price = price_mount.getText().toString().trim();
+
+                if (kol_vo.equals("") && price.equals("")) {
+
+                    toast = Toast.makeText(getActivity(),
+                            "Введите что-то", Toast.LENGTH_SHORT);
+                    toast.show();
+
+                } else {
+
+                    org.json.simple.JSONObject json_extra = new org.json.simple.JSONObject();
+                    String add_extra;
+
+                    json_extra.put("value", price);
+                    json_extra.put("title", kol_vo);
+                    add_extra = String.valueOf(json_extra);
+
+                    if (finalI == 0){
+                        finalExtra_comp[0] =finalExtra_comp[0].substring(0, finalExtra_comp[0].length() - 1)
+                                + "\"" + finalI + "\":" + json_extra + "}";
+                    } else {
+                        finalExtra_comp[0] = finalExtra_comp[0].substring(0, finalExtra_comp[0].length() - 1)
+                                + ",\"" + finalI + "\":" + json_extra + "}";
+                    }
+
+                    Log.d("extra_mount", String.valueOf(finalExtra_comp[0]));
+
+                    extra_mount(finalExtra_comp[0]);
+                    count_mount.setText("");
+                    price_mount.setText("");
+
+                }
+            }
+        };
+
+        btn_add_mount.setOnClickListener(on_click);
+
+        if (extra_mounting.equals("null")) {
+            extra_mounting = "{}";
+        }
+        final_mount = extra_mounting;
     }
 
     void fixtures(){
@@ -3210,15 +3531,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         listView.setLayoutParams(params);
     }
 
-    public void fromBase64(String imag) {
-
-        byte[] decodedString = Base64.decode(imag, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        Bitmap bmHalf = Bitmap.createScaledBitmap(decodedByte, decodedByte.getWidth(),
-                decodedByte.getHeight(), false);
-        image.setImageBitmap(bmHalf);
-    }
-
     @Override
     public void onClick(View v) {
         Intent intent;
@@ -3253,7 +3565,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
                     }
                 }catch (Exception e){
-
                 }
 
                 try {
@@ -3412,14 +3723,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 startActivity(intent);
                 break;
             case R.id.btn_texture:
-                s_setMessage = "  Матовый больше похож на побелку \n  Сатин - на, крашенный потолок \n  Глянец - имеет лёгкий отблеск";
+                s_setMessage = " Выберите фактуру для Вашего будущего потолка \n  Матовый больше похож на побелку \n  Сатин - на, крашенный потолок \n  Глянец - имеет лёгкий отблеск";
                 s_setMessage1 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
                 fun_builder();
                 break;
             case R.id.btn_width:
-                s_setMessage = "    От ширины материала зависит бесшовный ли будет потолок и его цена, чем шире полотно тем дороже";
+                s_setMessage = " От производителя материала зависит качество потолка и его цена";
                 s_setMessage1 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
@@ -3428,7 +3739,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             case R.id.btn_vstavka:
                 s_setMessage = "    Между стеной и натяжным потолком после монтажа остаётся технологический засор 5мм, который закрывается декоративной вставкой";
                 s_setMessage1 = "";
-                s_setdrawable = String.valueOf(R.drawable.vstavka);
+                s_setdrawable = String.valueOf(R.raw.vstavka);
                 s_setdrawable1 = "";
                 fun_builder();
                 break;
@@ -3465,8 +3776,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         "\nШторный карниз можно крепить на потолок двумя способами:" +
                         "\n 1.Видимый";
                 s_setMessage1 = "2.Скрытый (в этом случае надо указать длину стены, на которой окно и ставить галочку напротив надписи скрытый шторный карниз)";
-                s_setdrawable = String.valueOf(R.drawable.karniz1);
-                s_setdrawable1 = String.valueOf(R.drawable.karniz2);
+                s_setdrawable = String.valueOf(R.raw.karniz1);
+                s_setdrawable1 = String.valueOf(R.raw.karniz2);
                 fun_builder();
                 break;
             case R.id.btn_add_cornice:
@@ -3479,7 +3790,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             case R.id.btn_add_truby:
                 s_setMessage = "    На картинке изображены 3 трубы разного диаметра. Выбираем отдельно одну трубу 55, а две других 32";
                 s_setMessage1 = "(Чтобы удалить ненужный светильник, нажмите на него в таблице)";
-                s_setdrawable = "";
+                s_setdrawable = String.valueOf(R.raw.obvod);
                 s_setdrawable1 = "";
                 fun_builder();
                 break;
@@ -3492,16 +3803,18 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 fun_builder();
                 break;
             case R.id.btn_add_vent:
-                s_setMessage = "    (Чтобы удалить ненужный корниз, нажмите на него в таблице)";
+                s_setMessage = "    (Чтобы удалить ненужную вентиляцию, нажмите на неё в таблице)";
                 s_setMessage1 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
                 fun_builder();
                 break;
             case R.id.btn_add_diff:
-                intent = new Intent(getActivity(), Activity_add_diffuzor.class);
-                intent.putExtra("id_calc", id_calculation);
-                startActivity(intent);
+                s_setMessage = "    Вентиляционная решётка для отвода воздуха, который попадает за потолочное пространство\n    (Чтобы удалить ненужный диффузор, нажмите на него в таблице)";
+                s_setMessage1 = "";
+                s_setdrawable = "";
+                s_setdrawable1 = "";
+                fun_builder();
                 break;
             case R.id.color_canvases:
                 intent = new Intent(getActivity(), Activity_color.class);
@@ -3516,7 +3829,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 break;
 
             case R.id.btn_add_profile:
-                s_setMessage = "    (Чтобы удалить ненужный кaрниз, нажмите на него в таблице)";
+                s_setMessage = "    (Чтобы удалить ненужный переход, нажмите на него в таблице)";
                 s_setMessage1 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
@@ -3591,6 +3904,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             case R.id.btn_bond_beam:
                 s_setMessage = "    На 1м  используется:   \nБрус 40*50  + 3 * Подвес прямой П 60 (0,8) +  6 * Дюбель полим. " +
                         "6 * 51 + 6 * Саморез ГДК 3,5 * 51 + 6 * Саморез ГДК 3,5 * 41";
+                s_setMessage1 = "";
+                s_setdrawable = "";
+                s_setdrawable1 = "";
+                fun_builder();
+                break;
+            case R.id.btn_drain_the_water:
+                s_setMessage = "    В работу входит слив воды. Укажите количество комнат";
                 s_setMessage1 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
@@ -4624,8 +4944,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             count_fire = Double.parseDouble(ed_fire.getText().toString());
             component_count.set(items_9, component_count.get(items_9) + count_fire * 3);
             component_count.set(items_10, component_count.get(items_10) + count_fire * 6);
-            component_count.set(items_495, component_count.get(items_495) + count_fire * 6);
-            component_count.set(items_16, component_count.get(items_16) + count_fire);
+            component_count.set(items_495, component_count.get(items_495) + count_fire);
             component_count.set(items_58, component_count.get(items_58) + count_fire);
             component_count.set(items_3, component_count.get(items_3) + count_fire * 3);
             component_count.set(items_5, component_count.get(items_5) + count_fire * 3);
@@ -4654,8 +4973,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         rouding(654, component_count.get(654), 2.5);
         rouding(655, component_count.get(655), 2.5);
         rouding(656, component_count.get(656), 2.5);
-
-        component_count.set(items_4, Math.ceil(component_count.get(items_4)));
 
         //--------------------------------------- ВОЗВРАЩАЕМ СТОИМОСТЬ КОМПЛЕКТУЮЩИХ ----------------------------------------//
 
@@ -4716,6 +5033,37 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
         }
 
+        // другие комп
+        if (final_comp.equals("{}")){
+        } else {
+            int comp = 0;
+            try {
+            org.json.JSONObject dat = new org.json.JSONObject(final_comp);
+            do {
+                try {
+                    JSONObject id_array = dat.getJSONObject(String.valueOf(comp));
+                    String title = id_array.getString("title");
+                    String value = id_array.getString("value");
+
+                    ContentValues values = new ContentValues();
+                    values.put(DBHelper.KEY_TITLE, title);
+                    values.put(DBHelper.KEY_QUANTITY, "1");
+                    values.put(DBHelper.KEY_STACK, "0");
+                    values.put(DBHelper.KEY_GM_PRICE, value);
+                    values.put(DBHelper.KEY_GM_TOTAL, value);
+                    values.put(DBHelper.KEY_DEALER_PRICE, value);
+                    values.put(DBHelper.KEY_DEALER_TOTAL, value);
+                    db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+                } catch (Exception e) {
+                }
+                comp++;
+            } while (dat.length() != comp);
+        } catch (Exception e) {
+            Log.d("extra_comp", String.valueOf(e));
+        }
+        }
+
+
         sqlQuewy = "select * " +
                 "FROM component_item";
         c = db.rawQuery(sqlQuewy, new String[]{});         // заполняем массивы из табли
@@ -4772,10 +5120,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
                 c.close();
 
-                if (rb_h.equals("1")){
-                    price += 10;
-                }
-
                 //price = double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40;
                 canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
                 canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -4800,19 +5144,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
                 db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
 
-                if (rb_h.equals("1")){
-                    price -= 10;
-                }
+                try {
+                    //Сюда считаем итоговую сумму обрезков
+                    canvases_data.set(0, "Количесво обрезков");                 // название
+                    canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
+                    canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
+                    canvases_data.set(3, Math.rint(100 * (Double.valueOf(square_obr) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
+                    canvases_data.set(4, Math.rint(100 * (margin(price, gm_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(5, Math.rint(100 * Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40, gm_can_marg, dealer_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
+                    canvases_data.set(7, Math.rint(100 * (Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
-                //Сюда считаем итоговую сумму обрезков
-                canvases_data.set(0, "Количесво обрезков");                 // название
-                canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
-                canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
-                canvases_data.set(3, Math.rint(100 * (Double.valueOf(square_obr) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
-                canvases_data.set(4, Math.rint(100 * (margin(price, gm_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
-                canvases_data.set(5, Math.rint(100 * Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-                canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40, gm_can_marg, dealer_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
-                canvases_data.set(7, Math.rint(100 * (Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+                } catch (Exception e){
+                }
 
                 can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
 
@@ -4843,10 +5187,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
             }
             c.close();
-
-            if (rb_h.equals("1")){
-                price += 10;
-            }
 
             canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
             canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -4891,18 +5231,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 //}
                 //c.close();
 
-                if (rb_h.equals("1")){
-                    price -= 10;
+                try {
+                    canvases_data.set(0, "Количесво обрезков");                 // название
+                    canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
+                    canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
+                    canvases_data.set(3, Math.rint(100 * (Double.valueOf(square_obr) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
+                    canvases_data.set(4, Math.rint(100 * (margin(price, gm_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(5, Math.rint(100 * Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40, gm_can_marg, dealer_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
+                    canvases_data.set(7, Math.rint(100 * (Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+                } catch (Exception e){
                 }
-
-                canvases_data.set(0, "Количесво обрезков");                 // название
-                canvases_data.set(1, Double.valueOf(square_obr));           // кол-во
-                canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
-                canvases_data.set(3, Math.rint(100 * (Double.valueOf(square_obr) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
-                canvases_data.set(4, Math.rint(100 * (margin(price, gm_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
-                canvases_data.set(5, Math.rint(100 * Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-                canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40, gm_can_marg, dealer_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
-                canvases_data.set(7, Math.rint(100 * (Double.parseDouble(square_obr) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
                 can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
 
@@ -5031,28 +5370,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-        sqlQuewy = "select * "
-                + "FROM table_other_work";
-        c = db.rawQuery(sqlQuewy, new String[]{});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    String title = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                    String stack = "0";
-                    String quantity = "1";
-                    String dealer_price = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                    String dealer_total = String.valueOf(Double.parseDouble(dealer_price) * Integer.valueOf(quantity));
-                    ContentValues values = new ContentValues();
-                    values.put(DBHelper.KEY_TITLE, title);
-                    values.put(DBHelper.KEY_QUANTITY, quantity);
-                    values.put(DBHelper.KEY_STACK, stack);
-                    values.put(DBHelper.KEY_DEALER_PRICE, dealer_price);
-                    values.put(DBHelper.KEY_DEALER_TOTAL, dealer_total);
-                    db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
-                } while (c.moveToNext());
-            }
-        }
-
         Cursor cursor = db.query(DBHelper.TABLE_COMPONENT_ITEM, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
@@ -5101,15 +5418,20 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
+        int cost = 0;
+        if (rb_h.equals("1")){
+            cost = 10;
+        }
+
         //периметр только для ПВХ
         if (n1.equals("28") && P > 0 && rb_baget.equals("0")) {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_TITLE, "Периметр");
             values.put(DBHelper.KEY_QUANTITY, P);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(0));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(0));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(0));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(0));
+            values.put(DBHelper.KEY_GM_SALARY, results.get(0) + cost);
+            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * (results.get(0) + cost));
+            values.put(DBHelper.KEY_DEALER_SALARY, results.get(0) + cost);
+            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * (results.get(0) + cost));
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
@@ -5136,7 +5458,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
 
         count_ed_in_cut_shop = 0;
-        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0") || ed_in_cut_shop.getText().toString().equals("0.0")) {
         } else {
             count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
             ContentValues values = new ContentValues();
@@ -5149,24 +5471,24 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
-        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
-        } else {
-            count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
-            values.put(DBHelper.KEY_QUANTITY, count_ed_in_cut_shop);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(21));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(21));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
+        //if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        //} else {
+        //    count_ed_in_cut_shop = Double.valueOf(ed_in_cut_shop.getText().toString());
+        //    ContentValues values = new ContentValues();
+        //    values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
+        //    values.put(DBHelper.KEY_QUANTITY, count_ed_in_cut_shop);
+        //    values.put(DBHelper.KEY_GM_SALARY, results.get(21));
+        //    values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
+        //    values.put(DBHelper.KEY_DEALER_SALARY, results.get(21));
+        //    values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_ed_in_cut_shop * results.get(21));
+        //    db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+        //}
 
         SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
         Log.d("mLog", "vstav = " + SPSO.getString("", ""));
 
         //вставка
-        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
+        if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0") || ed_in_cut_shop.getText().toString().equals("0.0")) {
         } else {
             try {
                 String id_color = "0";
@@ -5193,7 +5515,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         //Слив воды
         int drain = 0;
-        if (ed_drain_the_water.equals("0") || ed_drain_the_water.equals("0.0") || ed_drain_the_water.equals("")) {
+        if (ed_drain_the_water.getText().toString().equals("") || ed_drain_the_water.getText().toString().equals("0.0") ||
+                ed_drain_the_water.getText().toString().equals("0")) {
         } else {
             drain = Integer.valueOf(ed_drain_the_water.getText().toString());
             ContentValues values = new ContentValues();
@@ -5207,7 +5530,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
 
         double mount_w = 0;
-        if (mount_wall.getText().toString().equals("") || mount_wall.getText().toString().equals("0")) {
+        if (mount_wall.getText().toString().equals("") || mount_wall.getText().toString().equals("0") || mount_wall.getText().toString().equals("0.0")) {
         } else {
             mount_w = Double.valueOf(mount_wall.getText().toString());
             ContentValues values = new ContentValues();
@@ -5221,7 +5544,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
 
         double mount_g = 0;
-        if (mount_granite.getText().toString().equals("") || mount_granite.getText().toString().equals("0")) {
+        if (mount_granite.getText().toString().equals("") || mount_granite.getText().toString().equals("0") || mount_granite.getText().toString().equals("0.0")) {
         } else {
             mount_g = Double.valueOf(mount_granite.getText().toString());
             ContentValues values = new ContentValues();
@@ -5452,6 +5775,36 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
+        // другие работы
+        if (final_mount.equals("{}")){
+        } else {
+            int comp = 0;
+            try {
+                org.json.JSONObject dat = new org.json.JSONObject(final_mount);
+                do {
+                    try {
+                        JSONObject id_array = dat.getJSONObject(String.valueOf(comp));
+                        String title = id_array.getString("title");
+                        String value = id_array.getString("value");
+
+                        ContentValues values = new ContentValues();
+                        values.put(DBHelper.KEY_TITLE, title);
+                        values.put(DBHelper.KEY_QUANTITY, "1");
+                        values.put(DBHelper.KEY_GM_SALARY, value);
+                        values.put(DBHelper.KEY_GM_SALARY_TOTAL, value);
+                        values.put(DBHelper.KEY_DEALER_SALARY, value);
+                        values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, value);
+                        db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+                    } catch (Exception e) {
+                    }
+
+                    comp++;
+
+                } while (dat.length() != comp);
+            } catch (Exception e) {
+            }
+        }
+
         sqlQuewy = "select * " +
                 "FROM mounting_data";
         Cursor k = db.rawQuery(sqlQuewy, new String[]{});         // заполняем массивы из табли
@@ -5460,7 +5813,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 do {
 
                     String id = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                    String quantity = k.getString(k.getColumnIndex(k.getColumnName(2)));
+                    String quantity = String.valueOf(k.getInt(k.getColumnIndex(k.getColumnName(2))));
 
                     String gm_salary_total = String.valueOf(Math.round(Double.parseDouble(k.getString(k.getColumnIndex(k.getColumnName(3)))) * 100.0) / 100.0);
                     String dealer_salary_total = String.valueOf(Math.round(Double.parseDouble(k.getString(k.getColumnIndex(k.getColumnName(6)))) * 100.0) / 100.0);
@@ -5687,7 +6040,22 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             }
             if (name_project.getText().toString().equals("")) {
-                name_project.setText("Потолок");
+
+                int count_calc = 0;
+                sqlQuewy = "select * "
+                        + "FROM rgzbn_gm_ceiling_calculations " +
+                        "where project_id=?";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_project)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            count_calc++;
+                        } while (c.moveToNext());
+                    }
+                }
+
+                count_calc++;
+                name_project.setText("Потолок " + count_calc);
             }
             if (square_obr == null) {
                 square_obr = "0";
@@ -5858,6 +6226,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             String cut_data = cut_d;
             String offcut_square = square_obr;
             String original_sketch = original_sk;
+            String height = rb_h;
             String discount = dis;
 
             ContentValues values = new ContentValues();
@@ -5910,6 +6279,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_OFFCUT_SQUARE, offcut_square);
             values.put(DBHelper.KEY_ORIGINAL_SKETCH, original_sketch);
             values.put(DBHelper.KEY_DISCOUNT, discount);
+            values.put(DBHelper.KEY_HEIGHT, height);
+            values.put(DBHelper.KEY_EXTRA_COMPONENTS, final_comp);
+            values.put(DBHelper.KEY_EXTRA_MOUNTING, final_mount);
 
             int max_id_contac = 0;
             id_calculation = getActivity().getIntent().getStringExtra("id_calculation");  // id_calculation
@@ -5946,6 +6318,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 values.put(DBHelper.KEY_ID, max_id_contac);
                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
 
+                sync(max_id_contac);
+
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(),
                         "Расчёт добавлен ", Toast.LENGTH_SHORT);
                 toast.show();
@@ -5963,10 +6337,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             if (dealer_calc.equals("true")) {
                 Intent intent = new Intent(getActivity(), Activity_zamer.class);
                 startActivity(intent);
-            } else {
-                sync(max_id_contac);
-                getActivity().finish();
             }
+
+            getActivity().finish();
         }
     }
 
@@ -5978,24 +6351,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         values.put(DBHelper.KEY_ID_OLD, id);
         values.put(DBHelper.KEY_ID_NEW, "0");
         values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
-        values.put(DBHelper.KEY_SYNC, "0");
-        values.put(DBHelper.KEY_TYPE, "send");
-        values.put(DBHelper.KEY_STATUS, "1");
-        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-        values = new ContentValues();
-        values.put(DBHelper.KEY_ID_OLD, id);
-        values.put(DBHelper.KEY_ID_NEW, "0");
-        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cal");
-        values.put(DBHelper.KEY_SYNC, "0");
-        values.put(DBHelper.KEY_TYPE, "send");
-        values.put(DBHelper.KEY_STATUS, "1");
-        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-        values = new ContentValues();
-        values.put(DBHelper.KEY_ID_OLD, id);
-        values.put(DBHelper.KEY_ID_NEW, "0");
-        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations_cut");
         values.put(DBHelper.KEY_SYNC, "0");
         values.put(DBHelper.KEY_TYPE, "send");
         values.put(DBHelper.KEY_STATUS, "1");

@@ -1,10 +1,840 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="@style/backgroun"
     tools:context="ru.ejevikaapp.authorization.Dealer.Activity_margin">
 
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Редактирование маржинальности и прайса монтажа"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            style="@style/text_style_spisok"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Укажите, какой процент прибыли от заказа Вы желаете получать"
+            style="@style/text_style_spisok"/>
+
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:layout_marginTop="10dp"
+            android:id="@+id/canvases_margin"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="(от полотен)"
+            style="@style/text_style_spisok"/>
+
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/components_margin"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="(от комплектующих)"
+            style="@style/text_style_spisok"/>
+
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mounting_margin"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="(от монтажа)"
+            style="@style/text_style_spisok"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="15dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Монтаж"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp1"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Монтаж, если выбран потолочный багет"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp31"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Монтаж, если выбран алюминиевый багет"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp32"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Люстра планочная"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp2"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Люстра большая"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp3"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка светильников"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp4"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Светильники квадратные"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp5"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Пожарная сигнализация"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp6"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Обвод трубы D больше 120мм"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp7"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Обвод трубы D меньше 120мм"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp8"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Брус-разделитель, брус-отбойник"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp9"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Вставка"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp10"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Шторный карниз на полотно"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp11"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка электровытяжки"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp12"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Крепление в плитку"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp13"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Крепление в керамогранит"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp14"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Усиление стен"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp15"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка вентиляции"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp16"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Сложность доступа"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp17"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Дополнительный монтаж"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp18"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка диффузора"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp19"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Внутренний вырез для ПВХ"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp22"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Переход уровня по прямой"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp23"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Переход уровня по кривой"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp24"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Переход уровня по прямой с нишей"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp25"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Переход уровня по кривой с нишей"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp26"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Слив воды"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp27"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Парящий потолок"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp30"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Монтаж (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp33"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка люстры (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp34"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка светильников (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp36"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Светильники квадратные (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp37"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Пожарная сигнализация (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp38"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Обвод трубы D меньше 120мм (ткань)"/>
+
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp40"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Шторный карниз на полотно (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp41"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Установка вентиляции (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp42"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Обработка каждого угла (ткань)"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/mp43"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Транспортные расходы"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/transport"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:text="Выезд за город"/>
+        <EditText
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:inputType="number"
+            android:layout_height="40dp"
+            android:textColor="#000000"
+            android:background="@drawable/edit_text_style"
+            android:id="@+id/distance"/>
+
+        <Button
+            android:id="@+id/save_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/rounded_button"
+            android:text="Сохранить"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+</ScrollView>

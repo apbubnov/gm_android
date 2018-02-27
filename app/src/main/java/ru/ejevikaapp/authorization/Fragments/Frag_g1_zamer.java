@@ -57,8 +57,8 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
     Spinner sp_date;
 
     String date_zam, date_created, item, jsonClient = "", jsonClient_Contacts = "", client_id = "", client_new_id,
-            gager_id = "", global_results = "", time_h ="", dealer_id="";
-    Integer gager_id_int = 0, max_id = 0;
+            user_id = "", global_results = "", time_h ="", dealer_id="";
+    Integer user_id_int = 0, max_id = 0;
 
     String[] time_zam = {"- Выберите время замера -", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
             "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"};
@@ -71,10 +71,6 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
     String date = df.format(date_cr.getTime());
     String date_zamera = df.format(dateAndTime.getTime());
 
-    JSONObject jsonObjectClient = new JSONObject();
-    JSONObject jsonObjectClient_Contacts = new JSONObject();
-    JSONObject jsonObjectClient_Contacts_id = new JSONObject();
-
     int id_cl;
 
     public Frag_g1_zamer() {
@@ -83,9 +79,9 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-            SharedPreferences SP = this.getActivity().getSharedPreferences("gager_id", MODE_PRIVATE);
-            gager_id = SP.getString("", "");
-            gager_id_int = Integer.parseInt(gager_id);
+        SharedPreferences SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
+        user_id_int = Integer.parseInt(user_id);
 
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id = SP.getString("", "");
@@ -189,28 +185,23 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                         String sqlQuewy = "";
                         Cursor c;
                         max_id = 0;
+                        Log.d("mLog", String.valueOf(user_id_int));
                         try {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_clients " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 999999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
                                         max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
                                         max_id++;
-                                        Log.d("gager_id", "client 11 " + String.valueOf(max_id));
                                     } while (c.moveToNext());
                                 }
                             }
                         } catch (Exception e) {
-                            max_id = gager_id_int * 1000000 + 1;
-                            Log.d("gager_id", "client 12 " + String.valueOf(max_id));
+                            max_id = user_id_int * 1000000 + 1;
                         }
-
-                        Log.d("gager_id", "client 1_1 " + gager_id + " " + gager_id_int);
-
-                        Log.d("responce", "max_id " + max_id);
 
                         values.put(DBHelper.KEY_ID, max_id);
                         values.put(DBHelper.KEY_CLIENT_NAME, fio);
@@ -221,14 +212,14 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                         values.put(DBHelper.KEY_CREATED, date);
                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
-                        //values = new ContentValues();
-                        //values.put(DBHelper.KEY_ID_OLD, max_id);
-                        //values.put(DBHelper.KEY_ID_NEW, 0);
-                        //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                        //values.put(DBHelper.KEY_SYNC, "0");
-                        //values.put(DBHelper.KEY_TYPE, "send");
-                        //values.put(DBHelper.KEY_STATUS, "0");
-                        //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, max_id);
+                        values.put(DBHelper.KEY_ID_NEW, 0);
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "0");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                         Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, null, null,
                                 null, null, null);
@@ -243,7 +234,8 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 999999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000),
+                                    String.valueOf(user_id_int * 1000000 + 999999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -253,7 +245,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                                 }
                             }
                         } catch (Exception e) {
-                            max_id_contac = gager_id_int * 1000000 + 1;
+                            max_id_contac = user_id_int * 1000000 + 1;
                         }
 
                         Log.d("responce", "max_id_contac " + max_id);
@@ -262,14 +254,14 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                         values.put(DBHelper.KEY_PHONE, phone);
                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
 
-                        //values = new ContentValues();
-                        //values.put(DBHelper.KEY_ID_OLD, max_id_contac);
-                        //values.put(DBHelper.KEY_ID_NEW, 0);
-                        //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
-                        //values.put(DBHelper.KEY_SYNC, "0");
-                        //values.put(DBHelper.KEY_TYPE, "send");
-                        //values.put(DBHelper.KEY_STATUS, "0");
-                        //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, max_id_contac);
+                        values.put(DBHelper.KEY_ID_NEW, 0);
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "0");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                         String dealer_canvases_margin = "";
                         String dealer_components_margin = "";
@@ -301,7 +293,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_projects " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int * 1000000), String.valueOf(gager_id_int * 1000000 + 99999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -312,17 +304,18 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                                 }
                             }
                         } catch (Exception e) {
-                            max_id_proj = gager_id_int * 1000000 + 1;
+                            max_id_proj = user_id_int * 1000000 + 1;
                         }
 
+                        Log.d("mLog", "max_id_proj1 = " + max_id_proj);
                         values = new ContentValues();
                         values.put(DBHelper.KEY_ID, max_id_proj);
                         values.put(DBHelper.KEY_CLIENT_ID, id_cl);
                         values.put(DBHelper.KEY_PROJECT_INFO, address);
                         values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
                         values.put(DBHelper.KEY_CREATED, date);
-                        values.put(DBHelper.KEY_CREATED_BY, gager_id);
-                        values.put(DBHelper.KEY_MODIFIED_BY, gager_id);
+                        values.put(DBHelper.KEY_CREATED_BY, user_id);
+                        values.put(DBHelper.KEY_MODIFIED_BY, user_id);
                         values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                         values.put(DBHelper.KEY_PROJECT_STATUS, "1");
                         values.put(DBHelper.KEY_GM_CANVASES_MARGIN, gm_canvases_margin);
@@ -337,14 +330,15 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                         values.put(DBHelper.KEY_DISTANCE_COL, "0");
                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
-                        //values = new ContentValues();
-                        //values.put(DBHelper.KEY_ID_OLD, max_id_proj);
-                        //values.put(DBHelper.KEY_ID_NEW, 0);
-                        //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                        //values.put(DBHelper.KEY_SYNC, "0");
-                        //values.put(DBHelper.KEY_TYPE, "send");
-                        //values.put(DBHelper.KEY_STATUS, "0");
-                        //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                        Log.d("mLog", "max_id_proj2 = " + max_id_proj);
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, max_id_proj);
+                        values.put(DBHelper.KEY_ID_NEW, 0);
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "0");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                         JSONObject jsonObjectClient = new JSONObject();
                         sqlQuewy = "SELECT * "
@@ -372,8 +366,6 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                         cursor.close();
 
                         Log.d("responce", "послал client " + jsonClient);
-
-                        //new SendClientData().execute();
 
                         Toast toast = Toast.makeText(getActivity(),
                                 "Замер добавлен", Toast.LENGTH_SHORT);

@@ -21,7 +21,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     String SAVED_end = "";
@@ -225,6 +225,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_MP41 = "mp41";
     public static final String KEY_MP42 = "mp42";
     public static final String KEY_MP43 = "mp43";
+    public static final String KEY_MIN_SUM = "min_sum";
+    public static final String KEY_MIN_COMPONENTS_SUM = "min_components_sum";
 
     public static final String TABLE_RGZBN_GM_CEILING_OUTLAY = "rgzbn_gm_ceiling_outlay";
     public static final String KEY_CASH = "cash";
@@ -484,7 +486,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "mp11 TEXT, mp12 TEXT, mp13 TEXT, mp14 TEXT, mp15 TEXT, mp16 TEXT, mp17 TEXT, mp18 TEXT, " +
                 "mp19 TEXT, mp20 TEXT, mp21 TEXT, mp22 TEXT, mp23 TEXT, mp24 TEXT, mp25 TEXT, mp26 TEXT, mp27 TEXT, mp28 TEXT" +
                 ", mp29 TEXT, mp30 TEXT, mp31 TEXT, mp32 TEXT, mp33 TEXT, mp34 TEXT, mp35 TEXT, mp36 TEXT, mp37 TEXT, mp38 TEXT" +
-                ", mp39 TEXT, mp40 TEXT, mp41 TEXT, mp42 TEXT, mp43 TEXT, transport TEXT, user_id INTEGER, distance TEXT)");
+                ", mp39 TEXT, mp40 TEXT, mp41 TEXT, mp42 TEXT, mp43 TEXT, min_sum INTEGER, min_components_sum INTEGER," +
+                " transport TEXT, user_id INTEGER, distance TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_outlay (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "title TEXT, cash TEXT, status TEXT, date TEXT)");
@@ -561,6 +564,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Log.d("mLog", oldVersion + " " + newVersion);
 
+        /*
         if (oldVersion < 11) {
 
                 db.execSQL("ALTER TABLE  history_import_to_server ADD COLUMN title TEXT");
@@ -597,52 +601,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 onCreate(db);
 
         }
+    */
 
-       if (oldVersion < 12) {
-
-           Toast toast = Toast.makeText(mContext.getApplicationContext(),
-                   "Данные обновляются... \n дождетесь пока исчезнет эта надпись", Toast.LENGTH_SHORT);
-           toast.show();
-
-           String sqlQuewy = "SELECT _id, title "
-                   + "FROM history_import_to_server";
-
-           Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-
-           if (c != null) {
-               if (c.moveToFirst()) {
-                   do {
-                       String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                       String title = c.getString(c.getColumnIndex(c.getColumnName(1)));
-
-                       if (title == null) {
-                           ContentValues values = new ContentValues();
-                           values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
-                           db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "_id = ?", new String[]{id});
-                       }
-                   } while (c.moveToNext());
-               }
-           }
-           c.close();
-
-           db.execSQL("DROP TABLE IF EXISTS " + TABLE_RGZBN_GM_CEILING_PROJECTS);
-           onCreate(db);
-
-       }
-
-        if (oldVersion < 13) {
-
-            Toast toast = Toast.makeText(mContext.getApplicationContext(),
-                    "Данные обновляются... \n дождетесь пока исчезнет эта надпись", Toast.LENGTH_SHORT);
-            toast.show();
-
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
-            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"mount"});
-
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            onCreate(db);
-
-        }
     }
 }

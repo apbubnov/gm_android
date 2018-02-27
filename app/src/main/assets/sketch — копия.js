@@ -52,8 +52,7 @@ var ready = false;
 var text_points_lines_id = [];
 var down_g, right_g, up_g, left_g, granica;
 var diag_sort = [];
-var tre;
-var width_final, square_obrezkov = 0, angle_final, sq_polotna, cuts_json, p_usadki_final = 1;
+var width_final, square_obrezkov = 0, angle_final;
 clicks();
 ///////////////////////
 Function.prototype.process= function(state){
@@ -180,9 +179,7 @@ var close_sketch_click = function()
 		lines_length.push({name: l1+l2, length: Math.round(diag[i].length)});
 	}
 
-    //console.log(lines_length);
-
-	tre = fun_tre.getTre();
+	var tre = fun_tre.getTre();
 
 	if (tre === 29)
 	{
@@ -193,6 +190,7 @@ var close_sketch_click = function()
 	}
 	else
 	{
+
 		zerkalo(0.92);
 	}
 
@@ -214,37 +212,21 @@ var close_sketch_click = function()
 	
 	if (tre === 29)
 	{
-		if(!tkan())
-		{
-			if (auto === 0)
-			{
-				elem_preloader.style.display = 'none';
-			}
-			else
-			{
-				window.location = rup;
-			}
-			return;
-		}
-		find_obrezki_1pol(lines_tkan);
-		cuts_json = cuts_gen();
-	    save_cut_img();
+		
+		tkan();
+		save_cut_img();
 	}
 	else
 	{
-
 		polotno();
-		if (polotna.length === 1)
-		{
-			find_obrezki_1pol(lines_sort);
-			cuts_json = cuts_gen();
-		}
+
 	    save_cut_img();
 
-		remove_none_shvy();
-		rotate_final();
-		zerkalo(1);
-		remove_pt_intersects();
+	    remove_none_shvy();
+	    rotate_final();
+	    zerkalo(1);
+	    remove_pt_intersects();
+
         save_calc_image();
 
         lines_length1 = JSON.stringify(lines_length);
@@ -266,6 +248,8 @@ function change_window_location()
 	}
 }
 
+var suc_a1 = false, suc_a2 = false, suc_a3 = false;
+
 function w_h(){
 
     if (document.body.clientWidth > document.body.clientHeight)
@@ -282,239 +266,67 @@ function w_h(){
 	}
 
 }
+function save_calc_image(){
 
-var suc_a1 = false, suc_a2 = false, suc_a3 = false;
-
-function save_calc_image(){		// ajax
-
-	/*if (document.body.clientWidth > document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientHeight);
-		jQuery("#myCanvas").css("height", document.body.clientHeight - 120);
-		view.viewSize = new Size(document.body.clientHeight, document.body.clientHeight - 120);
-	}
-	else if (document.body.clientWidth < document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientWidth - 20);
-		jQuery("#myCanvas").css("height", document.body.clientWidth);
-		view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientWidth);
-	}*/
-
-	w_h();
+    w_h();
 
 	text_points_sdvig();
 	zoom(2);
 	align_center();
 	zoom(1);
-
-	for(var i in text_points)
-	{
-		/*if (view.zoom > 1)
-		{
-			text_points[i].fontSize -= 2;
-		}*/
-		text_points[i].bringToFront();
-	}
-	for(var i in text_diag)
-	{
-		//text_diag[i].fontSize -= 2;
-		if (diag_sort[i].length < 40)
-		{
-			text_diag[i].fontSize -= 1;
-			if (diag_sort[i].length < 30)
-			{
-				text_diag[i].fontSize -= 1;
-				if (diag_sort[i].length < 20)
-				{
-					text_diag[i].fontSize -= 1;
-					if (diag_sort[i].length < 10)
-					{
-						text_diag[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_diag[i].fontSize -= 2;
-		}*/
-		text_diag[i].position = diag_sort[i].position;
-		text_diag[i].bringToFront();
-	}
-	for(var i in text_lines)
-	{
-		if (lines[i].length < 40)
-		{
-			text_lines[i].fontSize -= 1;
-			if (lines[i].length < 30)
-			{
-				text_lines[i].fontSize -= 1;
-				if (lines[i].length < 20)
-				{
-					text_lines[i].fontSize -= 1;
-					if (lines[i].length < 10)
-					{
-						text_lines[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_lines[i].fontSize -= 2;
-		}*/
-		text_lines[i].position = lines[i].position;
-		text_lines[i].bringToFront();
-	}
-
+	
 	view.update();
-    /*var MainCanvas = document.getElementById('myCanvas');
 
-    var hidden_canv = document.createElement('canvas');
-    hidden_canv.style.display = 'none';
-    document.body.appendChild(hidden_canv);
-    hidden_canv.width = MainCanvas.width;
-    hidden_canv.height = MainCanvas.height;
-    var hidden_ctx = hidden_canv.getContext('2d');
-    hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0, hidden_canv.width, hidden_canv.height);
-    var image = hidden_canv.toDataURL("screenshot/png");*/
-
-	var bounds = project.activeLayer.bounds.clone();
-	project.activeLayer.bounds = new Rectangle({from: [0,0], 
-		to: [bounds.bottomRight.x - bounds.topLeft.x,bounds.bottomRight.y - bounds.topLeft.y]});
-	var rec = new Rectangle({from: bounds.topLeft, to: bounds.bottomRight});
-	var svg = project.activeLayer.exportSVG();
-	svg = '<?xml version="1.0" ?><svg height="'+rec.height.toFixed(0)+'px" width="'+rec.width.toFixed(0)+'px" xmlns="http://www.w3.org/2000/svg">'+svg.outerHTML+'</svg>';
-	//console.log(svg);
-	project.activeLayer.bounds = bounds;
+    var MainCanvas = document.getElementById('myCanvas');
+	var hidden_canv = document.createElement('canvas');
+        hidden_canv.style.display = 'none';
+        document.body.appendChild(hidden_canv);
+        hidden_canv.width = MainCanvas.width;
+        hidden_canv.height = MainCanvas.height;
+        var hidden_ctx = hidden_canv.getContext('2d');
+        hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0,
+        	hidden_canv.width, hidden_canv.height);
+        var image = hidden_canv.toDataURL("screenshot/png");
 
     AndroidFunction.func_elem_jform_n4(elem_jform_n4.value);
     AndroidFunction.func_elem_jform_n5(elem_jform_n5.value);
     AndroidFunction.func_elem_jform_n9(elem_jform_n9.value);
-    AndroidFunction.func_elem_jform_image(svg);
-
-
+    AndroidFunction.func_elem_jform_image(image);
 }
 
-function save_cut_img() // ajax2
+function save_cut_img()
 {
-	/*if (document.body.clientWidth > document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientHeight);
-		jQuery("#myCanvas").css("height", document.body.clientHeight - 120);
-		view.viewSize = new Size(document.body.clientHeight, document.body.clientHeight - 120);
-	}
-	else if (document.body.clientWidth < document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientWidth - 20);
-		jQuery("#myCanvas").css("height", document.body.clientWidth);
-		view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientWidth);
-	}*/
-
-	w_h();
+    w_h();
 
 	text_points_sdvig();
 	zoom(2);
 	align_center();
 	zoom(1);
-
-	if (tre === 29)
-	{
-		sdvig();
-		zoom(1);
-	}
-
-	for(var i in text_points)
-	{
-		/*if (view.zoom > 1)
-		{
-			text_points[i].fontSize -= 2;
-		}*/
-		text_points[i].bringToFront();
-	}
-	for(var i in text_diag)
-	{
-		//text_diag[i].fontSize -= 2;
-		if (diag_sort[i].length < 40)
-		{
-			text_diag[i].fontSize -= 1;
-			if (diag_sort[i].length < 30)
-			{
-				text_diag[i].fontSize -= 1;
-				if (diag_sort[i].length < 20)
-				{
-					text_diag[i].fontSize -= 1;
-					if (diag_sort[i].length < 10)
-					{
-						text_diag[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_diag[i].fontSize -= 2;
-		}*/
-		text_diag[i].position = diag_sort[i].position;
-		text_diag[i].bringToFront();
-	}
-
-	for(var i in text_lines)
-	{
-		if (lines[i].length < 40)
-		{
-			text_lines[i].fontSize -= 1;
-			if (lines[i].length < 30)
-			{
-				text_lines[i].fontSize -= 1;
-				if (lines[i].length < 20)
-				{
-					text_lines[i].fontSize -= 1;
-					if (lines[i].length < 10)
-					{
-						text_lines[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_lines[i].fontSize -= 2;
-		}*/
-		text_lines[i].position = lines[i].position;
-		text_lines[i].bringToFront();
-	}
-
+	
 	view.update();
-    /*var MainCanvas = document.getElementById('myCanvas');
+    var MainCanvas = document.getElementById('myCanvas');
 
     var hidden_canv = document.createElement('canvas');
-    hidden_canv.style.display = 'none';
-    document.body.appendChild(hidden_canv);
-    hidden_canv.width = MainCanvas.width;
-    hidden_canv.height = MainCanvas.height;
-    var hidden_ctx = hidden_canv.getContext('2d');
-    hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0, hidden_canv.width, hidden_canv.height);
-    var image = hidden_canv.toDataURL("screenshot/png");*/
+        hidden_canv.style.display = 'none';
+        document.body.appendChild(hidden_canv);
+        hidden_canv.width = MainCanvas.width;
+        hidden_canv.height = MainCanvas.height;
+        var hidden_ctx = hidden_canv.getContext('2d');
+        hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0, hidden_canv.width, hidden_canv.height);
+        var image = hidden_canv.toDataURL("screenshot/png");
 
-    var bounds = project.activeLayer.bounds.clone();
-	project.activeLayer.bounds = new Rectangle({from: [0,0], 
-		to: [bounds.bottomRight.x - bounds.topLeft.x,bounds.bottomRight.y - bounds.topLeft.y]});
-	var rec = new Rectangle({from: bounds.topLeft, to: bounds.bottomRight});
-	var svg = project.activeLayer.exportSVG();
-	svg = '<?xml version="1.0" ?><svg height="'+rec.height.toFixed(0)+'px" width="'+rec.width.toFixed(0)+'px" xmlns="http://www.w3.org/2000/svg">'+svg.outerHTML+'</svg>';
-	//console.log(svg);
-	project.activeLayer.bounds = bounds;
-    
     AndroidFunction.func_elem_jform_square_obrezkov(square_obrezkov);
-    AndroidFunction.func_elem_jform_image_cut(svg);
+    AndroidFunction.func_elem_jform_image_cut(image);
 
     js_polotna = JSON.stringify (koordinats_poloten);
     AndroidFunction.func_elem_jform_koordinats_poloten(js_polotna);
+
+    elem_preloader.style.display = 'none';
 }
 
-function get_original_sketch() // ajax3
+function get_original_sketch()
 {
+
     js_polotna = JSON.stringify(walls_points);
     AndroidFunction.func_elem_jform_walls_points(js_polotna);
 
@@ -549,7 +361,7 @@ function sdvig()
 		if (points_m.maxY > down_g.position.y)
 		{
 			sy = -Math.round(Decimal.abs(new Decimal(points_m.maxY).minus(down_g.position.y)).toNumber());
-			//('↓');
+			//console.log('↓');
 
 			sdvig_sy(sy);
 		}
@@ -557,7 +369,7 @@ function sdvig()
 		if (points_m.maxX > right_g.position.x)
 		{
 			sx = -Math.round(Decimal.abs(new Decimal(points_m.maxX).minus(right_g.position.x)).toNumber());
-			//('→');
+			//console.log('→');
 
 			sdvig_sx(sx);
 		}
@@ -565,7 +377,7 @@ function sdvig()
 		if (points_m.minX < left_g.position.x)
 		{
 			sx = Math.round(Decimal.abs(new Decimal(points_m.minX).minus(left_g.position.x)).toNumber());
-			//('←');
+			//console.log('←');
 
 			sdvig_sx(sx);
 		}
@@ -573,7 +385,7 @@ function sdvig()
 		if (points_m.minY < up_g.position.y)
 		{
 			sy = Math.round(Decimal.abs(new Decimal(points_m.minY).minus(up_g.position.y)).toNumber());
-			//('↑');
+			//console.log('↑');
 
 			sdvig_sy(sy);
 		}
@@ -779,26 +591,7 @@ function zoom(flag1)
 					clear_granica();
 					sdvig();
 					add_granica();
-					if (view.zoom < 0.4)
-					{
-						for (var key = text_points.length; key--;)
-						{
-							text_points[key].fontSize += 4;
-						}
-						for (var key in text_lines)
-						{
-							text_lines[key].fontSize += 4;
-						}
-						for (var key = text_diag.length; key--;)
-						{
-							text_diag[key].fontSize += 4;
-						}
-						for (var key = text_contur.length; key--;)
-						{
-							text_contur[key].fontSize += 4;
-						}
-					}
-					else if (view.zoom < 1)
+					if (view.zoom < 1)
 					{
 						for (var key = text_points.length; key--;)
 						{
@@ -816,24 +609,24 @@ function zoom(flag1)
 						{
 							text_contur[key].fontSize += 2;
 						}
-					}
-					else if (view.zoom < 2)
-					{
-						for (var key = text_points.length; key--;)
+						if (view.zoom < 0.4)
 						{
-							text_points[key].fontSize += 0.5;
-						}
-						for (var key in text_lines)
-						{
-							text_lines[key].fontSize += 0.5;
-						}
-						for (var key = text_diag.length; key--;)
-						{
-							text_diag[key].fontSize += 0.5;
-						}
-						for (var key = text_contur.length; key--;)
-						{
-							text_contur[key].fontSize += 0.5;
+							for (var key = text_points.length; key--;)
+							{
+								text_points[key].fontSize += 4;
+							}
+							for (var key in text_lines)
+							{
+								text_lines[key].fontSize += 4;
+							}
+							for (var key = text_diag.length; key--;)
+							{
+								text_diag[key].fontSize += 4;
+							}
+							for (var key = text_contur.length; key--;)
+							{
+								text_contur[key].fontSize += 4;
+							}
 						}
 					}
 					points_m = findMinAndMaxCordinate_g();
@@ -853,32 +646,13 @@ function zoom(flag1)
 				|| (points_m.maxX <= right_g.position.x
 				|| points_m.minX >= left_g.position.x))
 		{
-			if (view.zoom < 2.2)
+			if (view.zoom < 2)
 			{
 				view.zoom = new Decimal(view.zoom).plus(0.05).toNumber();
 				clear_granica();
 				sdvig();
 				add_granica();
-				if (view.zoom <= 0.4)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 4;
-					}
-					for (var key = text_contur.length; key--;)
-					{
-						text_contur[key].fontSize -= 4;
-					}
-				}
-				else if (view.zoom <= 1)
+				if (view.zoom < 1)
 				{
 					for (var key = text_points.length; key--;)
 					{
@@ -896,24 +670,24 @@ function zoom(flag1)
 					{
 						text_contur[key].fontSize -= 2;
 					}
-				}
-				else if (view.zoom <= 2)
-				{
-					for (var key = text_points.length; key--;)
+					if (view.zoom < 0.4)
 					{
-						text_points[key].fontSize -= 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 0.5;
-					}
-					for (var key = text_contur.length; key--;)
-					{
-						text_contur[key].fontSize -= 0.5;
+						for (var key = text_points.length; key--;)
+						{
+							text_points[key].fontSize -= 4;
+						}
+						for (var key in text_lines)
+						{
+							text_lines[key].fontSize -= 4;
+						}
+						for (var key = text_diag.length; key--;)
+						{
+							text_diag[key].fontSize -= 4;
+						}
+						for (var key = text_contur.length; key--;)
+						{
+							text_contur[key].fontSize -= 4;
+						}
 					}
 				}
 				points_m = findMinAndMaxCordinate_g();
@@ -934,7 +708,7 @@ function add_granica()
 		vh = view.viewSize.height,
 		vwz = new Decimal(vw).dividedBy(view.zoom),
 		vhz = new Decimal(vh).dividedBy(view.zoom);
-	granica = new Path.Rectangle(0, 0, vwz.minus(80 / view.zoom).toNumber(), vhz.minus(80 / view.zoom).toNumber());
+	granica = new Path.Rectangle(0, 0, vwz.minus(80).toNumber(), vhz.minus(80).toNumber());
 	granica.position = view.center;
 
 	left_g = new Path.Line(granica.segments[0].point, granica.segments[1].point);
@@ -1456,7 +1230,7 @@ tool.onMouseDrag = function(event)
 			line_v.addSegments([c_point, move_point]);
 		}
 		
-		if (line_v.length < 40 && line_h.length < 40)
+		if (line_v.length < 60 && line_h.length < 60)
 		{
 			if (line_v.length < line_h.length)
 			{
@@ -1516,24 +1290,22 @@ tool.onMouseDrag = function(event)
 			move_point = event.point;
 		}
 
-		add_granica();
-
-		if (move_point.y > down_g.position.y)
+		if (move_point.y - view.viewSize.height * (view.zoom - 1) > view.viewSize.height / view.zoom - 40)
 		{
 			clearInterval(timer1);
 			timer1 = setInterval(dvig_lines, 1, '1');
 		}
-		else if (move_point.y < up_g.position.y)
+		else if (move_point.y < view.viewSize.height * (view.zoom - 1) + 40)
 		{
 			clearInterval(timer1);
 			timer1 = setInterval(dvig_lines, 1, '2');
 		}
-		else if (move_point.x > right_g.position.x)
+		else if (move_point.x - view.viewSize.width * (view.zoom - 1) > view.viewSize.width / view.zoom - 40)
 		{
 			clearInterval(timer1);
 			timer1 = setInterval(dvig_lines, 1, '3');
 		}
-		else if (move_point.x < left_g.position.x)
+		else if (move_point.x < view.viewSize.width * (view.zoom - 1) + 40)
 		{
 			clearInterval(timer1);
 			timer1 = setInterval(dvig_lines, 1, '4');
@@ -1542,8 +1314,6 @@ tool.onMouseDrag = function(event)
 		{
 			clearInterval(timer1);
 		}
-
-		clear_granica();
 
 		line_v.addSegments([begin_point, move_point]);
 		line_v.strokeColor = 'blue';
@@ -1719,13 +1489,13 @@ tool.onMouseUp = function(event)
 		}
 		if (l === 0)
 		{
-			krug_start = new Path.Circle(begin_point, 20);
+			krug_start = new Path.Circle(begin_point, 40);
 			krug_start.strokeColor = 'green';
 		}
 
 		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point) 
 			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point) 
-			|| line_v.length >= 10 && line_h.length >= 10)
+			|| line_v.length >= 40 && line_h.length >= 40)
 		{
 			if (line_v.length > 3 || line_prodolzhenie(line_v)[0] !== null)
 			{
@@ -1790,7 +1560,7 @@ tool.onMouseUp = function(event)
 			good_lines = true;
 		}
 
-		if (line_v.length < 10 && line_h.length < 10 && !good_lines)
+		if (line_v.length < 40 && line_h.length < 40 && !good_lines)
 		{
 			line_v.removeSegments();
 			line_v.remove();
@@ -1809,7 +1579,7 @@ tool.onMouseUp = function(event)
 			return;
 		}
 		
-		if (line_v.length >= 10 && !good_lines)
+		if (line_v.length >= 40 && !good_lines)
 		{
 			line_h.removeSegments();
 			line_h.remove();
@@ -1818,7 +1588,7 @@ tool.onMouseUp = function(event)
 			line_pr = line_prodolzhenie(line_v);
 			prodolzhit_line(line_pr[0], line_v);
 		}
-		if (line_h.length >= 10 && !good_lines)
+		if (line_h.length >= 40 && !good_lines)
 		{
 			line_v.removeSegments();
 			line_v.remove();
@@ -1833,7 +1603,7 @@ tool.onMouseUp = function(event)
 				krug_start.remove();
 				begin_point = c_point;
 				start_point = c_point;
-				krug_start = new Path.Circle(begin_point, 20);
+				krug_start = new Path.Circle(begin_point, 40);
 				krug_start.strokeColor = 'green';
 			}
 			else
@@ -1862,12 +1632,12 @@ tool.onMouseUp = function(event)
 		}
 		if (l === 0)
 		{
-			krug_start = new Path.Circle(begin_point, 20);
+			krug_start = new Path.Circle(begin_point, 40);
 			krug_start.strokeColor = 'green';
 		}
 		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point) 
 			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point) 
-			|| line_v.length >= 10)
+			|| line_v.length >= 40)
 		{
 			if (line_v.length < 2)
 			{
@@ -1909,7 +1679,7 @@ tool.onMouseUp = function(event)
 		}
 	}
 
-	var circle = new Path.Circle(move_point, 20);
+	var circle = new Path.Circle(move_point, 40);
 	circle.strokeColor = 'green';
 	if (point_start_or_end === 'start')
 	{
@@ -2054,24 +1824,20 @@ function add_text_v_or_h(line_id)
 	}
 
 	text_lines[line_id] = new PointText();
-	text_lines[line_id].fontFamily = 'arial';
+
 	text_lines[line_id].fontWeight = 'bold';
-	text_lines[line_id].fontSize = 6;
-	var f = 2;
+	text_lines[line_id].fontSize = 16;
+	var f = 1;
 	while (f > view.zoom)
 	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			text_lines[line_id].fontSize += 4;
-		}
-		else if (f < 1)
+		f -= 0.05;
+		if (f < 1)
 		{
 			text_lines[line_id].fontSize += 2;
-		}
-		else if (f < 2)
-		{
-			text_lines[line_id].fontSize += 0.5;
+			if (f < 0.4)
+			{
+				text_lines[line_id].fontSize += 4;
+			}
 		}
 	}
 	text_lines[line_id].content = Math.round(lines[line_id].length);
@@ -2079,7 +1845,6 @@ function add_text_v_or_h(line_id)
 		-lines[line_id].segments[0].point.x))*180)/Math.PI;
     text_lines[line_id].rotate(angle);
     text_lines[line_id].position = lines[line_id].position;
-    text_lines[line_id].bringToFront();
 }
 
 function add_text_diag(index)
@@ -2089,24 +1854,19 @@ function add_text_diag(index)
 		text_diag[index].remove();
 	}
 	text_diag[index] = new PointText();
-	text_diag[index].fontFamily = 'times';
 	text_diag[index].fontWeight = 'bold';
-	text_diag[index].fontSize = 6;
-	var f = 2;
+	text_diag[index].fontSize = 16;
+	var f = 1;
 	while (f > view.zoom)
 	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			text_diag[index].fontSize += 4;
-		}
-		else if (f < 1)
+		f -= 0.05;
+		if (f < 1)
 		{
 			text_diag[index].fontSize += 2;
-		}
-		else if (f < 2)
-		{
-			text_diag[index].fontSize += 0.5;
+			if (f < 0.4)
+			{
+				text_diag[index].fontSize += 4;
+			}
 		}
 	}
 	text_diag[index].content = Math.round(diag_sort[index].length);
@@ -2114,7 +1874,6 @@ function add_text_diag(index)
 			-diag_sort[index].segments[0].point.x))*180)/Math.PI;
     text_diag[index].rotate(angle);
     text_diag[index].position = new Point(diag_sort[index].position.x, diag_sort[index].position.y);
-    text_diag[index].bringToFront();
 }
 
 function line_prodolzhenie(line)
@@ -2188,7 +1947,7 @@ function line_h_or_v(line)
 function point_opredelenie(point)
 {
 	var ret_rez = null;
-	var hitResults = project.hitTestAll(point, {class: Path, segments: true, tolerance: 20});
+	var hitResults = project.hitTestAll(point, {class: Path, segments: true, tolerance: 40});
 	for (var key in hitResults)
 	{
 		if (hitResults[key].item.segments.length === 2)
@@ -2253,7 +2012,7 @@ function lines_ravny(line1, line2)
 function point_near_lines(point)
 {
 	var ret_rez = [];
-	var hitResults = project.hitTestAll(point, {class: Path, segments: true, stroke: true, tolerance: 10});
+	var hitResults = project.hitTestAll(point, {class: Path, segments: true, stroke: true, tolerance: 38});
 	for (var key in hitResults)
 	{
 		if (hitResults[key].item.segments.length === 2)
@@ -2318,10 +2077,10 @@ function cancelLastAction()
 	    		start_point = cansel_array[count_cansel].start_point;
 	    		end_point = cansel_array[count_cansel].end_point;
 	    		krug_start.remove();
-	    		krug_start = new Path.Circle(start_point, 20);
+	    		krug_start = new Path.Circle(start_point, 40);
 				krug_start.strokeColor = 'green';
 				krug_end.remove();
-	    		krug_end = new Path.Circle(end_point, 20);
+	    		krug_end = new Path.Circle(end_point, 40);
 				krug_end.strokeColor = 'green';
 				for (var key = text_points.length; key--;)
 		    	{
@@ -2555,7 +2314,6 @@ function clear_elem()
 	{
 		text_lines[key].remove();
 	}
-	text_lines = [];
 	code = 64;
 	alfavit = 0;
 	lines = [];
@@ -3048,7 +2806,7 @@ function change_length(line, length, text_point_index)
 function triangulator()
 {
 	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	g_points = changePointsOrderForNaming(g_points, 2);
 	var ctx1, ctx2, ctx3, d, kolvo_lines, kolvo_lines_2, kolvo_lines_4a, kolvo_lines_4b, kolvo_lines_2_y, kolvo_lines_4a_y, kolvo_lines_4b_y,
 		cx, cy, cp2, c0, chek_line_2, cp4a, chek_line_4a, cp4b, chek_line_4b, chek_line_2_y, chek_line_4a_y, chek_line_4b_y, bdel;
 	var vertices = [];
@@ -3688,6 +3446,7 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
 		sq1_dec = sq1_dec.dividedBy(10000);
 		sq1_dec = sq1_dec.times(p_usadki).times(p_usadki);
 		sq1 = new Decimal(sq1).plus(sq1_dec).toNumber();
+		//sq1 += ((polotna[key].down.length * polotna[key].left.length) / 10000) * p_usadki * p_usadki;
 	}
 
 	var sq_obr = new Decimal(sq1).minus(sq2).toNumber();
@@ -3704,14 +3463,9 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
 	//console.log(price_it, "price");
 
 	width_final = width_polotna[j_f].width;
-	sq_polotna = sq1;
-	p_usadki_final = p_usadki;
-	//console.log(width_final, "width_polotna");
-
-
-	width_final = width_polotna[j_f].width;
 	
     AndroidFunction.func_elem_jform_width(width_final);
+	//console.log(width_final, "width_polotna");
 
 	for (var i = polotna.length; i--;)
 	{
@@ -3786,6 +3540,8 @@ var polotno = function()
 			h = points_m.maxY - points_m.minY;
 			height_chert = (h * 0.92) / kolvo_poloten;
 			j_n = width_polotna.length - 1;
+
+
 			for (var j = 0; j < width_polotna.length; j++)
 			{
 				if (width_polotna[j].width < height_chert)
@@ -3816,8 +3572,9 @@ var polotno = function()
 					continue;
 				}
 
-				if (kolvo_poloten === 1)
+				if (kolvo_poloten == 1)
 				{
+
 					if (add_polotno_fast(width_polotna[j].width, p_usadki) === false)
 					{
 						continue;
@@ -3831,7 +3588,7 @@ var polotno = function()
 					}
 				}
 
-				if (kolvo_polos === kolvo_poloten)
+				if (kolvo_polos == kolvo_poloten)
 				{
 					sq1 = 0;
 
@@ -3843,7 +3600,6 @@ var polotno = function()
 					}
 					sq1 = +sq1.toFixed(2);
 					sq_obr = new Decimal(sq1).minus(sq_og).toNumber();
-
 
 					if ((width_polotna[j].price < price_min) || (width_polotna[j].price === price_min && sq_obr < sq_min))
 					{
@@ -3899,6 +3655,7 @@ var polotno = function()
 
 function add_polotno_fast(p_width, p_usadki)
 {
+
 	for (var key = polotna.length; key--;)
 	{
 		polotna[key].left.remove();
@@ -3906,6 +3663,7 @@ function add_polotno_fast(p_width, p_usadki)
 		polotna[key].up.remove();
 		polotna[key].down.remove();
 	}
+
 	polotna = [];
 	var dotyanem = new Decimal(p_width).times(0.05).toNumber();
 	p_width = new Decimal(p_width).dividedBy(p_usadki).toNumber();
@@ -4223,7 +3981,7 @@ function get_koordinats_poloten(p_usadki)
 	                    content: pt_name,
 	                    fillColor: 'blue',
 	                    justification: 'center',
-	                    fontFamily: 'lucida console',
+	                    fontFamily: 'TimesNewRoman',
 	                    fontWeight: 'bold',
 	                    fontSize: text_points[0].fontSize
 	                });
@@ -4301,7 +4059,7 @@ function get_koordinats_poloten(p_usadki)
 	                    content: pt_name,
 	                    fillColor: 'blue',
 	                    justification: 'center',
-	                    fontFamily: 'lucida console',
+	                    fontFamily: 'TimesNewRoman',
 	                    fontWeight: 'bold',
 	                    fontSize: text_points[0].fontSize
 	                });
@@ -7056,7 +6814,7 @@ function okruglenie_all_segments()
 	}
 	
 	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	g_points = changePointsOrderForNaming(g_points, 2);
 
 	for (var i = diag_sort.length; i--;)
 	{
@@ -7086,18 +6844,6 @@ function okruglenie_all_segments()
 		diag_sort[i].removeSegments();
 		diag_sort[i].addSegments([p1, p2]);
 	}
-	for (var i = text_points.length; i--;)
-	{
-		text_points[i].bringToFront();
-	}
-	for (var i = text_diag.length; i--;)
-	{
-		text_diag[i].bringToFront();
-	}
-	for (var i in text_lines)
-	{
-		text_lines[i].bringToFront();
-	}
 }
 
 function find_part_chert_on_diag(diag_f, index)
@@ -7108,7 +6854,7 @@ function find_part_chert_on_diag(diag_f, index)
     var mass_w = [];
     var mass_d = [];
 	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	g_points = changePointsOrderForNaming(g_points, 2);
 	for (var key = g_points.length; key--;)
 	{
 		if (point_ravny(diag_f.segments[0].point, g_points[key]))
@@ -7285,22 +7031,7 @@ function wheel_zoom(e)
 	if (e.wheelDelta < 0 && view.zoom > 0.2)
 	{
 		view.zoom = new Decimal(view.zoom).minus(0.05).toNumber();
-		if (view.zoom < 0.4)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize += 4;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize += 4;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize += 4;
-			}
-		}
-		else if (view.zoom < 1)
+		if (view.zoom < 1)
 		{
 			for (var key = text_points.length; key--;)
 			{
@@ -7314,42 +7045,27 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize += 2;
 			}
-		}
-		else if (view.zoom < 2)
-		{
-			for (var key = text_points.length; key--;)
+			if (view.zoom < 0.4)
 			{
-				text_points[key].fontSize += 0.5;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize += 0.5;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize += 0.5;
+				for (var key = text_points.length; key--;)
+				{
+					text_points[key].fontSize += 4;
+				}
+				for (var key in text_lines)
+				{
+					text_lines[key].fontSize += 4;
+				}
+				for (var key = text_diag.length; key--;)
+				{
+					text_diag[key].fontSize += 4;
+				}
 			}
 		}
 	}
-	else if (e.wheelDelta > 0 && view.zoom < 2.2)
+	else if (e.wheelDelta > 0 && view.zoom < 2)
 	{
 		view.zoom = new Decimal(view.zoom).plus(0.05).toNumber();
-		if (view.zoom <= 0.4)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize -= 4;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize -= 4;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize -= 4;
-			}
-		}
-		else if (view.zoom <= 1)
+		if (view.zoom < 1)
 		{
 			for (var key = text_points.length; key--;)
 			{
@@ -7363,21 +7079,37 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize -= 2;
 			}
+			if (view.zoom < 0.4)
+			{
+				for (var key = text_points.length; key--;)
+				{
+					text_points[key].fontSize -= 4;
+				}
+				for (var key in text_lines)
+				{
+					text_lines[key].fontSize -= 4;
+				}
+				for (var key = text_diag.length; key--;)
+				{
+					text_diag[key].fontSize -= 4;
+				}
+			}
 		}
-		else if (view.zoom <= 2)
+	}
+
+	if (view.zoom === 1)
+	{
+		for (var key = text_points.length; key--;)
 		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize -= 0.5;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize -= 0.5;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize -= 0.5;
-			}
+			text_points[key].fontSize = 16;
+		}
+		for (var key in text_lines)
+		{
+			text_lines[key].fontSize = 16;
+		}
+		for (var key = text_diag.length; key--;)
+		{
+			text_diag[key].fontSize = 16;
 		}
 	}
 
@@ -7394,15 +7126,6 @@ function wheel_zoom(e)
 		start_point.y = parseFloat(start_point.y.toFixed(2));
 		end_point.x = parseFloat(end_point.x.toFixed(2));
 		end_point.y = parseFloat(end_point.y.toFixed(2));
-	}
-
-	for (var key in text_lines)
-	{
-		text_lines[key].position = lines[key].position;
-	}
-	for (var key = text_diag.length; key--;)
-	{
-		text_diag[key].position = diag_sort[key].position;
 	}
 }
 
@@ -7423,22 +7146,7 @@ function touch_zoom(event)
 			if (rast2 < rast && view.zoom > 0.2)
 			{
 				view.zoom = new Decimal(view.zoom).minus(0.05).toNumber();
-				if (view.zoom < 0.4)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize += 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize += 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize += 4;
-					}
-				}
-				else if (view.zoom < 1)
+				if (view.zoom < 1)
 				{
 					for (var key = text_points.length; key--;)
 					{
@@ -7452,42 +7160,27 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize += 2;
 					}
-				}
-				else if (view.zoom < 2)
-				{
-					for (var key = text_points.length; key--;)
+					if (view.zoom < 0.4)
 					{
-						text_points[key].fontSize += 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize += 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize += 0.5;
+						for (var key = text_points.length; key--;)
+						{
+							text_points[key].fontSize += 4;
+						}
+						for (var key in text_lines)
+						{
+							text_lines[key].fontSize += 4;
+						}
+						for (var key = text_diag.length; key--;)
+						{
+							text_diag[key].fontSize += 4;
+						}
 					}
 				}
 			}
-			else if (rast2 > rast && view.zoom < 2.2)
+			else if (rast2 > rast && view.zoom < 2)
 			{
 				view.zoom = new Decimal(view.zoom).plus(0.05).toNumber();
-				if (view.zoom <= 0.4)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 4;
-					}
-				}
-				if (view.zoom <= 1)
+				if (view.zoom < 1)
 				{
 					for (var key = text_points.length; key--;)
 					{
@@ -7501,21 +7194,37 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize -= 2;
 					}
+					if (view.zoom < 0.4)
+					{
+						for (var key = text_points.length; key--;)
+						{
+							text_points[key].fontSize -= 4;
+						}
+						for (var key in text_lines)
+						{
+							text_lines[key].fontSize -= 4;
+						}
+						for (var key = text_diag.length; key--;)
+						{
+							text_diag[key].fontSize -= 4;
+						}
+					}
 				}
-				else if (view.zoom <= 2)
+			}
+
+			if (view.zoom === 1)
+			{
+				for (var key = text_points.length; key--;)
 				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 0.5;
-					}
+					text_points[key].fontSize = 16;
+				}
+				for (var key in text_lines)
+				{
+					text_lines[key].fontSize = 16;
+				}
+				for (var key = text_diag.length; key--;)
+				{
+					text_diag[key].fontSize = 16;
 				}
 			}
 
@@ -7534,14 +7243,6 @@ function touch_zoom(event)
 			start_point.y = parseFloat(start_point.y.toFixed(2));
 			end_point.x = parseFloat(end_point.x.toFixed(2));
 			end_point.y = parseFloat(end_point.y.toFixed(2));
-		}
-		for (var key in text_lines)
-		{
-			text_lines[key].position = lines[key].position;
-		}
-		for (var key = text_diag.length; key--;)
-		{
-			text_diag[key].position = diag_sort[key].position;
 		}
 	}
 }
@@ -7885,7 +7586,7 @@ function clicks()
 function sort_sten()
 {
 	g_points = getPathsPoints(lines);
-	g_points = changePointsOrderForNaming(g_points, 2, lines);
+	g_points = changePointsOrderForNaming(g_points, 2);
 	var j;
 	for (var i = 0; i < g_points.length; i++)
 	{
@@ -7927,9 +7628,9 @@ function drawLabels()
                     content:namedPoints[i].name,
                     fillColor: 'blue',
                     justification: 'center',
-                    fontFamily: 'lucida console',
+                    fontFamily: 'TimesNewRoman',
                     fontWeight: 'bold',
-                    fontSize: 6
+                    fontSize : 16
                 });
             textPoints.push(pt);
             for (var key in lines)
@@ -7959,29 +7660,22 @@ function drawLabels()
             text_points_lines_id.push({id_pt: pt.id, id_line1: id1, id_line2: id2});
         }
     }
-    var f = 2;
+    var f = 1;
 	while (f > view.zoom)
 	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			for (var i = textPoints.length; i--;)
-			{
-				textPoints[i].fontSize += 4;
-			}
-		}
-		else if (f < 1)
+		f -= 0.05;
+		if (f < 1)
 		{
 			for (var i = textPoints.length; i--;)
 			{
 				textPoints[i].fontSize += 2;
 			}
-		}
-		else if (f < 2)
-		{
-			for (var i = textPoints.length; i--;)
+			if (f < 0.4)
 			{
-				textPoints[i].fontSize += 0.5;
+				for (var i = textPoints.length; i--;)
+				{
+					textPoints[i].fontSize += 4;
+				}
 			}
 		}
 	}
@@ -7991,7 +7685,7 @@ function drawLabels()
 function createVertexNames()
 {
     var namedPoints = [];
-    var allpoints = changePointsOrderForNaming(getPathsPoints(lines), 1, lines);
+    var allpoints = changePointsOrderForNaming(getPathsPoints(lines), 1);
     if (allpoints !== undefined)
     {
         for (var i = 0; i < allpoints.length; i++)
@@ -8015,7 +7709,7 @@ function createVertexNames()
     return namedPoints;
 }
 
-function findWallsByPoint(points, point, flag, lines)
+function findWallsByPoint(points,point,flag)
 {
 	var temp_point = [];
 	var j = 0, min_y, rez_point;
@@ -8023,14 +7717,14 @@ function findWallsByPoint(points, point, flag, lines)
 	{
 		for(var j in lines)
 		{
-			if (point_ravny(lines[j].getFirstSegment().point, point) || point_ravny(lines[j].getLastSegment().point, point))
-			{
+			if (point_ravny(lines[j].getFirstSegment().point, point) || point_ravny(lines[j].getLastSegment().point, point)) {
 				if (!point_ravny(lines[j].getFirstSegment().point, point) && lines[j].getFirstSegment().point.x >= point.x) {
 					temp_point.push(lines[j].getFirstSegment().point.clone());
 				}
 				if (!point_ravny(lines[j].getLastSegment().point, point) && lines[j].getLastSegment().point.x >= point.x) {
 					temp_point.push(lines[j].getLastSegment().point.clone());
 				}
+			
 			}
 		}
 		min_y = temp_point[0].y;
@@ -8059,11 +7753,12 @@ function findWallsByPoint(points, point, flag, lines)
 					return lines[j].getLastSegment().point.clone();
 				}
 			}
+				
 		}
 	}
 }
 
-function changePointsOrderForNaming(points, flag, lines)
+function changePointsOrderForNaming(points, flag)
 {
 	if (flag === 1)
 	{
@@ -8107,13 +7802,13 @@ function changePointsOrderForNaming(points, flag, lines)
         {
             if (result.length === 1)
             {
-                point = findWallsByPoint(result, result[result.length - 1], 1, lines);
+                point = findWallsByPoint(result, result[result.length - 1], 1);
                 points.splice(points.indexOf(point),1);
                 result.push(point);
             }
             else
             {
-                point = findWallsByPoint(result, result[result.length - 1], 2, lines);
+                point = findWallsByPoint(result, result[result.length - 1], 2);
                 points.splice(points.indexOf(point),1);
                 result.push(point);
             }
@@ -8222,7 +7917,7 @@ function sbros_but_color(elem)
 	clearInterval(timer_button_color);
 }
 
-var square_tkan, lines_tkan = [];
+var square_tkan;
 function tkan()
 {
 	var polygonVertices = [], polygons, paddingPolygon, x1, y1, x2, y2, intersections;
@@ -8234,6 +7929,7 @@ function tkan()
 
 	paddingPolygon = polygons.paddingPolygon;
 
+	var lines_tkan = [];
 	var chertezh = new Path();
 	for(var i = paddingPolygon.edges.length; i--;)
 	{
@@ -8371,7 +8067,7 @@ function tkan()
             content: pt_name,
             fillColor: 'black',
             justification: 'center',
-            fontFamily: 'lucida console',
+            fontFamily: 'TimesNewRoman',
             fontWeight: 'bold',
             fontSize: 12
         });
@@ -8509,7 +8205,6 @@ function tkan()
 	//console.log('sq_obr', square_obrezkov);
 
 	width_final = width_polotna[j_f].width;
-	sq_polotna = sq_polo;
 	//console.log(width_final, "width_polotna");
 
 	polotna[0].up.strokeColor = 'red';
@@ -8562,22 +8257,18 @@ function add_text_contur(arr)
 			var tc = new PointText();
 
 			tc.fontWeight = 'bold';
-			tc.fontSize = 4;
-			var f = 2;
+			tc.fontSize = 12;
+			var f = 1;
 			while (f > view.zoom)
 			{
-				f = new Decimal(f).minus(0.05).toNumber();
-				if (f <= 0.4 && f > 0.2)
-				{
-					tc.fontSize += 4;
-				}
-				else if (f < 1)
+				f -= 0.05;
+				if (f < 1)
 				{
 					tc.fontSize += 2;
-				}
-				else if (f < 2)
-				{
-					tc.fontSize += 0.5;
+					if (f < 0.4)
+					{
+						tc.fontSize += 4;
+					}
 				}
 			}
 			tc.content = Math.round(arr[i].length);
@@ -8585,7 +8276,6 @@ function add_text_contur(arr)
 				-arr[i].segments[0].point.x))*180)/Math.PI;
 		    tc.rotate(angle);
 		    tc.position = arr[i].position;
-		    tc.bringToFront();
 		    text_contur.push(tc);
 		}
 	}
@@ -8619,7 +8309,7 @@ var cuts = [];
 function find_obrezki_1pol(lines)
 {
 	g_points = getPathsPoints(lines);
-	g_points = changePointsOrderForNaming(g_points, 2, lines);
+	g_points = changePointsOrderForNaming(g_points, 2);
 	var points_m = findMinAndMaxCordinate_g();
 	var first = 0;
 	var temp, hitResults, gr_polotna1, gr_polotna2;
@@ -8646,7 +8336,7 @@ function find_obrezki_1pol(lines)
 	for(var i = g_points.length; i--;)
 	{
 		bool_kray = false;
-		hitResults = project.hitTestAll(g_points[i], {class: Path, segments: true, stroke: true, tolerance: 4});
+		hitResults = project.hitTestAll(g_points[i], {class: Path, segments: true, stroke: true, tolerance: 10});
 
 		for(var j = hitResults.length; j--;)
 		{
@@ -8677,7 +8367,7 @@ function find_obrezki_1pol(lines)
 	{
 		gr_polotna1 = [];
 		gr_polotna2 = [];
-		hitResults = project.hitTestAll(cuts[i].segments[0].point, {class: Path, segments: true, stroke: true, tolerance: 4});
+		hitResults = project.hitTestAll(cuts[i].segments[0].point, {class: Path, segments: true, stroke: true, tolerance: 10});
 		for(var j = hitResults.length; j--;)
 		{
 			if (hitResults[j].item === polotna[0].up || hitResults[j].item === polotna[0].down ||
@@ -8686,7 +8376,7 @@ function find_obrezki_1pol(lines)
 				gr_polotna1.push(hitResults[j].item);
 			}
 		}
-		hitResults = project.hitTestAll(cuts[i].segments[cuts[i].segments.length - 1].point, {class: Path, segments: true, stroke: true, tolerance: 4});
+		hitResults = project.hitTestAll(cuts[i].segments[cuts[i].segments.length - 1].point, {class: Path, segments: true, stroke: true, tolerance: 10});
 		for(var j = hitResults.length; j--;)
 		{
 			if (hitResults[j].item === polotna[0].up || hitResults[j].item === polotna[0].down ||
@@ -8741,32 +8431,10 @@ function find_obrezki_1pol(lines)
 				}
 			}
 			cuts[i].closed = true;
-			cuts[i].fillColor = 'red';
-			cuts[i].opacity = 0.1;
+			cuts[i].fillColor = 'green';
+			cuts[i].opacity = 0.2;
 		}
 	}
-}
-
-function cuts_gen()
-{
-	var arr_cuts = [], arr_points, cut_area;
-	for(var i = cuts.length; i--;)
-	{
-		arr_points = [];
-		cut_area = new Decimal(cuts[i].area);
-		cut_area = cut_area.dividedBy(10000);
-		cut_area = cut_area.times(p_usadki_final).times(p_usadki_final).toNumber();
-		if (cut_area > 1)
-		{
-			for(var j = cuts[i].segments.length; j--;)
-			{
-				arr_points.push({x: +cuts[i].segments[j].point.x.toFixed(2), y: +cuts[i].segments[j].point.y.toFixed(2)});
-			}
-			arr_cuts.push({sq: cut_area, points: arr_points});
-		}
-	}
-	var obj = {sq_canv: sq_polotna, cuts: arr_cuts};
-	return obj;
 }
 
 auto = fun_canv.get_auto();
@@ -8785,7 +8453,7 @@ var qw = fun_canv.get_diags_points();
 var qw = fun_canv.get_pt_points();
         qw = JSON.parse(qw);
         pt_points_rec = qw;
-        
+
 	ready = true;
 	triangulate_bool = true;
 	var obj, pt_name;
@@ -8829,7 +8497,7 @@ var qw = fun_canv.get_pt_points();
                 content: pt_name,
                 fillColor: 'blue',
                 justification: 'center',
-                fontFamily: 'lucida console',
+                fontFamily: 'TimesNewRoman',
                 fontWeight: 'bold',
                 fontSize : 16
             });
@@ -8853,6 +8521,7 @@ var qw = fun_canv.get_pt_points();
 		}
 		text_points_lines_id.push({id_pt: obj.id, id_line1: id1, id_line2: id2});
 	}
+
 	code = code_char;
 	alfavit = alfavit_num;
 	zerkalo(1);

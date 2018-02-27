@@ -2,6 +2,7 @@ package ru.ejevikaapp.authorization;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -13,6 +14,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -25,7 +27,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +42,11 @@ public class Send_All extends Service {
 
     static RequestQueue requestQueue;
 
-    static String domen = "test1";
+    static String domen;
 
     static String dealer_id = "";
 
+    static Context ctx;
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -53,6 +55,10 @@ public class Send_All extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service started!");
+
+        ctx = this.getApplicationContext();
+
+        domen = getResources().getString(R.string.link);
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
@@ -63,56 +69,56 @@ public class Send_All extends Service {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String change_time = "0000-00-00 00:00:00";
 
-       String sqlQuewy = "SELECT change_time "
-               + "FROM history_import_to_server" +
-               " WHERE title = ?";
+        String sqlQuewy = "SELECT change_time "
+                + "FROM history_import_to_server" +
+                " WHERE title = ?";
 
-       Cursor c = db.rawQuery(sqlQuewy, new String[]{"material"});
-       if (c != null) {
-           if (c.moveToFirst()) {
-               do {
-                   change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
-               } while (c.moveToNext());
-           }
-       }
-       c.close();
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{"material"});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
 
         jsonMaterial.put("change_time", change_time);
         material = String.valueOf(jsonMaterial);
         new Send_Material().execute();
 
-       sqlQuewy = "SELECT change_time "
-               + "FROM history_import_to_server" +
-               " WHERE title = ?";
+        sqlQuewy = "SELECT change_time "
+                + "FROM history_import_to_server" +
+                " WHERE title = ?";
 
-       c = db.rawQuery(sqlQuewy, new String[]{"mount"});
-       if (c != null) {
-           if (c.moveToFirst()) {
-               do {
-                   change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
-               } while (c.moveToNext());
-           }
-       }
-       c.close();
+        c = db.rawQuery(sqlQuewy, new String[]{"mount"});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
 
         jsonMounters.put("dealer_id", dealer_id);
         jsonMounters.put("change_time", change_time);
         mounters = String.valueOf(jsonMounters);
         new Send_Mounters().execute();
 
-       sqlQuewy = "SELECT change_time "
-               + "FROM history_import_to_server" +
-               " WHERE title = ?";
+        sqlQuewy = "SELECT change_time "
+                + "FROM history_import_to_server" +
+                " WHERE title = ?";
 
-       c = db.rawQuery(sqlQuewy, new String[]{"dealer"});
-       if (c != null) {
-           if (c.moveToFirst()) {
-               do {
-                   change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
-               } while (c.moveToNext());
-           }
-       }
-       c.close();
+        c = db.rawQuery(sqlQuewy, new String[]{"dealer"});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
 
         jsonDealer.put("dealer_id", dealer_id);
         jsonDealer.put("change_time", change_time);
@@ -146,6 +152,10 @@ public class Send_All extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "Alarm received: " + intent.getAction());
+
+            ctx = context;
+
+            domen = ctx.getResources().getString(R.string.link);
 
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
@@ -220,9 +230,9 @@ public class Send_All extends Service {
         }
 
         public static void setAlarm(Context context) {
-            AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent(ALARM_EVENT), 0);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000 * ALARM_INTERVAL_SEC, pi);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 3600000 * ALARM_INTERVAL_SEC, pi); // раз в час
         }
 
         public static void cancelAlarm(Context context) {
@@ -235,7 +245,7 @@ public class Send_All extends Service {
 
     static class Send_Material extends AsyncTask<Integer, String, String> {
 
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendMaterialToAndroid";
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendMaterialToAndroid";
         Map<String, String> parameters = new HashMap<String, String>();
 
         @Override
@@ -251,12 +261,12 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__","Send_Material "+ res);
+                    Log.d("send_all__", "Send_Material " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
                     ContentValues values;
-                    String new_id="";
+                    String new_id = "";
 
                     int count_m;
                     try {
@@ -314,11 +324,11 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_colors");
-                        Log.d("send_all__","rgzbn_gm_ceiling_colors "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_colors " + id_array);
 
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject color = id_array.getJSONObject(i);
 
                             String id = color.getString("id");
@@ -358,10 +368,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components");
-                        Log.d("send_all__","rgzbn_gm_ceiling_components "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_components " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject comp = id_array.getJSONObject(i);
 
                             String id = comp.getString("id");
@@ -404,10 +414,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components_option");
-                        Log.d("send_all__","rgzbn_gm_ceiling_components_option "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_components_option " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject comp_op = id_array.getJSONObject(i);
 
                             String id = comp_op.getString("id");
@@ -455,10 +465,10 @@ public class Send_All extends Service {
 
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_type");
-                        Log.d("send_all__","rgzbn_gm_ceiling_type "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_type " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject type = id_array.getJSONObject(i);
 
                             String id = type.getString("id");
@@ -498,10 +508,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_type_option");
-                        Log.d("send_all__","rgzbn_gm_ceiling_type_option "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_type_option " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject type_op = id_array.getJSONObject(i);
 
                             String id = type_op.getString("id");
@@ -545,10 +555,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_textures");
-                        Log.d("send_all__","rgzbn_gm_ceiling_textures "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_textures " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject text = id_array.getJSONObject(i);
 
                             String id = text.getString("id");
@@ -567,7 +577,7 @@ public class Send_All extends Service {
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
-                                        Log.d("mLog","upd " + String.valueOf(values));
+                                        Log.d("mLog", "upd " + String.valueOf(values));
                                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, values, "_id = ?", new String[]{id});
                                         count_m++;
                                     } while (c.moveToNext());
@@ -578,7 +588,7 @@ public class Send_All extends Service {
 
                             if (count_m == 0) {
                                 try {
-                                    Log.d("mLog","ins " + String.valueOf(values));
+                                    Log.d("mLog", "ins " + String.valueOf(values));
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, null, values);
 
@@ -589,10 +599,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_status");
-                        Log.d("send_all__","rgzbn_gm_ceiling_status "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_status " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject status = id_array.getJSONObject(i);
 
                             String id = status.getString("id");
@@ -634,8 +644,11 @@ public class Send_All extends Service {
                         Time time = new Time(Time.getCurrentTimezone());
                         time.setToNow();
                         String t = time.format("%Y-%m-%d %H:%M:00");
+
+                        Log.d(TAG, t);
+
                         values.put(DBHelper.KEY_CHANGE_TIME, t);
-                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?",new String[]{"material"});
+                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"material"});
 
                     } catch (Exception e) {
                         Log.d("send_all__", "send error " + String.valueOf(e));
@@ -652,7 +665,7 @@ public class Send_All extends Service {
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("sync_data", material );
+                    parameters.put("sync_data", material);
                     Log.d("send_all__", "mat = " + String.valueOf(parameters));
                     return parameters;
                 }
@@ -667,7 +680,7 @@ public class Send_All extends Service {
 
     static class Send_Mounters extends AsyncTask<Void, Void, Void> {
 
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendMountersToAndroid";
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendMountersToAndroid";
         Map<String, String> parameters = new HashMap<String, String>();
 
         @Override
@@ -683,12 +696,12 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__","Send_Mounters "+ res);
+                    Log.d("send_all__", "Send_Mounters " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
                     ContentValues values;
-                    String new_id="";
+                    String new_id = "";
 
                     int count_m;
                     try {
@@ -769,11 +782,11 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_mounters");
-                        Log.d("send_all__","rgzbn_gm_ceiling_mounters "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_mounters " + id_array);
 
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject mount = id_array.getJSONObject(i);
 
                             String id = mount.getString("id");
@@ -811,10 +824,10 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_mounters_map");
-                        Log.d("send_all__","rgzbn_gm_ceiling_mounters_map "+ id_array);
+                        Log.d("send_all__", "rgzbn_gm_ceiling_mounters_map " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
-                            count_m=0;
+                            count_m = 0;
                             org.json.JSONObject comp = id_array.getJSONObject(i);
 
                             String id_mounter = comp.getString("id_mounter");
@@ -856,7 +869,7 @@ public class Send_All extends Service {
                         time.setToNow();
                         String t = time.format("%Y-%m-%d %H:%M:00");
                         values.put(DBHelper.KEY_CHANGE_TIME, t);
-                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?",new String[]{"mount"});
+                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"mount"});
 
                     } catch (Exception e) {
                         Log.d("send_all__", "send error " + String.valueOf(e));
@@ -873,8 +886,8 @@ public class Send_All extends Service {
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("sync_data", mounters );
-                    Log.d("send_all__","mou = " +  String.valueOf(parameters));
+                    parameters.put("sync_data", mounters);
+                    Log.d("send_all__", "mou = " + String.valueOf(parameters));
                     return parameters;
                 }
             };
@@ -887,7 +900,7 @@ public class Send_All extends Service {
 
     static class Send_Dealer extends AsyncTask<Void, Void, Void> {
 
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendDealerInfoToAndroid";
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendDealerInfoToAndroid";
         Map<String, String> parameters = new HashMap<String, String>();
 
         @Override
@@ -903,12 +916,12 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__","Send_Dealer "+ res);
+                    Log.d("send_all__", "Send_Dealer " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
                     ContentValues values;
-                    String new_id="";
+                    String new_id = "";
 
                     int count_m;
                     try {
@@ -964,141 +977,148 @@ public class Send_All extends Service {
                             }
                         }
 
-                            id_array = dat.getJSONArray("rgzbn_gm_ceiling_mount");
-                            for (int i = 0; i < id_array.length(); i++) {
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_mount");
 
-                                count_m = 0;
-                                org.json.JSONObject user = id_array.getJSONObject(i);
+                        Log.d(TAG, String.valueOf(id_array));
 
-                                String id = user.getString("id");
-                                String mp1 = user.getString("mp1");
-                                String mp2 = user.getString("mp2");
-                                String mp3 = user.getString("mp3");
-                                String mp4 = user.getString("mp4");
-                                String mp5 = user.getString("mp5");
-                                String mp6 = user.getString("mp6");
-                                String mp7 = user.getString("mp7");
-                                String mp8 = user.getString("mp8");
-                                String mp9 = user.getString("mp9");
-                                String mp10 = user.getString("mp10");
-                                String mp11 = user.getString("mp11");
-                                String mp12 = user.getString("mp12");
-                                String mp13 = user.getString("mp13");
-                                String mp14 = user.getString("mp14");
-                                String mp15 = user.getString("mp15");
-                                String mp16 = user.getString("mp16");
-                                String mp17 = user.getString("mp17");
-                                String mp18 = user.getString("mp18");
-                                String mp19 = user.getString("mp19");
-                                String mp20 = user.getString("mp20");
-                                String mp21 = user.getString("mp21");
-                                String mp22 = user.getString("mp22");
-                                String mp23 = user.getString("mp23");
-                                String mp24 = user.getString("mp24");
-                                String mp25 = user.getString("mp25");
-                                String mp26 = user.getString("mp26");
-                                String mp27 = user.getString("mp27");
-                                String mp28 = user.getString("mp28");
-                                String mp29 = user.getString("mp29");
-                                String mp30 = user.getString("mp30");
-                                String mp31 = user.getString("mp31");
-                                String mp32 = user.getString("mp32");
-                                String mp33 = user.getString("mp33");
-                                String mp34 = user.getString("mp34");
-                                String mp35 = user.getString("mp35");
-                                String mp36 = user.getString("mp36");
-                                String mp37 = user.getString("mp37");
-                                String mp38 = user.getString("mp38");
-                                String mp39 = user.getString("mp39");
-                                String mp40 = user.getString("mp40");
-                                String mp41 = user.getString("mp41");
-                                String mp42 = user.getString("mp42");
-                                String mp43 = user.getString("mp43");
-                                String transport = user.getString("transport");
-                                String user_id = user.getString("user_id");
-                                String distance = user.getString("distance");
+                        for (int i = 0; i < id_array.length(); i++) {
 
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_ID, id);
-                                values.put(DBHelper.KEY_MP1, mp1);
-                                values.put(DBHelper.KEY_MP2, mp2);
-                                values.put(DBHelper.KEY_MP3, mp3);
-                                values.put(DBHelper.KEY_MP4, mp4);
-                                values.put(DBHelper.KEY_MP5, mp5);
-                                values.put(DBHelper.KEY_MP6, mp6);
-                                values.put(DBHelper.KEY_MP7, mp7);
-                                values.put(DBHelper.KEY_MP8, mp8);
-                                values.put(DBHelper.KEY_MP9, mp9);
-                                values.put(DBHelper.KEY_MP10, mp10);
-                                values.put(DBHelper.KEY_MP11, mp11);
-                                values.put(DBHelper.KEY_MP12, mp12);
-                                values.put(DBHelper.KEY_MP13, mp13);
-                                values.put(DBHelper.KEY_MP14, mp14);
-                                values.put(DBHelper.KEY_MP15, mp15);
-                                values.put(DBHelper.KEY_MP16, mp16);
-                                values.put(DBHelper.KEY_MP17, mp17);
-                                values.put(DBHelper.KEY_MP18, mp18);
-                                values.put(DBHelper.KEY_MP19, mp19);
-                                values.put(DBHelper.KEY_MP20, mp20);
-                                values.put(DBHelper.KEY_MP21, mp21);
-                                values.put(DBHelper.KEY_MP22, mp22);
-                                values.put(DBHelper.KEY_MP23, mp23);
-                                values.put(DBHelper.KEY_MP24, mp24);
-                                values.put(DBHelper.KEY_MP25, mp25);
-                                values.put(DBHelper.KEY_MP26, mp26);
-                                values.put(DBHelper.KEY_MP27, mp27);
-                                values.put(DBHelper.KEY_MP28, mp28);
-                                values.put(DBHelper.KEY_MP29, mp29);
-                                values.put(DBHelper.KEY_MP30, mp30);
-                                values.put(DBHelper.KEY_MP31, mp31);
-                                values.put(DBHelper.KEY_MP32, mp32);
-                                values.put(DBHelper.KEY_MP33, mp33);
-                                values.put(DBHelper.KEY_MP34, mp34);
-                                values.put(DBHelper.KEY_MP35, mp35);
-                                values.put(DBHelper.KEY_MP36, mp36);
-                                values.put(DBHelper.KEY_MP37, mp37);
-                                values.put(DBHelper.KEY_MP38, mp38);
-                                values.put(DBHelper.KEY_MP39, mp39);
-                                values.put(DBHelper.KEY_MP40, mp40);
-                                values.put(DBHelper.KEY_MP41, mp41);
-                                values.put(DBHelper.KEY_MP42, mp42);
-                                values.put(DBHelper.KEY_MP43, mp43);
-                                values.put(DBHelper.KEY_TRANSPORT, transport);
-                                values.put(DBHelper.KEY_USER_ID, user_id);
-                                values.put(DBHelper.KEY_DISTANCE, distance);
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
 
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_mount" +
-                                        " WHERE user_id = ?";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, values, "_id = ?", new String[]{id});
-                                            count_m++;
-                                        } while (c.moveToNext());
-                                    }
-                                }
+                            String id = user.getString("id");
+                            String mp1 = user.getString("mp1");
+                            String mp2 = user.getString("mp2");
+                            String mp3 = user.getString("mp3");
+                            String mp4 = user.getString("mp4");
+                            String mp5 = user.getString("mp5");
+                            String mp6 = user.getString("mp6");
+                            String mp7 = user.getString("mp7");
+                            String mp8 = user.getString("mp8");
+                            String mp9 = user.getString("mp9");
+                            String mp10 = user.getString("mp10");
+                            String mp11 = user.getString("mp11");
+                            String mp12 = user.getString("mp12");
+                            String mp13 = user.getString("mp13");
+                            String mp14 = user.getString("mp14");
+                            String mp15 = user.getString("mp15");
+                            String mp16 = user.getString("mp16");
+                            String mp17 = user.getString("mp17");
+                            String mp18 = user.getString("mp18");
+                            String mp19 = user.getString("mp19");
+                            String mp20 = user.getString("mp20");
+                            String mp21 = user.getString("mp21");
+                            String mp22 = user.getString("mp22");
+                            String mp23 = user.getString("mp23");
+                            String mp24 = user.getString("mp24");
+                            String mp25 = user.getString("mp25");
+                            String mp26 = user.getString("mp26");
+                            String mp27 = user.getString("mp27");
+                            String mp28 = user.getString("mp28");
+                            String mp29 = user.getString("mp29");
+                            String mp30 = user.getString("mp30");
+                            String mp31 = user.getString("mp31");
+                            String mp32 = user.getString("mp32");
+                            String mp33 = user.getString("mp33");
+                            String mp34 = user.getString("mp34");
+                            String mp35 = user.getString("mp35");
+                            String mp36 = user.getString("mp36");
+                            String mp37 = user.getString("mp37");
+                            String mp38 = user.getString("mp38");
+                            String mp39 = user.getString("mp39");
+                            String mp40 = user.getString("mp40");
+                            String mp41 = user.getString("mp41");
+                            String mp42 = user.getString("mp42");
+                            String mp43 = user.getString("mp43");
+                            String min_sum = user.getString("min_sum");
+                            String min_components_sum = user.getString("min_components_sum");
+                            String transport = user.getString("transport");
+                            String user_id = user.getString("user_id");
+                            String distance = user.getString("distance");
 
-                                c.close();
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, id);
+                            values.put(DBHelper.KEY_MP1, mp1);
+                            values.put(DBHelper.KEY_MP2, mp2);
+                            values.put(DBHelper.KEY_MP3, mp3);
+                            values.put(DBHelper.KEY_MP4, mp4);
+                            values.put(DBHelper.KEY_MP5, mp5);
+                            values.put(DBHelper.KEY_MP6, mp6);
+                            values.put(DBHelper.KEY_MP7, mp7);
+                            values.put(DBHelper.KEY_MP8, mp8);
+                            values.put(DBHelper.KEY_MP9, mp9);
+                            values.put(DBHelper.KEY_MP10, mp10);
+                            values.put(DBHelper.KEY_MP11, mp11);
+                            values.put(DBHelper.KEY_MP12, mp12);
+                            values.put(DBHelper.KEY_MP13, mp13);
+                            values.put(DBHelper.KEY_MP14, mp14);
+                            values.put(DBHelper.KEY_MP15, mp15);
+                            values.put(DBHelper.KEY_MP16, mp16);
+                            values.put(DBHelper.KEY_MP17, mp17);
+                            values.put(DBHelper.KEY_MP18, mp18);
+                            values.put(DBHelper.KEY_MP19, mp19);
+                            values.put(DBHelper.KEY_MP20, mp20);
+                            values.put(DBHelper.KEY_MP21, mp21);
+                            values.put(DBHelper.KEY_MP22, mp22);
+                            values.put(DBHelper.KEY_MP23, mp23);
+                            values.put(DBHelper.KEY_MP24, mp24);
+                            values.put(DBHelper.KEY_MP25, mp25);
+                            values.put(DBHelper.KEY_MP26, mp26);
+                            values.put(DBHelper.KEY_MP27, mp27);
+                            values.put(DBHelper.KEY_MP28, mp28);
+                            values.put(DBHelper.KEY_MP29, mp29);
+                            values.put(DBHelper.KEY_MP30, mp30);
+                            values.put(DBHelper.KEY_MP31, mp31);
+                            values.put(DBHelper.KEY_MP32, mp32);
+                            values.put(DBHelper.KEY_MP33, mp33);
+                            values.put(DBHelper.KEY_MP34, mp34);
+                            values.put(DBHelper.KEY_MP35, mp35);
+                            values.put(DBHelper.KEY_MP36, mp36);
+                            values.put(DBHelper.KEY_MP37, mp37);
+                            values.put(DBHelper.KEY_MP38, mp38);
+                            values.put(DBHelper.KEY_MP39, mp39);
+                            values.put(DBHelper.KEY_MP40, mp40);
+                            values.put(DBHelper.KEY_MP41, mp41);
+                            values.put(DBHelper.KEY_MP42, mp42);
+                            values.put(DBHelper.KEY_MP43, mp43);
+                            values.put(DBHelper.KEY_MIN_SUM, min_sum);
+                            values.put(DBHelper.KEY_MIN_COMPONENTS_SUM, min_components_sum);
+                            values.put(DBHelper.KEY_TRANSPORT, transport);
+                            values.put(DBHelper.KEY_USER_ID, user_id);
+                            values.put(DBHelper.KEY_DISTANCE, distance);
 
-                                if (count_m == 0) {
-                                    try {
-                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, null, values);
-                                    } catch (Exception e) {
-                                        Log.d("send_all__", "error "  + String.valueOf(e));
-                                    }
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_mount" +
+                                    " WHERE user_id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
                                 }
                             }
+
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, null, values);
+                                } catch (Exception e) {
+                                    Log.d("send_all__", "error " + String.valueOf(e));
+                                }
+                            }
+                        }
 
                         values = new ContentValues();
                         Time time = new Time(Time.getCurrentTimezone());
                         time.setToNow();
                         String t = time.format("%Y-%m-%d %H:%M:00");
                         values.put(DBHelper.KEY_CHANGE_TIME, t);
-                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?",new String[]{"dealer"});
+                        db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
 
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         Log.d(TAG, String.valueOf(e));
                     }
                 }
@@ -1112,7 +1132,7 @@ public class Send_All extends Service {
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("sync_data", dealer );
+                    parameters.put("sync_data", dealer);
                     Log.d("send_all__", "dealer = " + String.valueOf(parameters));
                     return parameters;
                 }
@@ -1123,4 +1143,5 @@ public class Send_All extends Service {
             return null;
         }
     }
+
 }

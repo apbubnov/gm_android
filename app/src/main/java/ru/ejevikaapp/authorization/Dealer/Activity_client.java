@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ru.ejevikaapp.authorization.Activity_add_client;
 import ru.ejevikaapp.authorization.Activity_inform_proj;
 import ru.ejevikaapp.authorization.Activity_zamer;
 import ru.ejevikaapp.authorization.Class.Frag_client_schedule_class;
@@ -50,7 +51,7 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
     String SAVED_ID = "", user_id;
     View view;
 
-    Button btn_search;
+    Button btn_search, btn_add_client;
     EditText c_search;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -61,12 +62,19 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
         setContentView(R.layout.activity_client);
 
         btn_search = (Button) findViewById(R.id.btn_search);
+        btn_add_client = (Button) findViewById(R.id.btn_add_client);
         c_search = (EditText) findViewById(R.id.c_search);
 
         btn_search.setOnClickListener(this);
+        btn_add_client.setOnClickListener(this);
 
-        list_clients = (ListView) findViewById(R.id.list_client);
-        clients("");
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
@@ -101,6 +109,10 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public void onResume() {
         super.onResume();
+
+        list_clients = (ListView) findViewById(R.id.list_client);
+        clients("");
+
     }
 
 
@@ -111,6 +123,11 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
             case R.id.btn_search:
                 clients(c_search.getText().toString());
 
+                break;
+
+            case R.id.btn_add_client:
+                Intent intent = new Intent(Activity_client.this, Activity_add_client.class);
+                startActivity(intent);
                 break;
         }
     }
@@ -132,7 +149,7 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
         ArrayList client = new ArrayList();
 
         if (client_name.equals("")) {
-            String sqlQuewy = "SELECT _id, client_name "
+            String sqlQuewy = "SELECT _id, client_name, created "
                     + "FROM rgzbn_gm_ceiling_clients " +
                     "where dealer_id = ? " +
                     "group by client_name";
@@ -141,18 +158,56 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
                 if (c.moveToFirst()) {
                     do {
 
-                        Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                null, c.getString(c.getColumnIndex(c.getColumnName(0))), null);
-                        client_mas.add(fc);
+                        String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        //client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        sqlQuewy = "SELECT project_info, project_status "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where client_id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                        if (cc != null) {
+                            if (cc.moveToLast()) {
+
+                                    String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                    sqlQuewy = "SELECT title "
+                                            + "FROM rgzbn_gm_ceiling_status " +
+                                            "where _id = ? ";
+                                    Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
+                                    if (c1 != null) {
+                                        if (c1.moveToFirst()) {
+                                            do {
+                                                status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
+                                            } while (c1.moveToNext());
+                                        }
+                                    }
+                                    c1.close();
+
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                            cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
+                                            c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                            status,
+                                            c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    client_mas.add(fc);
+
+                            } else {
+                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                        "-",
+                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                        "-",
+                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                client_mas.add(fc);
+                            }
+                            cc.close();
+                        }
+
                     } while (c.moveToNext());
                 }
             }
             c.close();
         } else {
-            String sqlQuewy = "SELECT _id, client_name "
+            String sqlQuewy = "SELECT _id, client_name, created "
                     + "FROM rgzbn_gm_ceiling_clients " +
                     "where dealer_id = ? and client_name LIKE '%" + client_name + "%' " +
                     "group by client_name ";
@@ -161,12 +216,50 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
                 if (c.moveToFirst()) {
                     do {
 
-                        Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                null, c.getString(c.getColumnIndex(c.getColumnName(0))), null);
-                        client_mas.add(fc);
+                        String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        //client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        sqlQuewy = "SELECT project_info, project_status "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where client_id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                        if (cc != null) {
+                            if (cc.moveToLast()) {
+
+                                String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                sqlQuewy = "SELECT title "
+                                        + "FROM rgzbn_gm_ceiling_status " +
+                                        "where _id = ? ";
+                                Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
+                                if (c1 != null) {
+                                    if (c1.moveToFirst()) {
+                                        do {
+                                            status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
+                                        } while (c1.moveToNext());
+                                    }
+                                }
+                                c1.close();
+
+                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                        cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
+                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                        status,
+                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                client_mas.add(fc);
+
+                            } else {
+                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                        "-",
+                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                        "-",
+                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                client_mas.add(fc);
+                            }
+                            cc.close();
+                        }
+
                     } while (c.moveToNext());
                 }
             }
@@ -175,14 +268,31 @@ public class Activity_client extends AppCompatActivity implements SwipeRefreshLa
 
         BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
 
-        dict.addStringField(R.id.name_brigade, new StringExtractor<Frag_client_schedule_class>() {
+        dict.addStringField(R.id.c_number, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getCreate();
+            }
+        });
+        dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
                 return nc.getFio();
             }
         });
-
-        FunDapter adapter = new FunDapter(this, client_mas, R.layout.brigade_list, dict);
+        dict.addStringField(R.id.c_price, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getAddress();
+            }
+        });
+        dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getStatus();
+            }
+        });
+        FunDapter adapter = new FunDapter(this, client_mas, R.layout.clients_item44, dict);
         list_clients.setAdapter(adapter);
         list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

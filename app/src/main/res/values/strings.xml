@@ -13,6 +13,7 @@
     <string name="title_activity_gager_office">Офис замерщик</string>
     <string name="title_activity_manager_office">Офис менеджера</string>
     <string name="title_activity_chief_office">Офис начальника МС</string>
+    <string name="link">test1</string>
 
 
     <string name="sendImagesToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.sendImagesToAndroid</string>

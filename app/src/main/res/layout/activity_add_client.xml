@@ -7,6 +7,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавление нового клиента"
+        android:textSize="17dp"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -44,7 +51,8 @@
             android:inputType="phone"
             android:layout_marginLeft="10dp"
             android:id="@+id/phone"
-            android:maxLength="12"/>
+            android:hint="7xxxxxxxxxx"
+            android:maxLength="11"/>
 
     </LinearLayout>
 

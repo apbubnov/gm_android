@@ -23,6 +23,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pixplicity.sharp.Sharp;
+
+import org.json.JSONObject;
+
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.R;
 
@@ -101,19 +105,16 @@ public class Fragment_inform_zapysch extends Fragment {
         }
         c.close();
 
-        if (imag.equals("")){
+        try {
+            Sharp.loadString(imag)
+                    .into(image);
+        }catch (Exception e){
             linear_head.setVisibility(View.GONE);
         }
 
-        StringBuffer sb = new StringBuffer(imag.subSequence(0, imag.length()));
-        sb.delete(0, 22);
-
-        if (imag.length() < 30) {
-        } else fromBase64(sb.toString()); // декодируем текст в картинку
-
         sqlQuewy = "SELECT n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11," +
                 " n12, n16, n17, n18, n19, n20, n21, n24, n25, dop_krepezh, " +
-                "n27, color, n28, n30, n31, n32 "
+                "n27, color, n28, n30, n31, n32, height, extra_components, extra_mounting "
                 + "FROM rgzbn_gm_ceiling_calculations" +
                 " WHERE _id = ?";
 
@@ -556,7 +557,8 @@ public class Fragment_inform_zapysch extends Fragment {
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(17)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(20)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(24)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(26)))) > 0))
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(26)))) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(27)))) > 0))
                     {
                         textt("Прочее");
 
@@ -630,6 +632,59 @@ public class Fragment_inform_zapysch extends Fragment {
                         if (Double.valueOf(drain) > 0){
                             drain = "Слив воды, кол-во комнат: " + drain;
                             textv(drain);
+                        }
+                        String height = c.getString(c.getColumnIndex(c.getColumnName(27)));
+                        if (Double.valueOf(height) > 0){
+                            height = "Комната выше 3-ех метров";
+                            textv(height);
+                        }
+
+                    }
+
+                    String extra_comp = c.getString(c.getColumnIndex(c.getColumnName(28)));
+                    if (extra_comp.equals("{}") || extra_comp.equals("null") ){
+                    } else {
+                        textt("Дополнительные компоненты");
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(extra_comp);
+                            int i=0;
+                            do {
+                                try {
+                                    JSONObject id_array = dat.getJSONObject(String.valueOf(i));
+                                    String title = id_array.getString("title");
+
+                                    textv("Название: " + title);
+
+                                } catch (Exception e) {
+                                }
+
+                                i++;
+                            } while (dat.length() != i);
+                        } catch (Exception e) {
+                        }
+
+                    }
+
+                    String extra_mount = c.getString(c.getColumnIndex(c.getColumnName(29)));
+                    if (extra_mount.equals("{}") || extra_mount.equals("null")){
+                    } else {
+                        textt("Дополнительные работы");
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(extra_mount);
+                            int i=0;
+                            do {
+                                try {
+                                    JSONObject id_array = dat.getJSONObject(String.valueOf(i));
+                                    String title = id_array.getString("title");
+
+                                    textv("Название: " + title);
+
+                                } catch (Exception e) {
+                                }
+
+                                i++;
+                            } while (dat.length() != i);
+                        } catch (Exception e) {
                         }
 
                     }

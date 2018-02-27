@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACTION_LOCATION_SOURCE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -156,7 +157,14 @@
         <activity android:name=".Dealer.Activity_spisok_brigade" />
         <activity android:name=".Dealer.Activity_add_brigade" />
         <activity android:name=".Dealer.Activity_for_spisok" />
-        <activity android:name=".Dealer.Activity_margin"></activity>
+        <activity android:name=".Dealer.Activity_margin" />
+        <activity android:name=".Dealer.Activity_mounting" />
+        <activity android:name=".Dealer.Activity_empty_mounting" />
+
+        <service
+            android:name=".Service_update"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

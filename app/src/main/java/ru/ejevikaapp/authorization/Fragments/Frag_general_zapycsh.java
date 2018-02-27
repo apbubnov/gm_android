@@ -422,6 +422,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         String sqlQuewy;
         Cursor c;
 
+        int min_sum =0;
+
         for (int i = 0; id_calcul.size() > i; i++) {
             sqlQuewy = "SELECT n4, n5, components_sum, canvases_sum, mounting_sum, discount "
                     + "FROM rgzbn_gm_ceiling_calculations" +
@@ -481,6 +483,20 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     total_d = tmp_d * 100 / (100 - can);
                     total_d += tmp2_d * 100 / (100 - mar);
                     total_d += tmp3_d * 100 / (100 - moun);
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+
+        sqlQuewy = "SELECT min_sum "
+                + "FROM rgzbn_gm_ceiling_mount" +
+                " WHERE user_id = ?";
+        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    min_sum = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
                 } while (c.moveToNext());
             }
         }
@@ -552,19 +568,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             }
             c.close();
 
-           //sqlQuewy = "SELECT dealer_mounting_margin "
-           //        + "FROM rgzbn_gm_ceiling_dealer_info" +
-           //        " WHERE dealer_id = ?";
-           //c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
-           //if (c != null) {
-           //    if (c.moveToFirst()) {
-           //        do {
-           //            dmm = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-           //        } while (c.moveToNext());
-           //    }
-           //}
-           //c.close();
-
             sum_transport = dist*dist_col*22;
 
             if (sum_transport < 624) {
@@ -608,9 +611,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         if (total_d == 0){
             final_amount.setText(String.valueOf(total_d));
-        } else if (total_d < 3499 && count_calc>0) {
-            total_d = 3500;
-            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа 3500р.");
+        } else if (total_d < min_sum && count_calc>0) {
+            total_d = min_sum;
+            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа "+min_sum+" р.");
         }
 
         components_sum_total.setText(String.valueOf((Math.round(tmp + tmp2) * 100.0) / 100));
@@ -773,7 +776,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         btn.setTextColor(Color.argb(0,0,0,0));
         btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
-        btn.setBackgroundResource(R.drawable.phone2);
+        btn.setBackgroundResource(R.raw.phone2);
         mainL.addView(btn);
 
         TextView txt = new TextView(getActivity());

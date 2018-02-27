@@ -87,7 +87,7 @@ public class Gager_office extends AppCompatActivity
 
             new AlertDialog.Builder(this)
                     .setTitle("Перезагрузить проекты?")
-                    .setIcon(R.drawable.alert)
+                    .setIcon(R.raw.alert)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 

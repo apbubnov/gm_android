@@ -386,7 +386,7 @@ public class Fragment_mounting_general extends Fragment {
                 Log.d("mLog","LOG " + j + " " + mp_title[j] + " " + results.get(j)+ " " + n.get(j)+ " " + count_price.get(j));
 
                 Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                        mp_title[j], String.valueOf(results.get(j)), String.valueOf(n.get(j)), String.valueOf(count_price.get(j)));
+                        mp_title[j], String.valueOf(results.get(j)), String.valueOf(n.get(j)), String.valueOf(count_price.get(j)), null);
 
                 client_mas.add(fc);
             }
@@ -395,7 +395,7 @@ public class Fragment_mounting_general extends Fragment {
         if (dop_krepezh>0){
             Log.d("mLog","LOG " + mp_title[17] + " " + results.get(17)+ " " + dop_krepezh + " " + count_dop_krepezh);
             Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                    mp_title[17], String.valueOf(results.get(17)), String.valueOf(dop_krepezh), String.valueOf(count_dop_krepezh));
+                    mp_title[17], String.valueOf(results.get(17)), String.valueOf(dop_krepezh), String.valueOf(count_dop_krepezh), null);
 
             client_mas.add(fc);
         }
@@ -423,7 +423,7 @@ public class Fragment_mounting_general extends Fragment {
         dict.addStringField(R.id.c_income, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
 

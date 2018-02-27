@@ -147,7 +147,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
                             String phone = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
 
                             Frag_client_schedule_class fc = new Frag_client_schedule_class(id_mounter,
-                                    name, null, number, phone);
+                                    name, null, number, phone, null);
                             installers_mas.add(fc);
                         }
                     }
@@ -176,7 +176,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
         dict.addStringField(R.id.c_name, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
-                return nc.getPhone();
+                return nc.getStatus();
             }
         });
 

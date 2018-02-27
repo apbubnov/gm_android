@@ -157,7 +157,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
             }
 
             Frag_client_schedule_class fc = new Frag_client_schedule_class(String.valueOf(brigade.get(g)),
-                    name_br, null, null, null);
+                    name_br, null, null, null, null);
             client_mas.add(fc);
         }
 

@@ -466,6 +466,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     }
 
                     String note = c.getString(c.getColumnIndex(c.getColumnName(2)));
+
+                    if (note.equals("null")){
+                        note = "";
+                    }
+
                     notes_cl.setText(note);
 
                 } while (c.moveToNext());
@@ -583,16 +588,15 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     void calc(ArrayList id_calcul) {
 
         for (int i = 0; i < id_calcul.size(); i++) {
-            Log.d("mLog", String.valueOf(id_calcul.get(i)));
         }
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         double s = 0.0;
         double p = 0.0;
-        double tmp = 0;     // компоненты
-        double tmp2 = 0;    // канвас
-        double tmp3 = 0;    // монтаж
+        double tmp = 0;     // компоненты со скидкой
+        double tmp2 = 0;    // канвас со скидкой
+        double tmp3 = 0;    // монтаж со скидкой
 
         double tmp_d = 0;     // компоненты
         double tmp2_d = 0;    // канвас
@@ -603,6 +607,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         String sqlQuewy;
         Cursor c;
+
+        int min_sum = 0;
 
         for (int i = 0; id_calcul.size() > i; i++) {
             sqlQuewy = "SELECT n4, n5, components_sum, canvases_sum, mounting_sum, discount "
@@ -617,7 +623,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         s += Double.parseDouble(S);
                         p += Double.parseDouble(P);
 
-                        dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
+                        try {
+                            dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
+                        }catch (Exception e){
+                            dis = 0;
+                        }
 
                         tmp_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
                         Double avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
@@ -659,6 +669,19 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     total_d = tmp_d * 100 / (100 - can);
                     total_d += tmp2_d * 100 / (100 - mar);
                     total_d += tmp3_d * 100 / (100 - moun);
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        sqlQuewy = "SELECT min_sum "
+                + "FROM rgzbn_gm_ceiling_mount" +
+                " WHERE user_id = ?";
+        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    min_sum = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
                 } while (c.moveToNext());
             }
         }
@@ -728,19 +751,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             }
             c.close();
 
-            //sqlQuewy = "SELECT dealer_mounting_margin "
-            //        + "FROM rgzbn_gm_ceiling_dealer_info" +
-            //        " WHERE dealer_id = ?";
-            //c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
-            //if (c != null) {
-            //    if (c.moveToFirst()) {
-            //        do {
-            //            dmm = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-            //        } while (c.moveToNext());
-            //    }
-            //}
-            //c.close();
-
             sum_transport = dist * dist_col * 11 + 250;
 
             if (sum_transport < 625) {
@@ -759,7 +769,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-                        discount += Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        try {
+                            discount += Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        }catch (Exception e){
+                        }
                     } while (c.moveToNext());
                 }
             }
@@ -776,11 +789,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             final_amount.setText(String.valueOf(Math.round(total_d * 100)/100));
         }
 
+        Log.d("mLog", total_d + " " + min_sum);
+
         if (total_d == 0) {
             final_amount.setText(String.valueOf(total_d));
-        } else if (total_d < 3499 && count_calc > 0) {
-            total_d = 3500;
-            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа 3500р.");
+        } else if (total_d < min_sum && count_calc > 0) {
+            total_d = min_sum;
+            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа "+ min_sum +" р.");
         }
 
         components_sum_total.setText(String.valueOf((Math.round(tmp + tmp2) * 100.0) / 100));
@@ -998,7 +1013,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         }
                         cc.close();
 
-                        Log.d("mLog", idd + " " + project_mounting_date + " " + project_mounter);
                         sqlQuewy = "select name "
                                 + "FROM rgzbn_users " +
                                 "where _id = ?";
@@ -1090,7 +1104,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             Button btnn = BtnList.get(editId);
 
             Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + btnn.getText().toString()));
+            intent.setData(Uri.parse("tel:+" + btnn.getText().toString()));
             startActivity(intent);
         }
     };
@@ -1299,7 +1313,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             case R.id.add_contact:
 
-                SharedPreferences SP = this.getActivity().getSharedPreferences("gager_id", MODE_PRIVATE);
+                SharedPreferences SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
                 String gager_id = SP.getString("", "");
                 int gager_id_int = Integer.parseInt(gager_id);
 
@@ -1573,7 +1587,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         values.put(DBHelper.KEY_CLIENT_NAME, String.valueOf(name_cl.getText()));
         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{id_cl});
         if (contact_cl.getText().length() > 0) {
-            Log.d("contacts", "4 " + String.valueOf(contact_cl.getText()));
             values = new ContentValues();
             values.put(DBHelper.KEY_PHONE, String.valueOf(contact_cl.getText()));
             values.put(DBHelper.KEY_CLIENT_ID, id_cl);
@@ -1693,7 +1706,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         btn.setTextColor(Color.argb(0,0,0,0));
         btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
-        btn.setBackgroundResource(R.drawable.phone2);
+        btn.setBackgroundResource(R.raw.phone2);
         mainL.addView(btn);
 
         TextView txt = new TextView(getActivity());
@@ -1758,7 +1771,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         c.close();
 
         double totall = 0.0;
-        Log.d("mLog", "dealer_id 2 " + dealer_id);
         sqlQuewy = "SELECT dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, " +
                 "gm_canvases_margin, gm_components_margin, gm_mounting_margin "
                 + "FROM rgzbn_gm_ceiling_dealer_info" +
@@ -1768,8 +1780,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-
-                    Log.d("mLog", String.valueOf(totall));
 
                     int can = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
                     int mar = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
@@ -1784,12 +1794,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         TextView tx1 = new TextView(getActivity());
 
-        if (dis == "0") {
+        if (dis.equals("")) {
             dis = "0";
         }
 
         if (Integer.valueOf(dis) > 0) {
-
             String tot1 = "Итого/ \n" + dis + "%";
             String tot2 = Math.round(totall) * 100.0 / 100 + "/ \n" + String.valueOf((Math.round(totall - (totall / 100 * Integer.valueOf(dis))) * 100.0) / 100);
             tx1.setText(tot1 + "     \n" + tot2);
