@@ -9,6 +9,12 @@
     </item>
 
     <item
+        android:id="@+id/initial_cost"
+        android:title="Себестоимость"
+        app:showAsAction="never">
+    </item>
+
+    <item
         android:id="@+id/min_sum"
         android:title="Минимальная сумма"
         app:showAsAction="never">

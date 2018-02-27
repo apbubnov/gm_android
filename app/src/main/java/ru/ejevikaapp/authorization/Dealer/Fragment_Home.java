@@ -46,7 +46,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class Fragment_Home extends Fragment implements View.OnClickListener {
 
     View view;
-    EditText name_org;
+    public TextView name_org;
 
     public Fragment_Home() {
         // Required empty public constructor
@@ -61,6 +61,16 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d("Fragment 1", "onResume");
+
         String avatar_user = "";
         try {
             SharedPreferences SP_end = getActivity().getSharedPreferences("avatar_user", MODE_PRIVATE);
@@ -152,37 +162,33 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             ava.setImageResource(R.raw.gm_hd);
         }
 
-        ava.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent, 1);
-            }
-        });
-
         Button btn_client = (Button) view.findViewById(R.id.btn_client);
         Button btn_zamer = (Button) view.findViewById(R.id.btn_zamer);
         Button btn_install = (Button) view.findViewById(R.id.btn_install);
         Button btn_add_zamer = (Button) view.findViewById(R.id.btn_add_zamer);
-        Button btn_save_name = (Button) view.findViewById(R.id.btn_save_name);
 
-        name_org = (EditText) view.findViewById(R.id.name_org);
-        SP_end = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
-        String user_name = SP_end.getString("", "");
+        String user_name = "";
+
+        sqlQuewy = "SELECT name "
+                + "FROM rgzbn_users " +
+                "where _id = ?";
+        c = db.rawQuery(sqlQuewy, new String[]{user_id});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    user_name = c.getString(c.getColumnIndex(c.getColumnName(0)));;
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        name_org = (TextView) view.findViewById(R.id.name_org);
         name_org.setText(user_name);
 
         btn_client.setOnClickListener(this);
         btn_zamer.setOnClickListener(this);
         btn_install.setOnClickListener(this);
         btn_add_zamer.setOnClickListener(this);
-        btn_save_name.setOnClickListener(this);
-
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     @Override
@@ -204,64 +210,37 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                 intent = new Intent(getActivity(), Activity_mounting.class);
                 startActivity(intent);
                 break;
-            case R.id.btn_save_name:
+            //case R.id.btn_save_name:
 
-                SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-                final String user_id = SP.getString("", "");
+            //   SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
+            //   final String user_id = SP.getString("", "");
 
-                DBHelper dbHelper = new DBHelper(getActivity());
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
-                values.put(DBHelper.KEY_NAME, name_org.getText().toString());
-                db.update(DBHelper.TABLE_USERS, values, "_id = ?",
-                        new String[]{user_id});
+            //   DBHelper dbHelper = new DBHelper(getActivity());
+            //   SQLiteDatabase db = dbHelper.getWritableDatabase();
+            //   ContentValues values = new ContentValues();
+            //   //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
+            //   values.put(DBHelper.KEY_NAME, name_org.getText().toString());
+            //   db.update(DBHelper.TABLE_USERS, values, "_id = ?",
+            //           new String[]{user_id});
 
-                SP = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
-                SharedPreferences.Editor ed = SP.edit();
-                ed.putString("", String.valueOf(name_org.getText()));
-                ed.commit();
+            //   SP = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
+            //   SharedPreferences.Editor ed = SP.edit();
+            //   ed.putString("", String.valueOf(name_org.getText()));
+            //   ed.commit();
 
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID_OLD, user_id);
-                values.put(DBHelper.KEY_ID_NEW, "0");
-                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
-                values.put(DBHelper.KEY_SYNC, "0");
-                values.put(DBHelper.KEY_TYPE, "send");
-                values.put(DBHelper.KEY_STATUS, "1");
-                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+            //   values = new ContentValues();
+            //   values.put(DBHelper.KEY_ID_OLD, user_id);
+            //   values.put(DBHelper.KEY_ID_NEW, "0");
+            //   values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+            //   values.put(DBHelper.KEY_SYNC, "0");
+            //   values.put(DBHelper.KEY_TYPE, "send");
+            //   values.put(DBHelper.KEY_STATUS, "1");
+            //   db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+            //   getActivity().startService(new Intent(getActivity(), Service_Sync.class));
 
-                break;
+            //   break;
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-
-        Bitmap bitmap = null;
-
-        ImageView ava = (ImageView) view.findViewById(R.id.ava);
-        switch (requestCode) {
-            case 1:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    ava.setImageBitmap(bitmap);
-
-                     SharedPreferences SP = getActivity().getSharedPreferences("avatar_user", MODE_PRIVATE);
-                     SharedPreferences.Editor ed = SP.edit();
-                     ed.putString("", String.valueOf(selectedImage));
-                     ed.commit();
-
-                }
-        }
-    }
 }

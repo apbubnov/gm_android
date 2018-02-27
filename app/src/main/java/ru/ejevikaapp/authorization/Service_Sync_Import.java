@@ -153,25 +153,6 @@ public class Service_Sync_Import extends Service {
                 }
             }
 
-            String version = "";
-            sqlQuewy = "SELECT change_time "
-                    + "FROM history_import_to_server" +
-                    " WHERE title = ?";
-
-            c = db.rawQuery(sqlQuewy, new String[]{"version"});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        version = "GM("+c.getString(c.getColumnIndex(c.getColumnName(0)))+")";
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-
-            jsonVersion.put("version", version);
-            version_send = String.valueOf(jsonVersion);
-            new Send_Version().execute();
-
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -285,26 +266,6 @@ public class Service_Sync_Import extends Service {
                         new ImportDate().execute();
                     }
                 }
-
-                String version = "";
-                sqlQuewy = "SELECT change_time "
-                        + "FROM history_import_to_server" +
-                        " WHERE title = ?";
-
-                c = db.rawQuery(sqlQuewy, new String[]{"version"});
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            version = "GM("+c.getString(c.getColumnIndex(c.getColumnName(0)))+")";
-                        } while (c.moveToNext());
-                    }
-                }
-                c.close();
-
-                jsonVersion.put("version", version);
-                version_send = String.valueOf(jsonVersion);
-                new Send_Version().execute();
-
 
             }
         }
@@ -1215,72 +1176,6 @@ public class Service_Sync_Import extends Service {
 
             return null;
         }
-    }
-
-    static class Send_Version extends AsyncTask<Integer, String, String> {
-
-        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.check_update";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(final Integer... integers) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d(TAG, "------------------ VERSION = " + res);
-                    if (res.equals("false")){
-                    }   else {
-
-                        SharedPreferences SP = ctx.getSharedPreferences("new_version", MODE_PRIVATE);
-                        SharedPreferences.Editor ed = SP.edit();
-                        ed.putString("", res);
-                        ed.commit();
-
-                        Intent intent = new Intent(ctx, Service_update.class);
-                        PendingIntent pendingIntent = PendingIntent.getService(ctx, 0, intent, 0);
-                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(ctx);
-
-                        Notification builder = new Notification.Builder(ctx)
-                                .setTicker("Доступно обновление")
-                                .setContentTitle("ГМ")
-                                .setContentText(
-                                        "Доступно обновление")
-                                .setSmallIcon(R.mipmap.ic_logo)
-                                .addAction(R.mipmap.ic_logo, "Скачать", pendingIntent)
-                                .setAutoCancel(true)
-                                .build();
-
-                        builder.flags |= Notification.FLAG_AUTO_CANCEL;
-                        notificationManager.notify(0, builder);
-                    }
-                }
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("send_all__", "send error 2 " + String.valueOf(error));
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("sync_data", version_send);
-                    Log.d("send_all__", "version = " + String.valueOf(parameters));
-                    return parameters;
-                }
-            };
-            requestQueue.add(request);
-            return null;
-        }
-
     }
 
 }

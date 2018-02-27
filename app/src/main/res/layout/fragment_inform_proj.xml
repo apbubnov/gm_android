@@ -34,7 +34,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="5dp"
         android:background="@drawable/rounded_button"
-        android:text=" Изменить чертёж "
+        android:text=" Изменить расчёт "
         android:textColor="#ffffff" />
 
     <LinearLayout

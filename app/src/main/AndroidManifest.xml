@@ -161,10 +161,6 @@
         <activity android:name=".Dealer.Activity_mounting" />
         <activity android:name=".Dealer.Activity_empty_mounting" />
 
-        <service
-            android:name=".Service_update"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>

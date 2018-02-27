@@ -164,10 +164,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         c_search.setVisibility(View.GONE);
         btn_search.setVisibility(View.GONE);
 
-       //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, time_zam);
-       //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-       //sp_date.setAdapter(adapter);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -175,18 +171,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         date_created = DateUtils.formatDateTime(this,                  //дата создания
                 dateAndTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_YEAR);
-
-       //sp_date.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-       //    public void onItemSelected(AdapterView<?> parent,
-       //                               View itemSelected, int selectedItemPosition, long selectedId) {
-
-       //        item = (String) parent.getItemAtPosition(selectedItemPosition);
-       //        time_h = item.substring(0, 5);
-       //    }
-
-       //    public void onNothingSelected(AdapterView<?> parent) {
-       //    }
-       //});
 
     }
 
@@ -207,6 +191,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
             dateAndTime.set(Calendar.MONTH, monthOfYear);
             dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             setInitialDateTime();
+
+            DateTime.setVisibility(View.VISIBLE);
 
             int count = 0;
 
@@ -368,21 +354,26 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void setListViewHeightBasedOnChildren(ListView listView) {
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
             return;
         }
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.AT_MOST);
+        int totalHeight = 0;
+        View view = null;
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            if (listItem instanceof ViewGroup)
-                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0) {
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     @Override

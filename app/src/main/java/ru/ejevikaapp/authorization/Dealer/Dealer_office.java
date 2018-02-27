@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -20,6 +23,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import java.io.IOException;
 
 import ru.ejevikaapp.authorization.DBHelper;
 import ru.ejevikaapp.authorization.Fragments.Frag_g3_zapusch;
@@ -30,6 +36,9 @@ import ru.ejevikaapp.authorization.Service_Sync;
 import ru.ejevikaapp.authorization.Service_Sync_Import;
 
 public class Dealer_office extends AppCompatActivity {
+
+    View promptsView;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -162,7 +171,7 @@ public class Dealer_office extends AppCompatActivity {
 
             return true;
 
-        } else if (id == R.id.margin) {
+        } else if (id == R.id.initial_cost) {
             Intent intent = new Intent(Dealer_office.this, Activity_margin.class);
             startActivity(intent);
             return true;
@@ -170,21 +179,47 @@ public class Dealer_office extends AppCompatActivity {
 
             final Context context = this;
             LayoutInflater li = LayoutInflater.from(context);
-            View promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+            promptsView = li.inflate(R.layout.layout_profile_dealer, null);
             AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
             mDialogBuilder.setView(promptsView);
             //final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
             final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+            final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+            final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+
+            String avatar_user = "";
+            try {
+                SharedPreferences SP_end = getSharedPreferences("avatar_user", MODE_PRIVATE);
+                avatar_user = SP_end.getString("", "");
+            } catch (Exception e) {
+            }
+
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(avatar_user));
+                ava.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                ava.setImageResource(R.raw.gm_hd);
+            }
+
+            ava.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, 1);
+                }
+            });
 
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             final String user_id = SP.getString("", "");
 
             String str_email = "";
+            String str_name = "";
             DBHelper dbHelper = new DBHelper(this);
             SQLiteDatabase db;
             db = dbHelper.getWritableDatabase();
 
-            String sqlQuewy = "SELECT email "
+            String sqlQuewy = "SELECT email, name "
                     + "FROM rgzbn_users" +
                     " WHERE _id = ?";
             Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
@@ -192,14 +227,14 @@ public class Dealer_office extends AppCompatActivity {
                 if (c.moveToFirst()) {
                     do {
                         str_email = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        str_name = c.getString(c.getColumnIndex(c.getColumnName(1)));
                     } while (c.moveToNext());
                 }
             }
             c.close();
 
-            Log.d("mLog", user_id + "  email =  " + str_email);
-
             email.setText(str_email);
+            name.setText(str_name);
 
             mDialogBuilder
                     .setCancelable(false)
@@ -212,8 +247,95 @@ public class Dealer_office extends AppCompatActivity {
                                     ContentValues values = new ContentValues();
                                     //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
                                     values.put(DBHelper.KEY_EMAIL, email.getText().toString());
-                                    db.update(DBHelper.TABLE_USERS, values, "user_id = ?",
+                                    values.put(DBHelper.KEY_NAME, name.getText().toString());
+                                    db.update(DBHelper.TABLE_USERS, values, "_id = ?",
                                             new String[]{user_id});
+
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_ID_OLD, user_id);
+                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                                    values.put(DBHelper.KEY_SYNC, "0");
+                                    values.put(DBHelper.KEY_TYPE, "send");
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
+
+                                    Intent intent = new Intent(Dealer_office.this, Dealer_office.class);
+                                    startActivity(intent);
+                                    finish();
+
+                                }
+                            })
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+            AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.show();
+
+            return true;
+        }  else if (id == R.id.margin) {
+
+            final Context context = this;
+            LayoutInflater li = LayoutInflater.from(context);
+            View promptsView = li.inflate(R.layout.layout_margin, null);
+            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+            mDialogBuilder.setView(promptsView);
+            final EditText canvases_margin = (EditText) promptsView.findViewById(R.id.canvases_margin);
+            final EditText components_margin = (EditText) promptsView.findViewById(R.id.components_margin);
+            final EditText mounting_margin = (EditText) promptsView.findViewById(R.id.mounting_margin);
+
+            SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
+            final String user_id = SP.getString("", "");
+
+            String min_sum = "";
+            DBHelper dbHelper = new DBHelper(this);
+            SQLiteDatabase db;
+            db = dbHelper.getWritableDatabase();
+
+            String str_canvases_margin = "";
+            String str_components_margin = "";
+            String str_mounting_margin = "";
+            String id_dealer_info="";
+            String sqlQuewy = "SELECT dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, _id "
+                    + "FROM rgzbn_gm_ceiling_dealer_info" +
+                    " WHERE dealer_id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        str_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        str_components_margin = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        str_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                        id_dealer_info = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+
+            canvases_margin.setText(str_canvases_margin);
+            components_margin.setText(str_components_margin);
+            mounting_margin.setText(str_mounting_margin);
+
+            mDialogBuilder
+                    .setCancelable(false)
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                    DBHelper dbHelper = new DBHelper(Dealer_office.this);
+                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                    ContentValues values = new ContentValues();
+                                    values.put(DBHelper.KEY_DEALER_CANVASES_MARGIN, canvases_margin.getText().toString());
+                                    values.put(DBHelper.KEY_DEALER_COMPONENTS_MARGIN, components_margin.getText().toString());
+                                    values.put(DBHelper.KEY_GM_MOUNTING_MARGIN, mounting_margin.getText().toString());
+                                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_DEALER_INFO, values, "dealer_id = ?", new String[]{user_id});
 
                                 }
                             })
@@ -228,10 +350,9 @@ public class Dealer_office extends AppCompatActivity {
             alertDialog.show();
 
             ContentValues values = new ContentValues();
-            values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, user_id);
+            values.put(DBHelper.KEY_ID_OLD, id_dealer_info);
             values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_dealer_info");
             values.put(DBHelper.KEY_SYNC, "0");
             values.put(DBHelper.KEY_TYPE, "send");
             values.put(DBHelper.KEY_STATUS, "1");
@@ -251,7 +372,6 @@ public class Dealer_office extends AppCompatActivity {
         loadFragment(Fragment_Home.newInstance());
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
 
         SharedPreferences SP = getSharedPreferences("first_entry", MODE_PRIVATE);
         final String first_entry = SP.getString("", "");
@@ -276,6 +396,34 @@ public class Dealer_office extends AppCompatActivity {
             ed.putString("", "1");
             ed.commit();
 
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        Bitmap bitmap = null;
+
+        ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ava.setImageBitmap(bitmap);
+
+                    SharedPreferences SP = getSharedPreferences("avatar_user", MODE_PRIVATE);
+                    SharedPreferences.Editor ed = SP.edit();
+                    ed.putString("", String.valueOf(selectedImage));
+                    ed.commit();
+
+                }
         }
     }
 }

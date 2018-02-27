@@ -34,7 +34,7 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_margin);
+        setContentView(R.layout.activity_initial_cost);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
@@ -43,9 +43,6 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
         SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
 
-        canvases_margin = (EditText) findViewById(R.id.canvases_margin);
-        components_margin = (EditText) findViewById(R.id.components_margin);
-        mounting_margin = (EditText) findViewById(R.id.mounting_margin);
         mp1 = (EditText) findViewById(R.id.mp1);
         mp2 = (EditText) findViewById(R.id.mp2);
         mp3 = (EditText) findViewById(R.id.mp3);
@@ -145,25 +142,6 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
         }
         c.close();
 
-        sqlQuewy = "SELECT dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, _id "
-                + "FROM rgzbn_gm_ceiling_dealer_info" +
-                " WHERE dealer_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{user_id});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    str_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    str_components_margin = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    str_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                    id_dealer_info = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        canvases_margin.setText(str_canvases_margin);
-        components_margin.setText(str_components_margin);
-        mounting_margin.setText(str_mounting_margin);
         mp1.setText(str_mp1);
         mp2.setText(str_mp2);
         mp3.setText(str_mp3);
@@ -219,8 +197,7 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_margin:
-                if (canvases_margin.getText().toString().equals("") && components_margin.getText().toString().equals("") && mounting_margin.getText().toString().equals("") &&
-                mp1.getText().toString().equals("") && mp2.getText().toString().equals("") && mp3.getText().toString().equals("") && mp4.getText().toString().equals("") &&
+                if (mp1.getText().toString().equals("") && mp2.getText().toString().equals("") && mp3.getText().toString().equals("") && mp4.getText().toString().equals("") &&
                 mp5.getText().toString().equals("") && mp6.getText().toString().equals("") && mp7.getText().toString().equals("") && mp8.getText().toString().equals("") &&
                 mp9.getText().toString().equals("") && mp10.getText().toString().equals("") && mp11.getText().toString().equals("") && mp12.getText().toString().equals("") &&
                 mp13.getText().toString().equals("") && mp14.getText().toString().equals("") && mp15.getText().toString().equals("") && mp16.getText().toString().equals("") &&

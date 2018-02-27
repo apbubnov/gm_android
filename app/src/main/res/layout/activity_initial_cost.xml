@@ -18,71 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Редактирование маржинальности и прайса монтажа"
+            android:text="Редактирование прайса"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
             android:textSize="20dp"
-            style="@style/text_style_spisok"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:textStyle="bold"
-            android:textSize="15dp"
-            android:text="Укажите, какой процент прибыли от заказа Вы желаете получать"
-            style="@style/text_style_spisok"/>
-
-        <EditText
-            android:layout_width="150dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:inputType="number"
-            android:layout_height="40dp"
-            android:textColor="#000000"
-            android:background="@drawable/edit_text_style"
-            android:layout_marginTop="10dp"
-            android:id="@+id/canvases_margin"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="(от полотен)"
-            style="@style/text_style_spisok"/>
-
-        <EditText
-            android:layout_width="150dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:inputType="number"
-            android:layout_height="40dp"
-            android:textColor="#000000"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/edit_text_style"
-            android:id="@+id/components_margin"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="(от комплектующих)"
-            style="@style/text_style_spisok"/>
-
-        <EditText
-            android:layout_width="150dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:inputType="number"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:textColor="#000000"
-            android:background="@drawable/edit_text_style"
-            android:id="@+id/mounting_margin"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="(от монтажа)"
             style="@style/text_style_spisok"/>
 
         <TextView

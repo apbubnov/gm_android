@@ -3543,8 +3543,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                //id_calculation = getActivity().getIntent().getStringExtra("id_calculation");  // id_calculation
-
                 String old_n2 = "";
                 String old_n3 = "";
                 String old_n4 = "";
@@ -3567,33 +3565,57 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }catch (Exception e){
                 }
 
-                try {
-                    String sqlQuewy = "select _id, price, width "
-                            + "FROM rgzbn_gm_ceiling_canvases " +
-                            "where _id = ? ";
-                    Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});         // заполняем массивы из таблицы
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                            } while (c.moveToNext());
-                        }
+                //try {
+                //    String sqlQuewy = "select _id, price, width "
+                //            + "FROM rgzbn_gm_ceiling_canvases " +
+                //            "where _id = ? ";
+                //    Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});         // заполняем массивы из таблицы
+                //    if (c != null) {
+                //        if (c.moveToFirst()) {
+                //            do {
+                //                id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                //                Log.d("perera",n3 + " " + String.valueOf(id_n3));
+                //            } while (c.moveToNext());
+                //        }
+                //    }
+                //    c.close();
+                //}catch (Exception e){
+                //    String sqlQuewy = "select _id, price, width "
+                //            + "FROM rgzbn_gm_ceiling_canvases " +
+                //            "where _id = ? ";
+                //    Cursor c = db.rawQuery(sqlQuewy, new String[]{texture_id});         // заполняем массивы из таблицы
+                //    if (c != null) {
+                //        if (c.moveToFirst()) {
+                //            do {
+                //                id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                //                Log.d("perera", String.valueOf(id_n3));
+                //            } while (c.moveToNext());
+                //        }
+                //    }
+                //    c.close();
+                //}
+                String sqlQuewy = "select name, country "
+                        + "FROM rgzbn_gm_ceiling_canvases " +
+                        "where _id = ? ";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{old_n3});         // заполняем массивы из таблицы
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            String name = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            String country = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                            String nc = name+" "+country;
+                            if (nc.equals(canvases) && (id_n3 == null)){
+                                id_n3 = Integer.valueOf(old_n3);
+                            } else {
+                                id_n3=0;
+                            }
+                        } while (c.moveToNext());
                     }
-                    c.close();
-                }catch (Exception e){
-                    String sqlQuewy = "select _id, price, width "
-                            + "FROM rgzbn_gm_ceiling_canvases " +
-                            "where _id = ? ";
-                    Cursor c = db.rawQuery(sqlQuewy, new String[]{texture_id});         // заполняем массивы из таблицы
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                            } while (c.moveToNext());
-                        }
-                    }
-                    c.close();
                 }
+                c.close();
+
+
+                Log.d("perera", old_n3+ " " + id_n3 + " " + old_n2 + " " + texture_id);
 
                 if (old_n3.equals("") || old_n2.equals("") || old_n4.equals("0.0") || old_n5.equals("0.0") || old_n4.equals("0") || old_n5.equals("0")) {
                     calculat = false;
@@ -7018,7 +7040,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 try {
                     sqlQuewy = "select name, country "
                             + "FROM rgzbn_gm_ceiling_canvases " +
-                            "where _id=?";
+                            "where _id = ?";
 
                     c = db.rawQuery(sqlQuewy, new String[]{n3});
 
@@ -7051,9 +7073,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                         canvases = spinner2.getSelectedItem().toString();
 
-                        String sqlQuewy = "select * "
-                                + "FROM rgzbn_gm_ceiling_canvases " +
-                                "where texture_id=? " +
+                        String sqlQuewy = "select * " +
+                                " FROM rgzbn_gm_ceiling_canvases " +
+                                " where texture_id = ? " +
                                 " ORDER BY width DESC";
 
                         SQLiteDatabase db;
@@ -7087,8 +7109,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             strr += str.charAt(i);
 
                         strr += " ]";
-
-                        Log.d("mLog canvases", strr);
 
                         c.close();
 

@@ -43,43 +43,50 @@ public class Activity_inform_proj extends AppCompatActivity {
     ArrayList id_calc = new ArrayList();
     ArrayList title_calc = new ArrayList();
 
+    Bundle saved;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inform_proj);
 
         mViewPager = (ViewPager) findViewById(R.id.container);
-
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-    }
 
+        setupViewPager(mViewPager);
+        tabLayout.setupWithViewPager(mViewPager);
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
             case android.R.id.home:
                 finish();
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        setupViewPager(mViewPager);
+
         tabLayout.setupWithViewPager(mViewPager);
+        setupViewPager(mViewPager);
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new Fragment_general_infor(), "Общее");
         count();
+        mViewPager.setOffscreenPageLimit(i);
+
         for (int j = 1; j < i + 1 ; j++) {
 
             Log.d("responce", j + " " +  String.valueOf(id_calc.get(j)));
@@ -175,6 +182,7 @@ public class Activity_inform_proj extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
+
         }
     }
 }

@@ -557,13 +557,15 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         for (int j = 0; count_calc > j; j++) {
             final CheckBox chb = CheckBoxList.get(j);
 
-            final int finalJ = j;
+            Log.d("mLog","cc = " + CheckBoxList.size());
             chb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("mLog"," тут ");
                     if (chb.isChecked()) {
                         id_calcul.add(chb.getId());
                         count_calc++;
+                        Log.d("mLog","count_calc2 " );
                         calc(id_calcul);
                     } else {
                         for (int in = 0; count_calc > in; in++) {
@@ -572,6 +574,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             int str3 = str1.compareTo(str2);
                             if (str3 == 0) {
                                 id_calcul.remove(in);
+                                Log.d("mLog","count_calc3 " );
                                 calc(id_calcul);
                                 count_calc--;
                                 break;
@@ -733,7 +736,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             c.close();
 
             sum_transport = Math.round((trans * dist_col * 100 / (100 - dmm) * 100.0)) / 100;
+
         } else if (transport.equals("2")) {
+
             int dist = 0;
             int dist_col = 0;
             int dmm = 0;
@@ -798,14 +803,18 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа "+ min_sum +" р.");
         }
 
-        components_sum_total.setText(String.valueOf((Math.round(tmp + tmp2) * 100.0) / 100));
-        mounting_sum.setText(String.valueOf((Math.round(tmp3) * 100.0) / 100));
-        total_sum.setText(String.valueOf((Math.round(tmp + tmp2 + tmp3) * 100.0) / 100));
+        components_sum_total.setText(String.valueOf((Math.round(tmp_d + tmp2_d) * 100.0) / 100));
+        mounting_sum.setText(String.valueOf((Math.round(tmp3_d) * 100.0) / 100));
+        total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100));
 
         S_and_P.setText(Math.round(s * 100.0) / 100.0 + " м2 / \n" + Math.round(p * 100.0) / 100.0 + " м");
     }
 
     void id_calc() {
+
+        CheckBoxList.clear();
+        ch_i = 0;
+        mainC.removeAllViews();
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -855,6 +864,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         }
         c.close();
 
+        Log.d("mLog","count_calc4 " );
         calc(id_calcul);
     }
 
@@ -888,6 +898,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             dateAndTime2.set(Calendar.MONTH, monthOfYear);
             dateAndTime2.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             setInitialDateTime2();
+
+            DateTime_mount.setVisibility(View.VISIBLE);
 
             list_work.setVisibility(View.VISIBLE);
             sp_brigade_free.setVisibility(View.VISIBLE);
@@ -1307,6 +1319,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                 mainC.removeAllViews();
                 id_calc();
+                Log.d("mLog","count_calc5 " );
                 calc(id_calcul);
 
                 break;
@@ -1678,21 +1691,26 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         }, 1);
     }
 
-    public void setListViewHeightBasedOnChildren(ListView listView) {
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
             return;
         }
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.AT_MOST);
+        int totalHeight = 0;
+        View view = null;
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            if (listItem instanceof ViewGroup)
-                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight();
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0) {
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     void btn(String title) {

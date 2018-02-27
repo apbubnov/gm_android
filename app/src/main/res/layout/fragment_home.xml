@@ -25,22 +25,23 @@
             android:orientation="vertical"
             android:layout_marginRight="20dp"
             android:layout_marginLeft="10dp">
-        <EditText
-            android:id="@+id/name_org"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Название организации"
-            android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/name_org"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="25dp"
+                android:layout_gravity="center"/>
 
-        <Button
-            android:id="@+id/btn_save_name"
-            android:text="ОК"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|right"
-            android:textSize="12dp"
-            android:background="@drawable/rounded_button"
-            android:textColor="#ffffff"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:id="@+id/sum_users"
+                android:layout_weight="2"
+                android:text="тут будет счёт"/>
         </LinearLayout>
     </LinearLayout>
 

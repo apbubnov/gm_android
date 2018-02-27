@@ -225,32 +225,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="10dp">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="Удобная дата \nзамера "
                     android:layout_marginLeft="5dp"
                     style="@style/text_style_spisok" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="10dp">
-                    <TextView android:id="@+id/currentDateTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#000000" />
 
                     <Button android:id="@+id/dateButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Изменить дату"
-                        android:layout_marginRight="10dp"
+                        android:text="Назначить \n дату"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="10dp"
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
-                </LinearLayout>
             </LinearLayout>
+
+
+            <TextView android:id="@+id/currentDateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="2"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:visibility="gone"
+                android:textColor="#000000" />
 
             <TextView
                 android:layout_width="match_parent"
