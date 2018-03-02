@@ -164,7 +164,7 @@
                         style="@style/text_style_spisok"
                         android:text="Улица клиента"
                         android:layout_weight="1"/>
-                    <EditText
+                    <AutoCompleteTextView
                         android:layout_marginTop="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

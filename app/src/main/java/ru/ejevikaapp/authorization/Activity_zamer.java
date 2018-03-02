@@ -11,13 +11,21 @@ import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
+import android.text.method.BaseKeyListener;
+import android.text.method.KeyListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -33,11 +41,26 @@ import android.widget.Toast;
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.simple.JSONObject;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,6 +101,9 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
     ArrayList<String> name_clients_id = new ArrayList<String>();
 
     private List<Spinner> SpinnerList = new ArrayList<Spinner>();
+
+    AutoCompleteTextView addressText;
+    List<String> addressList = new ArrayList<String>();
 
     Map<String, String> parameters = new HashMap<String, String>();
     RequestQueue requestQueue;
@@ -172,6 +198,80 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 dateAndTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_YEAR);
 
+        addressText = (AutoCompleteTextView) findViewById(R.id.c_address);
+
+        addressText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = addressText.getText().toString();
+                try {
+                    if (input.length() > 1)
+                        loadAddress();
+                } catch (IOException ex) {
+                    Log.d("loadAddress", "Error in!");
+                }
+            }
+        });
+
+        addressText.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, addressList));
+    }
+
+    private void loadAddress() throws IOException {
+        String input = addressText.getText().toString();
+        Log.i("loadAddress", input);
+
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        url += "?input=" + input;
+        url += "&location=51.661535,39.200287";
+        url += "&radius=200&address&types=geocode&language=ru&key=AIzaSyBXhCzmFicI1Xs3pOmfnpr0wlK6hV125_4";
+        Log.d("loadAddress", url);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                addressList.clear();
+                JSONObject dataJsonObj = null;
+                try {
+                    dataJsonObj = new JSONObject(response);
+                    JSONArray predictions = dataJsonObj.getJSONArray("predictions");
+
+                    for (int i = 0; i < predictions.length(); i++) {
+                        JSONObject prediction = predictions.getJSONObject(i);
+                        JSONObject structured_formatting = prediction.getJSONObject("structured_formatting");
+                        String address = structured_formatting.getString("main_text");
+                        addressList.add(address);
+                        Log.d("loadAddress", address);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                updateAdapterAddress();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("loadAddress", error.toString());
+            }
+        });
+
+        requestQueue.add(request);
+    }
+
+    private void updateAdapterAddress() {
+        addressText.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, addressList));
     }
 
     private void setInitialDateTime() {

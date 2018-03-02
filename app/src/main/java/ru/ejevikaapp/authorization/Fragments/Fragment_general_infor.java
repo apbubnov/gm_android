@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -26,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -46,6 +49,7 @@ import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -181,6 +185,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     ArrayList<String> name_zamer_id = new ArrayList<String>();
 
     ListView list_work;
+
+    AutoCompleteTextView addressText;
+    List<String> addressList = new ArrayList<String>();
 
     public Fragment_general_infor() {
         // Required empty public constructor
@@ -585,7 +592,82 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             });
         }
 
+        addressText = (AutoCompleteTextView) view.findViewById(R.id.c_address);
+
+        addressText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = addressText.getText().toString();
+                try {
+                    if (input.length() > 1)
+                        loadAddress();
+                } catch (IOException ex) {
+                    Log.d("loadAddress", "Error in!");
+                }
+            }
+        });
+
+        addressText.setAdapter(new ArrayAdapter<String>(this.getContext(),
+                android.R.layout.simple_dropdown_item_1line, addressList));
+
         return view;
+    }
+
+    private void loadAddress() throws IOException {
+        String input = addressText.getText().toString();
+        Log.i("loadAddress", input);
+
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        url += "?input=" + input;
+        url += "&location=51.661535,39.200287";
+        url += "&radius=200&address&types=geocode&language=ru&key=AIzaSyBXhCzmFicI1Xs3pOmfnpr0wlK6hV125_4";
+        Log.d("loadAddress", url);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this.getContext());
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                addressList.clear();
+                org.json.JSONObject dataJsonObj = null;
+                try {
+                    dataJsonObj = new org.json.JSONObject(response);
+                    JSONArray predictions = dataJsonObj.getJSONArray("predictions");
+
+                    for (int i = 0; i < predictions.length(); i++) {
+                        org.json.JSONObject prediction = predictions.getJSONObject(i);
+                        org.json.JSONObject structured_formatting = prediction.getJSONObject("structured_formatting");
+                        String address = structured_formatting.getString("main_text");
+                        addressList.add(address);
+                        Log.d("loadAddress", address);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                updateAdapterAddress();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("loadAddress", error.toString());
+            }
+        });
+
+        requestQueue.add(request);
+    }
+
+    private void updateAdapterAddress() {
+        addressText.setAdapter(new ArrayAdapter<String>(this.getContext(),
+                android.R.layout.simple_dropdown_item_1line, addressList));
     }
 
     void calc(ArrayList id_calcul) {
