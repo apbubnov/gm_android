@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.authorization.Crew.Activity_crew"
+    tools:context="ru.ejevikaapp.gm_android.Crew.Activity_crew"
     android:layout_margin="10dp"
     android:orientation="vertical">
 

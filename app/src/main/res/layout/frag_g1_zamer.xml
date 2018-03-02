@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.authorization.Fragments.Frag_g1_zamer">
+    tools:context="ru.ejevikaapp.gm_android.Fragments.Frag_g1_zamer">
 
     <ScrollView
         android:layout_width="match_parent"

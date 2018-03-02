@@ -4,13 +4,12 @@
 
     <item
         android:id="@+id/margin"
-        android:title="Маржинальность"
-        app:showAsAction="never">
+        android:title="Маржинальность">
     </item>
 
     <item
         android:id="@+id/initial_cost"
-        android:title="Себестоимость"
+        android:title="Прайс монтажа"
         app:showAsAction="never">
     </item>
 

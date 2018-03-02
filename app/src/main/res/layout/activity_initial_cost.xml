@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/backgroun"
-    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_margin">
+    tools:context="ru.ejevikaapp.gm_android.Dealer.Activity_margin">
 
 
     <LinearLayout
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Редактирование прайса"
+            android:text="Редактирование прайса монтажа"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
             android:textSize="20dp"

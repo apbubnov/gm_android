@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="ru.ejevikaapp.authorization">
+    package="ru.ejevikaapp.gm_android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name=".MainActivity">
+        <activity android:name="ru.ejevikaapp.gm_android.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,85 +26,85 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Dealer.Dealer_office"
+            android:name="ru.ejevikaapp.gm_android.Dealer.Dealer_office"
             android:label="@string/title_activity_dealer_office"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_svetiln"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_svetiln"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_kupit_svetiln"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_kupit_svetiln"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_truby"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_truby"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_vent"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_vent"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_diffuzor"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_diffuzor"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_client"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_client"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_upd_client"
+            android:name="ru.ejevikaapp.gm_android.Activity_upd_client"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_kupit_cornice"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_kupit_cornice"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Gager_office"
+            android:name="ru.ejevikaapp.gm_android.Gager_office"
             android:label="@string/title_activity_gager_office"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Manager_office"
+            android:name="ru.ejevikaapp.gm_android.Manager_office"
             android:label="@string/title_activity_manager_office"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Chief_office"
+            android:name="ru.ejevikaapp.gm_android.Chief_office"
             android:label="@string/title_activity_chief_office"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Activity_upd_brigade"
+            android:name="ru.ejevikaapp.gm_android.Activity_upd_brigade"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_draft"
+            android:name="ru.ejevikaapp.gm_android.Activity_draft"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Activity_color"
+            android:name="ru.ejevikaapp.gm_android.Activity_color"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_other_comp"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_other_comp"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_other_work"
+            android:name="ru.ejevikaapp.gm_android.Activity_add_other_work"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_inform_proj"
+            android:name="ru.ejevikaapp.gm_android.Activity_inform_proj"
             android:label="Просмотр проекта"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".Fragments.Activity_calcul"
+            android:name="ru.ejevikaapp.gm_android.Fragments.Activity_calcul"
             android:label="Расчётная страница"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_inform_zapysch"
+            android:name="ru.ejevikaapp.gm_android.Activity_inform_zapysch"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Manager.Activity_in_production_tab"
+            android:name="ru.ejevikaapp.gm_android.Manager.Activity_in_production_tab"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Manager.Activity_started_projects"
+            android:name="ru.ejevikaapp.gm_android.Manager.Activity_started_projects"
             android:screenOrientation="portrait" />
 
         <receiver
-            android:name=".Service_Sync$Alarm"
+            android:name="ru.ejevikaapp.gm_android.Service_Sync$Alarm"
             android:exported="true">
             <intent-filter>
                 <action android:name="net.multipi.ALARM" />
@@ -112,14 +112,14 @@
         </receiver>
 
         <service
-            android:name=".Service_Sync"
+            android:name="ru.ejevikaapp.gm_android.Service_Sync"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Activity_zamer" />
+        <activity android:name="ru.ejevikaapp.gm_android.Activity_zamer" />
 
         <receiver
-            android:name=".Service_Sync_Import$Alarm"
+            android:name="ru.ejevikaapp.gm_android.Service_Sync_Import$Alarm"
             android:exported="true">
             <intent-filter>
                 <action android:name="net.multipi.ALARM" />
@@ -127,39 +127,39 @@
         </receiver>
 
         <service
-            android:name=".Service_Sync_Import"
+            android:name="ru.ejevikaapp.gm_android.Service_Sync_Import"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Activity_add_profile" />
+        <activity android:name="ru.ejevikaapp.gm_android.Activity_add_profile" />
 
         <service
-            android:name=".Send_All"
+            android:name="ru.ejevikaapp.gm_android.Send_All"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".Crew.Activity_crew"
+            android:name="ru.ejevikaapp.gm_android.Crew.Activity_crew"
             android:label="Кабинет монтажника" />
         <activity
-            android:name=".Crew.Activity_calendar"
+            android:name="ru.ejevikaapp.gm_android.Crew.Activity_calendar"
             android:label="Календарь работ"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Crew.Activity_mounting_day"
+            android:name="ru.ejevikaapp.gm_android.Crew.Activity_mounting_day"
             android:label="Монтажи"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Crew.Activity_mounting_info"
+            android:name="ru.ejevikaapp.gm_android.Crew.Activity_mounting_info"
             android:screenOrientation="portrait" />
-        <activity android:name=".Dealer.Activity_client" />
-        <activity android:name=".Dealer.Activity_empty" />
-        <activity android:name=".Dealer.Activity_spisok_brigade" />
-        <activity android:name=".Dealer.Activity_add_brigade" />
-        <activity android:name=".Dealer.Activity_for_spisok" />
-        <activity android:name=".Dealer.Activity_margin" />
-        <activity android:name=".Dealer.Activity_mounting" />
-        <activity android:name=".Dealer.Activity_empty_mounting" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_client" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_empty" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_spisok_brigade" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_add_brigade" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_margin" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_mounting" />
+        <activity android:name="ru.ejevikaapp.gm_android.Dealer.Activity_empty_mounting" />
 
     </application>
 

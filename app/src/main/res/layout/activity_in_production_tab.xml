@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="ru.ejevikaapp.authorization.Activity_inform_proj">
+    tools:context="ru.ejevikaapp.gm_android.Activity_inform_proj">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"

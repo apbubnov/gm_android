@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_add_brigade">
+    tools:context="ru.ejevikaapp.gm_android.Dealer.Activity_add_brigade">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/backgroun"
-    tools:context="ru.ejevikaapp.authorization.Fragments.Fragment_inform_proj">
+    tools:context="ru.ejevikaapp.gm_android.Fragments.Fragment_inform_proj">
 
     <ScrollView
         android:layout_width="match_parent"

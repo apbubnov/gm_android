@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.authorization.Manager_office">
+    tools:context="ru.ejevikaapp.gm_android.Manager_office">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

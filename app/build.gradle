@@ -12,11 +12,11 @@ android {
     }
     compileSdkVersion 25
     defaultConfig {
-        applicationId "ru.ejevikaapp.authorization"
+        applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0.2602"
+        versionName "1.0.0203"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,6 +48,7 @@ dependencies {
     compile 'com.github.amigold.fundapter:library:1.0'
     // list с выбором
     compile 'it.neokree:MaterialTabs:0.11'
+
     testCompile 'junit:junit:4.12'
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile files('libs/GenAsync.jar')

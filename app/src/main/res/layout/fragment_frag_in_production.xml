@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.authorization.Manager.Frag_in_production">
+    tools:context="ru.ejevikaapp.gm_android.Manager.Frag_in_production">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

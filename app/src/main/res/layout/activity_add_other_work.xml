@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ru.ejevikaapp.authorization.Activity_add_other_work"
+    tools:context="ru.ejevikaapp.gm_android.Activity_add_other_work"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true">
 
