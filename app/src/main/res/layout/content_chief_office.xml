@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="ru.ejevikaapp.authorization.Chief_office"
+    tools:context="ru.ejevikaapp.gm_android.Chief_office"
     tools:showIn="@layout/app_bar_chief_office"
     android:id="@+id/relativelayout_fragment_blank4">
 

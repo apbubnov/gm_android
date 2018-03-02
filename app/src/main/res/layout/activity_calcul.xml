@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="ru.ejevikaapp.authorization.Fragments.Fragment_calculation"
+        android:name="ru.ejevikaapp.gm_android.Fragments.Fragment_calculation"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_calculation">

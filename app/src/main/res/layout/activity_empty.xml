@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_empty">
+    tools:context="ru.ejevikaapp.gm_android.Dealer.Activity_empty">
 
     <fragment
         android:layout_margin="10dp"
         android:id="@+id/fragment_empty_activity"
-        android:name="ru.ejevikaapp.authorization.Fragments.Frag_spisok"
+        android:name="ru.ejevikaapp.gm_android.Fragments.Frag_spisok"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/frag_spisok">

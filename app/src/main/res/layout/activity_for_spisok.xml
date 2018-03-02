@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.authorization.Dealer.Activity_for_spisok">
+    tools:context="ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok">
 
     <fragment
         android:layout_margin="10dp"
         android:id="@+id/fragment"
-        android:name="ru.ejevikaapp.authorization.Fragments.Frag_spisok"
+        android:name="ru.ejevikaapp.gm_android.Fragments.Frag_spisok"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/frag_spisok">

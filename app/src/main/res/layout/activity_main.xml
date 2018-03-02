@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="ru.ejevikaapp.authorization.MainActivity"
+    tools:context="ru.ejevikaapp.gm_android.MainActivity"
     style="@style/backgroun"
     android:orientation="vertical">
 
@@ -35,6 +35,7 @@
             android:layout_marginTop="50dp"
             android:layout_margin="10dp"
             android:ems="10"
+            android:maxLength="11"
             android:hint="Логин"
             android:inputType="textPersonName"
             android:textColor="#43358c"

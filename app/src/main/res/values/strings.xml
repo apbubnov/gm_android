@@ -15,16 +15,6 @@
     <string name="title_activity_chief_office">Офис начальника МС</string>
     <string name="link">test1</string>
 
-
-    <string name="sendImagesToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.sendImagesToAndroid</string>
-
-    <string name="sendMountersToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api2.sendMountersToAndroid</string>
-    <string name="sendDealerInfoToAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api2.sendDealerInfoToAndroid</string>
-
-    <string name="addDataFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid</string>
-    <string name="CheckDataFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid</string>
-    <string name="addImagesFromAndroid">http://calc.gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addImagesFromAndroid</string>
-
     <string name="title_activity_draft">Activity_draft</string>
     <string name="title_activity_inform_proj">Activity_inform_proj</string>
     <string name="section_format">Hello World from section: %1$d</string>
