@@ -1,5 +1,6 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,11 +25,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Fragments.Frag_g3_zapusch;
+import ru.ejevikaapp.gm_android.Fragments.FragmentClient;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
 import ru.ejevikaapp.gm_android.MainActivity;
 import ru.ejevikaapp.gm_android.R;
@@ -45,17 +53,16 @@ public class Dealer_office extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.start_home:
 
                     SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
                     SharedPreferences.Editor ed = SP.edit();
                     ed.putString("", "");
                     ed.commit();
-
                     loadFragment(Fragment_Home.newInstance());
 
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.start_calculation:
 
                     SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
                     ed = SP.edit();
@@ -64,13 +71,13 @@ public class Dealer_office extends AppCompatActivity {
                     loadFragment(Fragment_calculation.newInstance());
 
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.start_projects:
 
                     SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
                     ed = SP.edit();
                     ed.putString("", "");
                     ed.commit();
-                    loadFragment(Frag_g3_zapusch.newInstance());
+                    loadFragment(FragmentClient.newInstance());
 
                     return true;
             }
@@ -90,6 +97,7 @@ public class Dealer_office extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -108,6 +116,11 @@ public class Dealer_office extends AppCompatActivity {
             ed.commit();
 
             SP = getSharedPreferences("first_entry", MODE_PRIVATE);
+            ed = SP.edit();
+            ed.putString("", "");
+            ed.commit();
+
+            SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
             ed = SP.edit();
             ed.putString("", "");
             ed.commit();
@@ -153,12 +166,28 @@ public class Dealer_office extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
+                                    if (userInput.getText().toString().equals("")){
+                                        userInput.setText("0");
+                                    }
+
                                     DBHelper dbHelper = new DBHelper(Dealer_office.this);
                                     SQLiteDatabase db = dbHelper.getWritableDatabase();
                                     ContentValues values = new ContentValues();
                                     values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());
                                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, values, "user_id = ?",
                                             new String[]{user_id});
+
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_ID_OLD, user_id);
+                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mount");
+                                    values.put(DBHelper.KEY_SYNC, "0");
+                                    values.put(DBHelper.KEY_TYPE, "send");
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
+
 
                                 }
                             })
@@ -171,18 +200,6 @@ public class Dealer_office extends AppCompatActivity {
 
             AlertDialog alertDialog = mDialogBuilder.create();
             alertDialog.show();
-
-            ContentValues values = new ContentValues();
-            values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, user_id);
-            values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mount");
-            values.put(DBHelper.KEY_SYNC, "0");
-            values.put(DBHelper.KEY_TYPE, "send");
-            values.put(DBHelper.KEY_STATUS, "1");
-            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-            startService(new Intent(this, Service_Sync.class));
 
             return true;
 
@@ -214,7 +231,7 @@ public class Dealer_office extends AppCompatActivity {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(avatar_user));
                 ava.setImageBitmap(bitmap);
             } catch (IOException e) {
-                ava.setImageResource(R.raw.gm_hd);
+               // ava.setBackgroundResource(R.drawable.it_c);
             }
 
             ava.setOnClickListener(new View.OnClickListener() {
@@ -277,9 +294,7 @@ public class Dealer_office extends AppCompatActivity {
 
                                     startService(new Intent(Dealer_office.this, Service_Sync.class));
 
-                                    Intent intent = new Intent(Dealer_office.this, Dealer_office.class);
-                                    startActivity(intent);
-                                    finish();
+                                    loadFragment(Fragment_Home.newInstance());
 
                                 }
                             })
@@ -316,7 +331,7 @@ public class Dealer_office extends AppCompatActivity {
             String str_canvases_margin = "";
             String str_components_margin = "";
             String str_mounting_margin = "";
-            String id_dealer_info="";
+            String id_dealer_info = "";
             String sqlQuewy = "SELECT dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, _id "
                     + "FROM rgzbn_gm_ceiling_dealer_info" +
                     " WHERE dealer_id = ?";
@@ -333,17 +348,26 @@ public class Dealer_office extends AppCompatActivity {
             }
             c.close();
 
-
             canvases_margin.setText(str_canvases_margin);
             components_margin.setText(str_components_margin);
             mounting_margin.setText(str_mounting_margin);
 
+            final String id_dealer = id_dealer_info;
             mDialogBuilder
                     .setCancelable(false)
                     .setPositiveButton("OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
+                                    if (canvases_margin.getText().toString().equals("")){
+                                        canvases_margin.setText("0");
+                                    }
+                                    if (components_margin.getText().toString().equals("")){
+                                        components_margin.setText("0");
+                                    }
+                                    if (mounting_margin.getText().toString().equals("")){
+                                        mounting_margin.setText("0");
+                                    }
                                     DBHelper dbHelper = new DBHelper(Dealer_office.this);
                                     SQLiteDatabase db = dbHelper.getWritableDatabase();
                                     ContentValues values = new ContentValues();
@@ -352,28 +376,28 @@ public class Dealer_office extends AppCompatActivity {
                                     values.put(DBHelper.KEY_DEALER_MOUNTING_MARGIN, mounting_margin.getText().toString());
                                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_DEALER_INFO, values, "dealer_id = ?", new String[]{user_id});
 
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_ID_OLD, id_dealer);
+                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_dealer_info");
+                                    values.put(DBHelper.KEY_SYNC, "0");
+                                    values.put(DBHelper.KEY_TYPE, "send");
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
+
                                 }
                             })
                     .setNegativeButton("Отмена",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
 
             AlertDialog alertDialog = mDialogBuilder.create();
             alertDialog.show();
-
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_ID_OLD, id_dealer_info);
-            values.put(DBHelper.KEY_ID_NEW, "0");
-            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_dealer_info");
-            values.put(DBHelper.KEY_SYNC, "0");
-            values.put(DBHelper.KEY_TYPE, "send");
-            values.put(DBHelper.KEY_STATUS, "1");
-            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-            startService(new Intent(this, Service_Sync.class));
 
             return true;
         }
@@ -384,12 +408,17 @@ public class Dealer_office extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dealer_office);
-        loadFragment(Fragment_Home.newInstance());
+        loadFragment(Fragment_calculation.newInstance());
+
+        SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
+        SharedPreferences.Editor ed = SP.edit();
+        ed.putString("", "true");
+        ed.commit();
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-        SharedPreferences SP = getSharedPreferences("first_entry", MODE_PRIVATE);
+        SP = getSharedPreferences("first_entry", MODE_PRIVATE);
         final String first_entry = SP.getString("", "");
 
         if (first_entry.equals("")) {
@@ -401,6 +430,7 @@ public class Dealer_office extends AppCompatActivity {
                     .setNegativeButton("Спасибо",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    loadFragment(Fragment_calculation.newInstance());
                                     dialog.cancel();
                                 }
                             });
@@ -408,17 +438,11 @@ public class Dealer_office extends AppCompatActivity {
             alert.show();
 
             SP = getSharedPreferences("first_entry", MODE_PRIVATE);
-            SharedPreferences.Editor ed = SP.edit();
+            ed = SP.edit();
             ed.putString("", "1");
             ed.commit();
 
         }
-
-        SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-        SharedPreferences.Editor ed = SP.edit();
-        ed.putString("", "");
-        ed.commit();
-
     }
 
     @Override

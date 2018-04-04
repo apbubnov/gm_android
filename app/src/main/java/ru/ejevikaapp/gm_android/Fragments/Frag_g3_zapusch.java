@@ -15,15 +15,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
 
+import org.joda.time.DateTime;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync_Import;
@@ -57,10 +63,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         mSwipeRefreshLayout = (SwipeRefreshLayout) View.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorBlue);
 
         return View;
     }
@@ -68,50 +71,56 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh() {
 
-        getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                // Отменяем анимацию обновления
-                mSwipeRefreshLayout.setRefreshing(false);
-                onResume();
-            }
-        }, 3000);
+        if (HelperClass.isOnline(getActivity())) {
+            getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onResume();
+                }
+            }, 3000);
+        } else {
+            mSwipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getActivity().getApplicationContext(), "проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        try {
+            SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
+            user_id = SP.getString("", "");
 
-        SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-        user_id = SP.getString("", "");
+            dbHelper = new DBHelper(getActivity());
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        dbHelper = new DBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+            String usergroup = "";
+            String sqlQuewy = "SELECT group_id "
+                    + "FROM rgzbn_user_usergroup_map" +
+                    " WHERE user_id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-        String usergroup = "";
-        String sqlQuewy = "SELECT group_id "
-                + "FROM rgzbn_user_usergroup_map" +
-                " WHERE user_id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
-                } while (c.moveToNext());
+                    } while (c.moveToNext());
+                }
             }
-        }
-        c.close();
+            c.close();
 
-        if (usergroup.equals("14")) {
-            clients_dealer();
-        } else if (usergroup.equals("21") || usergroup.equals("22")){
-            clients_gager();
+            if (usergroup.equals("14")) {
+                clients_dealer();
+            } else if (usergroup.equals("21") || usergroup.equals("22")) {
+                clients_gager();
+            }
+
+        }catch (Exception e){
         }
+
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -136,7 +145,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        ArrayList client = new ArrayList();
+        ArrayList<Integer> client = new ArrayList();
 
         String sqlQuewy = "SELECT client_id "
                 + "FROM rgzbn_gm_ceiling_projects " +
@@ -145,13 +154,27 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    boolean bool = false;
+
+                    int clin = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+
+                    for(int g = 0; client.size()>g; g++) {
+                        if (clin == client.get(g)){
+                            bool = true;
+                        }
+                    }
+
+                    if (!bool) {
+                        client.add(clin);
+                    }
+
                 } while (c.moveToNext());
             }
         }
         c.close();
 
         for (int g = 0; g<client.size(); g++) {
+
             sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
                     " WHERE project_status <> ? and project_status <> ? and client_id = ?" +
@@ -176,7 +199,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                 String project_status = "";
                                 String project_status_title = "";
 
-                                sqlQuewy = "SELECT project_info, created, project_status "
+                                sqlQuewy = "SELECT project_info, project_calculation_date, project_status "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id = ?";
 
@@ -358,12 +381,12 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                             do {
                                 String p_info = "";
                                 String phone = "";
-                                String created = "";
+                                String project_calculation_date = "";
                                 String fio = "";
                                 String project_status = "";
                                 String project_status_title = "";
 
-                                sqlQuewy = "SELECT project_info, created, project_status "
+                                sqlQuewy = "SELECT project_info, project_calculation_date, project_status "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id = ?";
 
@@ -373,7 +396,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                     if (cursor_1.moveToFirst()) {
                                         do {
                                             p_info = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(0)));
-                                            created = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
+                                            project_calculation_date = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
                                             project_status = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(2)));
 
                                         } while (cursor_1.moveToNext());
@@ -395,42 +418,30 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                     }
                                 }
 
-                                //sqlQuewy = "SELECT phone "
-                                //        + "FROM rgzbn_gm_ceiling_clients_contacts" +
-                                //        " WHERE client_id = ?";
+                                SimpleDateFormat out_format = null;
+                                SimpleDateFormat out_format_time = null;
+                                SimpleDateFormat out_format_minute = null;
+                                Date change_max = null;
+                                int hours = 0;
+                                try {
+                                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    change_max = ft.parse(project_calculation_date);
 
-                                //Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_client});
+                                    out_format = new SimpleDateFormat("dd.MM.yyyy");
+                                    out_format_minute = new SimpleDateFormat("HH");
 
-                                //if (cursor != null) {
-                                //    if (cursor.moveToFirst()) {
-                                //        do {
-                                //            phone = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    hours = Integer.parseInt(out_format_minute.format(change_max))+1;
 
-                                //        } while (cursor.moveToNext());
-                                //    }
-                                //}
-                                //cursor.close();
+                                    out_format_time = new SimpleDateFormat("HH:mm");
 
-                                //sqlQuewy = "SELECT client_name "
-                                //        + "FROM rgzbn_gm_ceiling_clients" +
-                                //        " WHERE _id = ?";
-
-                                //cursor = db.rawQuery(sqlQuewy, new String[]{id_client});
-
-                                //if (cursor != null) {
-                                //    if (cursor.moveToFirst()) {
-                                //        do {
-                                //            fio = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                                //        } while (cursor.moveToNext());
-                                //    }
-                                //}
-                                //cursor.close();
-
-                                Log.d("spisok", created );
+                                }catch (Exception e){
+                                }
 
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
-                                        p_info, created, project_status_title, null);
+                                        p_info,
+                                        String.valueOf(out_format.format(change_max) +" "+ out_format_time.format(change_max))
+                                        + " - " + hours + ":00",
+                                        project_status_title, null);
                                 client_mas.add(fc);
 
                             } while (k.moveToNext());
@@ -453,13 +464,13 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                 return nc.getId();
             }
         });
-        dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
+        dict.addStringField(R.id.c_price, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
                 return nc.getAddress();
             }
         });
-        dict.addStringField(R.id.c_price, new StringExtractor<Frag_client_schedule_class>() {
+        dict.addStringField(R.id.c_address, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
                 return nc.getId_client();

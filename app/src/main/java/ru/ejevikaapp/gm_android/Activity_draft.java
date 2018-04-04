@@ -53,15 +53,10 @@ public class Activity_draft extends AppCompatActivity {
 
         @JavascriptInterface
         public void func_elem_jform_n5(String n5) {
-            Log.d("mLog", "1");
             SP5 = getSharedPreferences("SAVED_N5", MODE_PRIVATE);
-            Log.d("mLog", "2");
             SharedPreferences.Editor ed = SP5.edit();
-            Log.d("mLog", "3");
             ed.putString(SAVED_N5, n5);
-            Log.d("mLog", "4");
             ed.commit();
-            Log.d("mLog", "5");
         }
 
         @JavascriptInterface
@@ -225,12 +220,12 @@ public class Activity_draft extends AppCompatActivity {
         auto = sPref.getString("", "");
 
         Log.d("mLog", "________________" );
-        Log.d("mLog", canvases );
-        Log.d("mLog", textures);
-        Log.d("mLog", diags_points);
-        Log.d("mLog", walls_points );
-        Log.d("mLog", pt_points);
-        Log.d("mLog", auto);
+        Log.d("mLog", "canvases " + canvases );
+        Log.d("mLog", "text " + textures);
+        Log.d("mLog", "diags " + diags_points);
+        Log.d("mLog", "wall  " + walls_points );
+        Log.d("mLog", "pt " + pt_points);
+        Log.d("mLog", "auto " + auto);
         Log.d("mLog", "________________" );
 
         mWebView = (WebView) findViewById(R.id.webView);

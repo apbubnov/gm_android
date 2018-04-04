@@ -4,20 +4,23 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'GM'
-            keyPassword 'p3xoXKk6nm'
-            storeFile file('C:/Users/Дмитрий/key_store.jks')
-            storePassword 'p3xoXKk6nm'
+        }
+        release {
+            keyAlias 'it-ceiling_key'
+            keyPassword 'b0lx9fqg'
+            storeFile file('E:/it-ceiling_key.jks')
+            storePassword 'b0lx9fqg'
         }
     }
-    compileSdkVersion 25
+    compileSdkVersion 26
     defaultConfig {
         applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0.0203"
+        targetSdkVersion 26
+        versionCode 7
+        versionName '1.0.0402'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
@@ -31,6 +34,9 @@ android {
     }
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:23.0.1'
+    }
+    buildToolsVersion '26.0.2'
+    productFlavors {
     }
 }
 
@@ -48,7 +54,6 @@ dependencies {
     compile 'com.github.amigold.fundapter:library:1.0'
     // list с выбором
     compile 'it.neokree:MaterialTabs:0.11'
-
     testCompile 'junit:junit:4.12'
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile files('libs/GenAsync.jar')
@@ -61,6 +66,5 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     implementation files('libs/svg-android.jar')
     implementation files('libs/androidsvg-1.2.1.jar')
-
     compile 'com.pixplicity.sharp:library:1.1.0'
 }

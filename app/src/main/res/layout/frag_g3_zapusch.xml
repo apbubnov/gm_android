@@ -12,30 +12,30 @@
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Номер"
-            android:gravity="bottom"
+            android:text="№"
+            android:gravity="bottom|center"
             style="@style/text_style_columns_name"
             android:minLines="2"/>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Дата замера"
+            android:gravity="bottom|center"
+            style="@style/text_style_columns_name"
+            android:minLines="2"
+            android:layout_span="3"/>
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Адрес"
-            android:gravity="bottom"
+            android:gravity="bottom|center"
             style="@style/text_style_columns_name"
             android:minLines="2"
             android:layout_span="3" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Дата создания"
-            android:gravity="bottom"
-            style="@style/text_style_columns_name"
-            android:minLines="2"
-            android:layout_span="3"/>
 
         <TextView
             android:id="@+id/textView2"

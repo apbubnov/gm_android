@@ -6,6 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ru.ejevikaapp.gm_android.MainActivity"
     style="@style/backgroun"
+    android:fitsSystemWindows="true"
+    android:focusableInTouchMode="true"
+    android:descendantFocusability="beforeDescendants"
     android:orientation="vertical">
 
     <ScrollView
@@ -19,13 +22,13 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@raw/gm_logo"
             android:id="@+id/imageView"
+            android:layout_width="160dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
+            android:layout_marginBottom="40dp"
             android:layout_marginTop="40dp"
-            android:layout_marginBottom="40dp"/>
+            android:src="@drawable/it_c"/>
 
         <cn.zhaiyifan.rememberedittext.RememberEditText
             android:id="@+id/login"
@@ -59,7 +62,9 @@
             android:id="@+id/btn_vhod"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:elevation="0dp"
             android:text="Войти"
             android:textAppearance="?android:attr/textAppearanceLarge"
@@ -68,6 +73,15 @@
             android:background="@drawable/rounded_button"
             />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Регистрация"
+            android:layout_marginTop="10dp"
+            style="@style/text_style_spisok"
+            android:id="@+id/registration"
+            android:clickable="true"
+            android:gravity="center"/>
     </LinearLayout>
 
     </ScrollView>

@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import ru.ejevikaapp.gm_android.Manager.Frag_in_production;
-import ru.ejevikaapp.gm_android.Manager.Frag_started_projects;
 
 public class Manager_office extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -87,14 +86,14 @@ public class Manager_office extends AppCompatActivity
                     Frag_c.getTag()
             ).commit();
         }
-        else if (id == R.id.started_projects) {
-            Frag_started_projects Frag_g1_z = new Frag_started_projects();
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.relativelayout_fragment_blank3,
-                    Frag_g1_z,
-                    Frag_g1_z.getTag()
-            ).commit();
-        }
+       //else if (id == R.id.started_projects) {
+       //    Frag_started_projects Frag_g1_z = new Frag_started_projects();
+       //    FragmentManager manager = getSupportFragmentManager();
+       //    manager.beginTransaction().replace(R.id.relativelayout_fragment_blank3,
+       //            Frag_g1_z,
+       //            Frag_g1_z.getTag()
+       //    ).commit();
+       //}
        // else if (id == R.id.customer_orders) {
        //     Frag_g2_price_poloten Frag_g2_p = new Frag_g2_price_poloten();
        //     FragmentManager manager = getSupportFragmentManager();

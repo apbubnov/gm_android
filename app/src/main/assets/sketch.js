@@ -28,32 +28,24 @@ var lines_sort =[];
 var chert_close = false;
 var line_bad = false;
 var opred_rez;
-var cansel_array = [];
-var count_cansel = 0;
 var text_lines = [];
 var text_diag = [];
 var text_v, text_h;
 var text_points = [];
 var g_points = [];
 var diag = [];
-var fixed_walls = [];
-var razv_wall = [];
-var razv_wall_kos = [];
-var coef_wall_kos = [];
 var triangles = [];
-var fixed_diags = [];
 var vh = 'v';
 var points;
 var code = 64, alfavit = 0;
 var timer1, timer_mig, timer_button_color, timer_url;
-var fix_point_dvig;
+var fix_point_dvig, peredvig;
 var touch1, touch2;
 var ready = false;
-var text_points_lines_id = [];
 var down_g, right_g, up_g, left_g, granica;
 var diag_sort = [];
-var tre;
 var width_final, square_obrezkov = 0, angle_final, sq_polotna, cuts_json, p_usadki_final = 1;
+var arr_cancel = [];
 clicks();
 ///////////////////////
 Function.prototype.process= function(state){
@@ -232,7 +224,6 @@ var close_sketch_click = function()
 	}
 	else
 	{
-
 		polotno();
 		if (polotna.length === 1)
 		{
@@ -266,58 +257,22 @@ function change_window_location()
 	}
 }
 
-function w_h(){
-
-    if (document.body.clientWidth > document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientHeight);
-		jQuery("#myCanvas").css("height", document.body.clientHeight - 120);
-		view.viewSize = new Size(document.body.clientHeight, document.body.clientHeight - 120);
-	}
-	else if (document.body.clientWidth < document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientWidth - 20);
-		jQuery("#myCanvas").css("height", document.body.clientWidth);
-		view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientWidth);
-	}
-
-}
-
 var suc_a1 = false, suc_a2 = false, suc_a3 = false;
 
-function save_calc_image(){		// ajax
-
-	/*if (document.body.clientWidth > document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientHeight);
-		jQuery("#myCanvas").css("height", document.body.clientHeight - 120);
-		view.viewSize = new Size(document.body.clientHeight, document.body.clientHeight - 120);
-	}
-	else if (document.body.clientWidth < document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientWidth - 20);
-		jQuery("#myCanvas").css("height", document.body.clientWidth);
-		view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientWidth);
-	}*/
-
-	w_h();
-
+function save_calc_image()
+{
+	view.zoom = 1;
 	text_points_sdvig();
-	zoom(2);
 	align_center();
-	zoom(1);
 
 	for(var i in text_points)
 	{
-		/*if (view.zoom > 1)
-		{
-			text_points[i].fontSize -= 2;
-		}*/
+		text_points[i].fontSize = 14;
 		text_points[i].bringToFront();
 	}
 	for(var i in text_diag)
 	{
-		//text_diag[i].fontSize -= 2;
+		text_diag[i].fontSize = 12;
 		if (diag_sort[i].length < 40)
 		{
 			text_diag[i].fontSize -= 1;
@@ -334,50 +289,33 @@ function save_calc_image(){		// ajax
 				}
 			}
 		}
-		/*if (view.zoom > 1)
-		{
-			text_diag[i].fontSize -= 2;
-		}*/
 		text_diag[i].position = diag_sort[i].position;
 		text_diag[i].bringToFront();
 	}
-	for(var i in text_lines)
+	for(var i in lines)
 	{
+		text_lines[lines[i].id].fontSize = 14;
 		if (lines[i].length < 40)
 		{
-			text_lines[i].fontSize -= 1;
+			text_lines[lines[i].id].fontSize -= 1;
 			if (lines[i].length < 30)
 			{
-				text_lines[i].fontSize -= 1;
+				text_lines[lines[i].id].fontSize -= 1;
 				if (lines[i].length < 20)
 				{
-					text_lines[i].fontSize -= 1;
+					text_lines[lines[i].id].fontSize -= 1;
 					if (lines[i].length < 10)
 					{
-						text_lines[i].fontSize -= 1;
+						text_lines[lines[i].id].fontSize -= 1;
 					}
 				}
 			}
 		}
-		/*if (view.zoom > 1)
-		{
-			text_lines[i].fontSize -= 2;
-		}*/
-		text_lines[i].position = lines[i].position;
-		text_lines[i].bringToFront();
+		text_lines[lines[i].id].position = lines[i].position;
+		text_lines[lines[i].id].bringToFront();
 	}
 
 	view.update();
-    /*var MainCanvas = document.getElementById('myCanvas');
-
-    var hidden_canv = document.createElement('canvas');
-    hidden_canv.style.display = 'none';
-    document.body.appendChild(hidden_canv);
-    hidden_canv.width = MainCanvas.width;
-    hidden_canv.height = MainCanvas.height;
-    var hidden_ctx = hidden_canv.getContext('2d');
-    hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0, hidden_canv.width, hidden_canv.height);
-    var image = hidden_canv.toDataURL("screenshot/png");*/
 
 	var bounds = project.activeLayer.bounds.clone();
 	project.activeLayer.bounds = new Rectangle({from: [0,0], 
@@ -388,114 +326,46 @@ function save_calc_image(){		// ajax
 	//console.log(svg);
 	project.activeLayer.bounds = bounds;
 
+    
     AndroidFunction.func_elem_jform_n4(elem_jform_n4.value);
     AndroidFunction.func_elem_jform_n5(elem_jform_n5.value);
     AndroidFunction.func_elem_jform_n9(elem_jform_n9.value);
     AndroidFunction.func_elem_jform_image(svg);
 
-
 }
 
 function save_cut_img() // ajax2
 {
-	/*if (document.body.clientWidth > document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientHeight);
-		jQuery("#myCanvas").css("height", document.body.clientHeight - 120);
-		view.viewSize = new Size(document.body.clientHeight, document.body.clientHeight - 120);
-	}
-	else if (document.body.clientWidth < document.body.clientHeight)
-	{
-		jQuery("#myCanvas").css("width", document.body.clientWidth - 20);
-		jQuery("#myCanvas").css("height", document.body.clientWidth);
-		view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientWidth);
-	}*/
-
-	w_h();
-
+	view.zoom = 1;
 	text_points_sdvig();
-	zoom(2);
 	align_center();
-	zoom(1);
 
+	var ptfs = 14;
 	if (tre === 29)
 	{
-		sdvig();
-		zoom(1);
+		p_usadki_final = 1;
+		ptfs = 12;
 	}
-
+	
 	for(var i in text_points)
 	{
-		/*if (view.zoom > 1)
-		{
-			text_points[i].fontSize -= 2;
-		}*/
+		text_points[i].fontSize = ptfs;
 		text_points[i].bringToFront();
 	}
 	for(var i in text_diag)
 	{
-		//text_diag[i].fontSize -= 2;
-		if (diag_sort[i].length < 40)
-		{
-			text_diag[i].fontSize -= 1;
-			if (diag_sort[i].length < 30)
-			{
-				text_diag[i].fontSize -= 1;
-				if (diag_sort[i].length < 20)
-				{
-					text_diag[i].fontSize -= 1;
-					if (diag_sort[i].length < 10)
-					{
-						text_diag[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_diag[i].fontSize -= 2;
-		}*/
-		text_diag[i].position = diag_sort[i].position;
-		text_diag[i].bringToFront();
+		text_diag[i].remove();
 	}
-
 	for(var i in text_lines)
 	{
-		if (lines[i].length < 40)
-		{
-			text_lines[i].fontSize -= 1;
-			if (lines[i].length < 30)
-			{
-				text_lines[i].fontSize -= 1;
-				if (lines[i].length < 20)
-				{
-					text_lines[i].fontSize -= 1;
-					if (lines[i].length < 10)
-					{
-						text_lines[i].fontSize -= 1;
-					}
-				}
-			}
-		}
-		/*if (view.zoom > 1)
-		{
-			text_lines[i].fontSize -= 2;
-		}*/
-		text_lines[i].position = lines[i].position;
-		text_lines[i].bringToFront();
+		text_lines[i].remove();
+	}
+	for(var i in text_contur)
+	{
+		text_contur[i].remove();
 	}
 
 	view.update();
-    /*var MainCanvas = document.getElementById('myCanvas');
-
-    var hidden_canv = document.createElement('canvas');
-    hidden_canv.style.display = 'none';
-    document.body.appendChild(hidden_canv);
-    hidden_canv.width = MainCanvas.width;
-    hidden_canv.height = MainCanvas.height;
-    var hidden_ctx = hidden_canv.getContext('2d');
-    hidden_ctx.drawImage(MainCanvas, 0, 0,  hidden_canv.width,  hidden_canv.height, 0, 0, hidden_canv.width, hidden_canv.height);
-    var image = hidden_canv.toDataURL("screenshot/png");*/
 
     var bounds = project.activeLayer.bounds.clone();
 	project.activeLayer.bounds = new Rectangle({from: [0,0], 
@@ -595,73 +465,6 @@ function sdvig_sy(sy)
 	{
 		project.activeLayer.children[key].position.y = new Decimal(project.activeLayer.children[key].position.y).plus(sy).toNumber();
 	}
-
-	for (var key in cansel_array)
-	{
-		if (cansel_array[key].vid === '1')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].y = new Decimal(cansel_array[key].line_id[i][0].y).plus(sy).toNumber();
-					cansel_array[key].line_id[i][1].y = new Decimal(cansel_array[key].line_id[i][1].y).plus(sy).toNumber();
-				}
-			}
-			cansel_array[key].start_point.y = new Decimal(cansel_array[key].start_point.y).plus(sy).toNumber();
-			cansel_array[key].end_point.y = new Decimal(cansel_array[key].end_point.y).plus(sy).toNumber();
-		}
-		if (cansel_array[key].vid === '2')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].y = new Decimal(cansel_array[key].line_id[i][0].y).plus(sy).toNumber();
-					cansel_array[key].line_id[i][1].y = new Decimal(cansel_array[key].line_id[i][1].y).plus(sy).toNumber();
-				}
-			}
-
-			cansel_array[key].vert[1].y = new Decimal(cansel_array[key].vert[1].y).plus(sy).toNumber();
-			cansel_array[key].vert[3].y = new Decimal(cansel_array[key].vert[3].y).plus(sy).toNumber();
-		}
-		if (cansel_array[key].vid === '3_1')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].y = new Decimal(cansel_array[key].line_id[i][0].y).plus(sy).toNumber();
-					cansel_array[key].line_id[i][1].y = new Decimal(cansel_array[key].line_id[i][1].y).plus(sy).toNumber();
-				}
-			}
-			for (var i in cansel_array[key].diag)
-			{
-				cansel_array[key].diag[i][0].y = new Decimal(cansel_array[key].diag[i][0].y).plus(sy).toNumber();
-				cansel_array[key].diag[i][1].y = new Decimal(cansel_array[key].diag[i][1].y).plus(sy).toNumber();
-			}
-
-			cansel_array[key].vert[1].y = new Decimal(cansel_array[key].vert[1].y).plus(sy).toNumber();
-			cansel_array[key].vert[3].y = new Decimal(cansel_array[key].vert[3].y).plus(sy).toNumber();
-			cansel_array[key].vert[5].y = new Decimal(cansel_array[key].vert[5].y).plus(sy).toNumber();
-		}
-		if (cansel_array[key].vid === '3_mega')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].y = new Decimal(cansel_array[key].line_id[i][0].y).plus(sy).toNumber();
-					cansel_array[key].line_id[i][1].y = new Decimal(cansel_array[key].line_id[i][1].y).plus(sy).toNumber();
-				}
-			}
-			for (var i in cansel_array[key].diag)
-			{
-				cansel_array[key].diag[i][0].y = new Decimal(cansel_array[key].diag[i][0].y).plus(sy).toNumber();
-				cansel_array[key].diag[i][1].y = new Decimal(cansel_array[key].diag[i][1].y).plus(sy).toNumber();
-			}
-		}
-	}
 }
 
 function sdvig_sx(sx)
@@ -669,73 +472,6 @@ function sdvig_sx(sx)
 	for (var key in project.activeLayer.children)
 	{
 		project.activeLayer.children[key].position.x = new Decimal(project.activeLayer.children[key].position.x).plus(sx).toNumber();
-	}
-
-	for (var key in cansel_array)
-	{
-		if (cansel_array[key].vid === '1')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].x = new Decimal(cansel_array[key].line_id[i][0].x).plus(sx).toNumber();
-					cansel_array[key].line_id[i][1].x = new Decimal(cansel_array[key].line_id[i][1].x).plus(sx).toNumber();
-				}
-			}
-			cansel_array[key].start_point.x = new Decimal(cansel_array[key].start_point.x).plus(sx).toNumber();
-			cansel_array[key].end_point.x = new Decimal(cansel_array[key].end_point.x).plus(sx).toNumber();
-		}
-		if (cansel_array[key].vid === '2')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].x = new Decimal(cansel_array[key].line_id[i][0].x).plus(sx).toNumber();
-					cansel_array[key].line_id[i][1].x = new Decimal(cansel_array[key].line_id[i][1].x).plus(sx).toNumber();
-				}
-			}
-
-			cansel_array[key].vert[1].x = new Decimal(cansel_array[key].vert[1].x).plus(sx).toNumber();
-			cansel_array[key].vert[3].x = new Decimal(cansel_array[key].vert[3].x).plus(sx).toNumber();
-		}
-		if (cansel_array[key].vid === '3_1')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].x = new Decimal(cansel_array[key].line_id[i][0].x).plus(sx).toNumber();
-					cansel_array[key].line_id[i][1].x = new Decimal(cansel_array[key].line_id[i][1].x).plus(sx).toNumber();
-				}
-			}
-			for (var i in cansel_array[key].diag)
-			{
-				cansel_array[key].diag[i][0].x = new Decimal(cansel_array[key].diag[i][0].x).plus(sx).toNumber();
-				cansel_array[key].diag[i][1].x = new Decimal(cansel_array[key].diag[i][1].x).plus(sx).toNumber();
-			}
-
-			cansel_array[key].vert[1].x = new Decimal(cansel_array[key].vert[1].x).plus(sx).toNumber();
-			cansel_array[key].vert[3].x = new Decimal(cansel_array[key].vert[3].x).plus(sx).toNumber();
-			cansel_array[key].vert[5].x = new Decimal(cansel_array[key].vert[5].x).plus(sx).toNumber();
-		}
-		if (cansel_array[key].vid === '3_mega')
-		{
-			for (var i in cansel_array[key].line_id)
-			{
-				if (cansel_array[key].line_id[i] !== null)
-				{
-					cansel_array[key].line_id[i][0].x = new Decimal(cansel_array[key].line_id[i][0].x).plus(sx).toNumber();
-					cansel_array[key].line_id[i][1].x = new Decimal(cansel_array[key].line_id[i][1].x).plus(sx).toNumber();
-				}
-			}
-			for (var i in cansel_array[key].diag)
-			{
-				cansel_array[key].diag[i][0].x = new Decimal(cansel_array[key].diag[i][0].x).plus(sx).toNumber();
-				cansel_array[key].diag[i][1].x = new Decimal(cansel_array[key].diag[i][1].x).plus(sx).toNumber();
-			}
-		}
 	}
 }
 
@@ -1094,23 +830,6 @@ function dvig_lines(napr)
 			project.activeLayer.children[key].position.y -=  1;
 		}
 
-		for (var key in cansel_array)
-		{
-			if (cansel_array[key].vid === '1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].y -= 1;
-						cansel_array[key].line_id[i][1].y -= 1;
-					}
-				}
-				cansel_array[key].start_point.y -= 1;
-				cansel_array[key].end_point.y -= 1;
-			}
-		}
-
 		move_point.y = view.viewSize.height / view.zoom - 20;
 		begin_point.y -= 1;
 		start_point.y -= 1;
@@ -1120,23 +839,6 @@ function dvig_lines(napr)
 	  	for (var key in project.activeLayer.children)
 		{
 			project.activeLayer.children[key].position.y +=  1;
-		}
-
-		for (var key in cansel_array)
-		{
-			if (cansel_array[key].vid === '1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].y += 1;
-						cansel_array[key].line_id[i][1].y += 1;
-					}
-				}
-				cansel_array[key].start_point.y += 1;
-				cansel_array[key].end_point.y += 1;
-			}
 		}
 
 		move_point.y = view.viewSize.height * (view.zoom - 1) + 20;
@@ -1150,23 +852,6 @@ function dvig_lines(napr)
 			project.activeLayer.children[key].position.x -=  1;
 		}
 
-		for (var key in cansel_array)
-		{
-			if (cansel_array[key].vid === '1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x -= 1;
-						cansel_array[key].line_id[i][1].x -= 1;
-					}
-				}
-				cansel_array[key].start_point.x -= 1;
-				cansel_array[key].end_point.x -= 1;
-			}
-		}
-
 		move_point.x = view.viewSize.width / view.zoom - 20;
 		start_point.x -= 1;
 		begin_point.x -= 1;
@@ -1176,23 +861,6 @@ function dvig_lines(napr)
 	  	for (var key in project.activeLayer.children)
 		{
 			project.activeLayer.children[key].position.x +=  1;
-		}
-
-		for (var key in cansel_array)
-		{
-			if (cansel_array[key].vid === '1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x += 1;
-						cansel_array[key].line_id[i][1].x += 1;
-					}
-				}
-				cansel_array[key].start_point.x += 1;
-				cansel_array[key].end_point.x += 1;
-			}
 		}
 
 		move_point.x = view.viewSize.width * (view.zoom - 1) + 20;
@@ -1289,6 +957,10 @@ tool.onMouseDrag = function(event)
 {
 	if (move_point === undefined)
 	{
+		if (fix_point_dvig === undefined)
+		{
+			return;
+		}
 		var rast_x = Math.round(fix_point_dvig.x - event.point.x);
 		var rast_y = Math.round(fix_point_dvig.y - event.point.y);
 		for (var key in project.activeLayer.children)
@@ -1296,99 +968,7 @@ tool.onMouseDrag = function(event)
 			project.activeLayer.children[key].position.x -=  rast_x;
 			project.activeLayer.children[key].position.y -=  rast_y;
 		}
-		for (var key in cansel_array)
-		{
-			if (cansel_array[key].vid === '1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x -= rast_x;
-						cansel_array[key].line_id[i][1].x -= rast_x;
-						cansel_array[key].line_id[i][0].y -= rast_y;
-						cansel_array[key].line_id[i][1].y -= rast_y;
-					}
-				}
-				cansel_array[key].start_point.x -= rast_x;
-				cansel_array[key].end_point.x -= rast_x;
-				cansel_array[key].start_point.y -= rast_y;
-				cansel_array[key].end_point.y -= rast_y;
-			}
-			if (cansel_array[key].vid === '2')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x -= rast_x;
-						cansel_array[key].line_id[i][1].x -= rast_x;
-						cansel_array[key].line_id[i][0].y -= rast_y;
-						cansel_array[key].line_id[i][1].y -= rast_y;
-					}
-				}
-				//cansel_array[key].vert[0].x -= rast_x;
-				cansel_array[key].vert[1].x -= rast_x;
-				//cansel_array[key].vert[2].x -= rast_x;
-				cansel_array[key].vert[3].x -= rast_x;
-				//cansel_array[key].vert[0].y -= rast_y;
-				cansel_array[key].vert[1].y -= rast_y;
-				//cansel_array[key].vert[2].y -= rast_y;
-				cansel_array[key].vert[3].y -= rast_y;
-			}
-			if (cansel_array[key].vid === '3_1')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x -= rast_x;
-						cansel_array[key].line_id[i][1].x -= rast_x;
-						cansel_array[key].line_id[i][0].y -= rast_y;
-						cansel_array[key].line_id[i][1].y -= rast_y;
-					}
-				}
-				for (var i in cansel_array[key].diag)
-				{
-					cansel_array[key].diag[i][0].x -= rast_x;
-					cansel_array[key].diag[i][1].x -= rast_x;
-					cansel_array[key].diag[i][0].y -= rast_y;
-					cansel_array[key].diag[i][1].y -= rast_y;
-				}
-				//cansel_array[key].vert[0].x -= rast_x;
-				cansel_array[key].vert[1].x -= rast_x;
-				//cansel_array[key].vert[2].x -= rast_x;
-				cansel_array[key].vert[3].x -= rast_x;
-				//cansel_array[key].vert[4].x -= rast_x;
-				cansel_array[key].vert[5].x -= rast_x;
-				//cansel_array[key].vert[0].y -= rast_y;
-				cansel_array[key].vert[1].y -= rast_y;
-				//cansel_array[key].vert[2].y -= rast_y;
-				cansel_array[key].vert[3].y -= rast_y;
-				//cansel_array[key].vert[4].y -= rast_y;
-				cansel_array[key].vert[5].y -= rast_y;
-			}
-			if (cansel_array[key].vid === '3_mega')
-			{
-				for (var i in cansel_array[key].line_id)
-				{
-					if (cansel_array[key].line_id[i] !== null)
-					{
-						cansel_array[key].line_id[i][0].x -= rast_x;
-						cansel_array[key].line_id[i][1].x -= rast_x;
-						cansel_array[key].line_id[i][0].y -= rast_y;
-						cansel_array[key].line_id[i][1].y -= rast_y;
-					}
-				}
-				for (var i in cansel_array[key].diag)
-				{
-					cansel_array[key].diag[i][0].x -= rast_x;
-					cansel_array[key].diag[i][1].x -= rast_x;
-					cansel_array[key].diag[i][0].y -= rast_y;
-					cansel_array[key].diag[i][1].y -= rast_y;
-				}
-			}
-		}
+		
 		if (start_point !== undefined || end_point !== undefined)
 		{
 			start_point.x -= rast_x;
@@ -1397,6 +977,7 @@ tool.onMouseDrag = function(event)
 			end_point.y -= rast_y;		
 		}
 		fix_point_dvig = event.point;
+		peredvig = true;
 		return;
 	}
 	if (elem_useGrid.checked)
@@ -1692,6 +1273,22 @@ function proverka()
 
 tool.onMouseUp = function(event)
 {
+	if (!peredvig)
+	{
+		var hitResults = project.hitTestAll(event.point, {class: Path, segments: true, stroke: true, tolerance: 5});
+		for (var key in hitResults)
+		{
+			if (hitResults[key].item.segments.length === 2)
+			{
+				if (hitResults[key].item.data.fixed)
+				{
+					click_on_fixed(hitResults[key].item);
+					return;
+				}
+			}
+		}
+	}
+	peredvig = false;
 	touch1 = undefined;
 	touch2 = undefined;
 	fix_point_dvig = undefined;
@@ -1710,8 +1307,7 @@ tool.onMouseUp = function(event)
 			return;
 		}
 		good_lines = false;
-		count_cansel++;
-		cansel_array[count_cansel] = {line_id: [], start_point: start_point.clone(), end_point: end_point.clone(), vid: '1'};
+
 		var l = 0;
 		for (var key in lines)
 		{
@@ -1796,7 +1392,6 @@ tool.onMouseUp = function(event)
 			line_v.remove();
 			line_h.removeSegments();
 			line_h.remove();
-			count_cansel--;
 			var l = 0;
 			for (var key in lines)
 			{
@@ -1853,8 +1448,7 @@ tool.onMouseUp = function(event)
 			return;
 		}
 		good_lines = false;
-		count_cansel++;
-		cansel_array[count_cansel] = {line_id: [], start_point: start_point.clone(), end_point: end_point.clone(), vid: '1'};
+
 		var l = 0;
 		for (var key in lines)
 		{
@@ -1873,8 +1467,7 @@ tool.onMouseUp = function(event)
 			{
 				line_v.removeSegments();
 				line_v.remove();
-				//text_v.remove();
-				count_cansel--;
+
 				l = 0;
 				for (var key in lines)
 				{
@@ -1894,8 +1487,7 @@ tool.onMouseUp = function(event)
 		{
 			line_v.removeSegments();
 			line_v.remove();
-			//text_v.remove();
-			count_cansel--;
+
 			l = 0;
 			for (var key in lines)
 			{
@@ -1924,11 +1516,14 @@ tool.onMouseUp = function(event)
 		krug_end = circle;
 	}
 
+	lines_sort = [];
 	point_start_or_end = undefined;
 	if (point_ravny(start_point, end_point))
 	{
 		krug_end.remove();
 		krug_start.remove();
+		krug_end = undefined;
+		krug_start = undefined;
 		var l = 0;
 		for (var key in lines)
 		{
@@ -1936,7 +1531,6 @@ tool.onMouseUp = function(event)
 		}
 		if (l < 3)
 		{
-			count_cansel--;
 			begin_point = undefined;
 			move_point = undefined;
 			c_point = undefined;
@@ -1959,6 +1553,7 @@ tool.onMouseUp = function(event)
 	begin_point = undefined;
 	move_point = undefined;
 	c_point = undefined;
+	save_cancel();
 };
 
 function text_points_sdvig()
@@ -2002,8 +1597,6 @@ function prodolzhit_line(line_pr, line)
 	var p1, p2;
 	if (line_pr !== null)
 	{
-		points = [line_pr.segments[0].point.clone(), line_pr.segments[1].point.clone()];
-		cansel_array[count_cansel].line_id[line_pr.id] = points;
 		var max_rast = 0;
 		for (var i = line.segments.length; i--;)
 		{
@@ -2023,8 +1616,6 @@ function prodolzhit_line(line_pr, line)
 		
 		if (lines[line.id] !== undefined)
 		{
-			points = [line.segments[0].point.clone(), line.segments[1].point.clone()];
-			cansel_array[count_cansel].line_id[line.id] = points;
 			delete lines[line.id];
 		}
 		line.remove();
@@ -2033,8 +1624,8 @@ function prodolzhit_line(line_pr, line)
 	}
 	else
 	{
-		cansel_array[count_cansel].line_id[line.id] = null;
-		lines[line.id] = line;
+		lines.push(line);
+		line.data.id = lines.length - 1;
 	}
 }
 
@@ -2042,44 +1633,44 @@ function draw_lines_text()
 {
 	for (var key in lines)
 	{
-		add_text_v_or_h(lines[key].id);
+		add_text_v_or_h(lines[key]);
 	}
 }
 
-function add_text_v_or_h(line_id)
+function add_text_v_or_h(line)
 {
-	if (text_lines[line_id] !== undefined)
+	if (text_lines[line.id] !== undefined)
 	{
-		text_lines[line_id].remove();
+		text_lines[line.id].remove();
 	}
 
-	text_lines[line_id] = new PointText();
-	text_lines[line_id].fontFamily = 'arial';
-	text_lines[line_id].fontWeight = 'bold';
-	text_lines[line_id].fontSize = 6;
+	text_lines[line.id] = new PointText();
+	text_lines[line.id].fontFamily = 'arial';
+	text_lines[line.id].fontWeight = 'bold';
+	text_lines[line.id].fontSize = 6;
 	var f = 2;
 	while (f > view.zoom)
 	{
 		f = new Decimal(f).minus(0.05).toNumber();
 		if (f <= 0.4 && f > 0.2)
 		{
-			text_lines[line_id].fontSize += 4;
+			text_lines[line.id].fontSize += 4;
 		}
 		else if (f < 1)
 		{
-			text_lines[line_id].fontSize += 2;
+			text_lines[line.id].fontSize += 2;
 		}
 		else if (f < 2)
 		{
-			text_lines[line_id].fontSize += 0.5;
+			text_lines[line.id].fontSize += 0.5;
 		}
 	}
-	text_lines[line_id].content = Math.round(lines[line_id].length);
-	var angle = (Math.atan((lines[line_id].segments[1].point.y-lines[line_id].segments[0].point.y)/(lines[line_id].segments[1].point.x
-		-lines[line_id].segments[0].point.x))*180)/Math.PI;
-    text_lines[line_id].rotate(angle);
-    text_lines[line_id].position = lines[line_id].position;
-    text_lines[line_id].bringToFront();
+	text_lines[line.id].content = Math.round(line.length);
+	var angle = (Math.atan((line.segments[1].point.y-line.segments[0].point.y)/(line.segments[1].point.x
+		-line.segments[0].point.x))*180)/Math.PI;
+    text_lines[line.id].rotate(angle);
+    text_lines[line.id].position = line.position;
+    text_lines[line.id].bringToFront();
 }
 
 function add_text_diag(index)
@@ -2264,269 +1855,253 @@ function point_near_lines(point)
 	return ret_rez;
 }
 
-function cancelLastAction()
+function cancel_last_action()
 {
-	ready = false;
-	if (count_cansel > 0)
+	if (arr_cancel.length > 1)
 	{
-		if (count_cansel === 1)
+		arr_cancel.splice(arr_cancel.length - 1);
+	}
+
+	project.activeLayer.removeChildren();
+
+	clearInterval(timer_mig);
+
+	elem_window.style.display = arr_cancel[arr_cancel.length - 1].elem_window_style_display;
+	elem_newLength.value = arr_cancel[arr_cancel.length - 1].elem_newLength_value;
+	if (elem_window.style.display === "block")
+	{
+		first_click = false;
+		elem_newLength.focus();
+		elem_newLength.select();
+	}
+
+	triangulate_bool = arr_cancel[arr_cancel.length - 1].triangulate_bool;
+	vh = arr_cancel[arr_cancel.length - 1].vh;
+	chert_close = arr_cancel[arr_cancel.length - 1].chert_close;
+
+	view.zoom = arr_cancel[arr_cancel.length - 1].zoom;
+
+	code = arr_cancel[arr_cancel.length - 1].code;
+	alfavit = arr_cancel[arr_cancel.length - 1].alfavit;
+
+	ready = arr_cancel[arr_cancel.length - 1].ready;
+	close_sketch_click_bool = arr_cancel[arr_cancel.length - 1].close_sketch_click_bool;
+
+	if (arr_cancel[arr_cancel.length - 1].krug_start !== undefined)
+	{
+		krug_start = arr_cancel[arr_cancel.length - 1].krug_start.clone();
+		project.activeLayer.addChild(krug_start);
+	}
+
+	if (arr_cancel[arr_cancel.length - 1].krug_end !== undefined)
+	{
+		krug_end = arr_cancel[arr_cancel.length - 1].krug_end.clone();
+		project.activeLayer.addChild(krug_end);
+	}
+
+	if (arr_cancel[arr_cancel.length - 1].start_point !== undefined)
+	{
+		start_point = arr_cancel[arr_cancel.length - 1].start_point.clone();
+	}
+
+	if (arr_cancel[arr_cancel.length - 1].end_point !== undefined)
+	{
+		end_point = arr_cancel[arr_cancel.length - 1].end_point.clone();
+	}
+
+	lines_sort = [];
+	lines = [];
+	text_lines = [];
+
+	if (arr_cancel[arr_cancel.length - 1].lines_sort !== undefined && arr_cancel[arr_cancel.length - 1].lines_sort.length !== 0)
+	{
+		for (var key = arr_cancel[arr_cancel.length - 1].lines_sort.length; key--;)
 		{
-			clear_elem();
-		}
-		else
-		{
-			clearInterval(timer_mig);
-			if (cansel_array[count_cansel].vid === '1')
+			lines_sort[key] = arr_cancel[arr_cancel.length - 1].lines_sort[key].clone();
+			lines[lines_sort[key].data.id] = lines_sort[key];
+			if (chert_close)
 			{
-				elem_window.style.display = 'none';
-				for (var key in text_lines)
-				{
-					text_lines[key].remove();
-				}
-	    		for (var key in cansel_array[count_cansel].line_id)
-	    		{
-	    			if (cansel_array[count_cansel].line_id[key] === null)
-	    			{
-	    				lines[key].remove();
-	    				delete text_lines[key];
-	    				delete lines[key];
-	    			}
-	    			else
-	    			{
-	    				if (lines[key] === undefined)
-	    				{
-	    					var line = Path.Line(cansel_array[count_cansel].line_id[key][0], cansel_array[count_cansel].line_id[key][1]);
-	    					line.strokeColor = 'black';
-	    					line.strokeWidth = 3;
-	    					lines[line.id] = line;
-	    					for (var i in cansel_array)
-	    					{
-	    						if (cansel_array[i].line_id[key] !== undefined)
-	    						{
-	    							cansel_array[i].line_id[line.id] = cansel_array[i].line_id[key];
-	    							delete cansel_array[i].line_id[key];
-	    						}
-	    					}
-	    				}
-	    				else
-	    				{
-		    				lines[key].removeSegments();
-		    				lines[key].addSegments([cansel_array[count_cansel].line_id[key][0], cansel_array[count_cansel].line_id[key][1]]);
-		    			}
-	    			}
-	    		}
-	    		start_point = cansel_array[count_cansel].start_point;
-	    		end_point = cansel_array[count_cansel].end_point;
-	    		krug_start.remove();
-	    		krug_start = new Path.Circle(start_point, 20);
-				krug_start.strokeColor = 'green';
-				krug_end.remove();
-	    		krug_end = new Path.Circle(end_point, 20);
-				krug_end.strokeColor = 'green';
-				for (var key = text_points.length; key--;)
-		    	{
-		    		text_points[key].remove();
-		    	}
-		    	for (var key in lines)
-			    {
-			    	lines[key].strokeColor = 'black';
-			    }
-		    	text_points = [];
-		    	lines_sort = [];
-		    	fixed_walls = [];
-		    	chert_close = false;
-		    	code = 64;
-				alfavit = 0;
-				delete cansel_array[count_cansel];
-				count_cansel--;
+				add_text_v_or_h(lines_sort[key]);
 			}
-			if (cansel_array[count_cansel].vid === '2')
-			{
-				triangulate_bool = false;
-				elem_jform_n5.value = '';
-				elem_jform_n9.value = '';
-				for (var key in cansel_array[count_cansel].line_id)
-	    		{
-    				lines[key].removeSegments();
-    				lines[key].addSegments([cansel_array[count_cansel].line_id[key][0], cansel_array[count_cansel].line_id[key][1]]);
-    				add_text_v_or_h(key);
-	    		}
-	    		text_points[cansel_array[count_cansel].vert[0]].point = cansel_array[count_cansel].vert[1];
-    			text_points[cansel_array[count_cansel].vert[2]].point = cansel_array[count_cansel].vert[3];
-	    		fixed_walls[cansel_array[count_cansel].fixed_id] = false;
-	    		for (var key in cansel_array[count_cansel].razv_walls)
-	    		{
-	    			razv_wall[cansel_array[count_cansel].razv_walls[key]] = false;
-	    		}
-				for (var key = 0; key < lines_sort.length; key++)
-			    {
-			    	lines_sort[key].strokeColor = 'black';
-			    }
-
-				for (var key = 0; key < lines_sort.length; key++)
-			    {
-			    	if (fixed_walls[lines_sort[key].id])
-			    	{
-			    		lines_sort[key].strokeColor = 'green';
-			    	}
-			    	else
-			    	{
-			    		elem_window.style.display = 'block';
-			    		lines_sort[key].strokeColor = 'red';
-			    		text_lines[lines_sort[key].id].fillColor = 'Maroon';
-			    		timer_mig = setInterval(migalka, 500, lines_sort[key]);
-			    		elem_newLength.focus();
-			    		elem_newLength.value = Math.round(lines_sort[key].length);
-			    		elem_newLength.select();
-			    		first_click = false;
-			    		break;
-			    	}
-			    }
-			    for (var key = text_diag.length; key--;)
-		    	{
-		    		text_diag[key].remove();
-		    	}
-		    	text_diag = [];
-		    	for (var key = diag_sort.length; key--;)
-		    	{
-		    		diag_sort[key].remove();
-		    	}
-		    	diag_sort = [];
-		    	diag = [];
-		    	
-			    delete cansel_array[count_cansel];
-				count_cansel--;
-			}
-			if (cansel_array[count_cansel].vid === '3_1')
-			{
-				elem_jform_n4.value = '';
-				for (var key in cansel_array[count_cansel].line_id)
-	    		{
-    				lines[key].removeSegments();
-    				lines[key].addSegments([cansel_array[count_cansel].line_id[key][0], cansel_array[count_cansel].line_id[key][1]]);
-    				add_text_v_or_h(key);
-	    		}
-	    		for (var key in cansel_array[count_cansel].diag)
-	    		{
-    				diag_sort[key].removeSegments();
-    				diag_sort[key].addSegments([cansel_array[count_cansel].diag[key][0], cansel_array[count_cansel].diag[key][1]]);
-    				add_text_diag(key);
-	    		}
-	    		text_points[cansel_array[count_cansel].vert[0]].point = cansel_array[count_cansel].vert[1];
-    			text_points[cansel_array[count_cansel].vert[2]].point = cansel_array[count_cansel].vert[3];
-    			text_points[cansel_array[count_cansel].vert[4]].point = cansel_array[count_cansel].vert[5];
-				
-				fixed_diags[cansel_array[count_cansel].fixed_id] = false;
-				elem_window.style.display = 'block';
-
-				for (var key in diag)
-			    {
-			    	diag[key].strokeColor = 'black';
-			    }
-
-				for (var key = 0; key < diag_sort.length; key++)
-			    {
-			    	if (fixed_diags[diag_sort[key].id])
-			    	{
-			    		diag_sort[key].strokeColor = 'green';
-			    	}
-			    	else
-			    	{
-			    		diag_sort[key].strokeColor = 'red';
-			    		text_diag[key].fillColor = 'Maroon';
-			    		timer_mig = setInterval(migalka, 500, diag_sort[key]);
-			    		elem_newLength.focus();
-			    		elem_newLength.value = Math.round(diag_sort[key].length);
-			    		elem_newLength.select();
-			    		first_click = false;
-			    		break;
-			    	}
-			    }
-
-			    for (var key in triangles)
-		    	{
-		    		triangles[key].remove();
-		    	}
-		    	triangles = [];
-
-				delete cansel_array[count_cansel];
-				count_cansel--;
-			}
-			if (cansel_array[count_cansel].vid === '3_mega')
-			{
-				elem_jform_n4.value = '';
-				for (var key in cansel_array[count_cansel].line_id)
-	    		{
-    				lines[key].removeSegments();
-    				lines[key].addSegments([cansel_array[count_cansel].line_id[key][0], cansel_array[count_cansel].line_id[key][1]]);
-    				add_text_v_or_h(key);
-	    		}
-	    		for (var key in cansel_array[count_cansel].diag)
-	    		{
-    				diag_sort[key].removeSegments();
-    				diag_sort[key].addSegments([cansel_array[count_cansel].diag[key][0], cansel_array[count_cansel].diag[key][1]]);
-    				add_text_diag(key);
-	    		}
-
-	    		var j = 0;
-	    		for (var i = 0; i < lines_sort.length; i++)
-			    {
-			    	if (i === 0)
-			    	{
-			    		j = lines_sort.length - 1;
-			    	}
-			    	else
-			    	{
-			    		j = i - 1;
-			    	}
-			    	if (lines_sort[i] !== lines_sort[j] && obshaya_point(lines_sort[i], lines_sort[j]) !== null)
-			    	{
-			    		moveVertexName(lines_sort[i], lines_sort[j], obshaya_point(lines_sort[i], lines_sort[j]));
-			    	}
-			    }
-				
-				fixed_diags[cansel_array[count_cansel].fixed_id] = false;
-
-				elem_window.style.display = 'block';
-
-
-				for (var key = 0; key < diag_sort.length; key++)
-			    {
-			    	if (fixed_diags[diag_sort[key].id])
-			    	{
-			    		diag_sort[key].strokeColor = 'green';
-			    	}
-			    	else
-			    	{
-			    		diag_sort[key].strokeColor = 'black';
-			    	}
-
-			    	if (diag_sort[key].id === cansel_array[count_cansel].fixed_id)
-			    	{
-			    		diag_sort[key].strokeColor = 'red';
-			    		text_diag[key].fillColor = 'Maroon';
-			    		timer_mig = setInterval(migalka, 500, diag_sort[key]);
-			    		elem_newLength.focus();
-			    		elem_newLength.value = Math.round(diag_sort[key].length);
-			    		elem_newLength.select();
-			    		first_click = false;
-			    	}
-			    }
-
-			    for (var key in triangles)
-		    	{
-		    		triangles[key].remove();
-		    	}
-		    	triangles = [];
-
-				delete cansel_array[count_cansel];
-				count_cansel--;
-			}
-
-			sdvig();
-			zoom(1);
 		}
 	}
+	else if (arr_cancel[arr_cancel.length - 1].lines !== undefined)
+	{
+		lines = [];
+		for (var key in arr_cancel[arr_cancel.length - 1].lines)
+		{
+			lines[arr_cancel[arr_cancel.length - 1].lines[key].data.id] = arr_cancel[arr_cancel.length - 1].lines[key].clone();
+			if (chert_close)
+			{
+				add_text_v_or_h(lines[lines.length - 1]);
+			}
+		}
+	}
+
+	diag_sort = [];
+	diag = [];
+	text_diag = [];
+
+	if (triangulate_bool)
+	{
+		if (arr_cancel[arr_cancel.length - 1].diag_sort !== undefined
+			&& arr_cancel[arr_cancel.length - 1].diag_sort.length !== 0)
+		{
+			for (var key = arr_cancel[arr_cancel.length - 1].diag_sort.length; key--;)
+			{
+				diag_sort[key] = arr_cancel[arr_cancel.length - 1].diag_sort[key].clone();
+				diag[key] = diag_sort[key];
+			}
+		}
+		else if (arr_cancel[arr_cancel.length - 1].diag !== undefined)
+		{
+			diag = [];
+			for (var key in arr_cancel[arr_cancel.length - 1].diag)
+			{
+				diag[key] = arr_cancel[arr_cancel.length - 1].diag[key].clone();
+			}
+		}
+
+		for (var key in arr_cancel[arr_cancel.length - 1].text_diag)
+		{
+			text_diag[key] = arr_cancel[arr_cancel.length - 1].text_diag[key].clone();
+		}
+	}
+
+	text_points = [];
+	for (var key in arr_cancel[arr_cancel.length - 1].text_points)
+	{
+		text_points[key] = arr_cancel[arr_cancel.length - 1].text_points[key].clone();
+	}
+
+	g_points = [];
+	for (var key in arr_cancel[arr_cancel.length - 1].g_points)
+	{
+		g_points[key] = arr_cancel[arr_cancel.length - 1].g_points[key].clone();
+	}
+
+	triangles = [];
+
+	elem_jform_n4.value = arr_cancel[arr_cancel.length - 1].elem_jform_n4_value;
+	elem_jform_n5.value = arr_cancel[arr_cancel.length - 1].elem_jform_n5_value;
+	elem_jform_n9.value = arr_cancel[arr_cancel.length - 1].elem_jform_n9_value;
+
+	project.activeLayer.addChildren(lines);
+	project.activeLayer.addChildren(diag);
+	project.activeLayer.addChildren(text_lines);
+	project.activeLayer.addChildren(text_diag);
+	project.activeLayer.addChildren(text_points);
+
+	//console.log(arr_cancel);
+}
+
+function save_cancel()
+{
+	project.activeLayer.removeChildren();
+
+	var obj = {};
+
+	obj.elem_window_style_display = elem_window.style.display;
+	obj.elem_newLength_value = elem_newLength.value;
+
+	if (krug_start !== undefined)
+	{
+		obj.krug_start = krug_start.clone();
+		project.activeLayer.addChild(krug_start);
+	}
+
+	if (krug_end !== undefined)
+	{
+		obj.krug_end = krug_end.clone();
+		project.activeLayer.addChild(krug_end);
+	}
+
+	if (start_point !== undefined)
+	{
+		obj.start_point = start_point.clone();
+	}
+
+	if (end_point !== undefined)
+	{
+		obj.end_point = end_point.clone();
+	}
+
+	if (lines_sort !== undefined && lines_sort.length !== 0)
+	{
+		obj.lines_sort = [];
+		for (var key = lines_sort.length; key--;)
+		{
+			obj.lines_sort[key] = lines_sort[key].clone();
+		}
+	}
+	else if (lines !== undefined)
+	{
+		obj.lines = [];
+		for (var key in lines)
+		{
+			obj.lines[key] = lines[key].clone();
+		}
+	}
+
+	if (diag_sort !== undefined && diag_sort.length !== 0)
+	{
+		obj.diag_sort = [];
+		for (var key = diag_sort.length; key--;)
+		{
+			obj.diag_sort[key] = diag_sort[key].clone();
+		}
+	}
+	else if (diag !== undefined)
+	{
+		obj.diag = [];
+		for (var key in diag)
+		{
+			obj.diag[key] = diag[key].clone();
+		}
+	}
+	
+	
+	obj.text_points = [];
+	for (var key in text_points)
+	{
+		obj.text_points[key] = text_points[key].clone();
+	}
+
+	obj.text_diag = [];
+	for (var key in text_diag)
+	{
+		obj.text_diag[key] = text_diag[key].clone();
+	}
+	
+	obj.code = code;
+	obj.alfavit = alfavit;
+
+	obj.g_points = [];
+	for (var key in g_points)
+	{
+		obj.g_points[key] = g_points[key].clone();
+	}
+
+	obj.triangulate_bool = triangulate_bool;
+	obj.vh = vh;
+	obj.chert_close = chert_close;
+
+	obj.ready = ready;
+	obj.close_sketch_click_bool = close_sketch_click_bool;
+	obj.elem_jform_n4_value = elem_jform_n4.value;
+	obj.elem_jform_n5_value = elem_jform_n5.value;
+	obj.elem_jform_n9_value = elem_jform_n9.value;
+
+	obj.zoom = view.zoom;
+
+	arr_cancel.push(obj);
+
+	project.activeLayer.addChildren(lines);
+	project.activeLayer.addChildren(diag);
+	project.activeLayer.addChildren(text_lines);
+	project.activeLayer.addChildren(text_diag);
+	project.activeLayer.addChildren(text_points);
+	//console.log(arr_cancel);
 }
 
 function clear_elem()
@@ -2537,8 +2112,6 @@ function clear_elem()
 	}
 	view.zoom = 1;
 	elem_window.style.display = 'none';
-	cansel_array = [];
-	count_cansel = 0;
 	if (krug_start !== undefined)
 	{
 		krug_start.remove();
@@ -2560,8 +2133,7 @@ function clear_elem()
 	alfavit = 0;
 	lines = [];
 	lines_sort = [];
-	fixed_walls = [];
-	razv_wall = [];
+
 	g_points = [];
 	triangulate_bool = false;
 	vh = 'v';
@@ -2584,9 +2156,6 @@ function clear_elem()
 	}
 	diag = [];
 	diag_sort = [];
-	fixed_diags = [];
-	razv_wall_kos = [];
-	coef_wall_kos = [];
 	for (var key in triangles)
 	{
 		triangles[key].remove();
@@ -2604,7 +2173,7 @@ function resize_wall_begin()
 {
     for (var key = 0; key < lines_sort.length; key++)
     {
-    	if (!fixed_walls[lines_sort[key].id])
+    	if (!lines_sort[key].data.fixed)
     	{
     		elem_window.style.display = 'block';
     		elem_newLength.focus();
@@ -2639,7 +2208,7 @@ function change_length(line, length, text_point_index)
 			smez_wall1 = rez_lines[key];
 		}
 	}
-	if (!fixed_walls[smez_wall0.id] && !fixed_walls[smez_wall1.id])
+	if (!smez_wall0.data.fixed && !smez_wall1.data.fixed)
 	{
 		if (line.segments[0].point.x > line.segments[1].point.x)
 		{
@@ -2654,13 +2223,13 @@ function change_length(line, length, text_point_index)
 			point_sn = line.segments[0].point;
 		}
 	}
-	else if (!fixed_walls[smez_wall0.id])
+	else if (!smez_wall0.data.fixed)
 	{
 		line2 = smez_wall0;
 		point_s = line.segments[0].point;
 		point_sn = line.segments[1].point;
 	}
-	else if (!fixed_walls[smez_wall1.id])
+	else if (!smez_wall1.data.fixed)
 	{
 		line2 = smez_wall1;
 		point_s = line.segments[1].point;
@@ -2702,8 +2271,6 @@ function change_length(line, length, text_point_index)
 		   	if (!intersections)
 		   	{
 		   		alert('Недопустимая длина');
-		   		delete cansel_array[count_cansel];
-		   		count_cansel--;
 		   		return;
 		   	}
 	   	}
@@ -2721,25 +2288,16 @@ function change_length(line, length, text_point_index)
 	   	len_0.remove();
 	   	len_1.remove();
 
-		can_ver = moveVertexName(line, line2, newPoint);
-
-		cansel_array[count_cansel].vert[0] = can_ver;
-	    cansel_array[count_cansel].vert[1] = new Point(point_s.x - 10, point_s.y - 5);
-	    cansel_array[count_cansel].vert[2] = can_ver;
-	    cansel_array[count_cansel].vert[3] = new Point(point_s.x - 10, point_s.y - 5);
-
-		points = [cp1.clone(), point_s.clone()];
-	    cansel_array[count_cansel].line_id[line.id] = points;
-	    points = [point_s.clone(), cp2.clone()];
-	    cansel_array[count_cansel].line_id[line2.id] = points;
+		moveVertexName(line, line2, newPoint);
 
         line.removeSegments();
 	    line.addSegments([cp1, newPoint]);
 	    line2.removeSegments();
 	    line2.addSegments([newPoint, cp2]);
-	    fixed_walls[line.id] = true;
-	    add_text_v_or_h(line.id);
-	    add_text_v_or_h(line2.id);
+
+	    line.data.fixed = true;
+	    add_text_v_or_h(line);
+	    add_text_v_or_h(line2);
 
 		return;
 	}
@@ -2796,11 +2354,11 @@ function change_length(line, length, text_point_index)
 			cp2 = line2.segments[1].point;
 		}
 
-		coef = coef_wall_kos[line.id];
+		coef = line.data.coef_wall_kos;
 
 		if (coef === undefined)
 		{
-			razv_wall_kos[line.id] = {p1: cp1.clone(), p2: point_s.clone()};
+			line.data.razv_wall_kos = {p1: cp1.clone(), p2: point_s.clone()};
 			var chis = new Decimal(new Decimal(line.segments[1].point.y).minus(line.segments[0].point.y)), 
 				znam = new Decimal(new Decimal(line.segments[1].point.x).minus(line.segments[0].point.x));
 	    	coef = chis.dividedBy(znam);
@@ -2811,69 +2369,49 @@ function change_length(line, length, text_point_index)
 		Dx = dec_length.times(Decimal.sqrt(new Decimal(1).dividedBy(new Decimal(1).plus(coef.pow(2))))).toNumber();
     	Dy = dec_length.times(Decimal.sqrt(new Decimal(1).dividedBy(new Decimal(1).plus(new Decimal(1).dividedBy(coef.pow(2)))))).toNumber();
 
-    	if (razv_wall_kos[line.id].p1.x > razv_wall_kos[line.id].p2.x)
+    	if (line.data.razv_wall_kos.p1.x > line.data.razv_wall_kos.p2.x)
 		{
 			Dx = new Decimal(-1).times(Dx).toNumber();
 		}
-		if (razv_wall_kos[line.id].p1.y > razv_wall_kos[line.id].p2.y)
+		if (line.data.razv_wall_kos.p1.y > line.data.razv_wall_kos.p2.y)
 		{
 			Dy = new Decimal(-1).times(Dy).toNumber();
 		}
 
     	newPoint = new Point(new Decimal(cp1.x).plus(Dx).toNumber(), new Decimal(cp1.y).plus(Dy).toNumber());
-
-		cansel_array[count_cansel].vert[0] = +text_point_index + 1;
-	    cansel_array[count_cansel].vert[1] = new Point(point_s.x - 10, point_s.y - 5);
-	    if (text_points[+text_point_index + 2] !== undefined)
-	    {
-	    	cansel_array[count_cansel].vert[2] = +text_point_index + 2;
-	    }
-	    else
-	    {
-	    	cansel_array[count_cansel].vert[2] = 0;
-	    }
-	    cansel_array[count_cansel].vert[3] = new Point(cp2.x - 10, cp2.y - 5);
-
-		text_points[+text_point_index + 1].point = new Point(newPoint.x - 10, newPoint.y - 5);
-
-
-		points = [cp1.clone(), point_s.clone()];
-	    cansel_array[count_cansel].line_id[line.id] = points;
-	    points = [point_s.clone(), cp2.clone()];
-	    cansel_array[count_cansel].line_id[line2.id] = points;
 	    
-	    if (line_h_or_v(line2) === 'v' && !fixed_walls[line3.id])
+	    if (line_h_or_v(line2) === 'v' && !line3.data.fixed)
 	    {
 	    	if (line_h_or_v(line3) === null)
 	    	{
 	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
 					znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
-		    	coef_wall_kos[line3.id] = chis.dividedBy(znam);
+		    	line3.data.coef_wall_kos = chis.dividedBy(znam);
 		    	if (point_ravny(cp2, line3.segments[0].point))
 		    	{
-			    	razv_wall_kos[line3.id] = {p1: line3.segments[0].point.clone(), p2: line3.segments[1].point.clone()};
+			    	line3.data.razv_wall_kos = {p1: line3.segments[0].point.clone(), p2: line3.segments[1].point.clone()};
 			    }
 			    else
 			    {
-			    	razv_wall_kos[line3.id] = {p1: line3.segments[1].point.clone(), p2: line3.segments[0].point.clone()};
+			    	line3.data.razv_wall_kos = {p1: line3.segments[1].point.clone(), p2: line3.segments[0].point.clone()};
 			    }
 	    	}
 	    	cp2 = new Point(newPoint.x, cp2.y);
 	    }
-	    else if (line_h_or_v(line2) === 'h' && !fixed_walls[line3.id])
+	    else if (line_h_or_v(line2) === 'h' && !line3.data.fixed)
 	    {
 	    	if (line_h_or_v(line3) === null)
 	    	{
 	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
 					znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
-		    	coef_wall_kos[line3.id] = chis.dividedBy(znam);
+		    	line3.data.coef_wall_kos = chis.dividedBy(znam);
 		    	if (point_ravny(cp2, line3.segments[0].point))
 		    	{
-			    	razv_wall_kos[line3.id] = {p1: line3.segments[0].point.clone(), p2: line3.segments[1].point.clone()};
+			    	line3.data.razv_wall_kos = {p1: line3.segments[0].point.clone(), p2: line3.segments[1].point.clone()};
 			    }
 			    else
 			    {
-			    	razv_wall_kos[line3.id] = {p1: line3.segments[1].point.clone(), p2: line3.segments[0].point.clone()};
+			    	line3.data.razv_wall_kos = {p1: line3.segments[1].point.clone(), p2: line3.segments[0].point.clone()};
 			    }
 	    	}
 	    	cp2 = new Point(cp2.x, newPoint.y);
@@ -2882,8 +2420,8 @@ function change_length(line, length, text_point_index)
 	    {
 	    	var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)), 
 				znam = new Decimal(new Decimal(line2.segments[1].point.x).minus(line2.segments[0].point.x));
-	    	coef_wall_kos[line2.id] = chis.dividedBy(znam);
-	    	razv_wall_kos[line2.id] = {p1: point_s.clone(), p2: cp2.clone()};
+	    	line2.data.coef_wall_kos = chis.dividedBy(znam);
+	    	line2.data.razv_wall_kos = {p1: point_s.clone(), p2: cp2.clone()};
 	    }
 
 	    if (cp2.x > point_s.x && cp2.x < newPoint.x 
@@ -2891,33 +2429,31 @@ function change_length(line, length, text_point_index)
     	|| cp2.x < point_s.x && cp2.x > newPoint.x 
     	|| cp2.y < point_s.y && cp2.y > newPoint.y)
 	    {
-	    	razv_wall[line2.id] = true;
-	    	cansel_array[count_cansel].razv_walls.push(line2.id);
+	    	line2.data.razv_wall = true;
 	    }
 	    if (cp2.x > point_s3.x && point_s2_old.x < point_s3.x 
     	|| cp2.y > point_s3.y && point_s2_old.y < point_s3.y 
     	|| cp2.x < point_s3.x && point_s2_old.x > point_s3.x 
     	|| cp2.y < point_s3.y && point_s2_old.y > point_s3.y)
 	    {
-	    	razv_wall[line3.id] = true;
-	    	cansel_array[count_cansel].razv_walls.push(line3.id);
+	    	line3.data.razv_wall = true;
 	    }
 
         line.removeSegments();
 	    line.addSegments([cp1, newPoint]);
 	    line2.removeSegments();
 	    line2.addSegments([newPoint, cp2]);
-	    fixed_walls[line.id] = true;
-	    add_text_v_or_h(line.id);
-	    add_text_v_or_h(line2.id);
-	    if (line_h_or_v(line2) !== null && !fixed_walls[line3.id])
+
+	    line.data.fixed = true;
+	    add_text_v_or_h(line);
+	    add_text_v_or_h(line2);
+	    moveVertexName(line, line2, newPoint);
+	    if (line_h_or_v(line2) !== null && !line3.data.fixed)
 	    {
-	    	points = [point_s2.clone(), point_s3.clone()];
-	    	cansel_array[count_cansel].line_id[line3.id] = points;
-		    text_points[+text_point_index + 2].point = new Point(cp2.x - 10, cp2.y - 5);
 	    	line3.removeSegments();
 	    	line3.addSegments([cp2, point_s3]);
-	    	add_text_v_or_h(line3.id);
+	    	add_text_v_or_h(line3);
+	    	moveVertexName(line2, line3, cp2);
 	    }
 		return;
 	}
@@ -2944,7 +2480,7 @@ function change_length(line, length, text_point_index)
 
 	lx = 0;
 	ly = 0;
-	if (razv_wall[line.id])
+	if (line.data.razv_wall)
 	{
     	if (point_sn.x === point_s.x)
 		{
@@ -2986,67 +2522,52 @@ function change_length(line, length, text_point_index)
     	|| point_s2.x < point_s3.x && point_s2_old.x > point_s3.x 
     	|| point_s2.y < point_s3.y && point_s2_old.y > point_s3.y)
     {
-    	razv_wall[line3.id] = true;
-    	cansel_array[count_cansel].razv_walls.push(line3.id);
+    	line3.data.razv_wall = true;
     }
-
-    cansel_array[count_cansel].vert[0] = +text_point_index + 1;
-    cansel_array[count_cansel].vert[1] = new Point(point_s_old.x - 10, point_s_old.y - 5);
-
-    text_points[+text_point_index + 1].point = new Point(point_s.x - 10, point_s.y - 5);
-
-    points = [point_sn.clone(), point_s_old.clone()];
-	cansel_array[count_cansel].line_id[line.id] = points;
-	points = [point_s_old.clone(), point_s2_old.clone()];
-	cansel_array[count_cansel].line_id[line2.id] = points;
 
     line.removeSegments();
 	line.addSegments([point_sn, point_s]);
-    if (!fixed_walls[line3.id] && line_h_or_v(line2) !== null)
+    if (!line3.data.fixed && line_h_or_v(line2) !== null)
     {
-	    points = [point_s2_old.clone(), point_s3.clone()];
-	    cansel_array[count_cansel].line_id[line3.id] = points;
-
-	    cansel_array[count_cansel].vert[2] = +text_point_index + 2;
-    	cansel_array[count_cansel].vert[3] = new Point(point_s2_old.x - 10, point_s2_old.y - 5);
-    	text_points[+text_point_index + 2].point = new Point(point_s2.x - 10, point_s2.y - 5);
-
 	    line2.removeSegments();
 	    line2.addSegments([point_s, point_s2]);
 
 	    var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
 				znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
-	    coef_wall_kos[line3.id] = chis.dividedBy(znam);
-	    razv_wall_kos[line3.id] = {p1: point_s2_old.clone(), p2: point_s3.clone()};
+	    line3.data.coef_wall_kos = chis.dividedBy(znam);
+	    line3.data.razv_wall_kos = {p1: point_s2_old.clone(), p2: point_s3.clone()};
 
 	    line3.removeSegments();
 	    line3.addSegments([point_s2, point_s3]);
-	    fixed_walls[line.id] = true;
-	    add_text_v_or_h(line.id);
-	    add_text_v_or_h(line2.id);
-	    add_text_v_or_h(line3.id);
+	    add_text_v_or_h(line3);
+	    moveVertexName(line2, line3, point_s2);
 	}
 	else
 	{
-		cansel_array[count_cansel].vert[2] = +text_point_index + 1;
-    	cansel_array[count_cansel].vert[3] = new Point(point_s_old.x - 10, point_s_old.y - 5);
-    	if (coef_wall_kos[line2.id] === undefined)
+    	if (line2.data.coef_wall_kos === undefined)
     	{
     		var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)), 
 				znam = new Decimal(new Decimal(line2.segments[1].point.x).minus(line2.segments[0].point.x));
-	    	coef_wall_kos[line2.id] = chis.dividedBy(znam);
-    		razv_wall_kos[line2.id] = {p1: point_s_old.clone(), p2: point_s2_old.clone()};
+	    	line2.data.coef_wall_kos = chis.dividedBy(znam);
+    		line2.data.razv_wall_kos = {p1: point_s_old.clone(), p2: point_s2_old.clone()};
 		}
 	    line2.removeSegments();
 	    line2.addSegments([point_s, point_s2_old]);
-	    fixed_walls[line.id] = true;
-	    add_text_v_or_h(line.id);
-	    add_text_v_or_h(line2.id);
 	}
+	line.data.fixed = true;
+	add_text_v_or_h(line);
+	add_text_v_or_h(line2);
+	moveVertexName(line, line2, point_s);
 }
 
 function triangulator()
 {
+	for (var i = diag.length; i--;)
+	{
+		diag[i].remove();
+	}
+	diag = [];
+	diag_sort = [];
 	g_points = getPathsPoints(lines_sort);
 	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
 	var ctx1, ctx2, ctx3, d, kolvo_lines, kolvo_lines_2, kolvo_lines_4a, kolvo_lines_4b, kolvo_lines_2_y, kolvo_lines_4a_y, kolvo_lines_4b_y,
@@ -3276,6 +2797,13 @@ function good_diag(diag_i)
 function square()
 {
 	var a = 0, b = 0, c = 0, p = 0, s = 0, sq = 0, op, tr_bool;
+
+	for (var key in triangles)
+	{
+		triangles[key].remove();
+	}
+	triangles = [];
+
 	for (var i = diag_sort.length; i--;)
 	{
 		var hitResults0 = project.hitTestAll(diag_sort[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
@@ -3419,7 +2947,7 @@ function zerkalo(p_u)
 
 	for (var key = 0; key < lines_sort.length; key++)
     {
-    	add_text_v_or_h(lines_sort[key].id);
+    	add_text_v_or_h(lines_sort[key]);
     	if (p_u === 1)
     	{
     		text_lines[lines_sort[key].id].content = (+text_lines[lines_sort[key].id].content);
@@ -3600,16 +3128,7 @@ function remove_pt_intersects()
 	var del_bool = true;
 	for (var i = text_points.length; i--;)
 	{
-		del_bool = true;
-		for (var j = text_points_lines_id.length; j--;)
-		{
-			if (text_points[i].id === +text_points_lines_id[j].id_pt)
-			{
-				del_bool = false;
-				break;
-			}
-		}
-		if (del_bool)
+		if (text_points[i].data.id_line1 === undefined || text_points[i].data.id_line2 === undefined)
 		{
 			text_points[i].remove();
 		}
@@ -3645,7 +3164,7 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
 
 	for (var key = lines_sort.length; key--;)
     {
-    	add_text_v_or_h(lines_sort[key].id);
+    	add_text_v_or_h(lines_sort[key]);
     	text_lines[lines_sort[key].id].content = (+text_lines[lines_sort[key].id].content * p_usadki).toFixed(1);
     }
 
@@ -3704,14 +3223,12 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
 	//console.log(price_it, "price");
 
 	width_final = width_polotna[j_f].width;
+
+    AndroidFunction.func_elem_jform_width(width_final);
+
 	sq_polotna = sq1;
 	p_usadki_final = p_usadki;
 	//console.log(width_final, "width_polotna");
-
-
-	width_final = width_polotna[j_f].width;
-	
-    AndroidFunction.func_elem_jform_width(width_final);
 
 	for (var i = polotna.length; i--;)
 	{
@@ -4039,72 +3556,51 @@ function get_koordinats_poloten(p_usadki)
 	for (var i = polotna.length; i--;)
 	{
 		points_poloten[i] = [];
-		for (var key = text_points_lines_id.length; key--;)
+		for (var key = text_points.length; key--;)
 		{
-			op = obshaya_point(lines[+text_points_lines_id[key].id_line1], lines[+text_points_lines_id[key].id_line2]);
+			op = obshaya_point(lines[text_points[key].data.id_line1], lines[text_points[key].data.id_line2]);
 			if (op.x >= polotna[i].left.position.x && op.x <= polotna[i].right.position.x)
 			{
 				if (op.y < polotna[i].down.position.y && op.y > polotna[i].up.position.y)
 				{
-					for (var j = text_points.length; j--;)
-					{
-						if (text_points[j].id === +text_points_lines_id[key].id_pt)
-						{
-					    	points_poloten[i].push({point: op.clone(), name: text_points[j].content});
-					    	break;
-						}
-					}
+					points_poloten[i].push({point: op.clone(), name: text_points[key].content});
 				}
 
 				if (op.y === polotna[i].up.position.y)
 				{
 					cir = new Path.Circle(op, 2.5);
-					intersections = cir.getIntersections(lines[+text_points_lines_id[key].id_line1]);
+					intersections = cir.getIntersections(lines[text_points[key].data.id_line1]);
 					if (intersections[0].point.y > polotna[i].up.position.y)
 					{
-						for (var j = text_points.length; j--;)
+						inarr = false;
+						for (var e = points_poloten[i].length; e--;)
 						{
-							if (text_points[j].id === +text_points_lines_id[key].id_pt)
+							if (points_poloten[i][e].name === text_points[key].content)
 							{
-								inarr = false;
-								for (var e = points_poloten[i].length; e--;)
-								{
-									if (points_poloten[i][e].name === text_points[j].content)
-									{
-										inarr = true;
-									}
-								}
-								if (!inarr)
-								{
-							    	points_poloten[i].push({point: op.clone(), name: text_points[j].content});
-							    }
-						    	break;
+								inarr = true;
 							}
 						}
+						if (!inarr)
+						{
+					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
+					    }
 					}
 				
-					intersections = cir.getIntersections(lines[+text_points_lines_id[key].id_line2]);
+					intersections = cir.getIntersections(lines[text_points[key].data.id_line2]);
 					if (intersections[0].point.y > polotna[i].up.position.y)
 					{
-						for (var j = text_points.length; j--;)
+				    	inarr = false;
+						for (var e = points_poloten[i].length; e--;)
 						{
-							if (text_points[j].id === +text_points_lines_id[key].id_pt)
+							if (points_poloten[i][e].name === text_points[key].content)
 							{
-						    	inarr = false;
-								for (var e = points_poloten[i].length; e--;)
-								{
-									if (points_poloten[i][e].name === text_points[j].content)
-									{
-										inarr = true;
-									}
-								}
-								if (!inarr)
-								{
-							    	points_poloten[i].push({point: op.clone(), name: text_points[j].content});
-							    }
-						    	break;
+								inarr = true;
 							}
 						}
+						if (!inarr)
+						{
+					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
+					    }
 					}
 					cir.remove();
 				}
@@ -4112,52 +3608,38 @@ function get_koordinats_poloten(p_usadki)
 				if (op.y === polotna[i].down.position.y)
 				{
 					cir = new Path.Circle(op, 2.5);
-					intersections = cir.getIntersections(lines[+text_points_lines_id[key].id_line1]);
+					intersections = cir.getIntersections(lines[text_points[key].data.id_line1]);
 					if (intersections[0].point.y < polotna[i].down.position.y)
 					{
-						for (var j = text_points.length; j--;)
+						inarr = false;
+						for (var e = points_poloten[i].length; e--;)
 						{
-							if (text_points[j].id === +text_points_lines_id[key].id_pt)
+							if (points_poloten[i][e].name === text_points[key].content)
 							{
-								inarr = false;
-								for (var e = points_poloten[i].length; e--;)
-								{
-									if (points_poloten[i][e].name === text_points[j].content)
-									{
-										inarr = true;
-									}
-								}
-								if (!inarr)
-								{
-							    	points_poloten[i].push({point: op.clone(), name: text_points[j].content});
-							    }
-						    	break;
+								inarr = true;
 							}
 						}
+						if (!inarr)
+						{
+					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
+					    }
 					}
 				
-					intersections = cir.getIntersections(lines[+text_points_lines_id[key].id_line2]);
+					intersections = cir.getIntersections(lines[text_points[key].data.id_line2]);
 					if (intersections[0].point.y < polotna[i].down.position.y)
 					{
-						for (var j = text_points.length; j--;)
+				    	inarr = false;
+						for (var e = points_poloten[i].length; e--;)
 						{
-							if (text_points[j].id === +text_points_lines_id[key].id_pt)
+							if (points_poloten[i][e].name === text_points[key].content)
 							{
-						    	inarr = false;
-								for (var e = points_poloten[i].length; e--;)
-								{
-									if (points_poloten[i][e].name === text_points[j].content)
-									{
-										inarr = true;
-									}
-								}
-								if (!inarr)
-								{
-							    	points_poloten[i].push({point: op.clone(), name: text_points[j].content});
-							    }
-						    	break;
+								inarr = true;
 							}
 						}
+						if (!inarr)
+						{
+					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
+					    }
 					}
 					cir.remove();
 				}
@@ -4401,8 +3883,6 @@ function isIntersect(point1, point2, point3, point4)// есть ли перес�
 
 function change_length_diag_4angle(index, newLength)
 {
-	count_cansel++;
-	cansel_array[count_cansel] = {line_id: [], vert: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_1'};
 	var Dx, Dy;
 
 	var pd0 = diag_sort[index].segments[0].point.clone();
@@ -4476,8 +3956,6 @@ function change_length_diag_4angle(index, newLength)
    	if (!intersections || a1.length + b1.length <= +newLength)
    	{
    		alert('Недопустимая длина');
-   		delete cansel_array[count_cansel];
-   		count_cansel--;
    		return;
    	}
 
@@ -4502,8 +3980,6 @@ function change_length_diag_4angle(index, newLength)
    	if (!intersections || a2.length + b2.length <= +newLength)
    	{
    		alert('Недопустимая длина');
-   		delete cansel_array[count_cansel];
-   		count_cansel--;
    		return;
    	}
 
@@ -4521,75 +3997,109 @@ function change_length_diag_4angle(index, newLength)
    	len_0.remove();
    	len_1.remove();
 
-
-    points = [pd1.clone(), oldObshayaPoint1.clone()];
-    cansel_array[count_cansel].line_id[a1.id] = points;
-    points = [oldObshayaPoint1.clone(), pd0.clone()];
-    cansel_array[count_cansel].line_id[b1.id] = points;
-
     a1.removeSegments();
     a1.addSegments([pd1, newObshayaPoint1]);
     b1.removeSegments();
     b1.addSegments([newObshayaPoint1, newPoint]);
-    add_text_v_or_h(a1.id);
-    add_text_v_or_h(b1.id);
+    add_text_v_or_h(a1);
+    add_text_v_or_h(b1);
 
-    can_ver = moveVertexName(a1, b1, newObshayaPoint1);
-    cansel_array[count_cansel].vert[0] = can_ver;
-	cansel_array[count_cansel].vert[1] = new Point(oldObshayaPoint1.x - 10, oldObshayaPoint1.y - 5);
-
-
-	points = [pd1.clone(), oldObshayaPoint2.clone()];
-    cansel_array[count_cansel].line_id[a2.id] = points;
-    points = [oldObshayaPoint2.clone(), pd0.clone()];
-    cansel_array[count_cansel].line_id[b2.id] = points;
+    moveVertexName(a1, b1, newObshayaPoint1);
 
     a2.removeSegments();
     a2.addSegments([pd1, newObshayaPoint2]);
     b2.removeSegments();
     b2.addSegments([newObshayaPoint2, newPoint]);
-    add_text_v_or_h(a2.id);
-    add_text_v_or_h(b2.id);
+    add_text_v_or_h(a2);
+    add_text_v_or_h(b2);
 
-    can_ver = moveVertexName(a2, b2, newObshayaPoint2);
-    cansel_array[count_cansel].vert[2] = can_ver;
-	cansel_array[count_cansel].vert[3] = new Point(oldObshayaPoint2.x - 10, oldObshayaPoint2.y - 5);
-
-
-	points = [pd0.clone(), pd1.clone()];
-    cansel_array[count_cansel].diag[index] = points;
+    moveVertexName(a2, b2, newObshayaPoint2);
 
 	c.removeSegments();
     c.addSegments([newPoint, pd1]);
     add_text_diag(index);
-    can_ver = moveVertexName(b1, b2, newPoint);
-    cansel_array[count_cansel].vert[4] = can_ver;
-	cansel_array[count_cansel].vert[5] = new Point(pd0.x - 10, pd0.y - 5);
-   	fixed_diags[diag_sort[index].id] = true;
+    moveVertexName(b1, b2, newPoint);
+   	diag_sort[index].data.fixed = true;
 }
 
 function moveVertexName(line1, line2, newPoint)
 {
 	var pt_id;
-	for (var key in text_points_lines_id)
+	for (var key in text_points)
 	{
-		if (+text_points_lines_id[key].id_line1 === line1.id && +text_points_lines_id[key].id_line2 === line2.id
-			|| +text_points_lines_id[key].id_line2 === line1.id && +text_points_lines_id[key].id_line1 === line2.id)
+		if (text_points[key].data.id_line1 === line1.data.id && text_points[key].data.id_line2 === line2.data.id
+			|| text_points[key].data.id_line2 === line1.data.id && text_points[key].data.id_line1 === line2.data.id)
 		{
-			pt_id = text_points_lines_id[key].id_pt;
+			text_points[key].point = new Point(newPoint.x - 10, newPoint.y - 5);
 			break;
 		}
 	}
+}
 
-	for (var key = text_points.length; key--;)
+function click_on_fixed(line)
+{
+	line.data.fixed = false;
+	clearInterval(timer_mig);
+	for (var key = 0; key < lines_sort.length; key++)
+    {
+    	if (!lines_sort[key].data.fixed)
+    	{
+    		lines_sort[key].strokeColor = 'black';
+    		text_lines[lines_sort[key].id].fillColor = 'black';
+    	}
+    }
+
+    for (var key = 0; key < diag_sort.length; key++)
+    {
+    	if (!diag_sort[key].data.fixed)
+    	{
+    		diag_sort[key].strokeColor = 'black';
+    		text_diag[key].fillColor = 'black';
+    	}
+    }
+
+    ready = false;
+    elem_window.style.display = 'block';
+
+    if (line.strokeWidth === 3)
+    {
+		triangulate_bool = false;
+
+	    for (var key = 0; key < lines_sort.length; key++)
+	    {
+	    	if (!lines_sort[key].data.fixed)
+	    	{
+	    		elem_preloader.style.display = 'none';
+	    		lines_sort[key].strokeColor = 'red';
+	    		text_lines[lines_sort[key].id].fillColor = 'Maroon';
+	    		timer_mig = setInterval(migalka, 500, lines_sort[key]);
+	    		elem_newLength.focus();
+	    		elem_newLength.value = Math.round(lines_sort[key].length);
+	    		elem_newLength.select();
+	    		first_click = false;
+	    		save_cancel();
+	    		return;
+	    	}
+	    }
+	}
+	else
 	{
-		//console.log(text_points[key].id, 'mov_ver_textid');
-		if (text_points[key].id === +pt_id)
-		{
-	    	text_points[key].point = new Point(newPoint.x - 10, newPoint.y - 5);
-	    	//console.log(key, 'mov_ver_return');
-	    	return key;
-		}
+		for (var key = 0; key < diag_sort.length; key++)
+	    {
+	    	if (!diag_sort[key].data.fixed)
+	    	{
+	    		elem_preloader.style.display = 'none';
+	    		diag_sort[key].strokeColor = 'red';
+	    		text_diag[key].fillColor = 'Maroon';
+	    		timer_mig = setInterval(migalka, 500, diag_sort[key]);
+	    		elem_newLength.focus();
+	    		elem_newLength.value = Math.round(diag_sort[key].length);
+	    		elem_newLength.select();
+	    		first_click = false;
+	    		save_cancel();
+	    		return;
+	    	}
+	    }
 	}
 }
 
@@ -4598,9 +4108,9 @@ var ok_enter_process, triangulate_bool = false;
 function ok_enter_all()
 {
 	var kol_fix = 0;
-	for (var key in fixed_walls)
+	for (var key in lines_sort)
 	{
-		if (fixed_walls[key])
+		if (lines_sort[key].data.fixed)
 		{
 			kol_fix++;
 		}
@@ -4615,7 +4125,6 @@ function ok_enter_all()
 	{
 		ok_enter();
 	}
-
 }
 
 var ok_enter = function()
@@ -4647,7 +4156,7 @@ var ok_enter = function()
 		{
 			for (var key = 0; key < diag_sort.length; key++)
 			{
-				if (!fixed_diags[diag_sort[key].id])
+				if (!diag_sort[key].data.fixed)
 		    	{
 					k = elem_jform_n9.value;
 		    		if (+k !== 4)
@@ -4667,7 +4176,7 @@ var ok_enter = function()
 			}
 			for (var key = 0; key < diag_sort.length; key++)
 		    {
-		    	if (fixed_diags[diag_sort[key].id])
+		    	if (diag_sort[key].data.fixed)
 		    	{
 		    		diag_sort[key].strokeColor = 'green';
 		    	}
@@ -4681,6 +4190,7 @@ var ok_enter = function()
 		    		elem_newLength.value = Math.round(diag_sort[key].length);
 		    		elem_newLength.select();
 		    		first_click = false;
+		    		save_cancel();
 		    		return;
 		    	}
 		    }
@@ -4689,6 +4199,7 @@ var ok_enter = function()
 		    text_points_sdvig();
 
 		    ready = true;
+		    save_cancel();
 		}
 		else
 		{
@@ -4702,10 +4213,8 @@ var ok_enter = function()
 			okruglenie_all_segments();
 			for (var key = 0; key < lines_sort.length; key++)
 		    {
-		    	if (!fixed_walls[lines_sort[key].id])
+		    	if (!lines_sort[key].data.fixed)
 		    	{
-		    		count_cansel++;
-					cansel_array[count_cansel] = {line_id: [], vert: [], fixed_id: lines_sort[key].id, razv_walls: [], vid: '2'};
 		    		change_length(lines_sort[key], str_length, key);
 		    		sdvig();
 	    			zoom(1);
@@ -4714,7 +4223,7 @@ var ok_enter = function()
 		    }
 		    for (var key = 0; key < lines_sort.length; key++)
 		    {
-		    	if (fixed_walls[lines_sort[key].id])
+		    	if (lines_sort[key].data.fixed)
 		    	{
 		    		lines_sort[key].strokeColor = 'green';
 		    	}
@@ -4728,6 +4237,7 @@ var ok_enter = function()
 		    		elem_newLength.value = Math.round(lines_sort[key].length);
 		    		elem_newLength.select();
 		    		first_click = false;
+		    		save_cancel();
 		    		return;
 		    	}
 		    }
@@ -4739,14 +4249,14 @@ var ok_enter = function()
 		    elem_jform_n9.value = k;
 			perimetr();
 			l = 0;
-			for (var key in fixed_walls)
-			{
-				l++;
-			}
 			l1 = 0;
 			for (var key in lines)
 			{
 				l1++;
+				if (lines[key].data.fixed)
+				{
+					l++;
+				}
 			}
 
 			if(l1 === l)
@@ -4833,6 +4343,7 @@ var ok_enter = function()
 
 				ready = true;
 	    	}
+	    	save_cancel();
 		}	
 	}
 	else
@@ -4864,7 +4375,7 @@ function diag_sortirovka()
 	{
 		hitResults0 = project.hitTestAll(diag[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
 		hitResults1 = project.hitTestAll(diag[i].segments[1].point, {class: Path, segments: true, tolerance: 2});
-		if (diag_count_walls(diag[i]) === 2 && diag_count_fixed_diags(diag[i]) >= 2 && (hitResults0.length === 3 || hitResults1.length === 3))
+		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 2 && (hitResults0.length === 3 || hitResults1.length === 3))
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -4883,7 +4394,7 @@ function diag_sortirovka()
 
 	for (var i in diag)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count_fixed_diags(diag[i]) >= 2)
+		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 2)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -4901,7 +4412,7 @@ function diag_sortirovka()
 	}
 	for (var i in diag)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count_fixed_diags(diag[i]) >= 1)
+		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 1)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -4919,7 +4430,7 @@ function diag_sortirovka()
 	}
 	for (var i in diag)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count_fixed_diags(diag[i]) >= 0)
+		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 0)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -4985,7 +4496,7 @@ function diag_count_walls(diag)
 	return count;
 }
 
-function diag_count_fixed_diags(diag)
+function diag_count(diag)
 {
 	var count = 0, op;
 	var hitResults0 = project.hitTestAll(diag.segments[0].point, {class: Path, segments: true, tolerance: 2});
@@ -5036,9 +4547,6 @@ function change_length_diag(index, length, rek)
 
 	if (diag_count_walls(diag_sort[index]) === 3)
 	{
-		count_cansel++;
-		cansel_array[count_cansel] = {line_id: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_mega'};
-
 		c = diag_sort[index];
 
 		hitResults0 = project.hitTestAll(diag_sort[index].segments[0].point, {class: Path, segments: true, tolerance: 2});
@@ -5124,8 +4632,6 @@ function change_length_diag(index, length, rek)
 	   	if (!intersections || a1.length + b1.length <= +length)
 	   	{
 	   		alert('Недопустимая длина');
-	   		delete cansel_array[count_cansel];
-	   		count_cansel--;
 	   		return;
 	   	}
 
@@ -5149,8 +4655,6 @@ function change_length_diag(index, length, rek)
 	   	if (!intersections)
 	   	{
 	   		alert('Недопустимая длина');
-	   		delete cansel_array[count_cansel];
-	   		count_cansel--;
 	   		return;
 	   	}
 
@@ -5172,19 +4676,6 @@ function change_length_diag(index, length, rek)
 	    angle_new = get_angle(newObshayaPoint2, pd1);
 	    angle_rotate = new Decimal(angle_old).minus(angle_new).toNumber();
 
-
-		for (var key = 0; key < lines_sort.length; key++)
-	    {
-	    	points = [lines_sort[key].segments[0].point.clone(), lines_sort[key].segments[1].point.clone()];
-	    	cansel_array[count_cansel].line_id[lines_sort[key].id] = points;
-	    }
-
-	    for (var key = 0; key < diag_sort.length; key++)
-	    {
-	    	points = [diag_sort[key].segments[0].point.clone(), diag_sort[key].segments[1].point.clone()];
-	    	cansel_array[count_cansel].diag[key] = points;
-	    }
-
 	    a1.removeSegments();
 	    a1.addSegments([pd1, newObshayaPoint1]);
 	    b1.removeSegments();
@@ -5200,37 +4691,19 @@ function change_length_diag(index, length, rek)
 	    b1.rotate(-angle_rotate, pd1);
 	    c.rotate(-angle_rotate, pd1);
 
-	    add_text_v_or_h(a1.id);
-	    add_text_v_or_h(b1.id);
-	    add_text_v_or_h(b2.id);
+	    add_text_v_or_h(a1);
+	    add_text_v_or_h(b1);
+	    add_text_v_or_h(b2);
 	    add_text_diag(index);
 
 	    can_ver = moveVertexName(b1, b2, obshaya_point(b1, b2));
 
     	can_ver = moveVertexName(a1, b1, obshaya_point(a1, b1));
 
-		fixed_diags[diag_sort[index].id] = true;
+		diag_sort[index].data.fixed = true;
 	}
 	else if (diag_count_walls(diag_sort[index]) === 2 && (hitResults0.length === 3 || hitResults1.length === 3))
 	{
-		if (!rek)
-		{
-			count_cansel++;
-			cansel_array[count_cansel] = {line_id: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_mega'};
-
-	    	for (var key = 0; key < lines_sort.length; key++)
-		    {
-		    	points = [lines_sort[key].segments[0].point.clone(), lines_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].line_id[lines_sort[key].id] = points;
-		    }
-
-		    for (var key = 0; key < diag_sort.length; key++)
-		    {
-		    	points = [diag_sort[key].segments[0].point.clone(), diag_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].diag[key] = points;
-		    }
-		}
-
 		c = diag_sort[index];
 
 		line_arr = line_arr_gen(index);
@@ -5321,7 +4794,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a1.length + b1.length <= +length)
 	   	{
-	   		if (!fixed_diags[a1.id])
+	   		if (!a1.data.fixed)
 	   		{
 	   			var napr, dop_length;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -5385,7 +4858,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a2.length + b2.length <= +length)
 	   	{
-	   		if (!fixed_diags[a2.id])
+	   		if (!a2.data.fixed)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -5528,7 +5001,7 @@ function change_length_diag(index, length, rek)
 
 	    for (var key = 0; key < lines_sort.length; key++)
 	    {
-	    	add_text_v_or_h(lines_sort[key].id);
+	    	add_text_v_or_h(lines_sort[key]);
 	    }
 
 	    for (var key = 0; key < diag_sort.length; key++)
@@ -5555,24 +5028,6 @@ function change_length_diag(index, length, rek)
 	}
 	else if (diag_count_walls(diag_sort[index]) === 2)
 	{
-		if (!rek)
-		{
-			count_cansel++;
-			cansel_array[count_cansel] = {line_id: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_mega'};
-
-			for (var key = 0; key < lines_sort.length; key++)
-		    {
-		    	points = [lines_sort[key].segments[0].point.clone(), lines_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].line_id[lines_sort[key].id] = points;
-		    }
-
-		    for (var key = 0; key < diag_sort.length; key++)
-		    {
-		    	points = [diag_sort[key].segments[0].point.clone(), diag_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].diag[key] = points;
-		    }
-		}
-
 		c = diag_sort[index];
 
 		line_arr = line_arr_gen(index);
@@ -5667,7 +5122,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a1.length + b1.length <= +length)
 	   	{
-	   		if (!fixed_diags[a1.id] && a1.strokeWidth === 1)
+	   		if (!a1.data.fixed && a1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -5699,7 +5154,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b1.id] && b1.strokeWidth === 1)
+	   		else if (!b1.data.fixed && b1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -5764,7 +5219,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a2.length + b2.length <= +length)
 	   	{
-	   		if (!fixed_diags[a2.id] && a2.strokeWidth === 1)
+	   		if (!a2.data.fixed && a2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -5796,7 +5251,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b2.id] && b2.strokeWidth === 1)
+	   		else if (!b2.data.fixed && b2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -5970,7 +5425,7 @@ function change_length_diag(index, length, rek)
 
 	    for (var key = 0; key < lines_sort.length; key++)
 	    {
-	    	add_text_v_or_h(lines_sort[key].id);
+	    	add_text_v_or_h(lines_sort[key]);
 	    }
 
 	    for (var key = 0; key < diag_sort.length; key++)
@@ -5997,24 +5452,6 @@ function change_length_diag(index, length, rek)
 	}
 	else if (diag_count_walls(diag_sort[index]) === 1)
 	{
-		if (!rek)
-		{
-			count_cansel++;
-			cansel_array[count_cansel] = {line_id: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_mega'};
-
-			for (var key = 0; key < lines_sort.length; key++)
-		    {
-		    	points = [lines_sort[key].segments[0].point.clone(), lines_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].line_id[lines_sort[key].id] = points;
-		    }
-
-		    for (var key = 0; key < diag_sort.length; key++)
-		    {
-		    	points = [diag_sort[key].segments[0].point.clone(), diag_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].diag[key] = points;
-		    }
-		}
-
 		c = diag_sort[index];
 
 		line_arr = line_arr_gen(index);
@@ -6109,7 +5546,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a1.length + b1.length <= +length)
 	   	{
-	   		if (!fixed_diags[a1.id] && a1.strokeWidth === 1)
+	   		if (!a1.data.fixed && a1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -6141,7 +5578,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b1.id] && b1.strokeWidth === 1)
+	   		else if (!b1.data.fixed && b1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -6205,7 +5642,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a2.length + b2.length <= +length)
 	   	{
-	   		if (!fixed_diags[a2.id] && a2.strokeWidth === 1)
+	   		if (!a2.data.fixed && a2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -6237,7 +5674,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b2.id] && b2.strokeWidth === 1)
+	   		else if (!b2.data.fixed && b2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -6408,7 +5845,7 @@ function change_length_diag(index, length, rek)
 
 	    for (var key = 0; key < lines_sort.length; key++)
 	    {
-	    	add_text_v_or_h(lines_sort[key].id);
+	    	add_text_v_or_h(lines_sort[key]);
 	    }
 
 	    for (var key = 0; key < diag_sort.length; key++)
@@ -6435,24 +5872,6 @@ function change_length_diag(index, length, rek)
 	}
 	else if (diag_count_walls(diag_sort[index]) === 0)
 	{
-		if (!rek)
-		{
-			count_cansel++;
-			cansel_array[count_cansel] = {line_id: [], diag: [], fixed_id: diag_sort[index].id, vid: '3_mega'};
-
-			for (var key = 0; key < lines_sort.length; key++)
-		    {
-		    	points = [lines_sort[key].segments[0].point.clone(), lines_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].line_id[lines_sort[key].id] = points;
-		    }
-
-		    for (var key = 0; key < diag_sort.length; key++)
-		    {
-		    	points = [diag_sort[key].segments[0].point.clone(), diag_sort[key].segments[1].point.clone()];
-		    	cansel_array[count_cansel].diag[key] = points;
-		    }
-		}
-
 		c = diag_sort[index];
 
 		line_arr = line_arr_gen(index);
@@ -6539,7 +5958,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a1.length + b1.length <= +length)
 	   	{
-	   		if (!fixed_diags[a1.id] && a1.strokeWidth === 1)
+	   		if (!a1.data.fixed && a1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -6571,7 +5990,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b1.id] && b1.strokeWidth === 1)
+	   		else if (!b1.data.fixed && b1.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -6635,7 +6054,7 @@ function change_length_diag(index, length, rek)
 
 	   	if (!intersections || a2.length + b2.length <= +length)
 	   	{
-	   		if (!fixed_diags[a2.id] && a2.strokeWidth === 1)
+	   		if (!a2.data.fixed && a2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd1, pd0);
@@ -6667,7 +6086,7 @@ function change_length_diag(index, length, rek)
    					}
    				}
 	   		}
-	   		else if (!fixed_diags[b2.id] && b2.strokeWidth === 1)
+	   		else if (!b2.data.fixed && b2.strokeWidth === 1)
 	   		{
 	   			var dop_length, napr;
 	   			var angle_ch_diag = get_angle(pd0, pd1);
@@ -6867,7 +6286,7 @@ function change_length_diag(index, length, rek)
 
 	    for (var key = 0; key < lines_sort.length; key++)
 	    {
-	    	add_text_v_or_h(lines_sort[key].id);
+	    	add_text_v_or_h(lines_sort[key]);
 	    }
 
 	    for (var key = 0; key < diag_sort.length; key++)
@@ -6895,7 +6314,7 @@ function change_length_diag(index, length, rek)
 
 	if (!rek)
 	{
-	    fixed_diags[diag_sort[index].id] = true;
+	    diag_sort[index].data.fixed = true;
 	}
 
 	for (var i = lines_sort.length; i--;)
@@ -6937,14 +6356,14 @@ function super_change_diag(main_diag_index, newLength, nefixed_diag_index, napr,
 	if (stop_rek)
 	{
 		alert('Недопустимая длина!');
-		cancelLastAction();
+		cancel_last_action();
 	}
 	else
 	{
 		change_length_diag(main_diag_index, newLength, true);
 		if (rek === false)
 		{
-			fixed_diags[diag_sort[main_diag_index].id] = true;
+			diag_sort[main_diag_index].data.fixed = true;
 		}
 	}
 }
@@ -7396,13 +6815,19 @@ function wheel_zoom(e)
 		end_point.y = parseFloat(end_point.y.toFixed(2));
 	}
 
-	for (var key in text_lines)
+	for (var key in lines)
 	{
-		text_lines[key].position = lines[key].position;
+		if (text_lines[lines[key].id] !== undefined)
+		{
+			text_lines[lines[key].id].position = lines[key].position;
+		}
 	}
-	for (var key = text_diag.length; key--;)
+	for (var key = diag_sort.length; key--;)
 	{
-		text_diag[key].position = diag_sort[key].position;
+		if (text_diag[key] !== undefined)
+		{
+			text_diag[key].position = diag_sort[key].position;
+		}
 	}
 }
 
@@ -7535,11 +6960,11 @@ function touch_zoom(event)
 			end_point.x = parseFloat(end_point.x.toFixed(2));
 			end_point.y = parseFloat(end_point.y.toFixed(2));
 		}
-		for (var key in text_lines)
+		for (var key in lines)
 		{
-			text_lines[key].position = lines[key].position;
+			text_lines[lines[key].id].position = lines[key].position;
 		}
-		for (var key = text_diag.length; key--;)
+		for (var key = diag_sort.length; key--;)
 		{
 			text_diag[key].position = diag_sort[key].position;
 		}
@@ -7560,7 +6985,8 @@ function clicks()
             AndroidFunction.func_back(1);
     	 }
 
-	document.getElementById('cancelLastAction').onclick = cancelLastAction;
+
+	document.getElementById('cancelLastAction').onclick = cancel_last_action;
 	document.getElementById('reset').onclick = clear_elem;
 	elem_button_ok = document.getElementById('ok');
 	elem_nums.push(elem_button_ok);
@@ -7884,6 +7310,7 @@ function clicks()
 
 function sort_sten()
 {
+	lines_sort = [];
 	g_points = getPathsPoints(lines);
 	g_points = changePointsOrderForNaming(g_points, 2, lines);
 	var j;
@@ -7915,7 +7342,6 @@ function drawLabels()
     var textPoints = [];
     var pt, id1, id2;
     g_points = [];
-    text_points_lines_id = [];
     var namedPoints = createVertexNames();
     for(var i=0;i<namedPoints.length;i++){
         if(namedPoints[i].point)
@@ -7956,7 +7382,8 @@ function drawLabels()
             		}
             	}
             }
-            text_points_lines_id.push({id_pt: pt.id, id_line1: id1, id_line2: id2});
+        	pt.data.id_line1 = +id1;
+        	pt.data.id_line2 = +id2;
         }
     }
     var f = 2;
@@ -8242,7 +7669,7 @@ function tkan()
 		x2 = paddingPolygon.edges[i].vertex2.x;
 		y2 = paddingPolygon.edges[i].vertex2.y;
 		lines_tkan.push(Path.Line(new Point(x1, y1), new Point(x2, y2)));
-		lines_tkan[lines_tkan.length - 1].strokeColor = 'red';
+		//lines_tkan[lines_tkan.length - 1].strokeColor = 'red';
 	}
 	var min_up_y = (lines_tkan[0].segments[0].point.y + lines_tkan[0].segments[1].point.y) / 2;
 	var m, start_line = lines_tkan[0];
@@ -8312,6 +7739,7 @@ function tkan()
 		seg0 = chertezh.segments[(i + chertezh.segments.length - 1) % chertezh.segments.length].point.clone();
 		seg1 = chertezh.segments[i].point.clone();
 		lines_tkan.push(Path.Line(seg0, seg1));
+		lines_tkan[lines_tkan.length - 1].data.id = lines_tkan.length - 1;
 	}
 	add_text_contur(lines_tkan);
 	square_tkan = new Decimal(Math.abs(chertezh.area)).dividedBy(10000).toNumber();
@@ -8346,7 +7774,7 @@ function tkan()
 	var c_i = 0, pt_name, pt, p;
 	alfavit = 0;
 	code = 64;
-	text_points_lines_id = [];
+
 	while(c_i < chertezh.segments.length)
 	{
 		p = chertezh.segments[ic].point;
@@ -8383,7 +7811,7 @@ function tkan()
         	{
         		if (point_ravny(p, lines_tkan[i].segments[j].point))
         		{
-        			id1 = lines_tkan[i].id;
+        			id1 = lines_tkan[i].data.id;
         		}
         	}
         }
@@ -8397,11 +7825,12 @@ function tkan()
         	{
         		if (point_ravny(p, lines_tkan[i].segments[j].point))
         		{
-        			id2 = lines_tkan[i].id;
+        			id2 = lines_tkan[i].data.id;
         		}
         	}
         }
-        text_points_lines_id.push({id_pt: pt.id, id_line1: id1, id_line2: id2});
+        pt.data.id_line1 = +id1;
+        pt.data.id_line2 = +id2;
 		c_i++;
 	}
 
@@ -8594,22 +8023,13 @@ function add_text_contur(arr)
 function moveVertexNameContur(line1, line2, newPoint)
 {
 	var pt_id;
-	for (var key in text_points_lines_id)
+	for (var key in text_points)
 	{
-		if (+text_points_lines_id[key].id_line1 === line1.id && +text_points_lines_id[key].id_line2 === line2.id
-			|| +text_points_lines_id[key].id_line2 === line1.id && +text_points_lines_id[key].id_line1 === line2.id)
+		if (text_points[key].data.id_line1 === line1.data.id && text_points[key].data.id_line2 === line2.data.id
+			|| text_points[key].data.id_line2 === line1.data.id && text_points[key].data.id_line1 === line2.data.id)
 		{
-			pt_id = text_points_lines_id[key].id_pt;
+			text_points[key].point = new Point(newPoint.x, newPoint.y);
 			break;
-		}
-	}
-
-	for (var key = text_points.length; key--;)
-	{
-		if (text_points[key].id === +pt_id)
-		{
-	    	text_points[key].point = new Point(newPoint.x, newPoint.y);
-	    	return key;
 		}
 	}
 }
@@ -8769,6 +8189,8 @@ function cuts_gen()
 	return obj;
 }
 
+save_cancel();
+
 auto = fun_canv.get_auto();
 
 if (auto == 1)
@@ -8796,7 +8218,8 @@ var qw = fun_canv.get_pt_points();
 		obj.strokeColor = 'green';
 		obj.strokeWidth = 3;
 		lines_sort.push(obj);
-		lines[obj.id] = obj;
+		lines.push(obj);
+		obj.data.id = lines.length - 1;
 	}
 	for (var i = diags_points_rec.length; i--;)
 	{
@@ -8806,6 +8229,7 @@ var qw = fun_canv.get_pt_points();
 		obj.strokeWidth = 1;
 		diag_sort.push(obj);
 	}
+
 	var code_char = 64, alfavit_num = 0, id1, id2, op;
 	for (var i = 0; i < pt_points_rec.length; i++)
 	{
@@ -8844,19 +8268,19 @@ var qw = fun_canv.get_pt_points();
 				{
 					if (point_ravny(obshaya_point(lines_sort[j], lines_sort[k]), op))
 					{
-						id1 = lines_sort[j].id;
-						id2 = lines_sort[k].id;
+						id1 = lines_sort[j].data.id;
+						id2 = lines_sort[k].data.id;
 						break;
 					}
 				}
 			}
 		}
-		text_points_lines_id.push({id_pt: obj.id, id_line1: id1, id_line2: id2});
+		obj.data.id_line1 = +id1;
+		obj.data.id_line2 = +id2;
 	}
 	code = code_char;
 	alfavit = alfavit_num;
 	zerkalo(1);
 	close_sketch_click_all();
 }
-
 });

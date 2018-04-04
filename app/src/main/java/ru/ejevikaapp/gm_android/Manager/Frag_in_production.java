@@ -188,22 +188,22 @@ public class Frag_in_production extends Fragment {
         FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item3, dict);
         list_clients.setAdapter(adapter);
 
-        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        //list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        //    @Override
+        //    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                Frag_client_schedule_class selectedid = client_mas.get(position);
-                final String s_id = selectedid.getId_client();
+        //        Frag_client_schedule_class selectedid = client_mas.get(position);
+        //        final String s_id = selectedid.getId_client();
 
-                SharedPreferences SP = getActivity().getSharedPreferences("id_cl", MODE_PRIVATE);
-                SharedPreferences.Editor ed = SP.edit();
-                ed.putString(SAVED_ID, String.valueOf(s_id));
-                ed.commit();
+        //        SharedPreferences SP = getActivity().getSharedPreferences("id_cl", MODE_PRIVATE);
+        //        SharedPreferences.Editor ed = SP.edit();
+        //        ed.putString(SAVED_ID, String.valueOf(s_id));
+        //        ed.commit();
 
-                Intent intent = new Intent(getActivity(), Activity_in_production_tab.class);
-                startActivity(intent);
-            }
-        });
+        //        Intent intent = new Intent(getActivity(), Activity_in_production_tab.class);
+        //        startActivity(intent);
+        //    }
+        //});
     }
 
 }

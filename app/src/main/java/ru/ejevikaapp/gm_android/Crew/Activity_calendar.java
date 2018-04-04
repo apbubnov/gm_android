@@ -74,11 +74,6 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
 
         user_id = getIntent().getStringExtra("id_brigade");
 
-        // BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
-        // FunDapter adapter = new FunDapter(this, installers_mas, R.layout.select_work_l, dict);
-        // list_installers.setAdapter(adapter);
-        // setListViewHeightBasedOnChildren(list_installers);
-
         info();
 
         ActionBar actionBar = getSupportActionBar();
@@ -387,7 +382,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
                 } else {
                     Button btn = new Button(this);
                     btn.setText("");
-                    btn.setBackgroundResource(R.drawable.calendar_btn);
+                    btn.setBackgroundResource(R.drawable.calendar_other_month);
                     btn.setLayoutParams(tableParams);
                     tableRow.addView(btn, j);
                 }

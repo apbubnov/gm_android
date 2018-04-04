@@ -56,11 +56,12 @@ public class Send_All extends Service {
 
         ctx = this.getApplicationContext();
 
-        domen = getResources().getString(R.string.link);
+        SharedPreferences SP = ctx.getSharedPreferences("link", MODE_PRIVATE);
+        domen = SP.getString("", "");
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        SharedPreferences SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
+        SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id = SP.getString("", "");
 
         dbHelper = new DBHelper(this);
@@ -153,7 +154,8 @@ public class Send_All extends Service {
 
             ctx = context;
 
-            domen = ctx.getResources().getString(R.string.link);
+            SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
+            domen = SP.getString("", "");
 
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
@@ -161,7 +163,7 @@ public class Send_All extends Service {
                 context.startService(new Intent(context, Service_Sync.class));
             } else {
 
-                SharedPreferences SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
+                SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
                 String dealer_id = SP.getString("", "");
 
                 dbHelper = new DBHelper(context);
@@ -279,8 +281,7 @@ public class Send_All extends Service {
                             String id = canv.getString("id");
                             String texture_id = canv.getString("texture_id");
                             String color_id = canv.getString("color_id");
-                            String name = canv.getString("name");
-                            String country = canv.getString("country");
+                            String manufacturer_id = canv.getString("manufacturer_id");
                             String width = canv.getString("width");
                             String price = canv.getString("price");
                             String count = canv.getString("count");
@@ -289,8 +290,7 @@ public class Send_All extends Service {
                             values.put(DBHelper.KEY_ID, id);
                             values.put(DBHelper.KEY_TEXTURE_ID, texture_id);
                             values.put(DBHelper.KEY_COLOR_ID, color_id);
-                            values.put(DBHelper.KEY_NAME, name);
-                            values.put(DBHelper.KEY_COUNTRY, country);
+                            values.put(DBHelper.KEY_MANUFACTURER_ID, manufacturer_id);
                             values.put(DBHelper.KEY_WIDTH, width);
                             values.put(DBHelper.KEY_PRICE, price);
                             values.put(DBHelper.KEY_COUNT, count);
@@ -314,6 +314,47 @@ public class Send_All extends Service {
                                 try {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES, null, values);
+                                } catch (Exception e) {
+                                    Log.d("responce", String.valueOf(e));
+                                }
+                            }
+
+                        }
+
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_manufacturers");
+                        for (int i = 0; i < id_array.length(); i++) {
+
+                            count_m = 0;
+                            org.json.JSONObject canv = id_array.getJSONObject(i);
+
+                            String id = canv.getString("id");
+                            String name = canv.getString("name");
+                            String country = canv.getString("country");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, id);
+                            values.put(DBHelper.KEY_NAME, name);
+                            values.put(DBHelper.KEY_COUNTRY, country);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers" +
+                                    " WHERE _id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_MANUFACTURERS, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    values.put(DBHelper.KEY_ID, id);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_MANUFACTURERS, null, values);
                                 } catch (Exception e) {
                                     Log.d("responce", String.valueOf(e));
                                 }

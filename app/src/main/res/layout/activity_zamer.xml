@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="@style/backgroun"
     tools:context="ru.ejevikaapp.gm_android.Activity_zamer">
 
         <LinearLayout
@@ -79,8 +80,8 @@
                 android:layout_height="40dp"
                 android:paddingLeft="5dp"
                 android:background="@drawable/edit_text_style"
-                android:hint="+7xxxxxxxxxx"
-                android:maxLength="12"
+                android:hint="7xxxxxxxxxx"
+                android:maxLength="11"
                 android:inputType="phone"
                 android:id="@+id/c_phone"/>
 
@@ -211,6 +212,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
                 style="@style/text_style_spisok"/>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -220,103 +222,122 @@
                 android:inputType="textMultiLine"
                 android:id="@+id/c_note"/>
 
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Удобная дата \nзамера "
-                    android:layout_marginLeft="5dp"
-                    style="@style/text_style_spisok" />
-
-                    <Button android:id="@+id/dateButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Назначить \n дату"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
-            </LinearLayout>
-
-
-            <TextView android:id="@+id/currentDateTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minLines="2"
-                android:gravity="center"
-                android:textSize="20dp"
-                android:visibility="gone"
-                android:textColor="#000000" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Выберите время замера (и замерщика):"
-                android:textSize="16dp"
+                android:text="Выберите замерщика и время замера"
                 android:gravity="center"
-                android:visibility="gone"
-                android:layout_margin="5dp"
-                android:id="@+id/text"
-                android:textColor="#000000"/>
+                android:layout_marginTop="10dp"
+                style="@style/text_style_spisok"/>
 
-            <TableLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:stretchColumns="*"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/table_l"
-                android:layout_marginBottom="5dp"
-                android:visibility="gone">
-            <TableRow>
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:textSize="12dp"
-                    android:gravity="center|top"
-                    android:minLines="2"
-                    android:textColor="#000000"
-                    android:visibility="gone"
-                    />
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Время"
-                    android:textSize="12dp"
-                    android:layout_span="3"
-                    android:textColor="#000000"
-                    />
-
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Адрес"
-                    android:textSize="12dp"
-                    android:layout_span="3"
-                    android:textColor="#000000"
-                    />
-
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Замерщик"
-                    android:textSize="12dp"
-                    android:layout_span="3"
-                    android:layout_marginLeft="5dp"
-                    android:textColor="#000000"
-                    />
-            </TableRow>
-            </TableLayout>
-
-            <ListView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/list_work">
-            </ListView>
+                android:orientation="horizontal"
+                android:background="@drawable/calendar_other_month"
+                android:layout_marginTop="10dp">
+
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:textColor="#ffffff"
+                    android:background="#43358c"
+                    android:id="@+id/calendar_minus"
+                    android:src="@drawable/left_arrow"
+                    android:textSize="25dp"/>
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/calendar_month"
+                    android:text="месяц год"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    style="@style/text_style_spisok"/>
+
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="right"
+                    android:background="#43358c"
+                    android:textColor="#ffffff"
+                    android:id="@+id/calendar_plus"
+                    android:src="@drawable/right_arrow"
+                    android:textSize="25dp" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="ПH"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="ВТ"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="СР"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="ЧТ"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="ПТ"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="СБ"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="ВС"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"
+                    android:background="@drawable/calendar_other_month"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </TableLayout>
 
             <Button
                 android:id="@+id/btn_add_zamer"

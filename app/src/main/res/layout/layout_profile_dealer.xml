@@ -11,7 +11,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:id="@+id/ed_ava"
-        app:siBorderWidth="2dp"/>
+        android:src="@drawable/it_c"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -33,6 +33,7 @@
         android:layout_marginTop="5dp"
         android:textSize="20dp"
         android:text="  Пароль(я пока не работаю): "
+        android:id="@+id/ed_name_text"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -46,6 +47,7 @@
         android:layout_height="wrap_content"
         android:text="  Почта: "
         android:layout_marginTop="5dp"
+        android:id="@+id/ed_password_text"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText

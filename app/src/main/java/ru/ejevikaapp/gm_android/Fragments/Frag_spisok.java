@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
@@ -29,6 +30,7 @@ import java.util.Date;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_zamer;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync_Import;
@@ -71,37 +73,38 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorBlue);
 
         return view ;
+
     }
 
     @Override
     public void onRefresh() {
-
-        getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                // Отменяем анимацию обновления
-                mSwipeRefreshLayout.setRefreshing(false);
-                onResume();
-            }
-        }, 3000);
+        if (HelperClass.isOnline(getActivity())) {
+            getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onResume();
+                }
+            }, 3000);
+        } else {
+            mSwipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getActivity().getApplicationContext(), "проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        client_mas.clear();
-        list_clients = (ListView)view.findViewById(R.id.list_client);
-        clients();
+        try {
+            client_mas.clear();
+            list_clients = (ListView) view.findViewById(R.id.list_client);
+            clients();
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -368,6 +371,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                 startActivity(intent);
             }
         });
+
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

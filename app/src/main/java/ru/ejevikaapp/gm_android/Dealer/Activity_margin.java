@@ -260,21 +260,6 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, values, "user_id = ?", new String[]{user_id});
 
                     values = new ContentValues();
-                    values.put(DBHelper.KEY_DEALER_CANVASES_MARGIN, str_canvases_margin);
-                    values.put(DBHelper.KEY_DEALER_COMPONENTS_MARGIN, str_components_margin);
-                    values.put(DBHelper.KEY_DEALER_MOUNTING_MARGIN, str_mounting_margin);
-                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_DEALER_INFO, values, "dealer_id = ?", new String[]{user_id});
-
-                    values = new ContentValues();
-                    values.put(DBHelper.KEY_ID_OLD, id_dealer_info);
-                    values.put(DBHelper.KEY_ID_NEW, "0");
-                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_dealer_info");
-                    values.put(DBHelper.KEY_SYNC, "0");
-                    values.put(DBHelper.KEY_TYPE, "send");
-                    values.put(DBHelper.KEY_STATUS, "1");
-                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                    values = new ContentValues();
                     values.put(DBHelper.KEY_ID_OLD, id_mount);
                     values.put(DBHelper.KEY_ID_NEW, "0");
                     values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mount");

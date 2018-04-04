@@ -1,103 +1,17 @@
-<TableLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:focusableInTouchMode="true"
-    android:descendantFocusability="beforeDescendants"
-    android:background="#ffffff"
-    style="@style/backgroun">
+    android:background="#ffffff">
 
-    <LinearLayout
+    <fragment
+        android:id="@+id/fragment"
+        android:name="ru.ejevikaapp.gm_android.Fragments.FragmentClient"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
-    <Button
-        android:id="@+id/btn_add_client"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
-        android:text="    Добавить клиента    "
-        android:background="@drawable/rounded_button"
-        android:textColor="#ffffff"/>
+        tools:layout="@layout/fragment_client">
+    </fragment>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="ФИО клиента"
-        android:textColor="#000000"
-        android:id="@+id/c_search"/>
-    <Button
-        android:id="@+id/btn_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
-        android:text="    Найти    "
-        android:background="@drawable/rounded_button"
-        android:textColor="#ffffff"/>
-
-    <View
-        android:layout_width="wrap_content"
-        android:background="#000000"
-        android:layout_height="2dp" />
-
-    <TableLayout
-        android:id="@+id/tablelayout"
-        android:layout_width="match_parent"
-        android:stretchColumns="*"
-        android:layout_height="wrap_content">
-    <TableRow>
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Создан"
-            style="@style/text_style_columns_name"
-            android:minLines="2"/>
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Клиент"
-            style="@style/text_style_columns_name"
-            android:minLines="2"/>
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Адрес"
-            style="@style/text_style_columns_name"
-            android:minLines="2"/>
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Статус"
-            android:gravity="center"
-            style="@style/text_style_columns_name"
-            android:minLines="2"/>
-
-    </TableRow>
-    </TableLayout>
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/swipe_container"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-
-        <ListView
-            android:layout_marginLeft="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/list_client">
-        </ListView>
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-    </LinearLayout>
-</TableLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,5 +1,6 @@
 package ru.ejevikaapp.gm_android;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -78,6 +79,7 @@ public class Gager_office extends AppCompatActivity
         return true;
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

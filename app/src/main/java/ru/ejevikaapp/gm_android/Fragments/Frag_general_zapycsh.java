@@ -1,8 +1,10 @@
 package ru.ejevikaapp.gm_android.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -36,6 +39,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
+import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync;
@@ -46,11 +50,11 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     TextView id_proj, dealer_cl, components_sum_total, mounting_sum, total_sum, final_amount, final_amount_disc, final_transport, final_transport_sum, data_mounting;
     Calendar dateAndTime = Calendar.getInstance();
-    TextView name_cl, contact_cl, address_cl, notes_cl, ed_discount, edit_transport_0, edit_transport_1, edit_transport_21, edit_transport_22;
+    TextView name_cl, contact_cl, address_cl, notes_cl, ed_discount, data_cl, project_calculator, project_mounter;
 
-    String id_cl, id_project, phone, fio, pro_info, mount_date="", dealer_id, item, S, P, transport = "", distance_col = "", distance = "", calc_date= "";
+    String id_cl, id_project, phone, fio, pro_info, mount_date = "", dealer_id, item, S, P, transport = "", distance_col = "", distance = "", calc_date = "";
 
-    String time_h ="";
+    String time_h = "";
 
     Button btn_transport_ok;
 
@@ -96,41 +100,21 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         view = inflater.inflate(R.layout.fragment_frag_general_zapycsh, container, false);
 
-
-        mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
-        titleViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        titleViewParams.height = 150;
-        titleViewParams.width = 150;
-        titleViewParams.setMargins(40, 2, 0, 20);
-
-        mainL2 = (LinearLayout) view.findViewById(R.id.phone_lay2);
-        titleViewParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        titleViewParams2.weight = 1;
-        titleViewParams2.setMargins(45, 0, 0, 0);
-
         mainC = (LinearLayout) view.findViewById(R.id.linear_calc);
         lin_calc = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         lin_calc.setMargins(0, 2, 0, 0);
+
         mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
-        titleViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        titleViewParams.height = 150;
-        titleViewParams.width = 150;
-        titleViewParams.setMargins(40, 2, 0, 20);
+        titleViewParams = new LinearLayout.LayoutParams(80, 80);
+        titleViewParams.weight = 1;
+        titleViewParams.setMargins(0, 0, 0, 20);
 
         mainL2 = (LinearLayout) view.findViewById(R.id.phone_lay2);
-        titleViewParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
+        titleViewParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
         titleViewParams2.weight = 1;
-        titleViewParams2.setMargins(45, 0, 0, 0);
-
-        mainC = (LinearLayout) view.findViewById(R.id.linear_calc);
-        lin_calc = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        lin_calc.setMargins(0, 2, 0, 0);
+        titleViewParams2.setMargins(0, 0, 0, 20);
 
         SharedPreferences SPI = this.getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
         id_cl = SPI.getString("", "");
@@ -142,32 +126,21 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         dealer_id = SPI.getString("", "");
 
         id_proj = (TextView) view.findViewById(R.id.id_proj);
-        id_proj.setText("Информация по проекту № " + id_project);
+        id_proj.setText("Проект №" + id_project);
 
         final_transport = (TextView) view.findViewById(R.id.final_transport);
         final_transport_sum = (TextView) view.findViewById(R.id.final_transport_sum);
         data_mounting = (TextView) view.findViewById(R.id.data_mounting);
-
-        btn_transport_ok = (Button) view.findViewById(R.id.btn_transport_ok);
-        btn_transport_ok.setOnClickListener(this);
-
-        done = (Button) view.findViewById(R.id.done);
-        done.setOnClickListener(this);
+        project_mounter = (TextView) view.findViewById(R.id.project_mounter);
+        project_calculator = (TextView) view.findViewById(R.id.project_calculator);
 
         name_cl = (TextView) view.findViewById(R.id.name_cl);
+        name_cl.setOnClickListener(this);
         contact_cl = (TextView) view.findViewById(R.id.contact_cl);
         address_cl = (TextView) view.findViewById(R.id.address_cl);
+        address_cl.setOnClickListener(this);
         ed_discount = (TextView) view.findViewById(R.id.ed_discount);
         notes_cl = (TextView) view.findViewById(R.id.notes_cl);
-
-        edit_transport_1 = (EditText) view.findViewById(R.id.edit_transport_1);
-        edit_transport_1.setVisibility(View.INVISIBLE);
-
-        edit_transport_21 = (EditText) view.findViewById(R.id.edit_transport_21);
-        edit_transport_21.setVisibility(View.INVISIBLE);
-
-        edit_transport_22 = (EditText) view.findViewById(R.id.edit_transport_22);
-        edit_transport_22.setVisibility(View.INVISIBLE);
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -186,69 +159,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             }
         }
         c.close();
-
-        rb_transport_0 = (RadioButton) view.findViewById(R.id.rb_transport_0);
-        rb_transport_1 = (RadioButton) view.findViewById(R.id.rb_transport_1);
-        rb_transport_2 = (RadioButton) view.findViewById(R.id.rb_transport_2);
-
-        if (distance.equals("0")){
-            distance = "1";
-        }
-        if (distance_col.equals("0")){
-            distance_col = "1";
-        }
-
-        if (transport.equals("0")) {
-            rb_transport_0.setChecked(true);
-            edit_transport_1.setVisibility(View.GONE);
-            edit_transport_21.setVisibility(View.GONE);
-            edit_transport_22.setVisibility(View.GONE);
-        } else if (transport.equals("1")) {
-            rb_transport_1.setChecked(true);
-            edit_transport_1.setVisibility(View.VISIBLE);
-            edit_transport_1.setText(distance_col);
-            edit_transport_21.setVisibility(View.GONE);
-            edit_transport_22.setVisibility(View.GONE);
-        } else if (transport.equals("2")) {
-            rb_transport_2.setChecked(true);
-            edit_transport_1.setVisibility(View.GONE);
-            edit_transport_21.setVisibility(View.VISIBLE);
-            edit_transport_21.setText(distance);
-            edit_transport_22.setVisibility(View.VISIBLE);
-            edit_transport_22.setText(distance_col);
-        }
-
-        RadioGroup radGrp = (RadioGroup) view.findViewById(R.id.radios_transport);
-        radGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int id) {
-                switch (id) {
-                    case R.id.rb_transport_0:
-                        edit_transport_1.setVisibility(View.GONE);
-                        edit_transport_21.setVisibility(View.GONE);
-                        edit_transport_22.setVisibility(View.GONE);
-                        transport = "0";
-                        break;
-
-                    case R.id.rb_transport_1:
-                        edit_transport_1.setVisibility(View.VISIBLE);
-                        edit_transport_1.setText(distance_col);
-                        edit_transport_21.setVisibility(View.GONE);
-                        edit_transport_22.setVisibility(View.GONE);
-                        transport = "1";
-                        break;
-
-                    case R.id.rb_transport_2:
-                        edit_transport_1.setVisibility(View.GONE);
-                        edit_transport_21.setVisibility(View.VISIBLE);
-                        edit_transport_21.setText(distance);
-                        edit_transport_22.setVisibility(View.VISIBLE);
-                        edit_transport_22.setText(distance_col);
-                        transport = "2";
-                        break;
-                }
-            }
-        });
 
         DateTime = (TextView) view.findViewById(R.id.data_cl);
         dealer_cl = (TextView) view.findViewById(R.id.dealer_cl);
@@ -295,7 +205,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         c.close();
 
         discount = 0;
-        sqlQuewy = "SELECT project_info, project_mounting_date, project_note, project_calculation_date "
+        sqlQuewy = "SELECT project_info, project_mounting_date, project_mounter, project_calculation_date, project_calculator "
                 + "FROM rgzbn_gm_ceiling_projects" +
                 " WHERE _id = ?";
 
@@ -303,60 +213,85 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         if (c != null) {
             if (c.moveToFirst()) {
-                do {
-                    pro_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    SimpleDateFormat out_format = null;
-                    SimpleDateFormat out_format_time = null;
-                    SimpleDateFormat out_format_minute = null;
-                    Date change_max = null;
-                    Date minute = null;
+                pro_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                address_cl.setText(pro_info);
 
-                    int hours = 0;
+                SimpleDateFormat out_format = null;
+                SimpleDateFormat out_format_time = null;
+                SimpleDateFormat out_format_minute = null;
+                Date change_max = null;
+                Date minute = null;
 
-                    try {
-                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        change_max = ft.parse(pro_info);
+                int hours = 0;
 
-                        out_format = new SimpleDateFormat("dd.MM.yyyy");
-                        out_format_minute = new SimpleDateFormat("HH");
+                mount_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
 
-                        hours = Integer.parseInt(out_format_minute.format(change_max))+1;
+                try {
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    change_max = ft.parse(mount_date);
 
-                        out_format_time = new SimpleDateFormat("HH:mm");
+                    out_format = new SimpleDateFormat("dd.MM.yyyy");
+                    out_format_minute = new SimpleDateFormat("HH");
 
-                        address_cl.setText(pro_info);
-                    }catch (Exception e){
+                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+
+                    out_format_time = new SimpleDateFormat("HH:mm");
+
+                    data_mounting.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                            + " - " + hours + ":00");
+                } catch (Exception e) {
+                }
+
+                String mount_id = c.getString(c.getColumnIndex(c.getColumnName(2)));
+
+                sqlQuewy = "SELECT name "
+                        + "FROM rgzbn_users" +
+                        " WHERE _id = ?";
+
+                Cursor c2 = db.rawQuery(sqlQuewy, new String[]{mount_id});
+
+                if (c2 != null) {
+                    if (c2.moveToFirst()) {
+                        fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
+                        project_mounter.setText(fio);
                     }
+                }
+                c2.close();
 
-                    mount_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    out_format = null;
-                    out_format_time = null;
-                    out_format_minute = null;
-                    change_max = null;
-                    minute = null;
+                mount_date = c.getString(c.getColumnIndex(c.getColumnName(3)));
 
-                    hours = 0;
+                try {
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    change_max = ft.parse(mount_date);
 
-                    try {
-                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        change_max = ft.parse(mount_date);
+                    out_format = new SimpleDateFormat("dd.MM.yyyy");
+                    out_format_minute = new SimpleDateFormat("HH");
 
-                        out_format = new SimpleDateFormat("dd.MM.yyyy");
-                        out_format_minute = new SimpleDateFormat("HH");
+                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
-                        hours = Integer.parseInt(out_format_minute.format(change_max))+1;
+                    out_format_time = new SimpleDateFormat("HH:mm");
 
-                        out_format_time = new SimpleDateFormat("HH:mm");
+                    DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                            + " - " + hours + ":00");
+                } catch (Exception e) {
+                }
 
-                        data_mounting.setText(String.valueOf(out_format.format(change_max) + "\n" + out_format_time.format(change_max))
-                                + " - " + hours + ":00");
-                    }catch (Exception e){
+                String calculator_id = c.getString(c.getColumnIndex(c.getColumnName(4)));
+
+                sqlQuewy = "SELECT name "
+                        + "FROM rgzbn_users" +
+                        " WHERE _id = ?";
+
+                c2 = db.rawQuery(sqlQuewy, new String[]{calculator_id});
+
+                if (c2 != null) {
+                    if (c2.moveToFirst()) {
+                        fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
+                        project_calculator.setText(fio);
                     }
+                }
+                c2.close();
 
-                    calc_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                    DateTime.setText(calc_date);
-
-                } while (c.moveToNext());
             }
         }
         c.close();
@@ -368,23 +303,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         transport();
         calc(id_calcul);
-
-        sqlQuewy = "SELECT name "
-                + "FROM rgzbn_users" +
-                " WHERE _id = ?";
-
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(dealer_id)});
-
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    String dealer_name = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    dealer_cl.setText(dealer_name);
-
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
 
         return view;
     }
@@ -413,7 +331,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         String sqlQuewy;
         Cursor c;
 
-        int min_sum =0;
+        int min_sum = 0;
 
         for (int i = 0; id_calcul.size() > i; i++) {
             sqlQuewy = "SELECT n4, n5, components_sum, canvases_sum, mounting_sum, discount "
@@ -430,23 +348,23 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                         try {
                             dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             dis = 0;
                         }
 
                         tmp_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
                         Double avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                        avg = avg * ((100 - dis)/100);
+                        avg = avg * ((100 - dis) / 100);
                         tmp += avg;
 
                         tmp2_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
                         avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
-                        avg = avg * ((100 - dis)/100);
+                        avg = avg * ((100 - dis) / 100);
                         tmp2 += avg;
 
                         tmp3_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
                         avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
-                        avg = avg * ((100 - dis)/100);
+                        avg = avg * ((100 - dis) / 100);
                         tmp3 += avg;
 
                     } while (c.moveToNext());
@@ -494,7 +412,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         c.close();
 
         if (transport.equals("0")) {
-            sum_transport=0;
+            sum_transport = 0;
             Log.d("mLog", transport);
         } else if (transport.equals("1")) {
             Log.d("mLog", transport);
@@ -567,7 +485,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             }
         }
 
-        discount =0;
+        discount = 0;
         for (int i = 0; id_calcul.size() > i; i++) {
             sqlQuewy = "SELECT discount "
                     + "FROM rgzbn_gm_ceiling_calculations" +
@@ -578,7 +496,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     do {
                         try {
                             discount += Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                        }catch (Exception e){
+                        } catch (Exception e) {
                         }
                     } while (c.moveToNext());
                 }
@@ -586,41 +504,39 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             c.close();
         }
 
-        if (discount > 0){
+        if (discount > 0) {
             sum_transport = sum_transport / 100 * (100 - discount);
         }
-
-        final_transport_sum.setText( String.valueOf((Math.round(sum_transport) * 100.0) / 100));
 
         total += sum_transport;
         total_d += sum_transport;
 
         if (discount > 0) {
-            final_amount_disc.setText("Итого/ \n"  + "  - %");
+            final_amount_disc.setText("Итого/ \n" + "  - %");
             final_amount.setText(String.valueOf((Math.round(total_d) * 100.0) / 100) + "/ \n" + String.valueOf((Math.round(total) * 100.0) / 100));
         } else {
             final_amount.setText(String.valueOf(total_d));
         }
 
-        if (total_d == 0){
+        if (total_d == 0) {
             final_amount.setText(String.valueOf(total_d));
-        } else if (total_d < min_sum && count_calc>0) {
+        } else if (total_d < min_sum && count_calc > 0) {
             total_d = min_sum;
-            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа "+min_sum+" р.");
+            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа " + min_sum + " р.");
         }
 
         components_sum_total.setText(String.valueOf((Math.round(tmp_d + tmp2_d) * 100.0) / 100));
         mounting_sum.setText(String.valueOf((Math.round(tmp3_d) * 100.0) / 100));
-        total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100 + transport ));
+        total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100 + transport));
 
         S_and_P.setText(Math.round(s * 100.0) / 100.0 + " м2 / \n" + Math.round(p * 100.0) / 100.0 + " м");
     }
 
-    void id_calc(){
+    void id_calc() {
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        count_calc =0;
+        count_calc = 0;
         id_calcul.clear();
 
         String sqlQuewy = "SELECT n4, n5, calculation_title, _id "
@@ -757,16 +673,18 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         }
     };
 
+    @SuppressLint("ResourceType")
     void btn(String title) {
+
+        int txt_i = bt_i;
         btn = new Button(getActivity());
         BtnList.add(bt_i, btn);
         btn.setId(bt_i++);
         btn.setLayoutParams(titleViewParams);
-        //btn.setBackgroundColor(Color.parseColor("#FFFFFFFF"));
         btn.setBackgroundResource(R.drawable.rounded_button_green);
         btn.setTextSize(1);
         btn.setText(title);
-        btn.setTextColor(Color.argb(0,0,0,0));
+        btn.setTextColor(Color.argb(0, 0, 0, 0));
         btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
         btn.setBackgroundResource(R.raw.phone2);
@@ -776,9 +694,11 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         txt.setLayoutParams(titleViewParams2);
         txt.setTextSize(14);
         txt.setText(title);
-        txt.setGravity(Gravity.LEFT);
+        txt.setId(txt_i);
+        txt.setOnLongClickListener(longGetPhone);
+        txt.setOnClickListener(getPhone);
         txt.setGravity(Gravity.CENTER_VERTICAL);
-        txt.setTextColor(Color.parseColor("#000000"));
+        txt.setTextColor(Color.parseColor("#414099"));
         mainL2.addView(txt);
     }
 
@@ -826,9 +746,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
                     tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
                     dis = c.getString(c.getColumnIndex(c.getColumnName(5)));
-                    Log.d("mLog1", String.valueOf(tmp));
-                    Log.d("mLog2", String.valueOf(tmp2));
-                    Log.d("mLog3", String.valueOf(tmp3));
                 } while (c.moveToNext());
             }
         }
@@ -861,21 +778,22 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         TextView tx1 = new TextView(getActivity());
 
+
         try {
             if (Integer.valueOf(dis) == null) {
                 dis = "0";
             }
-        }catch (Exception e){
-            dis="0";
+        } catch (Exception e) {
+            dis = "0";
         }
 
-        if (Integer.valueOf(dis)>0){
+        if (Integer.valueOf(dis) > 0) {
 
             String tot1 = "Итого/ \n" + dis + "%";
             String tot2 = Math.round(totall) * 100.0 / 100 + "/ \n" + String.valueOf((Math.round(totall - (totall / 100 * Integer.valueOf(dis))) * 100.0) / 100);
             tx1.setText(tot1 + "     \n" + tot2);
-        }else {
-            tx1.setText("Итого     " + totall);
+        } else {
+            tx1.setText("Итого     " + Math.round(totall) * 100.0 / 100);
         }
 
         tx1.setLayoutParams(lin_calc);
@@ -886,73 +804,80 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
-            case R.id.btn_transport_ok:
-                try {
-                    Log.d("mLog", transport);
-                    SQLiteDatabase db;
-                    db = dbHelper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    values.put(DBHelper.KEY_TRANSPORT, transport);
-                    if (transport.equals("0")) {
-                        values.put(DBHelper.KEY_DISTANCE, "0");
-                        values.put(DBHelper.KEY_DISTANCE_COL, "0");
-                    } else if (transport.equals("1")) {
-                        values.put(DBHelper.KEY_DISTANCE, "0");
-                        if (edit_transport_1.getText().toString().equals("")) {
-                            values.put(DBHelper.KEY_DISTANCE_COL, "1");
-                        } else {
-                            values.put(DBHelper.KEY_DISTANCE_COL, edit_transport_1.getText().toString());
-                        }
-                    } else if (transport.equals("2")) {
-                        if (edit_transport_21.getText().toString().equals("")) {
-                            values.put(DBHelper.KEY_DISTANCE, "1");
-                        } else {
-                            values.put(DBHelper.KEY_DISTANCE, edit_transport_21.getText().toString());
-                        }
-                        if (edit_transport_22.getText().toString().equals("")) {
-                            values.put(DBHelper.KEY_DISTANCE_COL, "1");
-                        } else {
-                            values.put(DBHelper.KEY_DISTANCE_COL, edit_transport_22.getText().toString());
-                        }
-                    }
-                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
+            case R.id.address_cl:
 
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Транспорт изменён", Toast.LENGTH_SHORT);
-                    toast.show();
+                String uri = "geo:0,0?q=" + pro_info;
+                Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(mapIntent);
 
-                    transport();
-
-                } catch (Exception e) {
-                }
                 break;
-            case R.id.done:
 
-                SQLiteDatabase db;
-                db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put(DBHelper.KEY_PROJECT_STATUS, "12");
-                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
+            case R.id.name_cl:
 
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID_OLD, id_project);
-                values.put(DBHelper.KEY_ID_NEW, 0);
-                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                values.put(DBHelper.KEY_SYNC, "0");
-                values.put(DBHelper.KEY_TYPE, "send");
-                values.put(DBHelper.KEY_STATUS, "1");
-                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                final Context context = getActivity();
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
+                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
-                Toast toast = Toast.makeText(getActivity(),
-                        "Проект выполнен!", Toast.LENGTH_SHORT);
-                toast.show();
+                pass.setVisibility(View.GONE);
+                email.setVisibility(View.GONE);
+                ava.setVisibility(View.GONE);
+                ed_name_text.setVisibility(View.GONE);
+                ed_password_text.setVisibility(View.GONE);
 
-                getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-                getActivity().finish();
+                name.setText(name_cl.getText().toString());
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                                new String[]{id_cl});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
+                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_zapysch.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.show();
 
                 break;
         }
     }
-
 }

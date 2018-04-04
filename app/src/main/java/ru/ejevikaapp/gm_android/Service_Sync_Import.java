@@ -65,7 +65,8 @@ public class Service_Sync_Import extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service started!");
 
-        domen = getResources().getString(R.string.link);
+        SharedPreferences SP = this.getSharedPreferences("link", MODE_PRIVATE);
+        domen = SP.getString("", "");
 
         int count = 0;
 
@@ -88,7 +89,7 @@ public class Service_Sync_Import extends Service {
             ctx = this.getApplicationContext();
             requestQueue = Volley.newRequestQueue(this.getApplicationContext());
 
-            SharedPreferences SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
+            SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
             String dealer_id = SP.getString("", "");
 
             SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
@@ -178,9 +179,10 @@ public class Service_Sync_Import extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "Alarm received: " + intent.getAction());
 
-            domen = context.getResources().getString(R.string.link);
-
             ctx = context;
+
+            SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
+            domen = SP.getString("", "");
 
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
@@ -189,24 +191,28 @@ public class Service_Sync_Import extends Service {
             dbHelper = new DBHelper(context);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-            String sqlQuewy = "SELECT * "
-                    + "FROM history_send_to_server";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        count++;
-                    } while (c.moveToNext());
+            try {
+                String sqlQuewy = "SELECT * "
+                        + "FROM history_send_to_server";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            count++;
+                        } while (c.moveToNext());
+                    }
                 }
+                c.close();
+            }catch (Exception e){
+                count = 0;
             }
-            c.close();
 
             if (!isRunning(context)) {
                 //context.startService(new Intent(context, Service_Sync_Import.class));
             } else if (count == 0){
                 Log.v(TAG, "don't start service: already running...");
 
-                SharedPreferences SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
+                SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
                 String dealer_id = SP.getString("", "");
 
                 SharedPreferences SP_end = context.getSharedPreferences("user_id", MODE_PRIVATE);
@@ -215,7 +221,7 @@ public class Service_Sync_Import extends Service {
                 sqlQuewy = "SELECT change_time "
                         + "FROM history_import_to_server" +
                         " WHERE user_id = ?";
-                c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
                 if (c != null) {
                     if (c.moveToFirst()) {
                         do {
@@ -675,8 +681,6 @@ public class Service_Sync_Import extends Service {
                                     String modified_by = porject_tmp.getString("modified_by");
                                     String calculation_title = porject_tmp.getString("calculation_title");
                                     String project_id = porject_tmp.getString("project_id");
-                                    String n1 = porject_tmp.getString("n1");
-                                    String n2 = porject_tmp.getString("n2");
                                     String n3 = porject_tmp.getString("n3");
                                     String n4 = porject_tmp.getString("n4");
                                     String n5 = porject_tmp.getString("n5");
@@ -725,8 +729,6 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_MODIFIED_BY, modified_by);
                                     values.put(DBHelper.KEY_CALCULATION_TITLE, calculation_title);
                                     values.put(DBHelper.KEY_PROJECT_ID, project_id);
-                                    values.put(DBHelper.KEY_N1, n1);
-                                    values.put(DBHelper.KEY_N2, n2);
                                     values.put(DBHelper.KEY_N3, n3);
                                     values.put(DBHelper.KEY_N4, n4);
                                     values.put(DBHelper.KEY_N5, n5);

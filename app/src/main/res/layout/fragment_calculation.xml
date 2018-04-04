@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:padding="5dp"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     style="@style/backgroun">
@@ -19,43 +20,44 @@
             android:id="@+id/frag_calcul"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="7dp"
                 android:gravity="center"
-                android:text="Характеристики полотна :"
+                android:text="Характеристики полотна"
+                android:textStyle="bold"
                 style="@style/text_style_spisok"
                 android:textSize="20dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:stretchColumns="0,3,5">
+                <TableRow>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Выберите фактуру полотна"
+                        style="@style/text_style_spisok"
+                        android:layout_weight="1"
+                        android:layout_span="7"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Выберите фактуру полотна"
-                    style="@style/text_style_spisok"
-                    android:textSize="15dp" />
-
-                <Button
-                    android:id="@+id/btn_texture"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:textColor="#414099"
-                    android:stateListAnimator="@null"
-                    android:textSize="20dp" />
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/canvas_help"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_button_question"
+                        android:stateListAnimator="@null"
+                        android:text="\?"
+                        android:textColor="#ffffff"
+                        android:textSize="20dp"
+                        android:layout_span="1"/>
+                </TableRow>
+            </TableLayout>
 
             <Spinner
                 android:id="@+id/spinner_canvases"
@@ -76,33 +78,36 @@
                 android:layout_marginTop="7dp"
                 android:background="#ffffff"
                 android:enabled="false"
+                android:visibility="gone"
                 android:text="ЦВЕT"
                 android:textColor="#ffffff" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
+                android:stretchColumns="0,3,5">
+                <TableRow>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Выберите производителя"
+                        style="@style/text_style_spisok"
+                        android:layout_weight="1"
+                        android:layout_span="7"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Выберите производителя"
-                    style="@style/text_style_spisok"
-                    android:textSize="15dp" />
-
-                <Button
-                    android:id="@+id/btn_width"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:textColor="#414099"
-                    android:stateListAnimator="@null"
-                    android:textSize="20dp" />
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/texture_help"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_button_question"
+                        android:text="\?"
+                        android:textColor="#ffffff"
+                        android:stateListAnimator="@null"
+                        android:textSize="20dp"
+                        android:layout_span="1"/>
+                </TableRow>
+            </TableLayout>
 
             <Spinner
                 android:id="@+id/spinner_texture"
@@ -123,1689 +128,1996 @@
                 android:text="НАЧЕРТИТЬ ПОТОЛОК"
                 android:textColor="#ffffff" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="15dp"
-                android:text="ЧЕРТЁЖ ВАШЕЙ КОМНАТЫ:"
-                style="@style/text_style_spisok"
-                android:textSize="20dp" />
-
-            <ImageView
-                android:id="@+id/id_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-
-            <TextView
-                android:id="@+id/area"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="S = "
-                style="@style/text_style_spisok" />
-
-            <TextView
-                android:id="@+id/perimetr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="P = "
-                style="@style/text_style_spisok"/>
-
-            <TextView
-                android:id="@+id/corners"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Кол-во углов = "
-                style="@style/text_style_spisok" />
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:id="@+id/linear_image"
+                android:visibility="gone"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="left"
-                    android:text="Выберите багет"
-                    style="@style/text_style_spisok" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/radios_b"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <RadioButton
-                        android:id="@+id/rb_b_no"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Обычный багет"
-                        android:checked="true"
-                        style="@style/text_style_spisok"/>
-
-                    <RadioButton
-                        android:id="@+id/rb_b_potol"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Потолочный багет"
-                        style="@style/text_style_spisok"/>
-
-                    <RadioButton
-                        android:id="@+id/rb_b_all"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Аллюминиевый багет"
-                        style="@style/text_style_spisok" />
-                </RadioGroup>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Декоративная вставка"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_vstavka"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:textColor="#414099"
-                    android:stateListAnimator="@null"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/radios_v"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <RadioButton
-                        android:id="@+id/rb_v_white"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Белая вставка"
-                        style="@style/text_style_spisok" />
-
-                    <RadioButton
-                        android:id="@+id/rb_v_color"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Цветная вставка"
-                        style="@style/text_style_spisok"/>
-
-                    <RadioButton
-                        android:id="@+id/rb_v_no"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Вставка не нужна"
-                        android:checked="true"
-                        style="@style/text_style_spisok"/>
-                </RadioGroup>
-
-                <Button
-                    android:id="@+id/btn_rb_v"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="#ffffff"
-                    android:enabled="false"
-                    android:text="ЦВЕТ"
-                    android:textColor="#ffffff" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Освещение"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_light"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Введите кол-во люстр:"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_lustr"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/lustr"
-                android:layout_width="match_parent"
-                android:paddingLeft="5dp"
-                android:hint=" шт."
-                android:inputType="number"
-                android:layout_height="40dp"
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Введите кол-во светильников: "
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_svetiln"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Кол-во"
-                    style="@style/text_style_spisok"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Вид"
-                    style="@style/text_style_spisok"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Диаметр"
-                    style="@style/text_style_spisok"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/count_fixtures"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:paddingLeft="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_vid_fixtures"
-                    style="@style/spinner_style"
-                    android:layout_height="40dp"
-                    android:layout_width="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"/>
-
-                <Spinner
-                    android:id="@+id/spinner_diametr_fixtures"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginLeft="5dp"
-                    style="@style/spinner_style"
-                    android:layout_weight="1"/>
-
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_svetilnik"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <ListView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_svetilnik"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Можете приобрести светильники у нас: "
-                    style="@style/text_style_spisok"/>
-
-                <Button
-                    android:id="@+id/btn_add_kupit_svetiln"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginTop="15dp"
+                    android:text="ЧЕРТЁЖ ВАШЕЙ КОМНАТЫ:"
                     style="@style/text_style_spisok"
-                    android:layout_marginLeft="10dp"
-                    android:text="Кол-во"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Цвет"/>
+                    android:textSize="20dp" />
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/count_ecola"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:paddingLeft="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_vid_ecola"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Лампа"
-                    style="@style/text_style_spisok"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_diametr_ecola"
+                <ImageView
+                    android:id="@+id/id_image"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:id="@+id/area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="S = "
+                    style="@style/text_style_spisok" />
+
+                <TextView
+                    android:id="@+id/perimetr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="P = "
+                    style="@style/text_style_spisok"/>
+
+                <TextView
+                    android:id="@+id/corners"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Кол-во углов = "
+                    style="@style/text_style_spisok" />
+
             </LinearLayout>
+
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_ecola"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_ecola">
-            </ListView>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Шторный карниз"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_karniz"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Скрытый карниз"
-                    style="@style/text_style_spisok" />
-
-                <CheckBox
-                    android:id="@+id/RB_karniz"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/karniz"
+                android:id="@+id/general_hide"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:inputType="numberDecimal"
-                android:background="@drawable/edit_text_style" />
+                android:layout_marginTop="10dp"
+                android:text="Добавить монтаж и комплектующие"
+                android:background="@drawable/rounded_button_question"
+                android:textColor="#ffffff"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Можете приобрести карнизы у нас: "
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_cornice"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="10dp"
-                    style="@style/text_style_spisok"
-                    android:text="Кол-во"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Тип"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/count_cornice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:paddingLeft="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_vid_cornice"
-                    android:layout_width="wrap_content"
-                    style="@style/spinner_style"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="10dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Длина"
-                    android:layout_marginLeft="10dp"
-                    style="@style/text_style_spisok"
-                    android:layout_marginBottom="5dp"/>
+                android:visibility="gone"
+                android:id="@+id/general_layout">
 
-                <Spinner
-                    android:id="@+id/spinner_diametr_cornice"
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+                        <Button
+                            android:id="@+id/buguette_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Изменить багет"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/buguette_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    style="@style/spinner_style"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/buguette_layout"
+                    android:visibility="gone"
+                    android:layout_marginTop="5dp">
+
+                    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/radios_b"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/rb_b_no"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Без багета"
+                            android:checked="true"
+                            style="@style/text_style_spisok"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_b_norm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Обычный багет"
+                            style="@style/text_style_spisok"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_b_potol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Потолочный багет"
+                            style="@style/text_style_spisok"/>
+
+                        <RadioButton
+                            android:id="@+id/rb_b_all"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Алюминиевый багет"
+                            style="@style/text_style_spisok" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"/>
-            </LinearLayout>
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_cornices"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
+                        <Button
+                            android:id="@+id/vstavka_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Декоративная вставка"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
 
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_cornice"/>
+                        <Button
+                            android:id="@+id/vstavka_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/vstavka_layout"
+                    android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
+                    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/radios_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Укажите кол-во труб входящих в потолок: "
-                    style="@style/text_style_spisok" />
+                        <RadioButton
+                            android:id="@+id/rb_v_white"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Белая вставка"
+                            style="@style/text_style_spisok" />
 
-                <Button
-                    android:id="@+id/btn_add_truby"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
+                        <RadioButton
+                            android:id="@+id/rb_v_color"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Цветная вставка"
+                            style="@style/text_style_spisok"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="10dp"
-                    style="@style/text_style_spisok"
-                    android:text="Кол-во"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Диаметр"/>
+                        <RadioButton
+                            android:id="@+id/rb_v_no"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Вставка не нужна"
+                            android:checked="true"
+                            style="@style/text_style_spisok"/>
+                    </RadioGroup>
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/count_pipes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:paddingLeft="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_diametr_pipes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_pipes"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_pipes"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="Прочий монтаж"
-                style="@style/text_style_spisok"
-                android:textSize="20dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/btn_rb_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="#ffffff"
+                        android:enabled="false"
+                        android:text="ЦВЕТ"
+                        android:textColor="#ffffff" />
+                </LinearLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    style="@style/text_style_spisok"
-                    android:text="Метраж стен с плиткой" />
-
-                <Button
-                    android:id="@+id/btn_mount_wall"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/mount_wall"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:background="@drawable/edit_text_style"
-                android:textColor="#000000"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:text="Метраж стен с керамогранитом" />
-
-
-                <Button
-                    android:id="@+id/btn_mount_granite"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/mount_granite"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/text_style_spisok"
-                    android:text="Провод" />
-
-                <Button
-                    android:id="@+id/btn_cabling"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_cabling"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:text="Закладная брусом" />
-
-                <Button
-                    android:id="@+id/btn_bond_beam"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/bond_beam"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:text="Парящий потолок" />
-
-                <Button
-                    android:id="@+id/btn_soaring_ceiling"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/soaring_ceiling"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Переход уровня: "
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_profile"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Кол-во"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Тип"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/count_profile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:paddingLeft="5dp" />
-
-                <Spinner
-                    android:id="@+id/spinner_vid_profile"
-                    style="@style/spinner_style"
-                    android:layout_height="40dp"
-                    android:layout_width="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_profiles"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_profile"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Пожарная сигнализация"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_fire"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_fire"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="шт"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal"
-                android:textColor="#000000" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Разделитель"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_separator"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_separator"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:hint="м."
-                android:textColor="#000000"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Сложность доступа"
-                    style="@style/text_style_spisok"/>
-
-                <Button
-                    android:id="@+id/btn_diff_acc"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_diff_acc"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Внутренний вырез (на месте)"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_in_cut"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_in_cut"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Внутренний вырез (в цеху)"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_in_cut_shop"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_in_cut_shop"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Слив воды"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_drain_the_water"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_drain_the_water"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="Кол-во комнат"
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Дополнительный крепеж"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_fasteners"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_fasteners"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Усиление стен"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_wall"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/ed_wall"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="м."
-                android:textColor="#000000"
-                android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Вентиляция "
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_vent"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp"  />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:text="Освещение"
+                    android:textStyle="bold"
                     style="@style/text_style_spisok"
-                    android:text="Кол-во"
-                    android:layout_marginLeft="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Тип"/>
+                    android:textSize="20dp" />
 
-            </LinearLayout>
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Добавить люстры"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"
+                            android:id="@+id/lustr_hide"/>
+
+                        <Button
+                            android:id="@+id/lustr_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/lustr_layout"
+                    android:visibility="gone"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Введите кол-во люстр:"
+                        style="@style/text_style_spisok"/>
+
+                    <EditText
+                        android:id="@+id/lustr"
+                        android:layout_width="match_parent"
+                        android:hint=" шт."
+                        android:inputType="number"
+                        android:layout_height="40dp"
+                        android:textColor="#000000"
+                        android:background="@drawable/edit_text_style"/>
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/svetiln_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Добавить светильники"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/svetiln_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/svetiln_layout"
+                    android:visibility="gone"
+                    android:layout_marginTop="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Кол-во"
+                            style="@style/text_style_spisok"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Вид"
+                            style="@style/text_style_spisok"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Диаметр"
+                            style="@style/text_style_spisok"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_fixtures"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:paddingLeft="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_vid_fixtures"
+                            style="@style/spinner_style"
+                            android:layout_height="40dp"
+                            android:layout_width="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_diametr_fixtures"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginLeft="5dp"
+                            style="@style/spinner_style"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_svetilnik"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_svetilnik"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Можете приобрести \nсветильники у нас: "
+                        style="@style/text_style_spisok"
+                        android:textSize="20dp"
+                        android:layout_marginTop="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Кол-во"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Цвет"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_ecola"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_vid_ecola"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Лампа"
+                            style="@style/text_style_spisok"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginBottom="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_diametr_ecola"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="10dp"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_ecola"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_ecola">
+                    </ListView>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/cabling_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Провод"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/cabling_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/count_hoods"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:paddingLeft="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:minWidth="100dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-
-                <Spinner
-                    android:id="@+id/spinner_type_hoods"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="5dp"
-                    style="@style/text_style_spisok"
-                    android:text="Размер"/>
-
-                <Spinner
-                    android:id="@+id/spinner_razmer_hoods"
+                    android:id="@+id/ed_cabling"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_hoods"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_hoods"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
+                    android:layout_marginTop="5dp"
+                    android:paddingLeft="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Диффузор "
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_diff"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp"   />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Кол-во"
+                    android:gravity="center"
+                    android:text="Прочий монтаж"
+                    android:textStyle="bold"
                     style="@style/text_style_spisok"
-                    android:layout_marginLeft="10dp"/>
+                    android:textSize="20dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Размер"/>
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                        <Button
+                            android:id="@+id/karniz_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Добавить шторный карниз"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/karniz_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/karniz_layout"
+                    android:visibility="gone"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/karniz"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:paddingLeft="5dp"
+                        android:hint="м."
+                        android:textColor="#000000"
+                        android:inputType="numberDecimal"
+                        android:background="@drawable/edit_text_style" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:text="Скрытый карниз"
+                            style="@style/text_style_spisok" />
+
+                        <CheckBox
+                            android:id="@+id/RB_karniz"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="left"
+                            android:text="Можете приобрести карнизы у нас: "
+                            style="@style/text_style_spisok" />
+
+                        <Button
+                            android:id="@+id/btn_add_cornice"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/white_btn_blue_text"
+                            android:text="\?"
+                            android:stateListAnimator="@null"
+                            android:textColor="#414099"
+                            android:textSize="20dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Кол-во"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Тип"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_cornice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_vid_cornice"
+                            android:layout_width="wrap_content"
+                            style="@style/spinner_style"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Длина"
+                            style="@style/text_style_spisok"
+                            android:layout_marginBottom="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_diametr_cornice"
+                            android:layout_width="match_parent"
+                            style="@style/spinner_style"
+                            android:layout_height="40dp"
+                            android:layout_marginRight="10dp"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_cornices"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_cornice"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/pipes_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Добавить трубы, входящие в потолок "
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/pipes_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/pipes_layout"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Кол-во"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Диаметр"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_pipes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginRight="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_diametr_pipes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_pipes"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_pipes"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/bond_beam_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Закладная брусом"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/bond_beam_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/count_diffuzor"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/bond_beam"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
                     android:paddingLeft="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
-                    android:hint="Кол-во"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
 
-                <Spinner
-                    android:id="@+id/spinner_diffuzor"
-                    android:layout_width="wrap_content"
+                <TableLayout
+                    android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    style="@style/spinner_style"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-            </LinearLayout>
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_diffuzor"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
+                        <Button
+                            android:id="@+id/separator_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Разделитель"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
 
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_diffuzor"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Другие комплектующие"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_other_comp"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp"   />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Название "
-                    style="@style/text_style_spisok"
-                    android:layout_marginLeft="10dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Стоимость"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                        <Button
+                            android:id="@+id/separator_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/count_comp"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/ed_separator"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
                     android:background="@drawable/edit_text_style"
-                    android:hint="Название"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/mount_wall_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Метраж стен с плиткой"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/mount_wall_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/price_comp"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/mount_wall"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
                     android:background="@drawable/edit_text_style"
-                    android:hint="Стоимость"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
-            </LinearLayout>
+                    android:textColor="#000000"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_comp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
 
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_comp"/>
+                        <Button
+                            android:id="@+id/mount_granite_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Метраж стен с керамогранитом"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="Другие монтажные работы"
-                    style="@style/text_style_spisok" />
-
-                <Button
-                    android:id="@+id/btn_add_other_mount"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:text="\?"
-                    android:stateListAnimator="@null"
-                    android:textColor="#414099"
-                    android:textSize="20dp"   />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Название "
-                    style="@style/text_style_spisok"
-                    android:layout_marginLeft="10dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/text_style_spisok"
-                    android:text="Стоимость"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                        <Button
+                            android:id="@+id/mount_granite_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/count_mount"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/mount_granite"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
-                    android:hint="Название"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/wall_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Усиление стен"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/wall_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
 
                 <EditText
-                    android:id="@+id/price_mount"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/ed_wall"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
-                    android:hint="Стоимость"
-                    android:inputType="number"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"/>
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/fasteners_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Дополнительный крепеж"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/fasteners_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_fasteners"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/fire_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Пожарная сигнализация"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/fire_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_fire"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="шт"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:textColor="#000000"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/add_vent_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Вентиляция "
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/add_vent_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:id="@+id/add_vent_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Кол-во"
+                            android:layout_marginLeft="10dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Тип"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_hoods"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:minWidth="100dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_type_hoods"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginBottom="5dp"
+                            style="@style/text_style_spisok"
+                            android:text="Размер"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_razmer_hoods"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_hoods"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_hoods"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/add_diff_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Диффузор "
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/add_diff_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/add_diff_layout"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Кол-во"
+                            style="@style/text_style_spisok"
+                            android:layout_marginLeft="10dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Размер"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5dp">
+
+                        <EditText
+                            android:id="@+id/count_diffuzor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+
+                        <Spinner
+                            android:id="@+id/spinner_diffuzor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            style="@style/spinner_style"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_diffuzor"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_diffuzor"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/soaring_ceiling_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Парящий потолок"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/soaring_ceiling_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/soaring_ceiling"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/add_profile_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Переход уровня "
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/add_profile_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/add_profile_layout"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Кол-во"
+                            android:gravity="center"
+                            style="@style/text_style_spisok"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Тип"
+                            android:gravity="center"
+                            style="@style/text_style_spisok"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_profile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Кол-во"
+                            android:inputType="number"
+                            android:paddingLeft="5dp" />
+
+                        <Spinner
+                            android:id="@+id/spinner_vid_profile"
+                            style="@style/spinner_style"
+                            android:layout_height="40dp"
+                            android:layout_width="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_profiles"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_profile"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/in_cut_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Внутренний вырез (на месте)"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/in_cut_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_in_cut"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/in_cut_shop_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Внутренний вырез (в цеху)"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/in_cut_shop_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_in_cut_shop"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/drain_the_water_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Слив воды"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/drain_the_water_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_drain_the_water"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:hint="Кол-во комнат"
+                    android:textColor="#000000"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/height_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Высота помещения"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/height_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/radios_height"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone">
+
+                    <RadioButton
+                        android:id="@+id/rb_h_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Больше 3ех метров"
+                        android:checked="true"
+                        style="@style/text_style_spisok"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_h_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Меньше 3ех метров"
+                        style="@style/text_style_spisok" />
+                </RadioGroup>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/diff_acc_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Сложность доступа"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/diff_acc_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <EditText
+                    android:id="@+id/ed_diff_acc"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="м."
+                    android:textColor="#000000"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/edit_text_style"
+                    android:inputType="numberDecimal"
+                    android:visibility="gone"/>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/add_other_comp_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Другие комплектующие"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/add_other_comp_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:id="@+id/add_other_comp_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Название "
+                            style="@style/text_style_spisok"
+                            android:layout_marginLeft="10dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Стоимость"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_comp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Название"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+
+                        <EditText
+                            android:id="@+id/price_comp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Стоимость"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_comp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_comp"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+
+                        <Button
+                            android:id="@+id/add_other_mount_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Другие монтажные работы"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/add_other_mount_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/add_other_mount_layout"
+                    android:layout_marginTop="5dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Название "
+                            style="@style/text_style_spisok"
+                            android:layout_marginLeft="10dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/text_style_spisok"
+                            android:text="Стоимость"/>
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/count_mount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Название"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+
+                        <EditText
+                            android:id="@+id/price_mount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:paddingLeft="5dp"
+                            android:background="@drawable/edit_text_style"
+                            android:hint="Стоимость"
+                            android:inputType="number"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Добавить"
+                        android:layout_gravity="center"
+                        android:id="@+id/btn_add_mount"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rounded_button"
+                        android:textColor="#ffffff"/>
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/list_mount"/>
+
+                </LinearLayout>
+
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:stretchColumns="0,3,5"
+                    android:layout_marginTop="10dp">
+                    <TableRow>
+                        <Button
+                            android:id="@+id/mounting_hide"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Отменить монтаж"
+                            android:layout_span="7"
+                            android:background="@drawable/rounded_button_question"
+                            android:textColor="#ffffff"/>
+
+                        <Button
+                            android:id="@+id/mounting_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/rounded_button_question"
+                            android:text="\?"
+                            android:layout_marginLeft="5dp"
+                            android:textColor="#ffffff"
+                            android:stateListAnimator="@null"
+                            android:textSize="20dp"
+                            android:layout_span="1"/>
+                    </TableRow>
+                </TableLayout>
+
+                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/radios_mounting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <RadioButton
+                        android:id="@+id/rb_m_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Нужен"
+                        android:checked="true"
+                        style="@style/text_style_spisok"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_m_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Не нужен"
+                        style="@style/text_style_spisok" />
+                </RadioGroup>
+
             </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Добавить"
-                android:layout_gravity="center"
-                android:id="@+id/btn_add_mount"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:id="@+id/list_mount"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#7b7b7b"
-                android:layout_marginTop="4dp" />
 
             <TextView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Новый процент скидки"
-                style="@style/text_style_spisok" />
+                android:textStyle="bold"
+                style="@style/text_style_spisok"
+                android:textSize="20dp" />
 
             <EditText
                 android:id="@+id/ed_discount"
@@ -1817,93 +2129,62 @@
                 android:background="@drawable/edit_text_style"
                 android:inputType="numberDecimal" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:textSize="20dp"
-                android:gravity="center"
-                android:text="Монтаж"
-                style="@style/text_style_spisok" />
-
-            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/radios_mounting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="vertical">
-
-                <RadioButton
-                    android:id="@+id/rb_m_yes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Нужен"
-                    android:checked="true"
-                    style="@style/text_style_spisok"/>
-
-                <RadioButton
-                    android:id="@+id/rb_m_no"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Не нужен"
-                    style="@style/text_style_spisok" />
-            </RadioGroup>
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:textSize="20dp"
-                android:gravity="center"
-                android:text="Высота помещения"
-                style="@style/text_style_spisok" />
-
-            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/radios_height"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="vertical">
-
-                <RadioButton
-                    android:id="@+id/rb_h_yes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Больше 3ех метров"
-                    android:checked="true"
-                    style="@style/text_style_spisok"/>
-
-                <RadioButton
-                    android:id="@+id/rb_h_no"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Меньше 3ех метров"
-                    style="@style/text_style_spisok" />
-            </RadioGroup>
-
             <Button
                 android:id="@+id/btn_calculate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rounded_button_green"
                 android:text="Рассчитать"
                 android:textColor="#ffffff" />
 
             <TextView
                 android:id="@+id/text_calculate"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:text="0.00 руб."
+                android:text="0 руб."
                 style="@style/text_style_spisok"
-                android:textSize="20dp" />
+                android:textStyle="bold"
+                android:textSize="25dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/second_layout">
+
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:stretchColumns="0,3,5"
+                android:layout_marginTop="10dp">
+                <TableRow>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Название расчета:"
+                        android:layout_span="7"
+                        android:gravity="center|left"
+                        style="@style/text_style_spisok"/>
+
+                    <Button
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_button"
+                        android:text="\?"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="#ffffff"
+                        android:stateListAnimator="@null"
+                        android:textSize="20dp"
+                        android:layout_span="1"/>
+                </TableRow>
+            </TableLayout>
 
             <EditText
                 android:id="@+id/name_project"
@@ -1911,6 +2192,7 @@
                 android:layout_gravity="center"
                 android:hint="Введите название расчёта"
                 android:paddingLeft="5dp"
+                android:layout_marginTop="5dp"
                 android:inputType="textCapWords"
                 android:textColor="#000000"
                 android:layout_height="40dp"
@@ -1921,10 +2203,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_button"
                 android:text="Сохранить"
                 android:textColor="#ffffff" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

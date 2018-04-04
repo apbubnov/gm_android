@@ -161,47 +161,49 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     }
                     k.close();
 
-                    sqlQuewy = "SELECT  texture_title "
-                            + "FROM rgzbn_gm_ceiling_textures" +
-                            " WHERE _id = ?";
-                    k = db.rawQuery(sqlQuewy, new String[]{n2});
+                    try {
+                        sqlQuewy = "SELECT  texture_title "
+                                + "FROM rgzbn_gm_ceiling_textures" +
+                                " WHERE _id = ?";
+                        k = db.rawQuery(sqlQuewy, new String[]{n2});
 
-                    if (k != null) {
-                        if (k.moveToFirst()) {
-                            do {
-                                String title = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                                TextView mat_2 = (TextView) view.findViewById(R.id.mat_2);
-                                mat_2.setText(mat_2.getText() + "  " + title);
-                            } while (k.moveToNext());
+                        if (k != null) {
+                            if (k.moveToFirst()) {
+                                do {
+                                    String title = k.getString(k.getColumnIndex(k.getColumnName(0)));
+                                    TextView mat_2 = (TextView) view.findViewById(R.id.mat_2);
+                                    mat_2.setText(mat_2.getText() + "  " + title);
+                                } while (k.moveToNext());
+                            }
                         }
-                    }
-                    k.close();
+                        k.close();
 
-                    sqlQuewy = "SELECT name, country, width "
-                            + "FROM rgzbn_gm_ceiling_canvases" +
-                            " WHERE _id = ?";
+                        sqlQuewy = "SELECT name, country, width "
+                                + "FROM rgzbn_gm_ceiling_canvases" +
+                                " WHERE _id = ?";
 
-                    k = db.rawQuery(sqlQuewy, new String[]{n3});
+                        k = db.rawQuery(sqlQuewy, new String[]{n3});
 
-                    if (k != null) {
-                        if (k.moveToFirst()) {
-                            do {
-                                TextView mat_3 = (TextView) view.findViewById(R.id.mat_3);
+                        if (k != null) {
+                            if (k.moveToFirst()) {
+                                do {
+                                    TextView mat_3 = (TextView) view.findViewById(R.id.mat_3);
 
 
-                                String title = k.getString(k.getColumnIndex(k.getColumnName(0))) + " " +
-                                        k.getString(k.getColumnIndex(k.getColumnName(1))) + " " + k.getString(k.getColumnIndex(k.getColumnName(2)));
+                                    String title = k.getString(k.getColumnIndex(k.getColumnName(0))) + " " +
+                                            k.getString(k.getColumnIndex(k.getColumnName(1))) + " " + k.getString(k.getColumnIndex(k.getColumnName(2)));
 
-                                Log.d("mLog1", title);
+                                    Log.d("mLog1", title);
 
-                                mat_3.setText(mat_3.getText() + "  " + title);
+                                    mat_3.setText(mat_3.getText() + "  " + title);
 
-                                Log.d("mLog2", title);
-                            } while (k.moveToNext());
+                                    Log.d("mLog2", title);
+                                } while (k.moveToNext());
+                            }
                         }
+                        k.close();
+                    }catch (Exception e){
                     }
-                    k.close();
-
 
                     String color = c.getString(c.getColumnIndex(c.getColumnName(22)));
 

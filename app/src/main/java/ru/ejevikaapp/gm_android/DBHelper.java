@@ -2,14 +2,15 @@ package ru.ejevikaapp.gm_android;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 14;
+    public static final int DATABASE_VERSION = 17;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     String SAVED_end = "";
@@ -39,8 +40,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_DEALER_ID = "dealer_id";
     public static final String KEY_CALCULATION_TITLE = "calculation_title";
     public static final String KEY_PROJECT_ID = "project_id";
-    public static final String KEY_N1 = "n1";   //  тип полотна
-    public static final String KEY_N2 = "n2";   //  фактура
     public static final String KEY_N3 = "n3";   //  ширина
     public static final String KEY_N4 = "n4";   //  площадь
     public static final String KEY_N5 = "n5";   //  периметр
@@ -91,9 +90,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_RGZBN_GM_CEILING_CANVASES = "rgzbn_gm_ceiling_canvases";
     public static final String KEY_TEXTURE_ID = "texture_id";
     public static final String KEY_COLOR_ID = "color_id";
+    public static final String KEY_MANUFACTURER_ID = "manufacturer_id";
+    public static final String KEY_WIDTH = "width";
+
+    public static final String TABLE_RGZBN_GM_CEILING_CANVASES_MANUFACTURERS = "rgzbn_gm_ceiling_canvases_manufacturers";
     public static final String KEY_NAME = "name";
     public static final String KEY_COUNTRY = "country";
-    public static final String KEY_WIDTH = "width";
 
     public static final String TABLE_RGZBN_GM_CEILING_CANVASES_ALL = "rgzbn_gm_ceiling_canvases_all";
     public static final String KEY_PURCHASING_PRICE = "purchasing_price";
@@ -141,6 +143,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_GM_MOUNTING_MARGIN = "gm_mounting_margin";
     public static final String KEY_DEALER_TYPE = "dealer_type";
     public static final String KEY_DISCOUNT = "discount";
+    public static final String KEY_CITY = "city";
 
     public static final String TABLE_RGZBN_GM_CEILING_DIFFUSERS = "rgzbn_gm_ceiling_diffusers";     // диффузор
     public static final String KEY_N23_COUNT = "n23_count";
@@ -405,19 +408,26 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_calculations (_id INTEGER, " +
                 "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
-                "calculation_title TEXT, project_id INTEGER, n1 INTEGER, n2 INTEGER, n3 INTEGER, " +
-                "n4 TEXT, n5 TEXT, n6 TEXT, n7 TEXT, n8 TEXT, n9 TEXT, n10 TEXT, n11 TEXT, n12 INTEGER, n16 TEXT, n17 TEXT, " +
-                "n18 TEXT, n19 TEXT, n20 TEXT, " +
-                "n21 TEXT, n24 TEXT, n25 INTEGER, n27 TEXT, n28 TEXT, n30 TEXT, n31 TEXT, n32 TEXT, height TEXT, components_sum TEXT, canvases_sum TEXT, " +
-                "mounting_sum INTEGER, dealer_components_sum TEXT, dealer_canvases_sum TEXT, " +
-                "dop_krepezh TEXT, extra_components TEXT, extra_mounting TEXT, color INTEGER, " +
-                "details TEXT, calc_image TEXT, calc_data TEXT, calc_point TEXT, cut_image TEXT, cut_data TEXT," +
-                " offcut_square TEXT, original_sketch TEXT, discount TEXT)");
+                "calculation_title TEXT DEFAULT NULL, project_id INTEGER, n3 INTEGER DEFAULT NULL, " +
+                "n4 TEXT DEFAULT NULL, n5 TEXT DEFAULT NULL, n6 TEXT DEFAULT NULL, n7 TEXT DEFAULT NULL, n8 TEXT DEFAULT NULL, n9 TEXT DEFAULT NULL, " +
+                "n10 TEXT DEFAULT NULL, n11 TEXT DEFAULT NULL, n12 INTEGER DEFAULT NULL, n16 TEXT DEFAULT NULL, n17 TEXT DEFAULT NULL, " +
+                "n18 TEXT DEFAULT NULL, n19 TEXT DEFAULT NULL, n20 TEXT DEFAULT NULL, " +
+                "n21 TEXT DEFAULT NULL, n24 TEXT DEFAULT NULL, n25 INTEGER DEFAULT NULL, n27 TEXT DEFAULT NULL, n28 TEXT DEFAULT NULL, " +
+                "n30 TEXT DEFAULT NULL, n31 TEXT DEFAULT NULL, n32 TEXT DEFAULT NULL, height TEXT DEFAULT NULL, " +
+                "components_sum TEXT DEFAULT NULL, canvases_sum TEXT DEFAULT NULL, " +
+                "mounting_sum INTEGER DEFAULT NULL, dealer_components_sum TEXT DEFAULT NULL, dealer_canvases_sum TEXT DEFAULT NULL, " +
+                "dop_krepezh TEXT DEFAULT NULL, extra_components TEXT DEFAULT NULL, extra_mounting TEXT DEFAULT NULL, color INTEGER DEFAULT NULL, " +
+                "details TEXT DEFAULT NULL, calc_image TEXT DEFAULT NULL, calc_data TEXT DEFAULT NULL, calc_point TEXT DEFAULT NULL, " +
+                "cut_image TEXT DEFAULT NULL, cut_data TEXT DEFAULT NULL," +
+                " offcut_square TEXT DEFAULT NULL, original_sketch TEXT DEFAULT NULL, discount TEXT DEFAULT NULL)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_calc_guild (calc_id INTEGER, guild_id INTEGER, user_id INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases (_id INTEGER, " +
-                "texture_id INTEGER, color_id INTEGER, name TEXT, country TEXT, width TEXT, price TEXT, count INTEGER)");
+                "texture_id INTEGER, color_id INTEGER, manufacturer_id INTEGER, width TEXT, price TEXT, count INTEGER)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_manufacturers (_id INTEGER, " +
+                "name TEXT, countyr TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_all (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_canvas INTEGER, length TEXT, purchasing_price TEXT, date TEXT, user_accepted_id INTEGER)");
@@ -448,7 +458,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_dealer_info (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "dealer_canvases_margin INTEGER, dealer_components_margin INTEGER, dealer_mounting_margin INTEGER, " +
                 "gm_canvases_margin INTEGER, " +
-                "gm_components_margin INTEGER, gm_mounting_margin INTEGER, dealer_id INTEGER, dealer_type INTEGER, discount INTEGER)");
+                "gm_components_margin INTEGER, gm_mounting_margin INTEGER, dealer_id INTEGER, dealer_type INTEGER, discount INTEGER, " +
+                "city TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_diffusers (_id INTEGER, " +
                 "calculation_id INTEGER, n23_count INTEGER, n23_size INTEGER)");
@@ -552,6 +563,77 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion < 14) {
             db.execSQL("ALTER TABLE  rgzbn_gm_ceiling_calculations ADD COLUMN dealer_components_sum TEXT");
             db.execSQL("ALTER TABLE  rgzbn_gm_ceiling_calculations ADD COLUMN dealer_canvases_sum TEXT");
+        }
+        if (oldVersion < 15) {
+            db.execSQL("ALTER TABLE  rgzbn_gm_ceiling_dealer_info ADD COLUMN city TEXT");
+        }
+
+        if (oldVersion < 16) {
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_calculations");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_calculations (_id INTEGER, " +
+                    "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
+                    "calculation_title TEXT DEFAULT NULL, project_id INTEGER, n1 INTEGER DEFAULT NULL, n2 INTEGER DEFAULT NULL, n3 INTEGER DEFAULT NULL, " +
+                    "n4 TEXT DEFAULT NULL, n5 TEXT DEFAULT NULL, n6 TEXT DEFAULT NULL, n7 TEXT DEFAULT NULL, n8 TEXT DEFAULT NULL, n9 TEXT DEFAULT NULL, " +
+                    "n10 TEXT DEFAULT NULL, n11 TEXT DEFAULT NULL, n12 INTEGER DEFAULT NULL, n16 TEXT DEFAULT NULL, n17 TEXT DEFAULT NULL, " +
+                    "n18 TEXT DEFAULT NULL, n19 TEXT DEFAULT NULL, n20 TEXT DEFAULT NULL, " +
+                    "n21 TEXT DEFAULT NULL, n24 TEXT DEFAULT NULL, n25 INTEGER DEFAULT NULL, n27 TEXT DEFAULT NULL, n28 TEXT DEFAULT NULL, " +
+                    "n30 TEXT DEFAULT NULL, n31 TEXT DEFAULT NULL, n32 TEXT DEFAULT NULL, height TEXT DEFAULT NULL, " +
+                    "components_sum TEXT DEFAULT NULL, canvases_sum TEXT DEFAULT NULL, " +
+                    "mounting_sum INTEGER DEFAULT NULL, dealer_components_sum TEXT DEFAULT NULL, dealer_canvases_sum TEXT DEFAULT NULL, " +
+                    "dop_krepezh TEXT DEFAULT NULL, extra_components TEXT DEFAULT NULL, extra_mounting TEXT DEFAULT NULL, color INTEGER DEFAULT NULL, " +
+                    "details TEXT DEFAULT NULL, calc_image TEXT DEFAULT NULL, calc_data TEXT DEFAULT NULL, calc_point TEXT DEFAULT NULL, " +
+                    "cut_image TEXT DEFAULT NULL, cut_data TEXT DEFAULT NULL," +
+                    " offcut_square TEXT DEFAULT NULL, original_sketch TEXT DEFAULT NULL, discount TEXT DEFAULT NULL)");
+
+
+            SharedPreferences SP_end = mContext.getSharedPreferences("user_id", MODE_PRIVATE);
+            String user_id = SP_end.getString("", "");
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
+        }
+
+        if (oldVersion < 17) {
+
+            //1
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_canvases");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases (_id INTEGER, " +
+                    "texture_id INTEGER, color_id INTEGER, manufacturer_id INTEGER, width TEXT, price TEXT, count INTEGER)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_manufacturers (_id INTEGER, " +
+                    "name TEXT, countyr TEXT)");
+
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"material"});
+
+
+            //2
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_calculations");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_calculations (_id INTEGER, " +
+                    "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
+                    "calculation_title TEXT DEFAULT NULL, project_id INTEGER, n3 INTEGER DEFAULT NULL, " +
+                    "n4 TEXT DEFAULT NULL, n5 TEXT DEFAULT NULL, n6 TEXT DEFAULT NULL, n7 TEXT DEFAULT NULL, n8 TEXT DEFAULT NULL, n9 TEXT DEFAULT NULL, " +
+                    "n10 TEXT DEFAULT NULL, n11 TEXT DEFAULT NULL, n12 INTEGER DEFAULT NULL, n16 TEXT DEFAULT NULL, n17 TEXT DEFAULT NULL, " +
+                    "n18 TEXT DEFAULT NULL, n19 TEXT DEFAULT NULL, n20 TEXT DEFAULT NULL, " +
+                    "n21 TEXT DEFAULT NULL, n24 TEXT DEFAULT NULL, n25 INTEGER DEFAULT NULL, n27 TEXT DEFAULT NULL, n28 TEXT DEFAULT NULL, " +
+                    "n30 TEXT DEFAULT NULL, n31 TEXT DEFAULT NULL, n32 TEXT DEFAULT NULL, height TEXT DEFAULT NULL, " +
+                    "components_sum TEXT DEFAULT NULL, canvases_sum TEXT DEFAULT NULL, " +
+                    "mounting_sum INTEGER DEFAULT NULL, dealer_components_sum TEXT DEFAULT NULL, dealer_canvases_sum TEXT DEFAULT NULL, " +
+                    "dop_krepezh TEXT DEFAULT NULL, extra_components TEXT DEFAULT NULL, extra_mounting TEXT DEFAULT NULL, color INTEGER DEFAULT NULL, " +
+                    "details TEXT DEFAULT NULL, calc_image TEXT DEFAULT NULL, calc_data TEXT DEFAULT NULL, calc_point TEXT DEFAULT NULL, " +
+                    "cut_image TEXT DEFAULT NULL, cut_data TEXT DEFAULT NULL," +
+                    " offcut_square TEXT DEFAULT NULL, original_sketch TEXT DEFAULT NULL, discount TEXT DEFAULT NULL)");
+
+
+            SharedPreferences SP_end = mContext.getSharedPreferences("user_id", MODE_PRIVATE);
+            String user_id = SP_end.getString("", "");
+            values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
         }
     }
 

@@ -1,6 +1,7 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
+import ru.ejevikaapp.gm_android.ActivityPrice;
 import ru.ejevikaapp.gm_android.Activity_zamer;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
@@ -48,6 +50,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public void onResume() {
         super.onResume();
@@ -115,7 +118,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
 
                     sqlQuewy = "SELECT project_info, project_status "
                             + "FROM rgzbn_gm_ceiling_projects " +
-                            "where client_id = ? and (project_status = 10 or project_status = 5) or project_status = 4";
+                            "where client_id = ? and (project_status = 10 or project_status = 5 or project_status = 4)";
                     Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
                     if (cc != null) {
                         if (cc.moveToFirst()) {
@@ -142,13 +145,14 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(avatar_user));
             ava.setImageBitmap(bitmap);
         } catch (IOException e) {
-            ava.setImageResource(R.raw.gm_hd);
+           // ava.setBackgroundResource(R.drawable.it_c);
         }
 
         Button btn_client = (Button) view.findViewById(R.id.btn_client);
         Button btn_zamer = (Button) view.findViewById(R.id.btn_zamer);
         Button btn_install = (Button) view.findViewById(R.id.btn_install);
         Button btn_add_zamer = (Button) view.findViewById(R.id.btn_add_zamer);
+        Button price = (Button) view.findViewById(R.id.price);
 
         String user_name = "";
 
@@ -159,7 +163,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    user_name = c.getString(c.getColumnIndex(c.getColumnName(0)));;
+                    user_name = c.getString(c.getColumnIndex(c.getColumnName(0)));
                 } while (c.moveToNext());
             }
         }
@@ -191,6 +195,10 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                 break;
             case R.id.btn_install:
                 intent = new Intent(getActivity(), Activity_mounting.class);
+                startActivity(intent);
+                break;
+            case R.id.price:
+                intent = new Intent(getActivity(), ActivityPrice.class);
                 startActivity(intent);
                 break;
         }

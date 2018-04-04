@@ -1,41 +1,42 @@
 package ru.ejevikaapp.gm_android;
 
+
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.text.method.BaseKeyListener;
-import android.text.method.KeyListener;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,19 +50,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
+import net.danlew.android.joda.JodaTimeAndroid;
+
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,13 +65,17 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.Attributes;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.Class.phone_edit;
+import ru.ejevikaapp.gm_android.Crew.Activity_calendar;
+import ru.ejevikaapp.gm_android.Crew.Activity_mounting_day;
 
 public class Activity_zamer extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
+    View promptsView;
     TextView DateTime;
     Calendar dateAndTime = new GregorianCalendar();
     Calendar date_cr = new GregorianCalendar();
@@ -87,9 +87,16 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     TextView t_fio, t_phone, text;
 
-    String date_zam, date_created,jsonClient = "", user_id = "",time_h = "", dealer_id = "", id_z;
+    String date_zam, date_created, jsonClient = "", user_id = "",time_h = "", dealer_id = "", id_z;
 
     Integer user_id_int = 0, max_id = 0;
+
+    int day_week, year, day, dday, month, max_day;
+    TextView calendar_month;
+    TableLayout tableLayout;
+    private List<Button> BtnList = new ArrayList<Button>();
+    ImageButton calendar_minus, calendar_plus;
+    ListView list_work;
 
     String[] time_zam = {"- Выберите время замера -", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
             "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"};
@@ -105,7 +112,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
     AutoCompleteTextView addressText;
     List<String> addressList = new ArrayList<String>();
 
-    Map<String, String> parameters = new HashMap<String, String>();
     RequestQueue requestQueue;
 
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -124,8 +130,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     SQLiteDatabase db;
 
-    ListView list_work;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,12 +145,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id = SP.getString("", "");
 
-        list_work = (ListView)findViewById(R.id.list_work);
-
         text = (TextView) findViewById(R.id.text);
-
-        DateTime = (TextView) findViewById(R.id.currentDateTime);
-        setInitialDateTime();
 
         linearLayout = (LinearLayout) findViewById(R.id.linear_spinner);
         lin_calc = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -178,9 +177,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         btn_add_zamer = (Button) findViewById(R.id.btn_add_zamer);
         btn_selection = (Button) findViewById(R.id.btn_selection);
 
-        btn_date.setOnClickListener(this);
-        btn_add_zamer.setOnClickListener(this);
         btn_search.setOnClickListener(this);
+        btn_add_zamer.setOnClickListener(this);
         btn_selection.setOnClickListener(this);
 
         c_search.setVisibility(View.GONE);
@@ -189,6 +187,19 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        Calendar cl = Calendar.getInstance();
+        day_week = cl.get(Calendar.DAY_OF_WEEK);
+        year = cl.get(Calendar.YEAR);
+        day = cl.get(Calendar.DAY_OF_MONTH);
+        month = cl.get(Calendar.MONTH);
+        calendar_minus = (ImageButton)findViewById(R.id.calendar_minus);
+        calendar_minus.setOnClickListener(this);
+        calendar_plus = (ImageButton)findViewById(R.id.calendar_plus);
+        calendar_plus.setOnClickListener(this);
+        calendar_month = (TextView)findViewById(R.id.calendar_month);
+        tableLayout = (TableLayout) findViewById(R.id.tableLayout);
+        cal_preview();
 
         date_created = DateUtils.formatDateTime(this,                  //дата создания
                 dateAndTime.getTimeInMillis(),
@@ -282,202 +293,358 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         date_zamera = df.format(dateAndTime.getTime());
     }
 
-    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            dateAndTime.set(Calendar.YEAR, year);
-            dateAndTime.set(Calendar.MONTH, monthOfYear);
-            dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            setInitialDateTime();
+    void date() {
 
-            DateTime.setVisibility(View.VISIBLE);
+        int count = 0;
 
-            int count = 0;
+        sel_work.clear();
 
-            sel_work.clear();
-
-            String sqlQuewy = "select _id "
-                    + "FROM rgzbn_users ";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        Log.d("mLog", "id = " + id);
-                        sqlQuewy = "select * "
-                                + "FROM rgzbn_user_usergroup_map " +
-                                "where user_id = ? and group_id = 22 ";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
-                        if (cc != null) {
-                            if (cc.moveToFirst()) {
-                                count++;
-                                name_zamer_id.add(id);
-                            }
+        String sqlQuewy = "select _id "
+                + "FROM rgzbn_users ";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    Log.d("mLog", "id = " + id);
+                    sqlQuewy = "select * "
+                            + "FROM rgzbn_user_usergroup_map " +
+                            "where user_id = ? and group_id = 22 ";
+                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
+                    if (cc != null) {
+                        if (cc.moveToFirst()) {
+                            count++;
+                            name_zamer_id.add(id);
                         }
-                        cc.close();
-                    } while (c.moveToNext());
-                }
+                    }
+                    cc.close();
+                } while (c.moveToNext());
             }
-            c.close();
+        }
+        c.close();
 
-            if (count == 0) {
-                count++;
-                name_zamer_id.add(user_id);
-            }
+        if (count == 0) {
+            count++;
+            name_zamer_id.add(user_id);
+        }
 
-            for (int i = 9; i < 21; i++) {
-                for (int j = 0; count > j; j++) {
-                    String date_zamera1 = date_zamera + " " + i + ":00:00";
-                    sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
-                            + "FROM rgzbn_gm_ceiling_projects " +
-                            "where project_calculation_date = '" + date_zamera1 + "' and project_calculator =?";
-                    c = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                                String project_calculation_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                                String project_calculator = c.getString(c.getColumnIndex(c.getColumnName(3)));
+        for (int i = 9; i < 21; i++) {
+            for (int j = 0; count > j; j++) {
+                String date_zamera1 = date_zamera + " " + i + ":00:00";
 
-                                Log.d("mLog", idd + " " + project_calculation_date + " " + project_calculator);
-                                sqlQuewy = "select name, _id "
-                                        + "FROM rgzbn_users " +
-                                        "where _id = ?";
-                                Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_calculator});
-                                if (cc != null) {
-                                    if (cc.moveToFirst()) {
-                                        do {
-                                            String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                            String id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where project_calculation_date = '" + date_zamera1 + "' and project_calculator = ?";
+                c = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                            String project_calculation_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                            String project_calculator = c.getString(c.getColumnIndex(c.getColumnName(3)));
 
-                                            sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
-                                                    project_info, name, null));
-
-                                        } while (cc.moveToNext());
-                                    }
-                                }
-                                cc.close();
-
-                            } while (c.moveToNext());
-                        } else {
-
-                            String name = "";
-                            String id = "";
+                            Log.d("mLog", idd + " " + project_calculation_date + " " + project_calculator);
                             sqlQuewy = "select name, _id "
                                     + "FROM rgzbn_users " +
                                     "where _id = ?";
-                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_calculator});
                             if (cc != null) {
                                 if (cc.moveToFirst()) {
                                     do {
-                                        name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                        id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                                        String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                        String id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                        sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
+                                                project_info, name, null));
 
                                     } while (cc.moveToNext());
                                 }
                             }
                             cc.close();
 
-                            sel_work.add(new Select_work(id, i + ":00 - " + (i + 1) + ":00",
-                                    "", name, null));
+                        } while (c.moveToNext());
+                    } else {
+
+                        String name = "";
+                        String id = "";
+                        sqlQuewy = "select name, _id "
+                                + "FROM rgzbn_users " +
+                                "where _id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                        sel_work.add(new Select_work(id, i + ":00 - " + (i + 1) + ":00",
+                                "", name, null));
+                    }
+                }
+                c.close();
+            }
+        }
+    }
+
+    void cal_preview() {
+
+        dday = 0;
+        max_day = 0;
+        String month_str = "";
+
+        if (month == 0) {
+            max_day = 31;
+            calendar_month.setText("Январь");
+        } else if (month == 1) {
+            if ((year % 4) == 0) {
+                max_day = 29;
+            } else {
+                max_day = 28;
+            }
+            calendar_month.setText("Февраль");
+        } else if (month == 2) {
+            max_day = 31;
+            calendar_month.setText("Март");
+        } else if (month == 3) {
+            max_day = 30;
+            calendar_month.setText("Апрель");
+        } else if (month == 4) {
+            max_day = 31;
+            calendar_month.setText("Май");
+        } else if (month == 5) {
+            max_day = 30;
+            calendar_month.setText("Июнь");
+        } else if (month == 6) {
+            max_day = 31;
+            calendar_month.setText("Июль");
+        } else if (month == 7) {
+            max_day = 31;
+            calendar_month.setText("Август");
+        } else if (month == 8) {
+            max_day = 30;
+            calendar_month.setText("Сентябрь");
+        } else if (month == 9) {
+            max_day = 31;
+            calendar_month.setText("Октябрь");
+        } else if (month == 10) {
+            max_day = 30;
+            calendar_month.setText("Ноябрь");
+        } else if (month == 11) {
+            max_day = 31;
+            calendar_month.setText("Декабрь");
+        }
+
+        calendar_month.setText(calendar_month.getText().toString() + " " + year);
+
+        JodaTimeAndroid.init(this);
+        org.joda.time.DateTime dt = new DateTime(year, month + 1, 1, 0, 0, 0, 0);
+        String first_day = dt.toString("E");
+
+        int first_day_int = 0;
+        if (first_day.equals("пн")) {
+            first_day_int = 0;
+        } else if (first_day.equals("вт")) {
+            first_day_int = 1;
+        } else if (first_day.equals("ср")) {
+            first_day_int = 2;
+        } else if (first_day.equals("чт")) {
+            first_day_int = 3;
+        } else if (first_day.equals("пт")) {
+            first_day_int = 4;
+        } else if (first_day.equals("сб")) {
+            first_day_int = 5;
+        } else if (first_day.equals("вс")) {
+            first_day_int = 6;
+        }
+
+        int ROWS = 6;
+        int COLUMNS = 7;
+        boolean flag = false;
+        dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        for (int i = 0; i < ROWS; i++) {
+
+            int count = 0;
+            TableRow tableRow = new TableRow(this);
+
+            TableRow.LayoutParams tableParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT, 4f);
+
+            for (int j = 0; j < COLUMNS; j++) {
+                if ((j == first_day_int || flag) && dday < max_day) {
+
+                    Button btn = new Button(this);
+                    dday++;
+                    String mount_day;
+
+                    if (dday < 10 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-0" + dday;
+                    } else if (dday < 10 && month > 9) {
+                        mount_day = year + "-" + (month + 1) + "-0" + dday;
+                    } else if (dday > 9 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-" + dday;
+                    } else {
+                        mount_day = year + "-" + (month + 1) + "-" + dday;
+                    }
+
+                    ArrayList<String> client = new ArrayList<>();
+
+                    String sqlQuewy = "SELECT _id "
+                            + "FROM rgzbn_gm_ceiling_clients " +
+                            "where dealer_id = ?";
+                    Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                            } while (c.moveToNext());
                         }
                     }
                     c.close();
+
+                    for (int g = 0; client.size() > g; g ++) {
+                        sqlQuewy = "select * "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where project_calculation_date > ? and project_calculation_date < ? and project_calculator <> ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", ""});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                                    btn.setTextColor(Color.BLACK);
+                                } while (cc.moveToNext());
+                            } else {
+                                btn.setBackgroundResource(R.drawable.calendar_btn);
+                                btn.setTextColor(R.style.text_style_spisok);
+                            }
+                        }
+                        cc.close();
+                    }
+
+                    count++;
+                    flag = true;
+                    BtnList.add(btn);
+                    btn.setId(dday - 1);
+                    btn.setText(String.valueOf(dday));
+                    btn.setLayoutParams(tableParams);
+                    btn.setOnClickListener(getPhone);
+                    tableRow.addView(btn, j);
+                } else {
+                    Button btn = new Button(this);
+                    btn.setText("");
+                    btn.setBackgroundResource(R.drawable.calendar_other_month);
+                    btn.setLayoutParams(tableParams);
+                    tableRow.addView(btn, j);
                 }
             }
+            tableLayout.addView(tableRow, i);
+        }
+    }
 
-            alert();
+    public static final Pattern VALID_PHONE_NUMBER_REGEX =
+            Pattern.compile("^[7]{1}[0-9]{10}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validatePhone(String phoneStr) {
+        Matcher matcher = VALID_PHONE_NUMBER_REGEX .matcher(phoneStr);
+        return matcher.find();
+    }
+
+    View.OnClickListener getPhone = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int editId = v.getId();
+            final Button btnn = BtnList.get(editId);
+            int day = Integer.parseInt(btnn.getText().toString());
+            String mount_day;
+
+            if (day < 10 && month < 10) {
+                mount_day = year + "-0" + (month + 1) + "-0" + day;
+            } else if (day < 10 && month > 9) {
+                mount_day = year + "-" + (month + 1) + "-0" + day;
+            } else if (day > 9 && month < 10) {
+                mount_day = year + "-0" + (month + 1) + "-" + day;
+            } else {
+                mount_day = year + "-" + (month + 1) + "-" + day;
+            }
+
+            LayoutInflater li = LayoutInflater.from(Activity_zamer.this);
+            promptsView = li.inflate(R.layout.dialog_list, null);
+            final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(Activity_zamer.this);
+            mDialogBuilder.setView(promptsView)
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+            list_work = (ListView) promptsView.findViewById(R.id.list_work);
+            setListViewHeightBasedOnChildren(list_work);
+            TextView day_zamer = (TextView) promptsView.findViewById(R.id.day_zamer);
+            day_zamer.setText(mount_day);
+            date_zamera = mount_day;
+
+            date();
+
+            final AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.show();
+
+            BindDictionary<Select_work> dict = new BindDictionary<>();
+            dict.addStringField(R.id.c_time, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getTime();
+                }
+            });
+            dict.addStringField(R.id.c_address, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getAddres();
+                }
+            });
+            dict.addStringField(R.id.c_name, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getName();
+                }
+            });
+
+            final FunDapter adapter = new FunDapter(Activity_zamer.this, sel_work, R.layout.select_work_l, dict);
+            list_work.setAdapter(adapter);
+
+            list_work.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                    Select_work selectedid = sel_work.get(position);
+                    id_z = selectedid.getId();
+                    if (selectedid.getAddres().equals("")) {
+                        String time = selectedid.getTime();
+                        view.setBackgroundColor(Color.LTGRAY);
+                        time_h = time.substring(0, time.length() - 8);
+
+                        Toast toast = Toast.makeText(Activity_zamer.this,
+                                "Замер выбран на " + time, Toast.LENGTH_SHORT);
+                        toast.show();
+
+                        btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        alertDialog.dismiss();
+                    } else {
+                        Toast toast = Toast.makeText(Activity_zamer.this,
+                                "Этот замерщик занят, выберите другого замерщика или другое время", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                }
+            });
+
         }
     };
-
-    void alert() {
-
-        TableLayout table_l = (TableLayout) findViewById(R.id.table_l);
-        table_l.setVisibility(View.VISIBLE);
-        text.setVisibility(View.VISIBLE);
-
-        BindDictionary<Select_work> dict = new BindDictionary<>();
-        dict.addStringField(R.id.c_time, new StringExtractor<Select_work>() {
-            @Override
-            public String getStringValue(Select_work nc, int position) {
-                return nc.getTime();
-            }
-        });
-        dict.addStringField(R.id.c_address, new StringExtractor<Select_work>() {
-            @Override
-            public String getStringValue(Select_work nc, int position) {
-                return nc.getAddres();
-            }
-        });
-        dict.addStringField(R.id.c_name, new StringExtractor<Select_work>() {
-            @Override
-            public String getStringValue(Select_work nc, int position) {
-                return nc.getName();
-            }
-        });
-
-        final FunDapter adapter = new FunDapter(this, sel_work, R.layout.select_work_l, dict);
-        list_work.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(list_work);
-
-        final View[] v = new View[1];
-        list_work.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-
-                try {
-                    v[0].setBackgroundColor(Color.WHITE);
-                }catch (Exception e){
-                }
-
-                Select_work selectedid = sel_work.get(position);
-                id_z = selectedid.getId();
-                if (selectedid.getAddres().equals("")){
-                    String time = selectedid.getTime();
-                    view.setBackgroundColor(Color.LTGRAY);
-                    time_h = time.substring(0,time.length()-8);
-
-                    v[0] = view;
-                    Toast toast = Toast.makeText(Activity_zamer.this,
-                            "Замер выбран на " + time, Toast.LENGTH_SHORT);
-                    toast.show();
-                } else {
-                    Toast toast = Toast.makeText(Activity_zamer.this,
-                            "Этот замерщик занят, выберите другого замерщика или другое время", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        });
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-        String dealer_calc = SP.getString("", "");
-        if (dealer_calc.equals("true")){
-            int max_id_proj = Integer.parseInt(getIntent().getStringExtra("project"));
-
-            String sqlQuewy = "SELECT _id "
-                    + "FROM rgzbn_gm_ceiling_projects " +
-                    "WHERE _id = ? ";
-            Cursor cc = db.rawQuery(sqlQuewy, new String[]{String.valueOf(max_id_proj)});
-            if (cc != null) {
-                if (cc.moveToFirst()) {
-                    do {
-                        // если создался проект
-                    } while (cc.moveToNext());
-                } else {
-                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?",
-                            new String[]{String.valueOf(max_id_proj)});
-                }
-            }
-            cc.close();
-
-        }
-
-    }
 
     public void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
@@ -626,16 +793,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
                 break;
 
-            case R.id.dateButton:
-
-                new DatePickerDialog(this, d,
-                        dateAndTime.get(Calendar.YEAR),
-                        dateAndTime.get(Calendar.MONTH),
-                        dateAndTime.get(Calendar.DAY_OF_MONTH))
-                        .show();
-
-                break;
-
             case R.id.btn_add_zamer:
 
                 db = dbHelper.getWritableDatabase();
@@ -677,207 +834,213 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 }
 
                 if (!bool) {
-                    if (fio.length() > 0 && phone.length() > 0 && address.length() > 0 && house.length()>0 && time_h.length()>0) {
-                        ContentValues values = new ContentValues();
-                        try {
-                            String sqlQuewy = "";
-                            Cursor c;
-                            max_id = 0;
+                    if(validatePhone(phone)) {
+                        if (fio.length() > 0 && address.length() > 0 && house.length() > 0 && time_h.length() > 0) {
+                            ContentValues values = new ContentValues();
                             try {
-                                sqlQuewy = "select MAX(_id) "
-                                        + "FROM rgzbn_gm_ceiling_clients " +
-                                        "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                            max_id++;
-                                        } while (c.moveToNext());
+                                String sqlQuewy = "";
+                                Cursor c;
+                                max_id = 0;
+                                try {
+                                    sqlQuewy = "select MAX(_id) "
+                                            + "FROM rgzbn_gm_ceiling_clients " +
+                                            "where _id>? and _id<?";
+                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                                    if (c != null) {
+                                        if (c.moveToFirst()) {
+                                            do {
+                                                max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                                max_id++;
+                                            } while (c.moveToNext());
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    max_id = user_id_int * 1000000 + 1;
                                 }
-                            } catch (Exception e) {
-                                max_id = user_id_int * 1000000 + 1;
-                            }
 
-                            values.put(DBHelper.KEY_ID, max_id);
-                            values.put(DBHelper.KEY_CLIENT_NAME, fio);
-                            values.put(DBHelper.KEY_CLIENT_DATA_ID, "");
-                            values.put(DBHelper.KEY_TYPE_ID, "1");
-                            values.put(DBHelper.KEY_DEALER_ID, dealer_id);
-                            values.put(DBHelper.KEY_MANAGER_ID, "");
-                            values.put(DBHelper.KEY_CREATED, date);
-                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
-
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_ID_OLD, max_id);
-                            values.put(DBHelper.KEY_ID_NEW, 0);
-                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                            values.put(DBHelper.KEY_SYNC, "0");
-                            values.put(DBHelper.KEY_TYPE, "send");
-                            values.put(DBHelper.KEY_STATUS, "1");
-                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, null, null,
-                                    null, null, null);
-                            cursor.moveToLast();
-                            int kdIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
-                            id_cl = cursor.getInt(kdIndex);
-                            cursor.close();
-
-                            values = new ContentValues();
-                            int max_id_contac = 0;
-                            try {
-                                sqlQuewy = "select MAX(_id) "
-                                        + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                        "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                            max_id_contac++;
-                                        } while (c.moveToNext());
-                                    }
-                                }
-                            } catch (Exception e) {
-                                max_id_contac = user_id_int * 1000000 + 1;
-                            }
-
-                            values.put(DBHelper.KEY_ID, max_id_contac);
-                            values.put(DBHelper.KEY_CLIENT_ID, max_id);
-                            try {
-                                phone_edit pe = new phone_edit();
-                                values.put(DBHelper.KEY_PHONE, pe.edit(phone));
-                            } catch (Exception e) {
-                            }
-                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
-
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_ID_OLD, max_id_contac);
-                            values.put(DBHelper.KEY_ID_NEW, 0);
-                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
-                            values.put(DBHelper.KEY_SYNC, "0");
-                            values.put(DBHelper.KEY_TYPE, "send");
-                            values.put(DBHelper.KEY_STATUS, "1");
-                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                            String dealer_canvases_margin = "";
-                            String dealer_components_margin = "";
-                            String dealer_mounting_margin = "";
-                            String gm_canvases_margin = "";
-                            String gm_components_margin = "";
-                            String gm_mounting_margin = "";
-
-                            sqlQuewy = "select dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, gm_canvases_margin, " +
-                                    "gm_components_margin, gm_mounting_margin "
-                                    + "FROM rgzbn_gm_ceiling_dealer_info " +
-                                    "where dealer_id = ?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        dealer_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                        dealer_components_margin = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                                        dealer_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                                        gm_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                                        gm_components_margin = c.getString(c.getColumnIndex(c.getColumnName(4)));
-                                        gm_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(5)));
-                                    } while (c.moveToNext());
-                                }
-                            }
-
-
-                            int max_id_proj = 0;
-                            SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                            String dealer_calc = SP.getString("", "");
-                            if (dealer_calc.equals("true")){
-
-                                max_id_proj = Integer.parseInt(getIntent().getStringExtra("project"));
-                                int id_calculation = Integer.parseInt(getIntent().getStringExtra("calculation"));
+                                values.put(DBHelper.KEY_ID, max_id);
+                                values.put(DBHelper.KEY_CLIENT_NAME, fio);
+                                values.put(DBHelper.KEY_CLIENT_DATA_ID, "");
+                                values.put(DBHelper.KEY_TYPE_ID, "1");
+                                values.put(DBHelper.KEY_DEALER_ID, dealer_id);
+                                values.put(DBHelper.KEY_MANAGER_ID, "");
+                                values.put(DBHelper.KEY_CREATED, date);
+                                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
                                 values = new ContentValues();
-                                values.put(DBHelper.KEY_ID_OLD, id_calculation);
+                                values.put(DBHelper.KEY_ID_OLD, max_id);
                                 values.put(DBHelper.KEY_ID_NEW, 0);
-                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
                                 values.put(DBHelper.KEY_SYNC, "0");
                                 values.put(DBHelper.KEY_TYPE, "send");
                                 values.put(DBHelper.KEY_STATUS, "1");
                                 db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                            } else {
+                                Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, null, null,
+                                        null, null, null);
+                                cursor.moveToLast();
+                                int kdIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
+                                id_cl = cursor.getInt(kdIndex);
+                                cursor.close();
+
+                                values = new ContentValues();
+                                int max_id_contac = 0;
                                 try {
                                     sqlQuewy = "select MAX(_id) "
-                                            + "FROM rgzbn_gm_ceiling_projects " +
+                                            + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                             "where _id>? and _id<?";
-                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
+                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
                                     if (c != null) {
                                         if (c.moveToFirst()) {
                                             do {
-                                                max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                                max_id_proj++;
+                                                max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                                max_id_contac++;
                                             } while (c.moveToNext());
                                         }
                                     }
                                 } catch (Exception e) {
-                                    max_id_proj = user_id_int * 1000000 + 1;
+                                    max_id_contac = user_id_int * 1000000 + 1;
                                 }
+
+                                values.put(DBHelper.KEY_ID, max_id_contac);
+                                values.put(DBHelper.KEY_CLIENT_ID, max_id);
+                                try {
+                                    phone_edit pe = new phone_edit();
+                                    values.put(DBHelper.KEY_PHONE, pe.edit(phone));
+                                } catch (Exception e) {
+                                }
+                                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, max_id_contac);
+                                values.put(DBHelper.KEY_ID_NEW, 0);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "send");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                String dealer_canvases_margin = "";
+                                String dealer_components_margin = "";
+                                String dealer_mounting_margin = "";
+                                String gm_canvases_margin = "";
+                                String gm_components_margin = "";
+                                String gm_mounting_margin = "";
+
+                                sqlQuewy = "select dealer_canvases_margin, dealer_components_margin, dealer_mounting_margin, gm_canvases_margin, " +
+                                        "gm_components_margin, gm_mounting_margin "
+                                        + "FROM rgzbn_gm_ceiling_dealer_info " +
+                                        "where dealer_id = ?";
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id)});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            dealer_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                            dealer_components_margin = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                            dealer_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                            gm_canvases_margin = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                                            gm_components_margin = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                                            gm_mounting_margin = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                                        } while (c.moveToNext());
+                                    }
+                                }
+
+
+                                int max_id_proj = 0;
+                                SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
+                                String dealer_calc = SP.getString("", "");
+                                if (dealer_calc.equals("true")) {
+
+                                    max_id_proj = Integer.parseInt(getIntent().getStringExtra("project"));
+                                    int id_calculation = Integer.parseInt(getIntent().getStringExtra("calculation"));
+
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_ID_OLD, id_calculation);
+                                    values.put(DBHelper.KEY_ID_NEW, 0);
+                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
+                                    values.put(DBHelper.KEY_SYNC, "0");
+                                    values.put(DBHelper.KEY_TYPE, "send");
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                } else {
+                                    try {
+                                        sqlQuewy = "select MAX(_id) "
+                                                + "FROM rgzbn_gm_ceiling_projects " +
+                                                "where _id>? and _id<?";
+                                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
+                                        if (c != null) {
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                                    max_id_proj++;
+                                                } while (c.moveToNext());
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        max_id_proj = user_id_int * 1000000 + 1;
+                                    }
+                                }
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, max_id_proj);
+                                values.put(DBHelper.KEY_STATE, "1");
+                                values.put(DBHelper.KEY_CLIENT_ID, id_cl);
+                                values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
+                                values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
+                                values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, "0000-00-00 00:00:00");
+                                values.put(DBHelper.KEY_PROJECT_MOUNTING_START, "0000-00-00 00:00:00");
+                                values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
+                                values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
+                                values.put(DBHelper.KEY_CREATED, date);
+                                values.put(DBHelper.KEY_CREATED_BY, user_id_int);
+                                values.put(DBHelper.KEY_MODIFIED_BY, user_id_int);
+                                values.put(DBHelper.KEY_PROJECT_STATUS, "1");
+                                values.put(DBHelper.KEY_WHO_CALCULATE, "1");
+                                values.put(DBHelper.KEY_GM_CANVASES_MARGIN, gm_canvases_margin);
+                                values.put(DBHelper.KEY_GM_COMPONENTS_MARGIN, gm_components_margin);
+                                values.put(DBHelper.KEY_GM_MOUNTING_MARGIN, gm_mounting_margin);
+                                values.put(DBHelper.KEY_DEALER_CANVASES_MARGIN, dealer_canvases_margin);
+                                values.put(DBHelper.KEY_DEALER_COMPONENTS_MARGIN, dealer_components_margin);
+                                values.put(DBHelper.KEY_DEALER_MOUNTING_MARGIN, dealer_mounting_margin);
+                                values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(c_note.getText()));
+                                values.put(DBHelper.KEY_TRANSPORT, "1");
+                                values.put(DBHelper.KEY_DISTANCE, "0");
+                                values.put(DBHelper.KEY_DISTANCE_COL, "1");
+                                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, max_id_proj);
+                                values.put(DBHelper.KEY_ID_NEW, 0);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "send");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                Toast toast = Toast.makeText(this,
+                                        "Замер добавлен", Toast.LENGTH_SHORT);
+                                toast.show();
+
+                                startService(new Intent(this, Service_Sync.class));
+
+                                finish();
+
+                            } catch (NullPointerException e) {
+                                Toast toast = Toast.makeText(this,
+                                        "Произошла какая-та ошибка....", Toast.LENGTH_SHORT);
+                                toast.show();
                             }
 
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_ID, max_id_proj);
-                            values.put(DBHelper.KEY_STATE, "1");
-                            values.put(DBHelper.KEY_CLIENT_ID, id_cl);
-                            values.put(DBHelper.KEY_PROJECT_INFO, full_address);
-                            values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
-                            values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
-                            values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, "0000-00-00 00:00:00");
-                            values.put(DBHelper.KEY_PROJECT_MOUNTING_START, "0000-00-00 00:00:00");
-                            values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
-                            values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
-                            values.put(DBHelper.KEY_CREATED, date);
-                            values.put(DBHelper.KEY_CREATED_BY, user_id_int);
-                            values.put(DBHelper.KEY_MODIFIED_BY, user_id_int);
-                            values.put(DBHelper.KEY_PROJECT_STATUS, "1");
-                            values.put(DBHelper.KEY_WHO_CALCULATE, "1");
-                            values.put(DBHelper.KEY_GM_CANVASES_MARGIN, gm_canvases_margin);
-                            values.put(DBHelper.KEY_GM_COMPONENTS_MARGIN, gm_components_margin);
-                            values.put(DBHelper.KEY_GM_MOUNTING_MARGIN, gm_mounting_margin);
-                            values.put(DBHelper.KEY_DEALER_CANVASES_MARGIN, dealer_canvases_margin);
-                            values.put(DBHelper.KEY_DEALER_COMPONENTS_MARGIN, dealer_components_margin);
-                            values.put(DBHelper.KEY_DEALER_MOUNTING_MARGIN, dealer_mounting_margin);
-                            values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(c_note.getText()));
-                            values.put(DBHelper.KEY_TRANSPORT, "1");
-                            values.put(DBHelper.KEY_DISTANCE, "0");
-                            values.put(DBHelper.KEY_DISTANCE_COL, "1");
-                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
-
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_ID_OLD, max_id_proj);
-                            values.put(DBHelper.KEY_ID_NEW, 0);
-                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                            values.put(DBHelper.KEY_SYNC, "0");
-                            values.put(DBHelper.KEY_TYPE, "send");
-                            values.put(DBHelper.KEY_STATUS, "1");
-                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
+                        } else {
                             Toast toast = Toast.makeText(this,
-                                    "Замер добавлен", Toast.LENGTH_SHORT);
-                            toast.show();
-
-                            startService(new Intent(this, Service_Sync.class));
-
-                            finish();
-
-                        } catch (NullPointerException e) {
-                            Toast toast = Toast.makeText(this,
-                                    "Произошла какая-та ошибка....", Toast.LENGTH_SHORT);
+                                    "У Вас что-то незаполнено ", Toast.LENGTH_SHORT);
                             toast.show();
                         }
-
                     } else {
                         Toast toast = Toast.makeText(this,
-                                "У Вас что-то незаполнено ", Toast.LENGTH_SHORT);
+                                "Проверьте ваш номер ", Toast.LENGTH_SHORT);
                         toast.show();
                     }
                 } else {
@@ -1010,6 +1173,28 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                     }
 
                 }
+                break;
+
+            case R.id.calendar_minus:
+                month--;
+                if (month<0) {
+                    month = 11;
+                    year--;
+                }
+                tableLayout.removeAllViews();
+                cal_preview();
+
+                break;
+
+            case R.id.calendar_plus:
+                month++;
+                if (month==12){
+                    month = 0;
+                    year ++;
+                }
+                tableLayout.removeAllViews();
+                cal_preview();
+
                 break;
         }
     }

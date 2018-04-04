@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"> Гильдия мастеров </string>
+    <string name="app_name"> IT-Ceiling </string>
     <string name="title_activity_calcul">Размеры помещения</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

@@ -52,8 +52,8 @@ public class Activity_inform_proj extends AppCompatActivity {
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setupViewPager(mViewPager);
-        tabLayout.setupWithViewPager(mViewPager);
+        //setupViewPager(mViewPager);
+        //tabLayout.setupWithViewPager(mViewPager);
 
     }
 
@@ -84,24 +84,19 @@ public class Activity_inform_proj extends AppCompatActivity {
 
         for (int j = 1; j < i + 1 ; j++) {
 
-            Log.d("responce", j + " " +  String.valueOf(id_calc.get(j)));
             adapter.addFragment(new Fragment_inform_proj(), String.valueOf(title_calc.get(j)));
 
             SharedPreferences SP = getSharedPreferences("id_calc", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
             ed.putString(SAVED_ID, String.valueOf(id_calc.get(j)));
             ed.commit();
-
         }
-
-        viewPager.setAdapter(adapter);
+            viewPager.setAdapter(adapter);
     }
 
     void count(){
         SharedPreferences SPI = getSharedPreferences("id_project_spisok", MODE_PRIVATE);
         id_cl = SPI.getString(SAVED_ID,"");
-
-        Log.d("responce", id_cl);
 
         i=0;
 
