@@ -6012,12 +6012,30 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     if (c.moveToFirst()) {
                         do {
                             for (String cn : c.getColumnNames()) {
-                                item_content2 = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                                item_content3 = c.getString(c.getColumnIndex(c.getColumnName(4)));
-                                item_content2 += " " + item_content3;
+                                int id = c.getInt(c.getColumnIndex(c.getColumnName(3)));
+                                Log.d("mLog", String.valueOf(id));
+                                //item_content3 = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                                //item_content2 += " " + item_content3;
+
+                                sqlQuewy = "select name, country "
+                                        + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                                        "where _id = ?";
+                                Cursor k = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+                                if (k != null) {
+                                    if (k.moveToFirst()) {
+                                        do {
+                                            Log.d("mLog", String.valueOf(item_content2));
+                                            item_content2 = c.getString(c.getColumnIndex(c.getColumnName(1))) + " "
+                                                    + c.getInt(c.getColumnIndex(c.getColumnName(2)));
+
+                                        } while (k.moveToNext());
+                                    }
+                                }
+                                k.close();
+                                s_t.add(item_content2);
                             }
 
-                            s_t.add(item_content2);
+                            //s_t.add(item_content2);
                         } while (c.moveToNext());
                     }
                 }
@@ -6077,12 +6095,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String str = "[";
 
                         if (c.moveToFirst()) {
-                            int nameIndex = c.getColumnIndex(DBHelper.KEY_NAME);
-                            int countryIndex = c.getColumnIndex(DBHelper.KEY_COUNTRY);
+                            int countryIndex = c.getColumnIndex(DBHelper.KEY_MANUFACTURER_ID);
                             int priceIndex = c.getColumnIndex(DBHelper.KEY_PRICE);
                             int widthIndex = c.getColumnIndex(DBHelper.KEY_WIDTH);
                             do {
-                                String nc = c.getString(nameIndex) + " " + c.getString(countryIndex);
+                                String nc = c.getString(countryIndex);
 
                                 if (nc.equals(canvases)) {
 

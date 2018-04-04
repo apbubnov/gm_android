@@ -117,7 +117,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_TITLE = "title";
 
     public static final String TABLE_RGZBN_GM_CEILING_COLORS = "rgzbn_gm_ceiling_colors";
-    public static final String KEY_FILE = "file";
     public static final String KEY_HEX = "hex";
 
     public static final String TABLE_RGZBN_GM_CEILING_COMPONENTS = "rgzbn_gm_ceiling_components";
@@ -427,7 +426,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "texture_id INTEGER, color_id INTEGER, manufacturer_id INTEGER, width TEXT, price TEXT, count INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_manufacturers (_id INTEGER, " +
-                "name TEXT, countyr TEXT)");
+                "name TEXT, country TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_all (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_canvas INTEGER, length TEXT, purchasing_price TEXT, date TEXT, user_accepted_id INTEGER)");
@@ -603,7 +602,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     "texture_id INTEGER, color_id INTEGER, manufacturer_id INTEGER, width TEXT, price TEXT, count INTEGER)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_manufacturers (_id INTEGER, " +
-                    "name TEXT, countyr TEXT)");
+                    "name TEXT, country TEXT)");
 
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
