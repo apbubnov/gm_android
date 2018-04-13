@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -413,9 +414,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         if (transport.equals("0")) {
             sum_transport = 0;
-            Log.d("mLog", transport);
         } else if (transport.equals("1")) {
-            Log.d("mLog", transport);
             int trans = 0;
             int dist_col = 0;
             int dmm = 0;
@@ -537,6 +536,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         count_calc = 0;
+        mainC.removeAllViews();
         id_calcul.clear();
 
         String sqlQuewy = "SELECT n4, n5, calculation_title, _id "
@@ -762,9 +762,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-
-                    Log.d("mLog", String.valueOf(totall));
-
                     int can = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
                     int mar = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
                     int moun = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(2))));
@@ -778,7 +775,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         TextView tx1 = new TextView(getActivity());
 
-
         try {
             if (Integer.valueOf(dis) == null) {
                 dis = "0";
@@ -789,16 +785,27 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         if (Integer.valueOf(dis) > 0) {
 
-            String tot1 = "Итого/ \n" + dis + "%";
-            String tot2 = Math.round(totall) * 100.0 / 100 + "/ \n" + String.valueOf((Math.round(totall - (totall / 100 * Integer.valueOf(dis))) * 100.0) / 100);
-            tx1.setText(tot1 + "     \n" + tot2);
-        } else {
-            tx1.setText("Итого     " + Math.round(totall) * 100.0 / 100);
-        }
+            String tot1 = "Итого/ " + dis + "%";
+            String tot2 = Math.round(totall) * 100.0 / 100 + "/ " + String.valueOf((Math.round(totall - (totall / 100 * Integer.valueOf(dis))) * 100.0) / 100);
+            //tx1.setText(tot1 + "     \n" + tot2);
+            tx1.setText(tot1);
 
-        tx1.setLayoutParams(lin_calc);
-        tx1.setTextColor(Color.parseColor("#414099"));
-        mainC.addView(tx1);
+            tx1.setLayoutParams(lin_calc);
+            tx1.setTextColor(Color.parseColor("#414099"));
+            mainC.addView(tx1);
+
+            TextView tx2 = new TextView(getActivity());
+            tx2.setText(tot2);
+            tx2.setLayoutParams(lin_calc);
+            tx2.setTextColor(Color.parseColor("#414099"));
+            mainC.addView(tx2);
+        } else {
+            tx1.setText("Итого = " + Math.round(totall) * 100.0 / 100);
+
+            tx1.setLayoutParams(lin_calc);
+            tx1.setTextColor(Color.parseColor("#414099"));
+            mainC.addView(tx1);
+        }
 
     }
 

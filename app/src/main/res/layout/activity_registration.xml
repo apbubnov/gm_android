@@ -26,7 +26,7 @@
         android:maxLength="11"
         android:inputType="phone"
         android:textColor="#43358c"
-        android:hint="7хххххххххх"
+        android:maxLines="1"
         android:textColorHint="#414099" />
 
     <TextView
@@ -43,6 +43,7 @@
         android:layout_gravity="center"
         android:inputType="textWebEmailAddress"
         android:textColor="#43358c"
+        android:maxLines="1"
         android:textColorHint="#43358c" />
 
     <TextView
@@ -58,6 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="#43358c"
+        android:maxLines="2"
         android:textColorHint="#43358c" />
 
     <TextView
@@ -73,6 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="#43358c"
+        android:maxLines="2"
         android:textColorHint="#43358c" />
 
     <Button

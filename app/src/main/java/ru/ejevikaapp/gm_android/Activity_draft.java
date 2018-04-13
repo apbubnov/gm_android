@@ -1,7 +1,9 @@
 package ru.ejevikaapp.gm_android;
 
+import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -157,6 +159,13 @@ public class Activity_draft extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mWebView.destroy();
+    }
+
     private static class MyJavaInterface {
         @android.webkit.JavascriptInterface
         public String getGreeting() {
@@ -201,8 +210,8 @@ public class Activity_draft extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draft);
 
-        sPref = PreferenceManager.getDefaultSharedPreferences(this);
-        canvases = sPref.getString(SAVED_TEXT, null);
+        sPref = this.getSharedPreferences("canvases", MODE_PRIVATE);
+        canvases = sPref.getString("", "");
 
         sPref = this.getSharedPreferences("textures_draft", MODE_PRIVATE);
         textures = sPref.getString("", "");
@@ -221,15 +230,19 @@ public class Activity_draft extends AppCompatActivity {
 
         Log.d("mLog", "________________" );
         Log.d("mLog", "canvases " + canvases );
-        Log.d("mLog", "text " + textures);
-        Log.d("mLog", "diags " + diags_points);
-        Log.d("mLog", "wall  " + walls_points );
-        Log.d("mLog", "pt " + pt_points);
+        Log.d("mLog", "textures " + textures);
+        Log.d("mLog", "diags_points " + diags_points);
+        Log.d("mLog", "walls_points  " + walls_points );
+        Log.d("mLog", "pt_points " + pt_points);
         Log.d("mLog", "auto " + auto);
         Log.d("mLog", "________________" );
 
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.getSettings().setJavaScriptEnabled(true);
+
+        if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+            mWebView.setWebContentsDebuggingEnabled(true);
+        }
 
         mWebView.loadUrl("file:///android_asset/index.html");
         mWebView.setWebChromeClient(new WebChromeClient());

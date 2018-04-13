@@ -1,180 +1,307 @@
-body
-{
-	font-family: Arial, sans-serif;
-	background-color:#414390; 
-	background-image: -moz-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
-	background-image: -webkit-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
-	background-image: -o-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
-	background-image: -ms-linear-gradient(bottom, #414390 0% ,#d3d3f9 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d3d3f9', endColorstr='#d3d3f9',GradientType=0 );
-	background-image: linear-gradient(bottom, #414390 0% ,#d3d3f9 100%);
+body {
+	font-family: "Cuprum", Arial, sans-serif;
+	background-color:#ffffff; 
 }
-#window
-{
+
+.btn-gm {
+	background-color: #414390;
+	color: #ffffff;
+}
+
+.sketch_hud {
+	height: 38px;
+}
+
+.tar {
+	display: inline-block;
 	width: 100%;
-	max-width: 500px;
-	height: 100px;
-	margin: 6px auto;
-	display: none;
-	background: #d3d3f9;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: 10px 10px 10px 10px;
-	border: 1px solid;
-	-webkit-border-radius:2px;
-	-moz-border-radius:2px; 
-	border-radius: 2px;
-	font-size: 16pt;
+	position: relative;
 }
-#newLength
-{
-	width: 60px;
-	font-size: 14pt;
+
+/*канва*/
+.div_canvas {
+	display: inline-block;
+	width: 100%;
 }
-.ok_back
-{
-	text-decoration:none; 
-	text-align:center; 
-	max-width: 60px;
-	width: 9%;
-	height: 32px;
-	border:solid 1px #004F72;
-	-webkit-border-radius:2px;
-	-moz-border-radius:2px; 
-	border-radius: 2px; 
-	font:16px Arial, Helvetica, sans-serif;
-	font-weight:bold; 
-	color:#ffffff;
-	text-shadow: #000000 1px 1px 0, #000000 -1px -1px 0, 
-                 #000000 -1px 1px 0, #000000 1px -1px 0;
-	background-color:#414390; 
-	background-image: -moz-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -webkit-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -o-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -ms-linear-gradient(top, #414390 0% ,#a3a3f9 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3f9', endColorstr='#a3a3f9',GradientType=0 );
-	background-image: linear-gradient(top, #414390 0% ,#a3a3f9 100%);
-	-webkit-box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff;
-	-moz-box-shadow: 0px 0px 2px #bababa,  inset 0px 0px 1px #ffffff;
-	box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff;
-	cursor: pointer;
+
+canvas {
+	margin: 10px 0px;
+	background: #e2e2e2;
+	border-top: 2px solid #414099;
+	border-bottom: 2px solid #414099;
 }
-.but_num
-{
-	margin-top: 6px;
-	text-decoration:none; 
-	text-align:center; 
-	padding:8px 4px;
-	width: 8%;
-	border:solid 1px #004F72; 
-	-webkit-border-radius:2px;
-	-moz-border-radius:2px; 
-	border-radius: 2px; 
-	font:16px Arial, Helvetica, sans-serif;
-	font-weight:bold; 
-	color:#ffffff;
-	text-shadow: #000000 1px 1px 0, #000000 -1px -1px 0, 
-                 #000000 -1px 1px 0, #000000 1px -1px 0;
-	background-color:#414390; 
-	background-image: -moz-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -webkit-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -o-linear-gradient(top, #414390 0%, #a3a3f9 100%);
-	background-image: -ms-linear-gradient(top, #414390 0% ,#a3a3f9 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a3a3f9', endColorstr='#a3a3f9',GradientType=0 );
-	background-image: linear-gradient(top, #414390 0% ,#a3a3f9 100%);
-	-webkit-box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff;
-	-moz-box-shadow: 0px 0px 2px #bababa,  inset 0px 0px 1px #ffffff;
-	box-shadow:0px 0px 2px #bababa, inset 0px 0px 1px #ffffff;
-	cursor: pointer;
-}
-canvas
-{
-	width: 90%;
-	height: 80%;
-	margin: 10px auto;
-	background: #EEEEEE;
-	border-radius: 4px;
-	border: 1px solid;
-}
-#sketch_editor
-{
+
+/* для мобилки */
+#sketch_editor {
+	display: block;
 	margin-top: 10px;
 }
+
+/* кнопонька изменения линии */
 .grid_check {
     position:absolute;
     top: 10px;
     left: 10px;
-    width: 24px;
-    height: 24px;
-    padding: 18px;
 }
-
 label .grid_check {
  width: 29px;
  height: 27px; 
  display: block; 
  position: relative;
 }
- 
 .grid_check input[type="checkbox"] + span {
  position: absolute; /* Абсолютное позиционирование */
  left: 6px; top: 6px;
  width: 24px; height: 24px;
- background: url('/templates/gantry/images/grid.png') no-repeat; /* Фоновый рисунок */
+ background: url('grid.png') no-repeat; /* Фоновый рисунок */
  cursor: pointer; /* Курсор в виде руки */
 }
- 
 .grid_check input[type="checkbox"]{
     display: none;
 }
- 
 .grid_check input[type="checkbox"]:checked + span   {
- background:url('/templates/gantry/images/grid.png') no-repeat;
+ background:url('grid.png') no-repeat;
  background-position:0px -24px;
 }
-
 .btn.grid_check {
     padding: 18px;
 }
-#cancelLastAction
-{
-	margin-left: 52px;
+/*--------*/
+
+#cancelLastAction {
+	margin-left: 58px;
 }
-#popup
-{
-	width: 320px;
-	height: 160px;
-	border-radius: 2px;
-	border: 1px solid;
-	margin: 60px auto;
-	left: 0px;
-	right: 0px;
-	display: none;
-	background: #e5f5f3;
-	position: fixed;
-	padding: 10px;
-	font-size: 12pt;
-	font-weight: bold;
+
+#reset {
+	margin-left: 6px;
 }
-.sketch_hud
-{
-	height: 38px;
-}
-#open_popup
-{
-	margin-bottom: 10px;
-}
-#back
-{
+
+#back {
 	position: absolute;
 	right: 10px;
 	top: 10px;
 }
 
-/*PRELOADER*/
+/* клавиатурка */
+#window {
+	display: none;
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	max-width: 360px;
+	height: 158px;
+	padding: 10px;
+	margin: auto;
+	background: #ffffff;
+}
 
+.numpad {
+	width: 280px;
+}
+
+.numpad td {
+	padding: 4px;
+}
+
+.but_num {
+	width: 48px;
+	height: 38px;
+	text-align:center;
+	background-color:#404199; 
+	border: 1px solid #414099; 
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px; 
+	border-radius: 15px;
+	font-size: 20px;
+	color:#ffffff;
+	font-weight:bold; 
+	text-decoration:none;
+	cursor: pointer;
+}
+
+.but_num:active, .sketch_hud:active {
+	background-color:#2a2b64; 
+}
+
+.but_num:hover, .sketch_hud:hover {
+	color:#9f99fb; 
+}
+
+#newLength {
+	width: 104px;
+	height: 38px;
+	font-size: 20px;
+	padding-left: 10px;
+	color: #414099;
+	border: 2px solid #414099;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px; 
+}
+
+#ok {
+	width: 104px;
+	height: 38px;
+}
+/*---------*/
+
+#open_popup {
+	margin-bottom: 10px;
+	margin-top: 0px;
+}
+
+/* для монитора */
+#sketch_editor2 {
+	display: none;
+	position:absolute;
+	height: 100%;
+	margin-top: 0px;
+}
+
+#back2 {
+	position: relative;
+	top: 15px;
+	margin-bottom: 15px;
+	margin-left: 100px;
+}
+
+#cancelLastAction2 {
+	width: 100%;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+#reset2 {
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+#open_popup2 {
+	display: none;
+	position: absolute;
+	bottom: 15px;
+	width: 100%;
+}
+
+#newLength2 {
+	width: 100%;
+	height: 38px;
+	font-size: 20px;
+	padding-left: 10px;
+	color: #414099;
+	border: 2px solid #414099;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px; 
+}
+
+#numback2 {
+	width: 100%;
+}
+
+#numpadMonitor {
+	display: none;
+}
+
+#numpadMobile {
+	display: block;
+}
+
+@media screen and (orientation:landscape) {
+	.div_canvas {
+		height: 100%;
+	}
+	canvas {
+		margin: 0px 10px 0px 0px;
+		border-top: 0;
+		border-bottom: 0;
+		border-right: 2px solid #414099;
+	}
+	#sketch_editor {
+		display: none;
+	}
+	#sketch_editor2 {
+		display: inline-block;
+	}
+	.grid_check {
+		position: relative;
+		top: 15px;
+		left: 0px;
+		margin-bottom: 15px;
+	}
+	#open_popup {
+		display: none;
+	}
+	#open_popup2 {
+		display: block;
+	}
+	#window {
+		left: auto;
+		bottom: 53px;
+		max-width: 190px;
+		height: 250px;
+		padding: 0;
+		margin: 0 5px 0 0;
+	}
+	.but_num {
+		width: 52px;
+	}
+	#numpadMobile {
+		display: none;
+	}
+	#numpadMonitor {
+		display: block;
+	}
+	.numpad {
+		width: 180px;
+	}
+}
+
+#popup
+{
+	width: 320px;
+	height: 160px;
+	
+}
+
+#popup2
+{
+	width: 320px;
+	height: 120px;
+}
+
+#popup3
+{
+	width: 420px;
+	height: 200px;
+}
+
+#popup, #popup2, #popup3
+{
+	border-radius: 2px;
+	border: 2px solid #414099;
+	margin: 60px auto;
+	left: 0px;
+	right: 0px;
+	display: none;
+	background: #ffffff;
+	position: fixed;
+	padding: 10px;
+	font-size: 12pt;
+	font-weight: bold;
+	z-index: 1;
+}
+
+#textarea_koordinats
+{
+	width: 340px;
+	height: 90px;
+	resize: none;
+}
+
+/*PRELOADER*/
 .PRELOADER_GM
 {
 	position: fixed;
@@ -188,7 +315,6 @@ label .grid_check {
 	text-align: center;
 	z-index: 1000;
 }
-
 .PRELOADER_GM_OPACITY
 {
 	background-color: rgba(54,53,127,.7);
@@ -217,7 +343,6 @@ label .grid_check {
 	transform: rotate(0deg);
 	z-index: 1002;
 }
-
 @keyframes PRELOADER {
 	from { transform: rotate(0deg); }
 	to { transform: rotate(359deg); }

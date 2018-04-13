@@ -3,7 +3,6 @@ package ru.ejevikaapp.gm_android.Fragments;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,8 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -40,7 +36,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -49,20 +44,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.simple.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ru.ejevikaapp.gm_android.ActivityEstimate;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
@@ -152,6 +140,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     ArrayList<String> time_free = new ArrayList<String>();
     ArrayList<Select_work> sel_work = new ArrayList<>();
     ArrayList<String> name_zamer_id = new ArrayList<String>();
+    ArrayList<Integer> estimate = new ArrayList<Integer>();
 
     ListView list_work;
 
@@ -1799,9 +1788,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         public void onClick(View v) {
             int id = v.getId();
 
+            int id_calc = estimate.get(id);
+
+            Log.d("mLog", "getEst = " + id + " " + id_calc);
             Intent intent;
             intent = new Intent(getActivity(), ActivityEstimate.class);
-            intent.putExtra("id_calculation", String.valueOf(id));
+            intent.putExtra("id_calculation", String.valueOf(id_calc));
             startActivity(intent);
 
         }
@@ -2325,8 +2317,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         rb.setTypeface(null, Typeface.BOLD);
         mainC.addView(rb);
 
-        ch_i++;
-
         TextView tx = new TextView(getActivity());
         tx.setText("S/P = " + n4 + " м2 / " + n5 + " м");
         tx.setLayoutParams(lin_calc);
@@ -2341,8 +2331,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
 
-        double s = 0.0;
-        double p = 0.0;
         double tmp = 0;     // компоненты
         double tmp2 = 0;    // канвас
         double tmp3 = 0;    // монтаж
@@ -2353,8 +2341,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 do {
                     S = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     P = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    s += Double.parseDouble(S);
-                    p += Double.parseDouble(P);
 
                     tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
                     tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
@@ -2427,9 +2413,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         btnEstimate.setText("Смета");
         btnEstimate.setBackgroundColor(Color.parseColor("#f8f8ff"));
         btnEstimate.setLayoutParams(lin_btn);
-        btnEstimate.setId(Integer.parseInt(id));
+        btnEstimate.setId(ch_i);
         btnEstimate.setOnClickListener(getEstimate);
         mainC.addView(btnEstimate);
+        estimate.add(Integer.valueOf(id));
+
+        ch_i++;
 
         ImageView image = new ImageView(getActivity());
         LinearLayout.LayoutParams ViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

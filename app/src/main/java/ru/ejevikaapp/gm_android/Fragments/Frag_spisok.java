@@ -230,7 +230,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 String project_note = "";
                                 i++;
 
-                                sqlQuewy = "SELECT project_info, client_id, project_calculation_date, project_note "
+                                sqlQuewy = "SELECT project_info, client_id, project_calculation_date, gm_manager_note "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id = ?";
 
@@ -243,8 +243,6 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                             id_client = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
                                             project_calculation_date = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(2)));
                                             project_note = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(3)));
-
-                                            Log.d("count_client", p_info + " " + id_client);
 
                                         } while (cursor_1.moveToNext());
                                     }

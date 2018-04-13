@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -92,7 +93,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     RadioGroup radios_height, radios_mounting;
 
-    int profile_12_13, profile_15_16, circle_count = 0, square_count = 0;
+    int circle_count = 0, square_count = 0;
 
     TextView area, perimetr, corners, text_calculate;
 
@@ -113,13 +114,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     SharedPreferences sPref, SP4, SP5, SP9, SPI, SPSO, SP, SPW;
 
     final String SAVED_TEXT = "saved_text";
-    final String SAVED_N4 = "";
-    final String SAVED_N5 = "";
-    final String SAVED_N9 = "";
-    final String SAVED_I = "";
-    final String SAVED_SO = "";
-    final String SAVED_W = "";
-    final String n1 = "28";
+    String n1 = "28";
 
     String SAVED_KP = "";
     String SAVED_WP = "";
@@ -128,8 +123,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     String SAVED_CODE = "";
     String SAVED_ALFAVIT = "";
 
-    Integer gm_can_marg, gm_comp_marg, gm_mount_marg, dealer_can_marg, dealer_comp_marg, dealer_mount_marg, count_svet,
-            count_vent, count_electr, count_diffus, count_pipes, user_id_int, id_n3 = 0;
+    Integer user_id_int, id_n3 = 0;
 
     Double S = 0.0, P = 0.0;
 
@@ -141,57 +135,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     EditText lustr, karniz, name_project, ed_discount, count_comp, price_comp;
 
-    boolean rb_k = false, calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true, chertezh_bool = false;
-
-    ArrayList<Double> component_count = new ArrayList();    // component_option
-    ArrayList canvases_data = new ArrayList();
-    ArrayList mounting_data = new ArrayList();
-    ArrayList<Integer> results = new ArrayList();
-    ArrayList component_item = new ArrayList();
-
-    int items_9, items_5, items_11, items_vstavka_bel, items_vstavka, items_10, items_16, items_556, items_4, items_58, items_3,
-            items_2, items_1, items_8, items_6, items_14, items_430, items_35, items_360, items_236,
-            items_239, items_559, items_38, items_495, items_233, items_659, items_660;
+    boolean calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true, chertezh_bool = false, countComponents = false;
 
     double n7 = 0, n8 = 0, n9 = 0, n10 = 0, n11 = 0, n12 = 0, n16 = 0, n17 = 0, n18 = 0, n19 = 0, n20 = 0, n21 = 0, n24 = 0, n25 = 0,
             n27 = 0, n28 = 0, n30 = 0, n31 = 0, n32 = 0, height = 0, dop_krepezh = 0, discount = 0;
-    int n6 = 0, color = 0, save_n2 = 0;
-    Integer n2 = 0;
-
-    int[] n13_count;
-    String[] n13_type;
-    int[] n13_size_id;
-    String[] n13_size;
-
-    int[] n22_count;
-    String[] n22_type;
-    int[] n22_size_id;
-    String[] n22_size;
-
-    int[] n14_count;
-    int[] n14_size_id;
-    String[] n14_size;
-
-    int[] n23_count;
-    String[] n23_type;
-    int[] n23_size_id;
-    String[] n23_size;
-
-    int[] n15_count;
-    String[] n15_type;
-    int[] n15_size_id;
-    String[] n15_size;
-
-    int[] n26_count;
-    int[] n26_type_id;
-    int[] n26_size_id;
-
-    double[] ar1_size;
-    double[] ar2_size;
-    double[] ar2_size2;
-
-    int[] n29_count;
-    int[] n29_type;
+    int n2 =0, n6 = 0, color = 0;
 
     RadioButton rb_v_white, rb_v_color, rb_v_no, rb_m_yes, rb_m_no, rb_b_no, rb_b_norm, rb_b_potol, rb_b_all, rb_h_no, rb_h_yes;
 
@@ -553,7 +501,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         if (id_calculation != null && id_project != null) {
             dbHelper = new DBHelper(getActivity());
             db = dbHelper.getReadableDatabase();
-            String sqlQuewy = "SELECT calculation_title, n1, n2, n3, n4, n5, n6, n7, n8, n9," +
+            String sqlQuewy = "SELECT calculation_title, n3, n4, n5, n6, n7, n8, n9," +
                     " n10, n11, n12, n16, n17, n18, n19, n20, n21, n24," +
                     " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch, n31, n32, height, " +
                     " extra_components, extra_mounting "
@@ -566,43 +514,54 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (k.moveToFirst()) {
                     do {
                         String calculation_title = k.getString(k.getColumnIndex(k.getColumnName(0)));
-                        String n1_2 = k.getString(k.getColumnIndex(k.getColumnName(1)));
-                        n2 = Integer.parseInt(k.getString(k.getColumnIndex(k.getColumnName(2))));
-                        n3 = k.getString(k.getColumnIndex(k.getColumnName(3)));
-                        String n4_2 = k.getString(k.getColumnIndex(k.getColumnName(4)));
-                        String n5_2 = k.getString(k.getColumnIndex(k.getColumnName(5)));
-                        String n6_2 = k.getString(k.getColumnIndex(k.getColumnName(6)));
-                        String n7_2 = k.getString(k.getColumnIndex(k.getColumnName(7)));
-                        String n8_2 = k.getString(k.getColumnIndex(k.getColumnName(8)));
-                        String n9_2 = k.getString(k.getColumnIndex(k.getColumnName(9)));
-                        String n10_2 = k.getString(k.getColumnIndex(k.getColumnName(10)));
-                        String n11_2 = k.getString(k.getColumnIndex(k.getColumnName(11)));
-                        String n12_2 = k.getString(k.getColumnIndex(k.getColumnName(12)));
-                        String n16_2 = k.getString(k.getColumnIndex(k.getColumnName(13)));
-                        String n17_2 = k.getString(k.getColumnIndex(k.getColumnName(14)));
-                        String n18_2 = k.getString(k.getColumnIndex(k.getColumnName(15)));
-                        String n19_2 = k.getString(k.getColumnIndex(k.getColumnName(16)));
-                        String n20_2 = k.getString(k.getColumnIndex(k.getColumnName(17)));
-                        String n21_2 = k.getString(k.getColumnIndex(k.getColumnName(18)));
-                        String n24_2 = k.getString(k.getColumnIndex(k.getColumnName(19)));
-                        String n25_2 = k.getString(k.getColumnIndex(k.getColumnName(20)));
-                        String dop_krepezh_2 = k.getString(k.getColumnIndex(k.getColumnName(21)));
-                        calc_image = k.getString(k.getColumnIndex(k.getColumnName(22)));
-                        String n27_2 = k.getString(k.getColumnIndex(k.getColumnName(23)));
-                        String color_2 = k.getString(k.getColumnIndex(k.getColumnName(24)));
-                        offcut_square = k.getString(k.getColumnIndex(k.getColumnName(25)));
-                        String discount_2 = k.getString(k.getColumnIndex(k.getColumnName(26)));
-                        String n28_2 = k.getString(k.getColumnIndex(k.getColumnName(27)));
-                        String n30_2 = k.getString(k.getColumnIndex(k.getColumnName(28)));
-                        original_sketch = k.getString(k.getColumnIndex(k.getColumnName(29)));
-                        String n31_2 = k.getString(k.getColumnIndex(k.getColumnName(30)));
-                        String n32_2 = k.getString(k.getColumnIndex(k.getColumnName(31)));
-                        String height_2 = k.getString(k.getColumnIndex(k.getColumnName(32)));
-                        String extra_components_2 = k.getString(k.getColumnIndex(k.getColumnName(33)));
-                        String extra_mounting_2 = k.getString(k.getColumnIndex(k.getColumnName(34)));
+                        n3 = k.getString(k.getColumnIndex(k.getColumnName(1)));
+                        String n4_2 = k.getString(k.getColumnIndex(k.getColumnName(2)));
+                        String n5_2 = k.getString(k.getColumnIndex(k.getColumnName(3)));
+                        String n6_2 = k.getString(k.getColumnIndex(k.getColumnName(4)));
+                        String n7_2 = k.getString(k.getColumnIndex(k.getColumnName(5)));
+                        String n8_2 = k.getString(k.getColumnIndex(k.getColumnName(6)));
+                        String n9_2 = k.getString(k.getColumnIndex(k.getColumnName(7)));
+                        String n10_2 = k.getString(k.getColumnIndex(k.getColumnName(8)));
+                        String n11_2 = k.getString(k.getColumnIndex(k.getColumnName(9)));
+                        String n12_2 = k.getString(k.getColumnIndex(k.getColumnName(10)));
+                        String n16_2 = k.getString(k.getColumnIndex(k.getColumnName(11)));
+                        String n17_2 = k.getString(k.getColumnIndex(k.getColumnName(12)));
+                        String n18_2 = k.getString(k.getColumnIndex(k.getColumnName(13)));
+                        String n19_2 = k.getString(k.getColumnIndex(k.getColumnName(14)));
+                        String n20_2 = k.getString(k.getColumnIndex(k.getColumnName(15)));
+                        String n21_2 = k.getString(k.getColumnIndex(k.getColumnName(16)));
+                        String n24_2 = k.getString(k.getColumnIndex(k.getColumnName(17)));
+                        String n25_2 = k.getString(k.getColumnIndex(k.getColumnName(18)));
+                        String dop_krepezh_2 = k.getString(k.getColumnIndex(k.getColumnName(19)));
+                        calc_image = k.getString(k.getColumnIndex(k.getColumnName(20)));
+                        String n27_2 = k.getString(k.getColumnIndex(k.getColumnName(21)));
+                        String color_2 = k.getString(k.getColumnIndex(k.getColumnName(22)));
+                        offcut_square = k.getString(k.getColumnIndex(k.getColumnName(23)));
+                        String discount_2 = k.getString(k.getColumnIndex(k.getColumnName(24)));
+                        String n28_2 = k.getString(k.getColumnIndex(k.getColumnName(25)));
+                        String n30_2 = k.getString(k.getColumnIndex(k.getColumnName(26)));
+                        original_sketch = k.getString(k.getColumnIndex(k.getColumnName(27)));
+                        String n31_2 = k.getString(k.getColumnIndex(k.getColumnName(28)));
+                        String n32_2 = k.getString(k.getColumnIndex(k.getColumnName(29)));
+                        String height_2 = k.getString(k.getColumnIndex(k.getColumnName(30)));
+                        String extra_components_2 = k.getString(k.getColumnIndex(k.getColumnName(31)));
+                        String extra_mounting_2 = k.getString(k.getColumnIndex(k.getColumnName(32)));
 
                         extra_comp(extra_components_2);
                         extra_mount(extra_mounting_2);
+
+                        sqlQuewy = "select texture_id "
+                                + "FROM rgzbn_gm_ceiling_canvases " +
+                                "where _id = ? ";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    n2 = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
 
                         name_project.setText(calculation_title);
                         area.setText(" S = " + n4_2 + " м2");
@@ -616,23 +575,78 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         ed.commit();
 
                         mount_wall.setText(n7_2);
+                        if(n7_2.equals("0") || n7_2.equals("") || n7_2.equals("0.0")){
+                        } else {
+                            mount_wall.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         mount_granite.setText(n8_2);
+                        if(n8_2.equals("0") || n8_2.equals("") || n8_2.equals("0.0")){
+                        } else {
+                            mount_granite.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         corners.setText(" Количество углов =   " + n9_2);
                         n9 = Double.valueOf(n9_2);
                         ed_in_cut.setText(n11_2);
+                        if(n11_2.equals("0") || n11_2.equals("") || n11_2.equals("0.0")){
+                        } else {
+                            ed_in_cut.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_in_cut_shop.setText(n31_2);
+                        if(n31_2.equals("0") || n31_2.equals("") || n31_2.equals("0.0")){
+                        } else {
+                            ed_in_cut_shop.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_drain_the_water.setText(n32_2);
+                        if(n32_2.equals("0") || n32_2.equals("") || n32_2.equals("0.0")){
+                        } else {
+                            ed_drain_the_water.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         lustr.setText(n12_2);
+                        if(n12_2.equals("0") || n12_2.equals("") || n12_2.equals("0.0")){
+                        } else {
+                            lustr_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         if (n16_2 == "1") {
                             n16 = 1;
                         }
                         ed_wall.setText(n18_2);
                         ed_cabling.setText(n19_2);
+                        if(n19_2.equals("0") || n19_2.equals("") || n19_2.equals("0.0")){
+                        } else {
+                            ed_cabling.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_separator.setText(n20_2);
+                        if(n20_2.equals("0") || n20_2.equals("") || n20_2.equals("0.0")){
+                        } else {
+                            ed_separator.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_fire.setText(n21_2);
+                        if(n21_2.equals("0") || n21_2.equals("") || n21_2.equals("0.0")){
+                        } else {
+                            ed_fire.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_diff_acc.setText(n24_2);
                         bond_beam.setText(n17_2);
+                        if(n17_2.equals("0") || n17_2.equals("") || n17_2.equals("0.0")){
+                        } else {
+                            bond_beam.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_fasteners.setText(dop_krepezh_2);
+                        if(dop_krepezh_2.equals("0") || dop_krepezh_2.equals("") || dop_krepezh_2.equals("0.0")){
+                        } else {
+                            ed_fasteners.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         StringBuffer sb = new StringBuffer(calc_image.subSequence(0, calc_image.length()));
                         sb.delete(0, 22);
 
@@ -643,12 +657,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
 
                         karniz.setText(n27_2);
+                        if(n27_2.equals("0") || n27_2.equals("") || n27_2.equals("0.0")){
+                        } else {
+                            karniz_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
 
                         db = dbHelper.getWritableDatabase();
                         sqlQuewy = "select hex "
                                 + "FROM rgzbn_gm_ceiling_colors " +
                                 "where title = ? ";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{color_2});
+                        c = db.rawQuery(sqlQuewy, new String[]{color_2});
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 do {
@@ -671,12 +690,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             rb_h_no.setChecked(true);
                         } else if (height_2.equals("1")) {
                             rb_h_yes.setChecked(true);
+                            radios_height.setVisibility(View.VISIBLE);
                         }
 
                         if (n6_2.equals("0")) {
                             rb_v_no.setChecked(true);
                         } else if (n6_2.equals("314")) {
                             rb_v_white.setChecked(true);
+                            vstavka_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
                         } else {
                             rb_v_color.setChecked(true);
                             db = dbHelper.getWritableDatabase();
@@ -694,6 +716,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                 }
                             }
                             c.close();
+                            vstavka_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
                         }
 
                         if (offcut_square.equals("")) {
@@ -707,18 +731,29 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         if (n28_2.equals("0")) {
                             n28 = 0;
                             rb_b_norm.setChecked(true);
+                            buguette_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
                         } else if (n28_2.equals("1")) {
                             n28 = 1;
                             rb_b_potol.setChecked(true);
+                            buguette_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
                         } else if (n28_2.equals("2")) {
                             n28 = 2;
                             rb_b_all.setChecked(true);
+                            buguette_layout.setVisibility(View.VISIBLE);
+                            countComponents = true;
                         } else if (n28_2.equals("3")) {
                             n28 = 3;
                             rb_b_no.setChecked(true);
                         }
 
                         soaring_ceiling.setText(n30_2);
+                        if(n30_2.equals("0") || n30_2.equals("") || n30_2.equals("0.0")){
+                        } else {
+                            soaring_ceiling.setVisibility(View.VISIBLE);
+                            countComponents = true;
+                        }
                         ed_discount.setText(discount_2);
 
                     } while (k.moveToNext());
@@ -756,6 +791,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         profile();
         hoods();
         diffuzor();
+
+        Log.d("mLog", "countComponents = " + countComponents);
+
+        if (countComponents){
+            general_layout.setVisibility(View.VISIBLE);
+        }
 
         return view;
     }
@@ -941,7 +982,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         } else bool_resume = true;
 
-
         if (id_project == null) {
         } else {
             if (chertezh_bool) {
@@ -1036,6 +1076,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ed.commit();
 
         SPSO = getActivity().getSharedPreferences("color_title", MODE_PRIVATE);
+        ed = SPSO.edit();
+        ed.putString("", "0");
+        ed.commit();
+
+        SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
         ed = SPSO.edit();
         ed.putString("", "0");
         ed.commit();
@@ -1154,6 +1199,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 org.json.JSONObject dat = new org.json.JSONObject(extra_components);
                 do {
                     try {
+                        add_other_comp_layout.setVisibility(View.VISIBLE);
+                        countComponents = true;
                         JSONObject id_array = dat.getJSONObject(String.valueOf(i[0]));
                         String title = id_array.getString("title");
                         String value = id_array.getString("value");
@@ -1322,6 +1369,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         } else {
             try {
+                add_other_mount_layout.setVisibility(View.VISIBLE);
+                countComponents = true;
                 org.json.JSONObject dat = new org.json.JSONObject(extra_mounting);
                 Log.d("extra_mount", String.valueOf(dat));
                 do {
@@ -1675,6 +1724,18 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
             cursor.close();
 
+            sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_fixtures" +
+                    " WHERE calculation_id = ?";
+            cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    svetiln_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
             BindDictionary<Svetiln_class> dict = new BindDictionary<>();
 
             dict.addStringField(R.id.tv_kol_vo, new StringExtractor<Svetiln_class>() {
@@ -1955,7 +2016,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, null, "calculation_id =?", new String[]{id_calculation},
+            sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_ecola" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    svetiln_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, null, "calculation_id =?", new String[]{id_calculation},
                     null, null, null);
 
             if (cursor.moveToFirst()) {
@@ -2296,7 +2369,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, null,
+            sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_cornice" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    karniz_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, null,
                     "calculation_id =?", new String[]{id_calculation}, null, null, null);
 
             if (cursor.moveToFirst()) {
@@ -2585,7 +2670,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, null, "calculation_id =?", new String[]{id_calculation},
+            sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_pipes" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    pipes_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, null, "calculation_id =?", new String[]{id_calculation},
                     null, null, null);
 
             if (cursor.moveToFirst()) {
@@ -2834,7 +2931,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, null, "calculation_id =?", new String[]{id_calculation},
+            String sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_profil" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    add_profile_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, null, "calculation_id =?", new String[]{id_calculation},
                     null, null, null);
 
             if (cursor.moveToFirst()) {
@@ -2849,7 +2958,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     String pipes = "";
 
 
-                    String sqlQuewy = "SELECT title "
+                    sqlQuewy = "SELECT title "
                             + "FROM rgzbn_gm_ceiling_type" +
                             " WHERE _id = ? ";
 
@@ -3148,7 +3257,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, null, "calculation_id =?", new String[]{id_calculation},
+            String sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_hoods" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    add_vent_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, null, "calculation_id =?", new String[]{id_calculation},
                     null, null, null);
 //
             if (cursor.moveToFirst()) {
@@ -3162,7 +3283,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     String size_c = cursor.getString(razmerIndex);
                     String type_str = "";
                     String size_str = "";
-                    String sqlQuewy = "SELECT title "
+                    sqlQuewy = "SELECT title "
                             + "FROM rgzbn_gm_ceiling_type" +
                             " WHERE _id = ?";
 
@@ -3424,7 +3545,19 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (id_calculation == null) {
         } else {
-            Cursor cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, null, "calculation_id =?", new String[]{id_calculation},
+            sqlQuewy = "SELECT * "
+                    + "FROM rgzbn_gm_ceiling_diffusers" +
+                    " WHERE calculation_id = ?";
+            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    add_diff_layout.setVisibility(View.VISIBLE);
+                    countComponents = true;
+                }
+            }
+            cursor.close();
+
+            cursor = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, null, "calculation_id =?", new String[]{id_calculation},
                     null, null, null);
 //
             if (cursor.moveToFirst()) {
@@ -3630,7 +3763,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 int old_n4 = 0;
                 int old_n5 = 0;
                 try {
-                    String sqlQuewy = "select n2, n3, n4, n5 "
+                    String sqlQuewy = "select n3, n4, n5 "
                             + "FROM rgzbn_gm_ceiling_calculations " +
                             "where _id=? ";
                     Cursor c = db.rawQuery(sqlQuewy, new String[]{id_calculation});
@@ -3638,22 +3771,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         if (c.moveToFirst()) {
                             do {
                                 try {
-                                    old_n2 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                } catch (Exception e) {
-                                    old_n2 = 0;
-                                }
-                                try {
-                                    old_n3 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(1))));
+                                    old_n3 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
                                 } catch (Exception e) {
                                     old_n3 = 0;
                                 }
                                 try {
-                                    old_n4 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    old_n4 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(1))));
                                 } catch (Exception e) {
                                     old_n4 = 0;
                                 }
                                 try {
-                                    old_n5 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                                    old_n5 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(2))));
                                 } catch (Exception e) {
                                     old_n5 = 0;
                                 }
@@ -3665,7 +3793,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 String nc = "_";
                 String sqlQuewy = "select name, country "
-                        + "FROM rgzbn_gm_ceiling_canvases " +
+                        + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
                         "where _id = ? ";
                 Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_n3)});         // заполняем массивы из таблицы
                 if (c != null) {
@@ -3674,7 +3802,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             String name = c.getString(c.getColumnIndex(c.getColumnName(0)));
                             String country = c.getString(c.getColumnIndex(c.getColumnName(1)));
                             nc = name + " " + country;
-                            if (nc.equals(canvases) && (n2 == old_n2)) {
+                            if (nc.equals(canvases)) {
                                 id_n3 = Integer.valueOf(old_n3);
                             } else {
                                 id_n3 = 0;
@@ -3686,32 +3814,26 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 Log.d("perera", old_n3 + " " + old_n2);
                 Log.d("perera", old_n3 + " " + id_n3);
-                Log.d("perera", old_n2 + " " + n2);
-                Log.d("perera", save_n2 + " " + n2);
                 Log.d("perera", save_n3 + " " + id_n3);
                 Log.d("perera", save_n3 + " " + canvases);
 
-                if ((((old_n3 == 0 && old_n2 == 0) || (old_n3 == id_n3 && old_n2 == n2))
-                        && (save_n2 == n2 || save_n2 == 0)
+                if ((((old_n3 == 0) || (old_n3 == id_n3))
                         && (save_n3.equals(id_n3) || save_n3.equals(""))
                         || (save_n3.equals(canvases) || save_n3.equals(""))) || calc_image.length()<10) {
                     Log.d("perera","then");
 
-                    if (old_n3 == 0 || old_n2 == 0 || old_n4 == 0 || old_n5 == 0 || old_n4 == 0 || old_n5 == 0) {
+                    if (old_n3 == 0 || old_n4 == 0 || old_n5 == 0 || old_n4 == 0 || old_n5 == 0) {
                         calculat = false;
                         calculation();
-                        save_n2 = n2;
                         save_n3 = String.valueOf(canvases);
                     } else {
-                        if (old_n3 == id_n3 && old_n2 == n2) {
+                        if (old_n3 == id_n3) {
                             calculat = false;
                             calculation();
-                            save_n2 = n2;
                             save_n3 = String.valueOf(canvases);
                         } else if (id_calculation == null) {
                             calculat = false;
                             calculation();
-                            save_n2 = n2;
                             save_n3 = String.valueOf(canvases);
                         } else {
                             SP = getActivity().getSharedPreferences("draft_auto", MODE_PRIVATE);
@@ -3801,40 +3923,48 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
 
                 } else {
-                    Log.d("perera","else");
 
-                    save_n2 = n2;
                     save_n3 = String.valueOf(canvases);
 
+                    int id = 0;
                     sqlQuewy = "select * " +
-                            " FROM rgzbn_gm_ceiling_canvases " +
-                            " where texture_id = ? " +
-                            " ORDER BY width DESC";
-
-                    db = dbHelper.getWritableDatabase();
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2)});
-
-                    String str = "[";
-
+                            " FROM rgzbn_gm_ceiling_canvases_manufacturers";
+                    c = db.rawQuery(sqlQuewy, new String[]{});
                     if (c.moveToFirst()) {
-                        canvases_id = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                        int nameIndex = c.getColumnIndex(DBHelper.KEY_NAME);
-                        int countryIndex = c.getColumnIndex(DBHelper.KEY_COUNTRY);
-                        int priceIndex = c.getColumnIndex(DBHelper.KEY_PRICE);
-                        int widthIndex = c.getColumnIndex(DBHelper.KEY_WIDTH);
                         do {
-                            nc = c.getString(nameIndex) + " " + c.getString(countryIndex);
 
-                            if (nc.equals(canvases)) {
+                            String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                            String country = c.getString(c.getColumnIndex(c.getColumnName(2)));
 
-                                float width = Float.valueOf(c.getString(widthIndex)) * 100;
-                                int price = Integer.valueOf(c.getString(priceIndex));
-                                str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
+                            name += " " + country;
+
+                            if (name.equals(canvases)) {
+
+                                id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
 
                             }
                         } while (c.moveToNext());
-                    } else
-                        Log.d("mLog", "0 rows");
+                    }
+
+                    String str = "[";
+                    sqlQuewy = "select price, width " +
+                            " FROM rgzbn_gm_ceiling_canvases " +
+                            " where manufacturer_id = ? and count > 0";
+                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
+                    if (c.moveToFirst()) {
+                        do {
+
+                            int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                            float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
+
+                            Log.d("mLog", String.valueOf(widthIndex) + "  " +priceIndex);
+
+                            float width = widthIndex * 100;
+                            int price = priceIndex;
+                            str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
+
+                        } while (c.moveToNext());
+                    }
 
                     String strr = "";
 
@@ -4154,7 +4284,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 break;
             case R.id.color_canvases:
                 intent = new Intent(getActivity(), Activity_color.class);
-                intent.putExtra("texture_id", n2);
+                Log.d("mLog", String.valueOf(n2));
+                intent.putExtra("texture_id", String.valueOf(n2));
                 startActivity(intent);
                 break;
             case R.id.btn_rb_v:
@@ -5036,7 +5167,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             if (calc_image.equals("")) {
                 id_n3 = null;
-                n2 = null;
             }
 
             Integer n3 = id_n3;
@@ -5474,342 +5604,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         getActivity().startService(new Intent(getActivity(), Service_Sync.class));
     }
 
-    void rouding(int id, double coun, double value) {
-
-        double count = Math.floor(coun / value);
-
-        if ((coun / value) > count) {
-            count++;
-        }
-
-        component_count.set(id, count * value);
-
-    }
-
-    double margin(double val, int mar) {
-
-        return val * 100 / (100 - mar);
-    }
-
-    double double_margin(double val, int mar, int mar2) {
-
-        return (val * 100 / (100 - mar)) * 100 / (100 - mar2);
-
-    }
-
-    //кольцо
-    void components_circle(int j, int id, int id2, int[] count, String[] sizes) {
-
-        String[] size = new String[sizes.length];
-        for (int i = 0; i < sizes.length - 1; i++) {
-            size[i] = sizes[i];
-        }
-
-        int[] counts = new int[count.length];
-        for (int i = 0; i < count.length - 1; i++) {
-            counts[i] = count[i];
-        }
-
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int i = 0;
-        String sqlQuewy = "select title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        i++;
-
-        //  круглое кольцо
-        ar1_size = new double[i];
-        ar2_size = new double[i];
-        int[] ar1_id = new int[i];
-        int[] ar2_id = new int[i];
-        i = 0;
-        sqlQuewy = "select _id, title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    ar1_id[i] = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    try {
-                        ar1_size[i] = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(1))).replace(",", "."));
-                    } catch (Exception e) {
-                        ar1_size[i] = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(1))));
-                    }
-
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        int y = 0;
-        for (int k = 0; k < j; k++) {
-            double min = ar1_size[i - 1];
-            String tmp = String.valueOf(size[k]);
-            if (tmp.length() < 4) {
-                for (int l = 0; l < i; l++) {
-                    if ((Double.parseDouble(size[k]) <= ar1_size[l]) && (min >= ar1_size[l])) {
-                        min = ar1_size[l];
-                        y = l;
-                    }
-                }
-                component_count.set(ar1_id[y], component_count.get(ar1_id[y]) + 1 * counts[k]);
-            }
-        }
-
-        // круглая платформа
-        i = 0;
-        sqlQuewy = "select _id, title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id2)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    //выводим внешний радиус круглой платформы
-                    String tmp = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    String tmp2 = "";
-                    int pos = 0;
-                    for (int l = 0; l < tmp.length(); l++) {
-                        pos = tmp.indexOf("-") + 1;
-                    }
-                    StringBuffer sb = new StringBuffer();
-                    char[] chars = tmp.toCharArray();
-                    for (int s = 0; pos < tmp.length(); pos++) {
-                        sb.append(chars[pos]);
-                    }
-
-                    tmp2 = String.valueOf(sb);
-                    ar2_size[i] = Integer.valueOf(tmp2);
-                    ar2_id[i] = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        for (int k = 0; k < j; k++) {
-            double min = 1000;
-            String tmp = String.valueOf(size[k]);
-            boolean flag = true;
-            if (tmp.length() < 4) {
-                for (int l = 0; l < i; l++) {
-                    if ((Double.parseDouble(size[k]) <= ar2_size[l]) && (min >= ar2_size[l])) {
-                        min = ar2_size[l];
-                        flag = false;
-                        y = l;
-                    }
-                }
-                if (!flag) {
-                    component_count.set(ar2_id[y], component_count.get(ar2_id[y]) + 1 * counts[k]);
-                }
-                if (flag) {
-                    component_count.set(items_1, component_count.get(items_1) + 1 * counts[k]);
-                }
-            }
-        }
-
-
-    }
-
-    //квадрат
-    void components_square(int j, int id, int id2, int[] count, String[] sizes) {
-
-        String[] size = new String[sizes.length];
-        for (int i = 0; i < sizes.length - 1; i++) {
-            size[i] = sizes[i];
-        }
-
-        int[] counts = new int[count.length];
-        for (int i = 0; i < count.length - 1; i++) {
-            counts[i] = count[i];
-        }
-
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int i = 0;
-        String sqlQuewy = "select title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        i++;
-
-        //термоквадраты из бд
-        ar1_size = new double[i];
-        ar2_size = new double[i];
-        ar2_size2 = new double[i];
-        int[] ar1_id = new int[i];
-        int[] ar2_id = new int[i];
-        i = 0;
-        sqlQuewy = "select _id, title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-
-                    if (c.getString(c.getColumnIndex(c.getColumnName(1))).length() > 3) {
-                        String tmp = c.getString(c.getColumnIndex(c.getColumnName(1)));
-
-                        String tmp2 = "";
-                        int pos = 0;
-                        for (int l = 0; l < tmp.length(); l++) {
-                            pos = tmp.indexOf("*");
-                        }
-
-                        StringBuffer sb = new StringBuffer();
-                        char[] chars = tmp.toCharArray();
-                        for (int s = 0; s < pos; s++) {
-                            sb.append(chars[s]);
-                        }
-
-                        tmp2 = String.valueOf(sb);
-                        ar1_size[i] = Double.parseDouble(tmp2);
-                        ar1_id[i] = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-
-                    }
-
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        for (int k = 0; k < j; k++) {
-            if (size[k].length() > 3) {
-                String tmp = String.valueOf(size[k]);
-                String tmp2 = "";
-                int pos = 0;
-                for (int l = 0; l < tmp.length(); l++) {
-                    pos = tmp.indexOf("*");
-                }
-
-                StringBuffer sb = new StringBuffer();
-                char[] chars = tmp.toCharArray();
-                for (int s = 0; s < pos; s++) {
-                    sb.append(chars[s]);
-                }
-
-                tmp2 = String.valueOf(sb);
-
-                int y = 0;
-                double min = 1000;
-
-                for (int l = 0; l < i; l++) {
-                    if ((Double.parseDouble(tmp2) <= ar1_size[l]) && (min >= ar1_size[l])) {
-                        min = ar1_size[l];
-                        y = l;
-                    }
-                }
-                component_count.set(ar1_id[y], component_count.get(ar1_id[y]) + 1 * counts[k]);
-
-            }
-        }
-
-        //квадратная платформа
-        i = 0;
-        sqlQuewy = "select _id, title "
-                + "FROM rgzbn_gm_ceiling_components_option " +
-                "where component_id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id2)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-
-                    //выводим внешний радиус квадратной платформы
-                    String tmp = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    String tmp2 = "";
-                    int pos = 0;
-                    for (int l = 0; l < tmp.length(); l++) {
-                        pos = tmp.indexOf("-") + 1;
-                    }
-                    StringBuffer sb = new StringBuffer();
-                    char[] chars = tmp.toCharArray();
-                    for (int s = 0; pos < tmp.length(); pos++) {
-                        sb.append(chars[pos]);
-                    }
-                    tmp2 = String.valueOf(sb);
-                    ar2_size2[i] = Integer.valueOf(tmp2);
-
-                    for (int l = 0; l < tmp.length(); l++) {
-                        pos = tmp.indexOf("-");
-                    }
-                    sb = new StringBuffer();
-                    chars = tmp.toCharArray();
-                    for (int s = 0; s < pos; s++) {
-                        sb.append(chars[s]);
-                    }
-                    tmp2 = String.valueOf(sb);
-
-                    ar2_size[i] = Integer.valueOf(tmp2);
-
-                    ar2_id[i] = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-
-                    i++;
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        for (int k = 0; k < j; k++) {
-            double min = 1000;
-            String tmp = String.valueOf(size[k]);
-            boolean flag = true;
-            if (tmp.length() > 3) {
-
-                String tmp2 = "";
-                int pos = 0;
-                for (int l = 0; l < tmp.length(); l++) {
-                    pos = tmp.indexOf("*");
-                }
-                StringBuffer sb = new StringBuffer();
-                char[] chars = tmp.toCharArray();
-                for (int s = 0; s < pos; s++) {
-                    sb.append(chars[s]);
-                }
-
-                tmp2 = String.valueOf(sb);
-
-                int y = 0;
-                for (int l = 0; l < i; l++) {
-                    if ((Double.parseDouble(tmp2) < ar2_size2[l]) && (Double.parseDouble(tmp2) > ar2_size[l]) && (min > ar2_size[l])) {
-                        min = ar2_size[l];
-                        flag = false;
-                        y = l;
-                    }
-                }
-                if (!flag) {
-                    component_count.set(ar2_id[y], component_count.get(ar2_id[y]) + 1 * counts[k]);
-                }
-                if (flag) {
-                    component_count.set(items_1, component_count.get(items_1) + 1 * counts[k]);
-                }
-            }
-        }
-
-    }
-
     void fun_builder() {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
 
@@ -5895,9 +5689,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 sqlQuewy = "select texture_title "
                         + "FROM rgzbn_gm_ceiling_textures " +
                         "where _id=?";
-
                 c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2)});
-
                 if (c != null) {
                     if (c.moveToFirst()) {
                         do {
@@ -6001,45 +5793,45 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
                 c.close();
 
+                if (n2 == 29){
+                    n1 = "29";
+                } else
+                    n1 = "28";
+
                 String item_content2 = null;
                 String item_content3 = null;
                 s_t.clear();
 
-                String groupBy2 = "manufacturer_id";
-                c = db.query("rgzbn_gm_ceiling_canvases", null, "texture_id = ? ",
-                        new String[]{String.valueOf(n2)}, groupBy2, null, null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
+                sqlQuewy = "select manufacturer_id "
+                        + "FROM rgzbn_gm_ceiling_canvases " +
+                        "where texture_id = ? " +
+                        "group by manufacturer_id";
+                Cursor k = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2)});
+                if (k != null) {
+                    if (k.moveToFirst()) {
                         do {
-                            for (String cn : c.getColumnNames()) {
-                                int id = c.getInt(c.getColumnIndex(c.getColumnName(3)));
-                                Log.d("mLog", String.valueOf(id));
-                                //item_content3 = c.getString(c.getColumnIndex(c.getColumnName(4)));
-                                //item_content2 += " " + item_content3;
 
-                                sqlQuewy = "select name, country "
-                                        + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                                        "where _id = ?";
-                                Cursor k = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
-                                if (k != null) {
-                                    if (k.moveToFirst()) {
-                                        do {
-                                            Log.d("mLog", String.valueOf(item_content2));
-                                            item_content2 = c.getString(c.getColumnIndex(c.getColumnName(1))) + " "
-                                                    + c.getInt(c.getColumnIndex(c.getColumnName(2)));
+                            String id = k.getString(k.getColumnIndex(k.getColumnName(0)));
+                            sqlQuewy = "select name, country "
+                                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                                    "where _id = ? " ;
+                            c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
 
-                                        } while (k.moveToNext());
-                                    }
+                                        item_content2 = c.getString(c.getColumnIndex(c.getColumnName(0))) + " "
+                                                + c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                        s_t.add(item_content2);
+                                    } while (c.moveToNext());
                                 }
-                                k.close();
-                                s_t.add(item_content2);
                             }
+                            c.close();
 
-                            //s_t.add(item_content2);
-                        } while (c.moveToNext());
+                        } while (k.moveToNext());
                     }
                 }
-                c.close();
+                k.close();
 
                 final Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner_texture);
                 ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, s_t);
@@ -6047,14 +5839,26 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 spinner2.setAdapter(adapter2);
 
                 try {
-                    sqlQuewy = "select name, country "
-                            + "FROM rgzbn_gm_ceiling_canvases " +
-                            "where _id = ?";
-
-                    c = db.rawQuery(sqlQuewy, new String[]{n3});
-
+                    int id = 0;
                     String item_content1 = "";
 
+                    sqlQuewy = "select manufacturer_id "
+                            + "FROM rgzbn_gm_ceiling_canvases " +
+                            "where _id = ?";
+                    c = db.rawQuery(sqlQuewy, new String[]{n3});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                            } while (c.moveToNext());
+                        }
+                    }
+                    c.close();
+
+                    sqlQuewy = "select name, country "
+                            + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                            "where _id = ?";
+                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id)});
                     if (c != null) {
                         if (c.moveToFirst()) {
                             do {
@@ -6083,52 +5887,110 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                         canvases = spinner2.getSelectedItem().toString();
 
-                        String sqlQuewy = "select * " +
-                                " FROM rgzbn_gm_ceiling_canvases " +
-                                " where texture_id = ? " +
-                                " ORDER BY width DESC";
-
                         SQLiteDatabase db;
                         db = dbHelper.getWritableDatabase();
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2)});
 
-                        String str = "[";
+                        int id = 0;
 
+                        String sqlQuewy = "select * " +
+                                " FROM rgzbn_gm_ceiling_canvases_manufacturers";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
                         if (c.moveToFirst()) {
-                            int countryIndex = c.getColumnIndex(DBHelper.KEY_MANUFACTURER_ID);
-                            int priceIndex = c.getColumnIndex(DBHelper.KEY_PRICE);
-                            int widthIndex = c.getColumnIndex(DBHelper.KEY_WIDTH);
                             do {
-                                String nc = c.getString(countryIndex);
 
-                                if (nc.equals(canvases)) {
-
-                                    float width = Float.valueOf(c.getString(widthIndex)) * 100;
-                                    int price = Integer.valueOf(c.getString(priceIndex));
-                                    str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
-
+                                String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                String country = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                name += " " + country;
+                                if (name.equals(canvases)) {
+                                    id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
                                 }
                             } while (c.moveToNext());
-                        } else
-                            Log.d("mLog", "0 rows");
+                        }
 
-                        String strr = "";
+                        SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
 
-                        for (int i = 0; i < str.length() - 1; i++)
-                            strr += str.charAt(i);
+                        Log.d("mLog", String.valueOf(SPSO.getString("", "")));
 
-                        strr += " ]";
+                        if (SPSO.getString("", "").equals("") || SPSO.getString("", "").equals("0")) {
+                            String str = "[";
+                            sqlQuewy = "select price, width, _id " +
+                                    " FROM rgzbn_gm_ceiling_canvases " +
+                                    " where texture_id = ? and manufacturer_id = ? and count > 0 " +
+                                    " order by width desc";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id)});
+                            if (c.moveToFirst()) {
+                                do {
 
-                        c.close();
+                                    int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                    float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
 
-                        SharedPreferences.Editor ed = sPref.edit();
-                        ed.putString(SAVED_TEXT, String.valueOf(strr)); // передача выбранных полотен на чертилку
-                        ed.commit();
+                                    float width = widthIndex * 100;
+                                    int price = priceIndex;
+                                    str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
 
-                        SP = getActivity().getSharedPreferences("textures_draft", MODE_PRIVATE);
-                        ed = SP.edit();
-                        ed.putString("", String.valueOf(n2));
-                        ed.commit();
+                                } while (c.moveToNext());
+                            }
+
+                            String strr = "";
+
+                            for (int i = 0; i < str.length() - 1; i++)
+                                strr += str.charAt(i);
+
+                            strr += "]";
+
+                            c.close();
+
+                            sPref = getActivity().getSharedPreferences("canvases", MODE_PRIVATE);
+                            SharedPreferences.Editor ed = sPref.edit();
+                            ed.putString("", String.valueOf(strr)); // передача выбранных полотен на чертилку
+                            ed.commit();
+
+                            SP = getActivity().getSharedPreferences("textures_draft", MODE_PRIVATE);
+                            ed = SP.edit();
+                            ed.putString("", String.valueOf(n2));
+                            ed.commit();
+                        } else {
+                            String color = SPSO.getString("", "");
+
+                            String str = "[";
+                            sqlQuewy = "select price, width, _id " +
+                                    " FROM rgzbn_gm_ceiling_canvases " +
+                                    " where texture_id = ? and manufacturer_id = ? and count > 0 and color_id = ?" +
+                                    " order by width desc";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), color});
+                            if (c.moveToFirst()) {
+                                do {
+
+                                    int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                    float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
+
+                                    float width = widthIndex * 100;
+                                    int price = priceIndex;
+                                    str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
+
+                                } while (c.moveToNext());
+                            }
+
+                            String strr = "";
+
+                            for (int i = 0; i < str.length() - 1; i++)
+                                strr += str.charAt(i);
+
+                            strr += "]";
+
+                            c.close();
+
+                            sPref = getActivity().getSharedPreferences("canvases", MODE_PRIVATE);
+                            SharedPreferences.Editor ed = sPref.edit();
+                            ed.putString("", String.valueOf(strr)); // передача выбранных полотен на чертилку
+                            ed.commit();
+
+                            SP = getActivity().getSharedPreferences("textures_draft", MODE_PRIVATE);
+                            ed = SP.edit();
+                            ed.putString("", String.valueOf(n2));
+                            ed.commit();
+
+                        }
                     }
 
                     public void onNothingSelected(AdapterView<?> parent) {

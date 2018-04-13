@@ -1,20 +1,322 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.ejevikaapp.gm_android.ActivityEstimate"
-    android:orientation="vertical">
+    tools:context="ru.ejevikaapp.gm_android.ActivityEstimate">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Смета по материалам и комплектющим" />
-    <TextView
-        android:layout_marginTop="10dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="типа смета"
-        android:id="@+id/text"/>
-</LinearLayout>
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/nameCeiling"
+            android:textColor="#000000"
+            android:textSize="17dp"
+            android:layout_margin="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/imageView"
+            android:adjustViewBounds="true"
+            android:layerType="software"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="3"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:id="@+id/calcData"
+                android:gravity="center"
+                android:layout_margin="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/linearComp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="17dp"
+            android:text="Смета по материалам и комплектующим"
+            android:layout_margin="10dp"/>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#000000"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"/>
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:stretchColumns="*"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:minLines="2"
+                    android:layout_span="4"
+                    android:textSize="12dp"
+                    android:text="Наименование"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:textSize="12dp"
+                    android:text="Цена, руб."
+                    android:gravity="center"
+                    android:layout_span="2"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Кол-во"
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Стоимость, руб."
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+            </TableRow>
+        </TableLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#000000"
+            android:layout_height="1dp" />
+
+        <ru.ejevikaapp.gm_android.Class.NonScrollListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listComponents"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="3dp">
+        </ru.ejevikaapp.gm_android.Class.NonScrollListView>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#b3b3b3"
+            android:layout_height="1dp" />
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:stretchColumns="*"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:minLines="2"
+                    android:layout_span="4"
+                    android:textSize="12dp"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:textSize="12dp"
+                    android:gravity="center"
+                    android:layout_span="2"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Итого"
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:gravity="center"
+                    android:id="@+id/totalComp"
+                    android:textSize="12dp"/>
+            </TableRow>
+        </TableLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#000000"
+            android:layout_height="1dp" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/linearMount">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Смета по монтажным работам"
+            android:textColor="#000000"
+            android:textSize="17dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#000000"
+            android:layout_height="1dp" />
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:stretchColumns="*"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:minLines="2"
+                    android:layout_span="4"
+                    android:textSize="12dp"
+                    android:text="Наименование"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:textSize="12dp"
+                    android:text="Цена, руб."
+                    android:gravity="center"
+                    android:layout_span="2"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Кол-во"
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Стоимость, руб."
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+            </TableRow>
+        </TableLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#000000"
+            android:layout_height="1dp" />
+
+
+        <ru.ejevikaapp.gm_android.Class.NonScrollListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listMounters"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="3dp">
+        </ru.ejevikaapp.gm_android.Class.NonScrollListView>
+
+        <View
+            android:layout_width="wrap_content"
+            android:background="#b3b3b3"
+            android:layout_height="1dp" />
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:stretchColumns="*"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:minLines="2"
+                    android:layout_span="4"
+                    android:textSize="12dp"
+                    android:gravity="center"
+                    style="@style/text_style_spisok"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:textSize="12dp"
+                    android:gravity="center"
+                    android:layout_span="2"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:text="Итого"
+                    android:gravity="center"
+                    android:textSize="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    style="@style/text_style_spisok"
+                    android:layout_span="2"
+                    android:gravity="center"
+                    android:id="@+id/totalMount"
+                    android:textSize="12dp"/>
+            </TableRow>
+        </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

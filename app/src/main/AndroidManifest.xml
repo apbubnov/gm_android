@@ -32,28 +32,10 @@
             android:label="@string/title_activity_dealer_office"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity_add_svetiln"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_kupit_svetiln"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_truby"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_vent"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_diffuzor"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".Activity_add_client"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity_upd_client"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_kupit_cornice"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Gager_office"
@@ -79,12 +61,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activity_color"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_other_comp"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity_add_other_work"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity_inform_proj"
@@ -129,8 +105,6 @@
             android:name=".Service_Sync_Import"
             android:enabled="true"
             android:exported="true" />
-
-        <activity android:name=".Activity_add_profile" />
 
         <service
             android:name=".Send_All"

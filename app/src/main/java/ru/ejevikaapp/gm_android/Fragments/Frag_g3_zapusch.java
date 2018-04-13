@@ -47,7 +47,6 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-
     public static Frag_g3_zapusch newInstance() {
         return new Frag_g3_zapusch();
     }
@@ -149,7 +148,8 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
         String sqlQuewy = "SELECT client_id "
                 + "FROM rgzbn_gm_ceiling_projects " +
-                "where project_calculator = ? and project_status <> 1 ";
+                "where project_calculator = ? and project_status <> 1 " +
+                " order by _id desc";
         Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
         if (c != null) {
             if (c.moveToFirst()) {
@@ -187,7 +187,8 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
                         sqlQuewy = "SELECT * "
                                 + "FROM rgzbn_gm_ceiling_projects" +
-                                " WHERE _id = ?";
+                                " WHERE _id = ? " +
+                                " order by _id desc";
                         Cursor k = db.rawQuery(sqlQuewy, new String[]{id});
                         if (k.moveToFirst()) {
                             int kdIndex = k.getColumnIndex(DBHelper.KEY_ID);

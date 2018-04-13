@@ -389,6 +389,7 @@ public class Activity_calendar extends AppCompatActivity implements View.OnClick
 
             }
             tableLayout.addView(tableRow, i);
+
         }
     }
 

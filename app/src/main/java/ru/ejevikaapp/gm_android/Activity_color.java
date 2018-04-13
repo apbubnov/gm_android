@@ -21,7 +21,8 @@ public class Activity_color extends Activity{
     DBHelper dbHelper;
     Button btn;
     int i=0;
-    private List<Button> BtnList = new ArrayList<Button>();
+    private ArrayList <Button> BtnList = new ArrayList<Button>();
+    ArrayList<Integer> color_array = new ArrayList<Integer>();
     View view;
 
     @Override
@@ -39,21 +40,7 @@ public class Activity_color extends Activity{
         String color = getIntent().getStringExtra("texture_id");
         String component_id = getIntent().getStringExtra("component_id");
 
-        Log.d("mLog", color + " " +component_id);
-
         if (color != null){
-            if (color.equals("2")){
-                text_title = "mat";
-            } else
-            if (color.equals("4")){
-                text_title = "sat";
-            }
-            if (color.equals("6")){
-                text_title = "glan";
-            }
-            if (color.equals("29")){
-                text_title = "desk";
-            }
 
             dbHelper = new DBHelper(this);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -64,19 +51,18 @@ public class Activity_color extends Activity{
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-
                         String color_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        sqlQuewy = "SELECT title, hex "
+                        sqlQuewy = "SELECT title, hex, _id "
                                 + "FROM rgzbn_gm_ceiling_colors" +
-                                " WHERE file LIKE '%"+text_title+"%' and _id = ? ";
+                                " where _id = ?";
                         Cursor cc = db.rawQuery(sqlQuewy, new String[]{color_id});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
                                     String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                     String hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
-                                    Log.d("mLog", title + " " + hex);
-                                    btn(title, hex);
+                                    String id = cc.getString(cc.getColumnIndex(cc.getColumnName(2)));
+                                    btn(id, title, hex);
                                 } while (cc.moveToNext());
                             }
                         }
@@ -105,17 +91,17 @@ public class Activity_color extends Activity{
                         try {
                             Integer.parseInt(color_id);
 
-                            Log.d("mLog color1",color_id);
                             sqlQuewy = "SELECT title, hex "
                                     + "FROM rgzbn_gm_ceiling_colors" +
                                     " WHERE title = ? ";
                             Cursor cc = db.rawQuery(sqlQuewy, new String[]{color_id});
                             if (cc != null) {
                                 if (cc.moveToFirst()) {
-                                        Log.d("mLog color2",color_id);
-                                        String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                        String hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
-                                        btn_vs(title, hex);
+                                    Log.d("mLog color2", color_id);
+                                    String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    String hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                                    String id = cc.getString(cc.getColumnIndex(cc.getColumnName(2)));
+                                    btn_vs(title, hex);
                                 }
                             }
                             cc.close();
@@ -145,15 +131,20 @@ public class Activity_color extends Activity{
             ed.putString("", btnn.getText().toString());
             ed.commit();
 
-            finish();
+            SP = getSharedPreferences("color_title_id", MODE_PRIVATE);
+            ed = SP.edit();
+            ed.putString("", String.valueOf(color_array.get(editId)));
+            ed.commit();
+
+             finish();
         }
     };
 
-    void btn(String title, String hex) {
-        Log.d("mLog color",hex);
+    void btn(String id, String title, String hex) {
         btn = new Button(this);
         BtnList.add(i, btn);
         btn.setId(i++);
+        color_array.add(Integer.valueOf(id));
         btn.setLayoutParams(titleViewParams);
         btn.setBackgroundColor(Color.parseColor("#"+hex));
         btn.setText(title);
@@ -165,19 +156,16 @@ public class Activity_color extends Activity{
         @Override
         public void onClick(View v) {
             int editId = v.getId();
-
             Button btnn = BtnList.get(editId);
             SharedPreferences SP = getSharedPreferences("color_title_vs", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
             ed.putString("", btnn.getText().toString());
             ed.commit();
-
             finish();
         }
     };
 
     void btn_vs(String title, String hex) {
-        Log.d("mLog color",hex);
         btn = new Button(this);
         BtnList.add(i, btn);
         btn.setId(i++);

@@ -13,8 +13,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 17;
     public static final String DATABASE_NAME = "srv112238_test1";
 
-    String SAVED_end = "";
-
     private Context mContext;
 
     public static final String TABLE_RGZBN_GM_CEILING_ANALYTICS_CANVASES = "rgzbn_gm_ceiling_analytics_canvases";

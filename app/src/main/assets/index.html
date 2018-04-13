@@ -1,11 +1,10 @@
-
 <html>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-	<link href="/templates/gantry/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
-	<link rel="stylesheet" href="/templates/gantry/font-awesome/css/font-awesome.min.css">
+	<link href="favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+	<link rel="stylesheet" href="web-fonts-with-css/css/fontawesome-all.min.css">
 	<link rel="stylesheet" href="bootstrap.min.css">
 	<link rel="stylesheet" href="styles.css">
 
@@ -14,35 +13,10 @@
 	<script type="text/javascript" src="paper-full.js"></script>
 	<script type="text/javascript" src="delaunay.js"></script>
 	<script type="text/javascript" src="sketch.js"></script>
+	<script type="text/javascript" src="for_cloth.js"></script>
 
 	<title>Построение чертежа</title>
-	<style type="text/css">
-		.grid_check{
-			position:absolute;
-			top:5px;
-			left:10px;
-			width:24px;
-			height:24px;
-			background: rgba(242, 238, 255, 0.57);
-		}
 
-		.grid_check input[type="checkbox"] + span{
-			position:absolute;
-			left:5px;
-			top:5px;
-			width:24px;
-			height:24px;
-			background:url('grid.png') no-repeat;
-			cursor:pointer;
-		}
-		.grid_check input[type="checkbox"]{
-			display:none;
-		}
-		.grid_check input[type="checkbox"]:checked + span{
-			background:url('grid.png') no-repeat;
-			background-position:0px -24px;
-		}
-	</style>
 </head>
 <body>
 
@@ -52,47 +26,176 @@
 </div>
 
 <form method="POST" action="" style="display: none" id="form1">
-	<input name="jform[n4]" id="jform_n4" value="" placeholder="Площадь" type="hidden">
-	<input name="jform[n5]" id="jform_n5" value="" placeholder="Периметр" type="hidden">
-	<input name="jform[n9]" id="jform_n9" value="" placeholder="Углы" type="hidden">
+	<input name="jform[n4]" id="jform_n4" placeholder="Площадь" type="hidden">
+	<input name="jform[n5]" id="jform_n5" placeholder="Периметр" type="hidden">
+	<input name="jform[n9]" id="jform_n9" placeholder="Углы" type="hidden">
 </form>
 <div id="popup">
 	<center>
 	<p>
 		Внимательно проверьте построенный чертеж, после отправки редактирование недоступно.
 	</p>
-	<button class="sketch_hud btn btn-primary" id ="close_popup" ><i class="fa fa-reply" aria-hidden="true"></i> Назад</button>
-	<button id="close_sketch" class="sketch_hud btn btn-success"><img src="save.png">Отправить</button>
+	<button id ="close_popup" class="sketch_hud btn btn-primary"><i class="fa fa-reply" aria-hidden="true"></i> Назад</button>
+	<button id="close_sketch" class="sketch_hud btn btn-success">Отправить</button>
+	</center>
+</div>
+<div id="popup2">
+	<center>
+	<p>
+		Выберите режим построения диагоналей.
+	</p>
+	<button id="triangulate_auto" class="sketch_hud btn btn-primary">Автоматический</button>
+	<button id="triangulate_manual" class="sketch_hud btn btn-primary">Ручной</button>
+	</center>
+</div>
+<div id="popup3">
+	<center>
+	<p>
+		Вставить координаты чертежа:
+	</p>
+	<p><textarea id="textarea_koordinats"></textarea></p>
+	<button id="koordinats_ok" class="sketch_hud btn btn-primary">Ок</button>
+	<button id="koordinats_cancel" class="sketch_hud btn btn-primary">Отмена</button>
 	</center>
 </div>
 
-<div id="sketch_editor" class="sketch_window">
-	<label class = "grid_check"><input type = "checkbox" id="useGrid" checked="true"/><span></span></label>
-	<button class="sketch_hud btn btn-primary" id ="cancelLastAction" ><i class="fa fa-reply" aria-hidden="true"><img src="cancel.png"></i> Отмена</button>
-	<button class="sketch_hud btn btn-warning" id ="reset" ><i class="fa fa-undo" aria-hidden="true"><img src="clean.png"></i> Очистить</button>
-	<button class="sketch_hud btn btn-danger" id ="back" ><i class="fa fa-times" aria-hidden="true"><img src="back.png"></i></button>
-	<center><canvas id="myCanvas" resize></canvas></center>
+<div class="tar">
+	<div id="sketch_editor" class="sketch_window">
+		<label class="sketch_hud btn btn-gm grid_check">
+			<input id="useGrid" type="checkbox" class="check" checked="true"><span></span>
+		</label>
+		<button class="sketch_hud btn btn-gm" id ="cancelLastAction" ><i class="fa fa-reply" aria-hidden="true"></i> Отмена</button>
+		<button class="sketch_hud btn btn-gm" id ="reset" ><i class="fa fa-undo" aria-hidden="true"></i> Очистить</button>
+		<button class="sketch_hud btn btn-gm" id ="back" ><i class="fa fa-times" aria-hidden="true"></i></button>
+	</div>
+
+	<div class="div_canvas">
+		<canvas id="myCanvas" resize></canvas>
+	</div>
+
+	<div id="sketch_editor2" class="sketch_window">
+		<center>
+			<label class="sketch_hud btn btn-gm grid_check">
+				<input id="useGrid2" type="checkbox" class="check" checked="true"><span></span>
+			</label>
+			<button class="sketch_hud btn btn-gm" id ="back2" ><i class="fa fa-times" aria-hidden="true"></i></button>
+			<br>
+			<button class="sketch_hud btn btn-gm" id ="cancelLastAction2" ><i class="fa fa-reply" aria-hidden="true"></i> Отмена</button>
+			<br>
+			<button class="sketch_hud btn btn-gm" id ="reset2" ><i class="fa fa-undo" aria-hidden="true"></i> Очистить</button>
+
+			<br>
+			<button id="open_popup2" class="sketch_hud btn btn-gm"><i class="fa fa-check" aria-hidden="true"></i> Сохранить и закрыть</button>
+		</center>
+	</div>
 </div>
 
 <div id="window">
 	<center>
-		<label>Введите длину:</label>
-		<input name="newLength" id="newLength" value="" placeholder="Длина" type="text" readonly>
-		<button class="ok_back" id="numback"><i class="fa fa-long-arrow-left" aria-hidden="true"><img src="no.png"></i></button>
-		<button class="ok_back" id="ok"><i class="fa fa-check" aria-hidden="true"><img src="save.png"></i></button><br>
-		<button class="but_num" id="num1">1</button>
-		<button class="but_num" id="num2">2</button>
-		<button class="but_num" id="num3">3</button>
-		<button class="but_num" id="num4">4</button>
-		<button class="but_num" id="num5">5</button>
-		<button class="but_num" id="num6">6</button>
-		<button class="but_num" id="num7">7</button>
-		<button class="but_num" id="num8">8</button>
-		<button class="but_num" id="num9">9</button>
-		<button class="but_num" id="num0">0</button>
+		<table col="5" id="numpadMobile" class="numpad">
+			<tr>
+				<td>
+					<button class="but_num" id="num1">1</button>
+				</td>
+				<td>
+					<button class="but_num" id="num2">2</button>
+				</td>
+				<td>
+					<button class="but_num" id="num3">3</button>
+				</td>
+				<td colspan="2">
+					<input name="newLength" id="newLength" value="" placeholder="Длина" type="text" readonly>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num4">4</button>
+				</td>
+				<td>
+					<button class="but_num" id="num5">5</button>
+				</td>
+				<td>
+					<button class="but_num" id="num6">6</button>
+				</td>
+				<td colspan="2">
+					<button class="but_num" id="ok"><i class="fa fa-check" aria-hidden="true"></i></button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num7">7</button>
+				</td>
+				<td>
+					<button class="but_num" id="num8">8</button>
+				</td>
+				<td>
+					<button class="but_num" id="num9">9</button>
+				</td>
+				<td>
+					<button class="but_num" id="num0">0</button>
+				</td>
+				<td>
+					<button class="but_num" id="numback"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></button>
+				</td>
+			</tr>
+		</table>
+		<table col="3" id="numpadMonitor" class="numpad">
+			<tr>
+				<td colspan="2">
+					<input name="newLength" id="newLength2" value="" placeholder="Длина" type="text" readonly>
+				</td>
+				<td>
+					<button class="but_num" id="ok2"><i class="fa fa-check" aria-hidden="true"></i></button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num12">1</button>
+				</td>
+				<td>
+					<button class="but_num" id="num22">2</button>
+				</td>
+				<td>
+					<button class="but_num" id="num32">3</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num42">4</button>
+				</td>
+				<td>
+					<button class="but_num" id="num52">5</button>
+				</td>
+				<td>
+					<button class="but_num" id="num62">6</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num72">7</button>
+				</td>
+				<td>
+					<button class="but_num" id="num82">8</button>
+				</td>
+				<td>
+					<button class="but_num" id="num92">9</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button class="but_num" id="num02">0</button>
+				</td>
+				<td colspan="2">
+					<button class="but_num" id="numback2"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></button>
+				</td>
+			</tr>
+		</table>
 	</center>
 </div>
-<center><button id="open_popup" class="sketch_hud btn btn-success"><i class="fa fa-check" aria-hidden="true"><img src="save.png"></i> Сохранить и закрыть</button></center>
+
+<center>
+	<button id="open_popup" class="sketch_hud btn btn-gm"><i class="fa fa-check" aria-hidden="true"></i> Сохранить и закрыть</button>
+</center>
 
 </body>
 </html>

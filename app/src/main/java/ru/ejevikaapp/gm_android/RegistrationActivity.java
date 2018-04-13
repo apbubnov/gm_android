@@ -93,9 +93,8 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                 //ed.putString("", "test1");
                 //ed.commit();
 
-                if (validatePhone(number) && validateMail(email)) {
+                if (number.length()>9 && number.length()<13 && validateMail(email)) {
                     String id_user = number.substring(1, number.length() - 3);
-
                     if (HelperClass.isOnline(this)) {
                         try {
                             jsonData.put("android_id", id_user);
@@ -155,7 +154,6 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-
                 }
             }) {
 
@@ -179,14 +177,6 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
     public static boolean validateMail(String emailStr) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
-        return matcher.find();
-    }
-
-    public static final Pattern VALID_PHONE_NUMBER_REGEX =
-            Pattern.compile("^[7]{1}[0-9]{10}$", Pattern.CASE_INSENSITIVE);
-
-    public static boolean validatePhone(String phoneStr) {
-        Matcher matcher = VALID_PHONE_NUMBER_REGEX .matcher(phoneStr);
         return matcher.find();
     }
 

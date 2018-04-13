@@ -27,6 +27,5 @@
             android:id="@+id/linear_lay">
         </LinearLayout>
 
-
     </ScrollView>
 </LinearLayout>

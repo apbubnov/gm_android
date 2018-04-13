@@ -1222,7 +1222,6 @@ public class HelperClass {
             }
         }
 
-
         sqlQuewy = "select * " +
                 "FROM component_item";
         c = db.rawQuery(sqlQuewy, new String[]{});         // заполняем массивы из табли
@@ -1287,14 +1286,35 @@ public class HelperClass {
 
         Log.d("mLog", "canvases = " + canvases + n3);
 
-        StringBuffer sb = new StringBuffer();
+        int count_space = 0;
         char[] chars = canvases.toCharArray();
         for (int s = 0; s < canvases.length(); s++) {
             if (chars[s] == ' ') {
-                break;
+                count_space ++;
+            }
+        }
+
+        StringBuffer sb = new StringBuffer();
+        chars = canvases.toCharArray();
+        int count = 0;
+        for (int s = 0; s < canvases.length(); s++) {
+
+            if (chars[s] == ' ') {
+                sb.append(chars[s]);
+                count++;
             } else {
                 sb.append(chars[s]);
             }
+
+            if (chars[s] == ' ' && count_space == count) {
+                break;
+            }
+        }
+
+        String str_sb = String.valueOf(sb);
+        try {
+            str_sb = str_sb.substring(0, str_sb.length() - 1);
+        } catch (Exception e){
         }
 
         //Сюда считаем итоговую сумму полотна
@@ -1371,10 +1391,27 @@ public class HelperClass {
             }
         } else {    //если изменён чертёж, то сюда
             double wf = Double.valueOf(width_final) / 100;
+
+            int id = 0;
+            sqlQuewy = "select _id "
+                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                    "where name LIKE('%"+str_sb+"%')";
+            c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        id = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+            Log.d("mLog", "canva = " +  str_sb + " " + n2 + " " + id + " " + wf);
+
             sqlQuewy = "select _id, price "
                     + "FROM rgzbn_gm_ceiling_canvases " +
-                    "where texture_id = ? and name LIKE('%" + sb + "%') and width =?";
-            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(wf)});         // заполняем массивы из таблицы
+                    "where texture_id = ? and manufacturer_id = ? and width =?";
+            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), String.valueOf(wf)});         // заполняем массивы из таблицы
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
@@ -1467,7 +1504,7 @@ public class HelperClass {
                         if (k != null) {
                             if (k.moveToFirst()) {
                                 do {
-                                    String full_name = component_id + " " + k.getString(k.getColumnIndex(k.getColumnName(1))) + " " + title;
+                                    String full_name = k.getString(k.getColumnIndex(k.getColumnName(1))) + " " + title;
 
                                     String unit = k.getString(k.getColumnIndex(k.getColumnName(2)));
                                     String quantity = "";
@@ -1614,9 +1651,9 @@ public class HelperClass {
                         ", стоимость, руб = " + cursor.getString(dealer_total));
 
                 components += "Hаименование = " + cursor.getString(title) +
-                        ", количество = " + cursor.getString(quantity) +
-                        ", цена, руб = " + cursor.getString(dealer_price) +
-                        ", стоимость, руб = " + cursor.getString(dealer_total)+" | ";
+                        "; количество = " + cursor.getString(quantity) +
+                        "; цена, руб = " + cursor.getString(dealer_price) +
+                        "; стоимость, руб = " + cursor.getString(dealer_total)+" | ";
 
             } while (cursor.moveToNext());
         } else
@@ -1629,7 +1666,6 @@ public class HelperClass {
         }
 
         //---------------------------------- РАСЧЕТ СТОИМОСТИ МОНТАЖА --------------------------------------//
-
 
         //внутренний вырез ТОЛЬКО ДЛЯ ПВХ
         if (n1.equals("28") && (n11 > 0)) {
@@ -2058,15 +2094,15 @@ public class HelperClass {
             int dealer_total = cursor.getColumnIndex(DBHelper.KEY_TOTAL_WITH_DEALER_MARGIN);
             do {
                 Log.d("mLog", "ID = " + cursor.getInt(idIndex) +
-                        ", наименование = " + cursor.getString(title) +
-                        ", количество = " + cursor.getString(quantity) +
-                        ", цена, руб = " + cursor.getString(dealer_price) +
-                        ", стоимость, руб = " + cursor.getString(dealer_total));
+                        "; наименование = " + cursor.getString(title) +
+                        "; количество = " + cursor.getString(quantity) +
+                        "; цена, руб = " + cursor.getString(dealer_price) +
+                        "; стоимость, руб = " + cursor.getString(dealer_total));
 
                 mounting += "Hаименование = " + cursor.getString(title) +
-                        ", количество = " + cursor.getString(quantity) +
-                        ", цена, руб = " + cursor.getString(dealer_price) +
-                        ", стоимость, руб = " + cursor.getString(dealer_total) + " | ";
+                        "; количество = " + cursor.getString(quantity) +
+                        "; цена, руб = " + cursor.getString(dealer_price) +
+                        "; стоимость, руб = " + cursor.getString(dealer_total) + " | ";
 
             } while (cursor.moveToNext());
         }

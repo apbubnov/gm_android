@@ -1,24 +1,11 @@
 jQuery(document).ready(function()
 {
-var reg_url = /gm-vrn/;
-if (!reg_url.test(location.href))
-{
-	window.history.back();
-}
-
-if (typeof(width_polotna) === "undefined" || typeof(diup) === "undefined" || typeof(rup) === "undefined" || typeof(tre) === "undefined" 
-	|| typeof(col) === "undefined" || typeof(man) === "undefined" || typeof(title) === "undefined")
-{
-	window.history.back();
-}
 
 paper.install(window);
 paper.setup("myCanvas");
 var tool = new Tool();
-resize_canvas();
-jQuery(window).resize(resize_canvas);
 
-var elem_newLength, elem_window, elem_useGrid, elem_jform_n4, elem_jform_n5, elem_jform_n9, elem_preloader, elem_button_ok, elem_nums = [];
+var elem_newLength, elem_window, elem_useGrid, elem_jform_n4, elem_jform_n5, elem_jform_n9, elem_preloader;
 var start_point, end_point, move_point, begin_point, c_point;
 var point_start_or_end;
 var krug_start, krug_end;
@@ -38,15 +25,19 @@ var triangles = [];
 var vh = 'v';
 var points;
 var code = 64, alfavit = 0;
-var timer1, timer_mig, timer_button_color, timer_url;
+var timer1, timer_mig;
 var fix_point_dvig, peredvig;
 var touch1, touch2;
 var ready = false;
 var down_g, right_g, up_g, left_g, granica;
 var diag_sort = [];
 var width_final, square_obrezkov = 0, angle_final, sq_polotna, cuts_json, p_usadki_final = 1;
-var arr_cancel = [];
+var arr_cancel = [], triangulate_rezhim = 0, begin_point_diag, end_point_diag, manual_diag, text_manual_diags = [];
+var str_all_lines = "ab=90;bc=176;cd=98;ad=167;ac=222", all_lines_length, lines_length = [];
+var seam = 0, code_og, alfavit_og, calc_img, cut_img, triangulator_pro = 0;
 clicks();
+resize_canvas();
+jQuery(window).resize(resize_canvas);
 ///////////////////////
 Function.prototype.process= function(state){
     var process= function(){
@@ -64,14 +55,333 @@ Function.prototype.process= function(state){
     return process;
 };
 
+if (triangulator_pro === 1)
+{
+	document.getElementById('popup3').style.display = 'block';
+	var elem_koordinans = document.getElementById('textarea_koordinats');
+
+	document.getElementById('koordinats_cancel').onclick = function()
+	{
+		document.getElementById('popup3').style.display = 'none';
+	};
+
+	document.getElementById('koordinats_ok').onclick = function()
+	{
+		build_chert_on_koordinats = build_chert_on_koordinats.process();
+		document.getElementById('preloader').style.display = 'block';
+		build_chert_on_koordinats();
+	};
+}
+
+var build_chert_on_koordinats = function()
+{
+	try
+	{
+		var arr1 = elem_koordinans.value.replace(/\s+/g, ' ').trim().split(' ');
+		var splited_str, splited_str2, name, x, y, chert_koordinats = [];
+		var line, pt;
+		
+		for (var i = arr1.length; i--;)
+		{
+			splited_str = arr1[i].split('(');
+			name = splited_str[0];
+			splited_str[1] = splited_str[1].replace(')', '');
+			splited_str2 = splited_str[1].split(';');
+			x = +splited_str2[0];
+			y = +splited_str2[1];
+			chert_koordinats.push({name: name, x: x + 100, y: y + 100});
+		}
+
+		for (var i = chert_koordinats.length - 1; i--;)
+		{
+			line = new Path.Line(new Point(chert_koordinats[i + 1].x, chert_koordinats[i + 1].y),
+								new Point(chert_koordinats[i].x, chert_koordinats[i].y));
+			line.strokeColor = 'green';
+			line.strokeWidth = 3;
+			line.data.fixed = true;
+			lines.push(line);
+			lines_sort.push(line);
+			line.data.id = lines.length - 1;
+
+			g_points.push(new Point(chert_koordinats[i + 1].x, chert_koordinats[i + 1].y));
+	        pt = new PointText(
+	            {
+	                point: new Point(chert_koordinats[i + 1].x - 10, chert_koordinats[i + 1].y - 5),
+	                content: chert_koordinats[i + 1].name,
+	                fillColor: 'blue',
+	                justification: 'center',
+	                fontFamily: 'lucida console',
+	                fontWeight: 'bold',
+	                fontSize: 6
+	            });
+	        text_points.push(pt);
+		}
+
+		line = new Path.Line(new Point(chert_koordinats[0].x, chert_koordinats[0].y),
+			new Point(chert_koordinats[chert_koordinats.length - 1].x, chert_koordinats[chert_koordinats.length - 1].y));
+		line.strokeColor = 'green';
+		line.strokeWidth = 3;
+		line.data.fixed = true;
+		lines.push(line);
+		lines_sort.push(line);
+		line.data.id = lines.length - 1;
+
+		g_points.push(new Point(chert_koordinats[0].x, chert_koordinats[0].y));
+	    pt = new PointText(
+	        {
+	            point: new Point(chert_koordinats[0].x - 10, chert_koordinats[0].y - 5),
+	            content: chert_koordinats[0].name,
+	            fillColor: 'blue',
+	            justification: 'center',
+	            fontFamily: 'lucida console',
+	            fontWeight: 'bold',
+	            fontSize: 6
+	        });
+	    text_points.push(pt);
+
+	    var ptsr, id1, id2;
+
+	    for (var i = text_points.length; i--;)
+	    {
+	    	ptsr = new Point(text_points[i].point.x + 10, text_points[i].point.y + 5);
+	    	for (var key in lines)
+	        {
+	        	for (var j in lines[key].segments)
+	        	{
+	        		if (point_ravny(ptsr, lines[key].segments[j].point))
+	        		{
+	        			id1 = key;
+	        		}
+	        	}
+	        }
+	        for (var key in lines)
+	        {
+	        	if (key === id1)
+	        	{
+	        		continue;
+	        	}
+	        	for (var j in lines[key].segments)
+	        	{
+	        		if (point_ravny(ptsr, lines[key].segments[j].point))
+	        		{
+	        			id2 = key;
+	        		}
+	        	}
+	        }
+	    	text_points[i].data.id_line1 = +id1;
+	    	text_points[i].data.id_line2 = +id2;
+
+	    	var f = 2;
+			while (f > view.zoom)
+			{
+				f = new Decimal(f).minus(0.05).toNumber();
+				if (f <= 0.4 && f > 0.2)
+				{
+					text_points[i].fontSize += 4;
+				}
+				else if (f < 1)
+				{
+					text_points[i].fontSize += 2;
+				}
+				else if (f < 2)
+				{
+					text_points[i].fontSize += 0.5;
+				}
+			}
+	    }
+
+	    draw_lines_text();
+	    chert_close = true;
+
+	    k = 0;
+	    for (var key = g_points.length; key--;)
+	    {
+	    	k++;
+	    }
+	    elem_jform_n9.value = k;
+		perimetr();
+
+	    triangulator();
+	    //console.log(triangles_count());
+		if (triangles_count() < k - 2)
+		{
+			for (var key = 3; key--;)
+			{
+				pulemet();
+				//console.log('pulemet');
+				if (triangles_count() === k - 2)
+				{
+					break;
+				}
+			}
+		}
+		if (triangles_count() < k - 2)
+		{
+			alert('Ошибка в построении диагоналей!');
+			//console.log(diag);
+			//console.log(diag_sort);
+			//console.log(triangles_count());
+			elem_preloader.style.display = 'none';
+			return;
+		}
+		diag_sortirovka();
+
+		for (var key = diag_sort.length; key--;)
+	    {
+	    	diag_sort[key].data.fixed = true;
+	    	diag_sort[key].strokeColor = 'green';
+	    	add_text_diag(key);
+	    }
+
+	    ready = true;
+	    triangulate_bool = true;
+	    text_points_sdvig();
+
+		document.getElementById('popup3').style.display = 'none';
+		console.log(lines, diag, text_points);
+		align_center();
+		resize_canvas();
+		square();
+		save_cancel();
+	}
+	catch(e)
+	{
+		alert('Ошибка!');
+	}
+	document.getElementById('preloader').style.display = 'none';
+}
+
+var build_chert = function()
+{
+	var regexp = /^\d+$/;
+	var v1, v2, l;
+	str_all_lines = str_all_lines.toUpperCase();
+	str_all_lines = str_all_lines.replace(/\s/g, '');
+	console.log(str_all_lines);
+	all_lines_length = str_all_lines.split(';');
+	for (var i = all_lines_length.length; i--;)
+	{
+		if (regexp.test(all_lines_length[i].substring(1, 2)))
+		{
+			v1 = all_lines_length[i].substring(0, 2);
+			if (regexp.test(all_lines_length[i].substring(3, 4)))
+			{
+				v2 = all_lines_length[i].substring(2, 4);
+			}
+			else
+			{
+				v2 = all_lines_length[i].substring(2, 3);
+			}
+		}
+		else
+		{
+			v1 = all_lines_length[i].substring(0, 1);
+			if (regexp.test(all_lines_length[i].substring(2, 3)))
+			{
+				v2 = all_lines_length[i].substring(1, 3);
+			}
+			else
+			{
+				v2 = all_lines_length[i].substring(1, 2);
+			}
+		}
+		l = +all_lines_length[i].substring(all_lines_length[i].indexOf('=') + 1);
+		all_lines_length[i] = {v1: v1, v2: v2, l: l, paint: false};
+	}
+	console.log(all_lines_length);
+	var osnova, b1, b2, line, b1_line, b2_line, ov;
+	for (var i = 0; i < all_lines_length.length; i++)
+	{
+		if (all_lines_length[i].v1 === "A" && all_lines_length[i].v2 === "B" ||
+			all_lines_length[i].v1 === "B" && all_lines_length[i].v2 === "A")
+		{
+			osnova = all_lines_length[i];
+			line = new Path.Line(new Point(100, 100), new Point(100 + osnova.l, 100));
+			line.strokeColor = 'black';
+			line.strokeWidth = 3;
+			lines.push(line);
+			line.data.id = lines.length - 1;
+			all_lines_length[i].paint = true;
+			break;
+		}
+	}
+	for (var i = 0; i < all_lines_length.length; i++)
+	{
+		for (var j = i; j < all_lines_length.length; j++)
+		{
+			if (all_lines_length[i] !== osnova && all_lines_length[j] !== osnova && i !== j)
+			{
+				ov = obshaya_vertex(all_lines_length[i], osnova);
+				if (ov)
+				{
+					if (obshaya_vertex(all_lines_length[j], osnova, ov) &&
+						obshaya_vertex(all_lines_length[i], all_lines_length[j], ov))
+					{
+						console.log(all_lines_length[i], all_lines_length[j]);
+					}
+				}
+				
+			}
+		}
+	}
+	console.log(lines);
+};
+
+/*
+function obshaya_vertex(all_lines_length1, all_lines_length2, symbol = undefined)
+{
+	if ((all_lines_length1.v1 === all_lines_length2.v1 || all_lines_length1.v1 === all_lines_length2.v2) &&
+		all_lines_length1.v1 !== symbol)
+	{
+		return all_lines_length1.v1;
+	}
+	if ((all_lines_length1.v2 === all_lines_length2.v1 || all_lines_length1.v2 === all_lines_length2.v2) &&
+		all_lines_length1.v2 !== symbol)
+	{
+		return all_lines_length1.v2;
+	}
+	return false;
+}
+*/
+
 project.activeLayer.applyMatrix = false;
 jQuery('#myCanvas').css('resize', 'both');
 
 function resize_canvas()
 {
-	jQuery("#myCanvas").css("width", document.body.clientWidth - 20 );
-	jQuery("#myCanvas").css("height", document.body.clientHeight - 120 );
-	view.viewSize = new Size(document.body.clientWidth - 20, document.body.clientHeight - 120);
+	var nl_value;
+	if (window.innerWidth > window.innerHeight) // для мониторов
+	{
+		jQuery("#myCanvas").css("height", document.body.clientHeight);
+		jQuery("#sketch_editor2").css("width", 180);
+		jQuery(".div_canvas").css("width", "calc(100% - 190px)");
+		jQuery("#myCanvas").css("width", document.body.clientWidth - 200);
+		view.viewSize = new Size(document.body.clientWidth - 200, document.body.clientHeight);
+		nl_value = elem_newLength.value;
+		elem_newLength = document.getElementById('newLength2');
+		elem_newLength.value = nl_value;
+		elem_useGrid = document.getElementById('useGrid2');
+	}
+	else //для мобильных
+	{
+		jQuery(".div_canvas").css("width", "100%");
+		jQuery("#myCanvas").css("width", document.body.clientWidth);
+		if (elem_window.style.display === "none" || elem_window.style.display === "")
+		{
+			jQuery("#myCanvas").css("height", document.body.clientHeight - 116);
+			view.viewSize = new Size(document.body.clientWidth, document.body.clientHeight - 116);
+		}
+		else
+		{
+			jQuery("#myCanvas").css("height", document.body.clientHeight - 216);
+			view.viewSize = new Size(document.body.clientWidth, document.body.clientHeight - 216);
+		}
+		nl_value = elem_newLength.value;
+		elem_newLength = document.getElementById('newLength');
+		elem_newLength.value = nl_value;
+		elem_useGrid = document.getElementById('useGrid');
+	}
+	
 	view.center = new Point(Math.round(view.viewSize.width / 2), Math.round(view.viewSize.height / 2));
 
 	sdvig();
@@ -79,19 +389,18 @@ function resize_canvas()
 	zoom(1);
 }
 
-document.getElementById('back').onclick = function()
+function go_back()
 {
     AndroidFunction.func_back(1);
-};
+}
 
-document.getElementById('open_popup').onclick = function()
+function open_popup()
 {
-	if (!ready)
+	if (ready)
 	{
-		return;
+		jQuery("#popup").css("display", "block");
 	}
-	jQuery("#popup").css("display", "block");
-};
+}
 
 document.getElementById('close_popup').onclick = function()
 {
@@ -108,19 +417,19 @@ function close_sketch_click_all()
 	setTimeout(close_sketch_click, 200);
 }
 
+var tre = fun_tre.getTre();
+
 var close_sketch_click = function()
 {
-	if (close_sketch_click_bool)
+	if (close_sketch_click_bool || !ready)
 	{
 		return;
 	}
-	if (!ready)
-	{
-		return;
-	}
+
 	close_sketch_click_bool = true;
 
-	var l1, l2, lc, lines_length = [];
+	var l1, l2, lc;
+	lines_length = [];
 	for (var i = 0; i < lines_sort.length; i++)
 	{
 		l1 = "";
@@ -172,15 +481,11 @@ var close_sketch_click = function()
 		lines_length.push({name: l1+l2, length: Math.round(diag[i].length)});
 	}
 
-    //console.log(lines_length);
-
-	tre = fun_tre.getTre();
+    //console.log(lines_length, diag);
 
 	if (tre === 29)
 	{
-        save_calc_image();
-        lines_length1 = JSON.stringify(lines_length);
-        AndroidFunction.func_elem_jform_ll(lines_length1);
+		calc_img = svg_gen(1);
 		zerkalo(1);
 	}
 	else
@@ -202,8 +507,10 @@ var close_sketch_click = function()
 	{
 		pt_points[key] = {x: text_points[key].point.x, y: text_points[key].point.y};
 	}
-	get_original_sketch();
-	
+
+	code_og = code;
+	alfavit_og = alfavit;
+
 	if (tre === 29)
 	{
 		if(!tkan())
@@ -214,13 +521,13 @@ var close_sketch_click = function()
 			}
 			else
 			{
-				window.location = rup;
+				window.location = url;
 			}
 			return;
 		}
 		find_obrezki_1pol(lines_tkan);
 		cuts_json = cuts_gen();
-	    save_cut_img();
+		cut_img = svg_gen(2);
 	}
 	else
 	{
@@ -230,89 +537,142 @@ var close_sketch_click = function()
 			find_obrezki_1pol(lines_sort);
 			cuts_json = cuts_gen();
 		}
-	    save_cut_img();
+		cut_img = svg_gen(2);
 
 		remove_none_shvy();
 		rotate_final();
 		zerkalo(1);
 		remove_pt_intersects();
-        save_calc_image();
+		calc_img = svg_gen(1);
 
-        lines_length1 = JSON.stringify(lines_length);
-        AndroidFunction.func_elem_jform_ll(lines_length1);
+
+		if (koordinats_poloten.length > 1)
+		{
+			seam = 1;
+		}
 	}
-	timer_url = setInterval(change_window_location, 200);
+
+	save_data();
 	elem_preloader.style.display = 'none';
 	close_sketch_click_bool = false;
 
 	AndroidFunction.func_back(1);
 };
 
-function change_window_location()
-{
-	if (suc_a1 && suc_a2 && suc_a3)
-	{
-		window.location = rup;
-		clearInterval(timer_url);
-	}
+function save_data(){
+
+    AndroidFunction.func_elem_jform_image(calc_img);
+    AndroidFunction.func_elem_jform_image_cut(cut_img);
+
+    var lines_length1 = JSON.stringify(lines_length);
+    AndroidFunction.func_elem_jform_ll(lines_length1);
+
+    var koordinats_poloten1 = JSON.stringify (koordinats_poloten);
+    AndroidFunction.func_elem_jform_koordinats_poloten(koordinats_poloten1);
+
+    AndroidFunction.func_elem_jform_n4(elem_jform_n4.value);
+    AndroidFunction.func_elem_jform_n5(elem_jform_n5.value);
+    AndroidFunction.func_elem_jform_n9(elem_jform_n9.value);
+
+	// добавить p_usadki_final
+
+    AndroidFunction.func_elem_jform_square_obrezkov(square_obrezkov);
+
+    js_polotna = JSON.stringify(walls_points);
+    AndroidFunction.func_elem_jform_walls_points(js_polotna);
+    js_polotna = JSON.stringify(diags_points);
+    AndroidFunction.func_elem_jform_diags_points(js_polotna);
+    js_polotna = JSON.stringify(pt_points);
+    AndroidFunction.func_elem_jform_pt_points(js_polotna);
+    AndroidFunction.func_elem_jform_code(code);
+    AndroidFunction.func_elem_jform_alfavit(alfavit);
+
 }
 
-var suc_a1 = false, suc_a2 = false, suc_a3 = false;
-
-function save_calc_image()
+function svg_gen(flag)
 {
 	view.zoom = 1;
 	text_points_sdvig();
 	align_center();
 
-	for(var i in text_points)
+	if (flag === 1)
 	{
-		text_points[i].fontSize = 14;
-		text_points[i].bringToFront();
-	}
-	for(var i in text_diag)
-	{
-		text_diag[i].fontSize = 12;
-		if (diag_sort[i].length < 40)
+		for(var i in text_points)
 		{
-			text_diag[i].fontSize -= 1;
-			if (diag_sort[i].length < 30)
+			text_points[i].fontSize = 14;
+			text_points[i].bringToFront();
+		}
+		for(var i in text_diag)
+		{
+			text_diag[i].fontSize = 12;
+			if (diag_sort[i].length < 40)
 			{
 				text_diag[i].fontSize -= 1;
-				if (diag_sort[i].length < 20)
+				if (diag_sort[i].length < 30)
 				{
 					text_diag[i].fontSize -= 1;
-					if (diag_sort[i].length < 10)
+					if (diag_sort[i].length < 20)
 					{
 						text_diag[i].fontSize -= 1;
+						if (diag_sort[i].length < 10)
+						{
+							text_diag[i].fontSize -= 1;
+						}
 					}
 				}
 			}
+			text_diag[i].position = diag_sort[i].position;
+			text_diag[i].bringToFront();
 		}
-		text_diag[i].position = diag_sort[i].position;
-		text_diag[i].bringToFront();
-	}
-	for(var i in lines)
-	{
-		text_lines[lines[i].id].fontSize = 14;
-		if (lines[i].length < 40)
+		for(var i in lines)
 		{
-			text_lines[lines[i].id].fontSize -= 1;
-			if (lines[i].length < 30)
+			text_lines[lines[i].id].fontSize = 14;
+			if (lines[i].length < 40)
 			{
 				text_lines[lines[i].id].fontSize -= 1;
-				if (lines[i].length < 20)
+				if (lines[i].length < 30)
 				{
 					text_lines[lines[i].id].fontSize -= 1;
-					if (lines[i].length < 10)
+					if (lines[i].length < 20)
 					{
 						text_lines[lines[i].id].fontSize -= 1;
+						if (lines[i].length < 10)
+						{
+							text_lines[lines[i].id].fontSize -= 1;
+						}
 					}
 				}
 			}
+			text_lines[lines[i].id].position = lines[i].position;
+			text_lines[lines[i].id].bringToFront();
 		}
-		text_lines[lines[i].id].position = lines[i].position;
-		text_lines[lines[i].id].bringToFront();
+	}
+	else if (flag === 2)
+	{
+		var ptfs = 14;
+		if (tre === 29)
+		{
+			p_usadki_final = 1;
+			ptfs = 12;
+		}
+		
+		for(var i in text_points)
+		{
+			text_points[i].fontSize = ptfs;
+			text_points[i].bringToFront();
+		}
+		for(var i in text_diag)
+		{
+			text_diag[i].remove();
+		}
+		for(var i in text_lines)
+		{
+			text_lines[i].remove();
+		}
+		for(var i in text_contur)
+		{
+			text_contur[i].remove();
+		}
 	}
 
 	view.update();
@@ -325,78 +685,7 @@ function save_calc_image()
 	svg = '<?xml version="1.0" ?><svg height="'+rec.height.toFixed(0)+'px" width="'+rec.width.toFixed(0)+'px" xmlns="http://www.w3.org/2000/svg">'+svg.outerHTML+'</svg>';
 	//console.log(svg);
 	project.activeLayer.bounds = bounds;
-
-    
-    AndroidFunction.func_elem_jform_n4(elem_jform_n4.value);
-    AndroidFunction.func_elem_jform_n5(elem_jform_n5.value);
-    AndroidFunction.func_elem_jform_n9(elem_jform_n9.value);
-    AndroidFunction.func_elem_jform_image(svg);
-
-}
-
-function save_cut_img() // ajax2
-{
-	view.zoom = 1;
-	text_points_sdvig();
-	align_center();
-
-	var ptfs = 14;
-	if (tre === 29)
-	{
-		p_usadki_final = 1;
-		ptfs = 12;
-	}
-	
-	for(var i in text_points)
-	{
-		text_points[i].fontSize = ptfs;
-		text_points[i].bringToFront();
-	}
-	for(var i in text_diag)
-	{
-		text_diag[i].remove();
-	}
-	for(var i in text_lines)
-	{
-		text_lines[i].remove();
-	}
-	for(var i in text_contur)
-	{
-		text_contur[i].remove();
-	}
-
-	view.update();
-
-    var bounds = project.activeLayer.bounds.clone();
-	project.activeLayer.bounds = new Rectangle({from: [0,0], 
-		to: [bounds.bottomRight.x - bounds.topLeft.x,bounds.bottomRight.y - bounds.topLeft.y]});
-	var rec = new Rectangle({from: bounds.topLeft, to: bounds.bottomRight});
-	var svg = project.activeLayer.exportSVG();
-	svg = '<?xml version="1.0" ?><svg height="'+rec.height.toFixed(0)+'px" width="'+rec.width.toFixed(0)+'px" xmlns="http://www.w3.org/2000/svg">'+svg.outerHTML+'</svg>';
-	//console.log(svg);
-	project.activeLayer.bounds = bounds;
-    
-    AndroidFunction.func_elem_jform_square_obrezkov(square_obrezkov);
-    AndroidFunction.func_elem_jform_image_cut(svg);
-
-    js_polotna = JSON.stringify (koordinats_poloten);
-    AndroidFunction.func_elem_jform_koordinats_poloten(js_polotna);
-}
-
-function get_original_sketch() // ajax3
-{
-    js_polotna = JSON.stringify(walls_points);
-    AndroidFunction.func_elem_jform_walls_points(js_polotna);
-
-    js_polotna = JSON.stringify(diags_points);
-    AndroidFunction.func_elem_jform_diags_points(js_polotna);
-
-    js_polotna = JSON.stringify(pt_points);
-    AndroidFunction.func_elem_jform_pt_points(js_polotna);
-
-    AndroidFunction.func_elem_jform_code(code);
-
-    AndroidFunction.func_elem_jform_alfavit(alfavit);
+	return svg;
 }
 
 function sdvig()
@@ -969,12 +1258,22 @@ tool.onMouseDrag = function(event)
 			project.activeLayer.children[key].position.y -=  rast_y;
 		}
 		
-		if (start_point !== undefined || end_point !== undefined)
+		if (start_point !== undefined && end_point !== undefined)
 		{
 			start_point.x -= rast_x;
 			end_point.x -= rast_x;
 			start_point.y -= rast_y;
 			end_point.y -= rast_y;		
+		}
+		if (begin_point_diag !== undefined)
+		{
+			begin_point_diag.x -= rast_x;
+			begin_point_diag.y -= rast_y;	
+		}
+		if (end_point_diag !== undefined)
+		{
+			end_point_diag.x -= rast_x;
+			end_point_diag.y -= rast_y;		
 		}
 		fix_point_dvig = event.point;
 		peredvig = true;
@@ -1273,13 +1572,51 @@ function proverka()
 
 tool.onMouseUp = function(event)
 {
-	if (!peredvig)
+	if (!peredvig && document.getElementById('popup2').style.display !== "block" && !close_sketch_click_bool)
 	{
-		var hitResults = project.hitTestAll(event.point, {class: Path, segments: true, stroke: true, tolerance: 5});
+		var hitResults = project.hitTestAll(event.point, {class: Path, fill: true, stroke: true, tolerance: 3});
 		for (var key in hitResults)
 		{
+			//console.log(hitResults);
+			for (var key2 in hitResults)
+			{
+				if (hitResults[key2].item.segments.length !== 2 && chert_close)
+				{
+					return;
+				}
+			}
 			if (hitResults[key].item.segments.length === 2)
 			{
+				if (!triangulate_bool && triangulate_rezhim === 2)
+				{
+					for (var i = 0; i < diag.length; i++)
+					{
+						if (diag[i] == hitResults[key].item)
+						{
+							elem_window.style.display = 'block';
+							resize_canvas();
+							elem_newLength.focus();
+				    		elem_newLength.value = Math.round(diag[i].length);
+				    		elem_newLength.select();
+				    		first_click = false;
+							manual_diag = diag[i];
+							manual_diag.strokeColor = 'red';
+							diag.splice(i, 1);
+							for (var j = text_manual_diags.length; j--;)
+							{
+								text_manual_diags[j].remove();
+							}
+							text_manual_diags = [];
+							for (var j = diag.length; j--;)
+							{
+								add_text_unfixed_length_diag(j);
+							}
+							//console.log(diag);
+							save_cancel();
+						}
+					}
+					return;
+				}
 				if (hitResults[key].item.data.fixed)
 				{
 					click_on_fixed(hitResults[key].item);
@@ -1556,6 +1893,127 @@ tool.onMouseUp = function(event)
 	save_cancel();
 };
 
+
+function clicks_pt()
+{
+	for (var i = text_points.length; i--;)
+	{
+		if (text_points[i].data.circle !== undefined)
+		{
+			text_points[i].data.circle.onMouseEnter = function(event)
+			{
+				if (manual_diag === undefined)
+				{
+					var l = 0, lf = 0;
+					for (var i = lines.length; i--;)
+					{
+						l++;
+						if (lines[i].data.fixed)
+						{
+							lf++;
+						}
+					}
+					if (l === lf && triangulate_rezhim === 2 && !this.data.selected)
+					{
+						this.fillColor = 'purple';
+						this.data.mouseEnter = true;
+					}
+				}
+			};
+
+			text_points[i].data.circle.onMouseLeave = function(event)
+			{
+				if (manual_diag === undefined)
+				{
+					var l = 0, lf = 0;
+					for (var i = lines.length; i--;)
+					{
+						l++;
+						if (lines[i].data.fixed)
+						{
+							lf++;
+						}
+					}
+					if (this.data.mouseEnter === true && !this.data.selected)
+					{
+						this.fillColor = 'blue';
+						this.data.mouseEnter = false;
+					}
+				}
+			};
+
+			text_points[i].data.circle.onMouseDown = function(event)
+			{
+				if (manual_diag === undefined)
+				{
+					var l = 0, lf = 0;
+					for (var i = lines.length; i--;)
+					{
+						l++;
+						if (lines[i].data.fixed)
+						{
+							lf++;
+						}
+					}
+					if (l === lf && triangulate_rezhim === 2)
+					{
+						draw_diag(this);
+						return;
+					}
+				}
+			}
+		}
+	}
+}
+
+function draw_diag(cir)
+{
+	if (begin_point_diag === undefined)
+	{
+		begin_point_diag = cir.position;
+		cir.fillColor = 'Maroon';
+		cir.data.selected = true;
+	}
+	else if (end_point_diag === undefined && !cir.data.selected)
+	{
+		for (var i = text_points.length; i--;)
+		{
+			if (text_points[i].data.circle.data.selected)
+			{
+				text_points[i].data.circle.fillColor = 'blue';
+				text_points[i].data.circle.data.selected = false;
+
+				end_point_diag = cir.position;
+				var newdiag = new Path.Line(begin_point_diag, end_point_diag);
+				newdiag.strokeWidth = 1;
+				newdiag.strokeColor = 'black';
+				if (good_diag(newdiag))
+				{
+					elem_window.style.display = 'block';
+					resize_canvas();
+					elem_newLength.focus();
+		    		elem_newLength.value = Math.round(newdiag.length);
+		    		elem_newLength.select();
+		    		first_click = false;
+					manual_diag = newdiag;
+					manual_diag.strokeColor = 'red';
+					cir.fillColor = 'blue';
+					save_cancel();
+				}
+				else
+				{
+					newdiag.remove();
+				}
+				begin_point_diag = undefined;
+				end_point_diag = undefined;
+				break;
+			}
+		}
+		begin_point_diag = undefined;
+		end_point_diag = undefined;
+	}
+}
+
 function text_points_sdvig()
 {
 	var angle_line = 0;
@@ -1706,6 +2164,41 @@ function add_text_diag(index)
     text_diag[index].rotate(angle);
     text_diag[index].position = new Point(diag_sort[index].position.x, diag_sort[index].position.y);
     text_diag[index].bringToFront();
+}
+
+function add_text_unfixed_length_diag(index)
+{
+	if (text_manual_diags[index] !== undefined)
+	{
+		text_manual_diags[index].remove();
+	}
+	text_manual_diags[index] = new PointText();
+	text_manual_diags[index].fontFamily = 'times';
+	text_manual_diags[index].fontWeight = 'bold';
+	text_manual_diags[index].fontSize = 6;
+	var f = 2;
+	while (f > view.zoom)
+	{
+		f = new Decimal(f).minus(0.05).toNumber();
+		if (f <= 0.4 && f > 0.2)
+		{
+			text_manual_diags[index].fontSize += 4;
+		}
+		else if (f < 1)
+		{
+			text_manual_diags[index].fontSize += 2;
+		}
+		else if (f < 2)
+		{
+			text_manual_diags[index].fontSize += 0.5;
+		}
+	}
+	text_manual_diags[index].content = diag[index].data.unfixed_length;
+	var angle = (Math.atan((diag[index].segments[1].point.y-diag[index].segments[0].point.y)/(diag[index].segments[1].point.x
+			-diag[index].segments[0].point.x))*180)/Math.PI;
+    text_manual_diags[index].rotate(angle);
+    text_manual_diags[index].position = new Point(diag[index].position.x, diag[index].position.y);
+    text_manual_diags[index].bringToFront();
 }
 
 function line_prodolzhenie(line)
@@ -1867,6 +2360,7 @@ function cancel_last_action()
 	clearInterval(timer_mig);
 
 	elem_window.style.display = arr_cancel[arr_cancel.length - 1].elem_window_style_display;
+	resize_canvas();
 	elem_newLength.value = arr_cancel[arr_cancel.length - 1].elem_newLength_value;
 	if (elem_window.style.display === "block")
 	{
@@ -1887,12 +2381,21 @@ function cancel_last_action()
 	ready = arr_cancel[arr_cancel.length - 1].ready;
 	close_sketch_click_bool = arr_cancel[arr_cancel.length - 1].close_sketch_click_bool;
 
+	triangulate_rezhim = arr_cancel[arr_cancel.length - 1].triangulate_rezhim;
+
+	manual_diag = undefined;
+	if (arr_cancel[arr_cancel.length - 1].manual_diag !== undefined)
+	{
+		manual_diag = arr_cancel[arr_cancel.length - 1].manual_diag.clone();
+		project.activeLayer.addChild(manual_diag);
+	}
+	krug_start = undefined;
 	if (arr_cancel[arr_cancel.length - 1].krug_start !== undefined)
 	{
 		krug_start = arr_cancel[arr_cancel.length - 1].krug_start.clone();
 		project.activeLayer.addChild(krug_start);
 	}
-
+	krug_end = undefined;
 	if (arr_cancel[arr_cancel.length - 1].krug_end !== undefined)
 	{
 		krug_end = arr_cancel[arr_cancel.length - 1].krug_end.clone();
@@ -1967,11 +2470,28 @@ function cancel_last_action()
 			text_diag[key] = arr_cancel[arr_cancel.length - 1].text_diag[key].clone();
 		}
 	}
+	else if (triangulate_rezhim === 2)
+	{
+		diag = [];
+		for (var key in arr_cancel[arr_cancel.length - 1].diag)
+		{
+			diag[key] = arr_cancel[arr_cancel.length - 1].diag[key].clone();
+		}
+		text_manual_diags = [];
+		for (var key in arr_cancel[arr_cancel.length - 1].text_manual_diags)
+		{
+			text_manual_diags[key] = arr_cancel[arr_cancel.length - 1].text_manual_diags[key].clone();
+		}
+	}
 
 	text_points = [];
 	for (var key in arr_cancel[arr_cancel.length - 1].text_points)
 	{
 		text_points[key] = arr_cancel[arr_cancel.length - 1].text_points[key].clone();
+		if (arr_cancel[arr_cancel.length - 1].text_points[key].data.circle !== undefined)
+		{
+			text_points[key].data.circle = arr_cancel[arr_cancel.length - 1].text_points[key].data.circle.clone();
+		}
 	}
 
 	g_points = [];
@@ -1990,9 +2510,19 @@ function cancel_last_action()
 	project.activeLayer.addChildren(diag);
 	project.activeLayer.addChildren(text_lines);
 	project.activeLayer.addChildren(text_diag);
+	project.activeLayer.addChildren(text_manual_diags);
 	project.activeLayer.addChildren(text_points);
+	for (var i = text_points.length; i--;)
+	{
+		if (text_points[i].data.circle !== undefined)
+		{
+			project.activeLayer.addChild(text_points[i].data.circle);
+		}
+	}
 
-	//console.log(arr_cancel);
+	clicks_pt();
+	document.getElementById('popup').style.display = 'none';
+	document.getElementById('popup2').style.display = 'none';
 }
 
 function save_cancel()
@@ -2003,6 +2533,13 @@ function save_cancel()
 
 	obj.elem_window_style_display = elem_window.style.display;
 	obj.elem_newLength_value = elem_newLength.value;
+	obj.triangulate_rezhim = triangulate_rezhim;
+
+	if (manual_diag !== undefined)
+	{
+		obj.manual_diag = manual_diag.clone();
+		project.activeLayer.addChild(manual_diag);
+	}
 
 	if (krug_start !== undefined)
 	{
@@ -2065,12 +2602,22 @@ function save_cancel()
 	for (var key in text_points)
 	{
 		obj.text_points[key] = text_points[key].clone();
+		if (text_points[key].data.circle !== undefined)
+		{
+			obj.text_points[key].data.circle = text_points[key].data.circle.clone();
+		}
 	}
 
 	obj.text_diag = [];
 	for (var key in text_diag)
 	{
 		obj.text_diag[key] = text_diag[key].clone();
+	}
+
+	obj.text_manual_diags = [];
+	for (var key in text_manual_diags)
+	{
+		obj.text_manual_diags[key] = text_manual_diags[key].clone();
 	}
 	
 	obj.code = code;
@@ -2100,7 +2647,15 @@ function save_cancel()
 	project.activeLayer.addChildren(diag);
 	project.activeLayer.addChildren(text_lines);
 	project.activeLayer.addChildren(text_diag);
+	project.activeLayer.addChildren(text_manual_diags);
 	project.activeLayer.addChildren(text_points);
+	for (var i = text_points.length; i--;)
+	{
+		if (text_points[i].data.circle !== undefined)
+		{
+			project.activeLayer.addChild(text_points[i].data.circle);
+		}
+	}
 	//console.log(arr_cancel);
 }
 
@@ -2161,6 +2716,13 @@ function clear_elem()
 		triangles[key].remove();
 	}
 	triangles = [];
+	manual_diag = undefined;
+	for (var key in text_manual_diags)
+	{
+		text_manual_diags[key].remove();
+	}
+	text_manual_diags = [];
+	triangulate_rezhim = 0;
 	elem_jform_n4.value = '';
 	elem_jform_n5.value = '';
 	elem_jform_n9.value = '';
@@ -2176,6 +2738,7 @@ function resize_wall_begin()
     	if (!lines_sort[key].data.fixed)
     	{
     		elem_window.style.display = 'block';
+    		resize_canvas();
     		elem_newLength.focus();
     		elem_newLength.value = Math.round(lines_sort[key].length);
     		elem_newLength.select();
@@ -2609,6 +3172,13 @@ function triangulator()
 function triangles_count()
 {
 	var count = 0, op, tr_bool;
+
+	for (var key in triangles)
+	{
+		triangles[key].remove();
+	}
+	triangles = [];
+
 	for (var i in diag)
 	{
 		var hitResults0 = project.hitTestAll(diag[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
@@ -2721,6 +3291,8 @@ function pulemet()
 
 function good_diag(diag_i)
 {
+	g_points = getPathsPoints(lines_sort);
+	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
 	var chertezh = new Path();
 	for (var key = g_points.length; key--;)
 	{
@@ -2733,11 +3305,38 @@ function good_diag(diag_i)
 	{
 		chertezh.remove();
 		project.activeLayer.addChildren(lines_sort);
+		for (var key in text_lines)
+		{
+			text_lines[key].bringToFront();
+		}
+
+		for (var key in text_points)
+		{
+			text_points[key].bringToFront();
+			if (text_points[key].data.circle !== undefined)
+			{
+				text_points[key].data.circle.bringToFront();
+			}
+		}
 		return false;
 	}
 
 	chertezh.remove();
 	project.activeLayer.addChildren(lines_sort);
+
+	for (var key in text_lines)
+	{
+		text_lines[key].bringToFront();
+	}
+
+	for (var key in text_points)
+	{
+		text_points[key].bringToFront();
+		if (text_points[key].data.circle !== undefined)
+		{
+			text_points[key].data.circle.bringToFront();
+		}
+	}
 
 	for (var key = lines_sort.length; key--;)
 	{
@@ -3251,53 +3850,15 @@ var polotno = function()
 	var price_it, sq_obr, sq_min, price_min, sq1, sq1_dec, usadka_final;
 	var time_end, time_start = performance.now();
 
+console.log(width_polotna);
 	while (true)
 	{
 		sq_min = 100222;
 		price_min = 10222444;
 		usadka_final = 0;
-		for (var i = lines_sort.length; i--;)
+
+		for (var angle_rotate = 0; angle_rotate < 360; angle_rotate++)
 		{
-			lines_sort[i].rotate(-1, view.center);
-
-			lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-			lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-			lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-			lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
-		}
-		for (var i = diag_sort.length; i--;)
-		{
-			diag_sort[i].rotate(-1, view.center);
-
-			diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-			diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-			diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-			diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
-		}
-		okruglenie_all_segments();
-
-		for (var angle_rotate = 0; angle_rotate < 181; angle_rotate++)
-		{
-			for (var i = lines_sort.length; i--;)
-			{
-				lines_sort[i].rotate(1, view.center);
-
-				lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-				lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-				lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-				lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
-			}
-			for (var i = diag_sort.length; i--;)
-			{
-				diag_sort[i].rotate(1, view.center);
-
-				diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-				diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-				diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-				diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
-			}
-			okruglenie_all_segments();
-
 			points_m = findMinAndMaxCordinate_g();
 
 			h = points_m.maxY - points_m.minY;
@@ -3333,6 +3894,7 @@ var polotno = function()
 					continue;
 				}
 
+console.log(angle_rotate, width_polotna[j].width, p_usadki);
 				if (kolvo_poloten === 1)
 				{
 					if (add_polotno_fast(width_polotna[j].width, p_usadki) === false)
@@ -3370,7 +3932,7 @@ var polotno = function()
 						j_f = j;
 						usadka_final = p_usadki;
 						break_bool = true;
-						//console.log(kolvo_poloten, price_min, sq_min, usadka_final, width_polotna[j].width, angle_rotate, sq1);
+						console.log(kolvo_poloten, price_min, sq_min, usadka_final, width_polotna[j].width, angle_rotate, sq1);
 					}
 
 					if (polotna[polotna.length - 1].up.position.y <= points_m.minY)
@@ -3379,27 +3941,27 @@ var polotno = function()
 					}
 				}
 			}
-		}
 
-		for (var i = lines_sort.length; i--;)
-		{
-			lines_sort[i].rotate(180, view.center);
+			for (var i = lines_sort.length; i--;)
+			{
+				lines_sort[i].rotate(1, view.center);
 
-			lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-			lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-			lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-			lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
-		}
-		for (var i = diag_sort.length; i--;)
-		{
-			diag_sort[i].rotate(180, view.center);
+				lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
+				lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
+				lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
+				lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+			}
+			for (var i = diag_sort.length; i--;)
+			{
+				diag_sort[i].rotate(1, view.center);
 
-			diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-			diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-			diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-			diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+				diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
+				diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
+				diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
+				diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+			}
+			okruglenie_all_segments();
 		}
-		okruglenie_all_segments();
 
 		if (break_bool)
 		{
@@ -3408,6 +3970,7 @@ var polotno = function()
 		kolvo_poloten++;
 	}
 
+	okruglenie_all_segments();
 	polotno_final(gradus_f, j_f, kolvo_poloten, usadka_final);
 
 	time_end = performance.now() - time_start;
@@ -3416,6 +3979,8 @@ var polotno = function()
 
 function add_polotno_fast(p_width, p_usadki)
 {
+
+
 	for (var key = polotna.length; key--;)
 	{
 		polotna[key].left.remove();
@@ -3840,9 +4405,52 @@ function get_koordinats_poloten(p_usadki)
 			ky = Decimal.abs(new Decimal(points_poloten[i][j].point.y).minus(polotna[i].down.position.y)).times(p_usadki).toNumber();
 			kx = +kx.toFixed(1);
 			ky = +ky.toFixed(1);
-			koordinats_poloten[i][j] = {name: points_poloten[i][j].name, koordinats: "(" + kx + ", " + ky + ")"};
+			koordinats_poloten[i][j] = {name: points_poloten[i][j].name, koordinats: "(" + kx + "; " + ky + ")"};
 		}
 	}
+	koordinats_poloten = sort_koordinats(koordinats_poloten);
+}
+
+function sort_koordinats(koordinats_poloten)
+{
+	for (var i = koordinats_poloten.length; i--;)
+	{
+		koordinats_poloten[i] = quicksort(koordinats_poloten[i], 0, koordinats_poloten[i].length - 1);
+	}
+	return koordinats_poloten;
+}
+
+function quicksort(a, lo, hi)
+{
+    if (lo < hi)
+    {
+        p = partition(a, lo, hi);
+        a = quicksort(a, lo, p - 1);
+        a = quicksort(a, p + 1, hi);
+    }
+    return a;
+}
+
+function partition(a, lo, hi)
+{
+    var pivot = a[hi];
+    var i = lo;
+    var ob;
+
+    for (j = lo; j < hi; j++)
+    {
+        if (a[j].name <= pivot.name)
+        {
+            ob = a[i];
+            a[i] = a[j];
+            a[j] = ob;
+            i = i + 1;
+        }
+    }
+    ob = a[i];
+    a[i] = a[hi];
+    a[hi] = ob;
+    return i;
 }
 
 function obshaya_point(line1, line2)
@@ -4060,6 +4668,7 @@ function click_on_fixed(line)
 
     ready = false;
     elem_window.style.display = 'block';
+    resize_canvas();
 
     if (line.strokeWidth === 3)
     {
@@ -4103,10 +4712,100 @@ function click_on_fixed(line)
 	}
 }
 
-var ok_enter_process, triangulate_bool = false;
+var change_length_all_diags = function()
+{
+	try
+	{
+		for (var key = text_manual_diags.length; key--;)
+		{
+			text_manual_diags[key].remove();
+			text_manual_diags[key] = undefined;
+		}
+		text_manual_diags = [];
+		diag_sortirovka();
+		triangulate_bool = true;
+		for (var key = text_points.length; key--;)
+		{
+			text_points[key].data.circle.remove();
+			text_points[key].data.circle = undefined;
+		}
+		for (var key = 0; key < diag_sort.length; key++)
+		{
+    		if (lines.length > 4)
+    		{
+	    		change_length_diag(key, diag_sort[key].data.unfixed_length, false);
+	    	}
+	    	else
+	    	{
+	    		change_length_diag_4angle(key, diag_sort[key].data.unfixed_length, false);
+	    	}
+		}
+		triangulate_rezhim = 0;
+		square();
+		text_points_sdvig();
+		ready = true;
+		sdvig();
+		zoom(1);
+		elem_preloader.style.display = 'none';
+	}
+	catch(e)
+	{
+		elem_preloader.style.display = 'none';
+		cancel_last_action();
+		alert('Ошибка!');
+	}
+};
+
+var ok_enter_process, triangulate_bool = false, change_length_all_diags_process;
 
 function ok_enter_all()
 {
+	if (manual_diag !== undefined)
+	{
+		var regexp = /^\d+$/;
+		if (regexp.test(elem_newLength.value))
+		{
+			if (elem_newLength.value < 3)
+			{
+				alert('Слишком маленькая длина!');
+				elem_newLength.focus();
+	    		elem_newLength.value = Math.round(manual_diag.length);
+	    		elem_newLength.select();
+				return;
+			}
+			if (elem_newLength.value > 10000)
+			{
+				alert('Слишком большая длина!');
+				elem_newLength.focus();
+	    		elem_newLength.value = Math.round(manual_diag.length);
+	    		elem_newLength.select();
+				return;
+			}
+		}
+		else
+		{
+			alert('Недопустимые символы!');
+			elem_newLength.focus();
+    		elem_newLength.value = Math.round(manual_diag.length);
+    		elem_newLength.select();
+			return;
+		}
+		manual_diag.data.unfixed_length = +elem_newLength.value;
+		manual_diag.strokeColor = 'green';
+		diag.push(manual_diag);
+		add_text_unfixed_length_diag(diag.length - 1);
+		manual_diag = undefined;
+		elem_window.style.display = 'none';
+		resize_canvas();
+		if (triangles_count() === lines.length - 2)
+		{
+			elem_preloader.style.display = 'block';
+			change_length_all_diags_process = change_length_all_diags.process();
+			setTimeout(change_length_all_diags_process, 200);
+		}
+		save_cancel();
+		return;
+	}
 	var kol_fix = 0;
 	for (var key in lines_sort)
 	{
@@ -4115,7 +4814,8 @@ function ok_enter_all()
 			kol_fix++;
 		}
 	}
-	if (kol_fix === lines_sort.length - 1 && !triangulate_bool)
+	if ((kol_fix === lines_sort.length || kol_fix === lines_sort.length - 1) &&
+		!triangulate_bool && (triangulate_rezhim === 1 || triangulator_pro === 0))
 	{
 		ok_enter_process = ok_enter.process();
 		elem_preloader.style.display = 'block';
@@ -4196,6 +4896,7 @@ var ok_enter = function()
 		    }
 		    square();
 		    elem_window.style.display = 'none';
+		    resize_canvas();
 		    text_points_sdvig();
 
 		    ready = true;
@@ -4248,102 +4949,133 @@ var ok_enter = function()
 		    }
 		    elem_jform_n9.value = k;
 			perimetr();
-			l = 0;
-			l1 = 0;
-			for (var key in lines)
-			{
-				l1++;
-				if (lines[key].data.fixed)
-				{
-					l++;
-				}
-			}
 
-			if(l1 === l)
+			if (triangulator_pro === 1 && triangulate_rezhim === 0)
 			{
-				for (var key = lines_sort.length; key--;)
+				for (var i = diag.length; i--;)
 				{
-					lines_sort[key].segments[0].point.x = +lines_sort[key].segments[0].point.x.toFixed(2);
-					lines_sort[key].segments[0].point.y = +lines_sort[key].segments[0].point.y.toFixed(2);
-					lines_sort[key].segments[1].point.x = +lines_sort[key].segments[1].point.x.toFixed(2);
-					lines_sort[key].segments[1].point.y = +lines_sort[key].segments[1].point.y.toFixed(2);
-				}
-				triangulator();
-				if (triangles_count() !== k - 2)
-				{
-					for (var key = 3; key--;)
+					diag[i].remove();
+					if (text_diag[i] !== undefined)
 					{
-						pulemet();
-						//console.log('pulemet');
-						if (triangles_count() === k - 2)
-						{
-							break;
-						}
+						text_diag[i].remove();
 					}
 				}
-				if (triangles_count() !== k - 2)
-				{
-					alert('Ошибка в построении диагоналей! Площадь будет посчитана неверно!');
-					//console.log(diag);
-					//console.log(diag_sort);
-					//console.log(triangles_count());
-				}
-			}
-			else
-			{
-				elem_preloader.style.display = 'none';
-				alert('Ошибка! Перестойте чертеж заново.');
+				diag = [];
+				diag_sort = [];
+				text_diag = [];
+				document.getElementById('popup2').style.display = 'block';
+				elem_window.style.display = 'none';
+				resize_canvas();
 				return;
 			}
-		    diag_sortirovka();
+			else if (triangulate_rezhim === 1 || triangulator_pro === 0)
+			{
+				l = 0;
+				l1 = 0;
+				for (var key in lines)
+				{
+					l1++;
+					if (lines[key].data.fixed)
+					{
+						l++;
+					}
+				}
 
-		    for (var i = lines_sort.length; i--;)
-			{
-				lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-				lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-				lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-				lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
-			}
-			for (var i = diag_sort.length; i--;)
-			{
-				diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-				diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-				diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-				diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
-			}
-			okruglenie_all_segments();
+				if(l1 === l)
+				{
+					for (var key = lines_sort.length; key--;)
+					{
+						lines_sort[key].segments[0].point.x = +lines_sort[key].segments[0].point.x.toFixed(2);
+						lines_sort[key].segments[0].point.y = +lines_sort[key].segments[0].point.y.toFixed(2);
+						lines_sort[key].segments[1].point.x = +lines_sort[key].segments[1].point.x.toFixed(2);
+						lines_sort[key].segments[1].point.y = +lines_sort[key].segments[1].point.y.toFixed(2);
+					}
+					triangulator();
+					if (triangles_count() !== k - 2)
+					{
+						for (var key = 3; key--;)
+						{
+							pulemet();
+							//console.log('pulemet');
+							if (triangles_count() === k - 2)
+							{
+								break;
+							}
+						}
+					}
+					if (triangles_count() !== k - 2)
+					{
+						alert('Ошибка в построении диагоналей!');
+						//console.log(diag);
+						//console.log(diag_sort);
+						//console.log(triangles_count());
+						elem_preloader.style.display = 'none';
+						cancel_last_action();
+						return;
+					}
+				}
+				else
+				{
+					elem_preloader.style.display = 'none';
+					alert('Ошибка! Перестойте чертеж заново.');
+					return;
+				}
+			    diag_sortirovka();
 
-	    	for (var i = 0; i < diag_sort.length; i++)
-			{
-				add_text_diag(i);
-			}
-		    if (lines_sort.length > 3)
+			    for (var i = lines_sort.length; i--;)
+				{
+					lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
+					lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
+					lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
+					lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+				}
+				for (var i = diag_sort.length; i--;)
+				{
+					diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
+					diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
+					diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
+					diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+				}
+				okruglenie_all_segments();
+
+		    	for (var i = 0; i < diag_sort.length; i++)
+				{
+					add_text_diag(i);
+				}
+			    if (lines_sort.length > 3)
+			    {
+				    triangulate_bool = true;
+				    diag_sort[0].strokeColor = 'red';
+				    text_diag[0].fillColor = 'Maroon';
+				    timer_mig = setInterval(migalka, 500, diag_sort[0]);
+		    		elem_newLength.focus();
+		    		elem_newLength.value = Math.round(diag_sort[0].length);
+		    		elem_newLength.select();
+		    		first_click = false;
+		    	}
+		    	else
+		    	{
+		    		var a = 0, b = 0, c = 0, p = 0, s = 0;
+					a = lines_sort[0].length;
+					b = lines_sort[1].length;
+					c = lines_sort[2].length;
+					p = (a + b + c) / 2;
+					s = Math.sqrt(p*(p-a)*(p-b)*(p-c));
+					s = s / 10000;
+					elem_jform_n4.value = s.toFixed(2);
+					elem_window.style.display = 'none';
+					resize_canvas();
+					text_points_sdvig();
+
+					ready = true;
+		    	}
+		    	save_cancel();
+		    }
+		    else
 		    {
-			    triangulate_bool = true;
-			    diag_sort[0].strokeColor = 'red';
-			    text_diag[0].fillColor = 'Maroon';
-			    timer_mig = setInterval(migalka, 500, diag_sort[0]);
-	    		elem_newLength.focus();
-	    		elem_newLength.value = Math.round(diag_sort[0].length);
-	    		elem_newLength.select();
-	    		first_click = false;
-	    	}
-	    	else
-	    	{
-	    		var a = 0, b = 0, c = 0, p = 0, s = 0;
-				a = lines_sort[0].length;
-				b = lines_sort[1].length;
-				c = lines_sort[2].length;
-				p = (a + b + c) / 2;
-				s = Math.sqrt(p*(p-a)*(p-b)*(p-c));
-				s = s / 10000;
-				elem_jform_n4.value = s.toFixed(2);
-				elem_window.style.display = 'none';
-				text_points_sdvig();
-
-				ready = true;
-	    	}
-	    	save_cancel();
+		    	elem_window.style.display = 'none';
+		    	resize_canvas();
+		    }
 		}	
 	}
 	else
@@ -6718,6 +7450,10 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize += 4;
 			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize += 4;
+			}
 		}
 		else if (view.zoom < 1)
 		{
@@ -6733,6 +7469,10 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize += 2;
 			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize += 2;
+			}
 		}
 		else if (view.zoom < 2)
 		{
@@ -6747,6 +7487,10 @@ function wheel_zoom(e)
 			for (var key = text_diag.length; key--;)
 			{
 				text_diag[key].fontSize += 0.5;
+			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize += 0.5;
 			}
 		}
 	}
@@ -6767,6 +7511,10 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize -= 4;
 			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize -= 4;
+			}
 		}
 		else if (view.zoom <= 1)
 		{
@@ -6782,6 +7530,10 @@ function wheel_zoom(e)
 			{
 				text_diag[key].fontSize -= 2;
 			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize -= 2;
+			}
 		}
 		else if (view.zoom <= 2)
 		{
@@ -6796,6 +7548,10 @@ function wheel_zoom(e)
 			for (var key = text_diag.length; key--;)
 			{
 				text_diag[key].fontSize -= 0.5;
+			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize -= 0.5;
 			}
 		}
 	}
@@ -6862,6 +7618,10 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize += 4;
 					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize += 4;
+					}
 				}
 				else if (view.zoom < 1)
 				{
@@ -6877,6 +7637,10 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize += 2;
 					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize += 2;
+					}
 				}
 				else if (view.zoom < 2)
 				{
@@ -6891,6 +7655,10 @@ function touch_zoom(event)
 					for (var key = text_diag.length; key--;)
 					{
 						text_diag[key].fontSize += 0.5;
+					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize += 0.5;
 					}
 				}
 			}
@@ -6911,6 +7679,10 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize -= 4;
 					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize -= 4;
+					}
 				}
 				if (view.zoom <= 1)
 				{
@@ -6926,6 +7698,10 @@ function touch_zoom(event)
 					{
 						text_diag[key].fontSize -= 2;
 					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize -= 2;
+					}
 				}
 				else if (view.zoom <= 2)
 				{
@@ -6940,6 +7716,10 @@ function touch_zoom(event)
 					for (var key = text_diag.length; key--;)
 					{
 						text_diag[key].fontSize -= 0.5;
+					}
+					for (var key = text_manual_diags.length; key--;)
+					{
+						text_manual_diags[key].fontSize -= 0.5;
 					}
 				}
 			}
@@ -6977,232 +7757,86 @@ function clicks()
 {
 	var polotna = fun_canv.getGreeting();
 
-        js_polotna = JSON.parse(polotna);
-        width_polotna = js_polotna;
+    js_polotna = JSON.parse(polotna);
+    width_polotna = js_polotna;
 
-    	 if (width_polotna.length === 0)
-    	 {
-            AndroidFunction.func_back(1);
-    	 }
-
+    if (width_polotna.length === 0)
+    {
+        AndroidFunction.func_back(1);
+    }
 
 	document.getElementById('cancelLastAction').onclick = cancel_last_action;
+	document.getElementById('cancelLastAction2').onclick = cancel_last_action;
 	document.getElementById('reset').onclick = clear_elem;
-	elem_button_ok = document.getElementById('ok');
-	elem_nums.push(elem_button_ok);
-	elem_button_ok.onclick = function()
+	document.getElementById('reset2').onclick = clear_elem;
+	document.getElementById('back').onclick = go_back;
+	document.getElementById('back2').onclick = go_back;
+	document.getElementById('open_popup').onclick = open_popup;
+	document.getElementById('open_popup2').onclick = open_popup;
+	document.getElementById('ok').onclick = elem_button_ok_onclick;
+	document.getElementById('ok2').onclick = elem_button_ok_onclick;
+
+	if (window.innerWidth > window.innerHeight) // для мониторов
 	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_button_ok.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_button_ok);
+		elem_newLength = document.getElementById('newLength2');
+		elem_useGrid = document.getElementById('useGrid2');
+	}
+	else //для мобильных
+	{
+		elem_newLength = document.getElementById('newLength');
+		elem_useGrid = document.getElementById('useGrid');
+	}
+
+	function elem_button_ok_onclick()
+	{
 		ok_enter_all();
-	};
+	}
+
 	document.onwheel = wheel_zoom;
 	document.getElementById('myCanvas').addEventListener('touchmove', touch_zoom, false);
 	document.getElementById('close_sketch').onclick = close_sketch_click_all;
 	elem_jform_n4 = document.getElementById('jform_n4');
 	elem_jform_n5 = document.getElementById('jform_n5');
 	elem_jform_n9 = document.getElementById('jform_n9');
-	elem_useGrid = document.getElementById('useGrid');
 	elem_window = document.getElementById('window');
-	elem_newLength = document.getElementById('newLength');
 	elem_preloader = document.getElementById('preloader');
 
-	var elem_num_0 = document.getElementById('num0');
-	elem_nums.push(elem_num_0);
-	elem_num_0.onclick = function()
+	document.getElementById('num0').onclick = elem_num_onclick;
+	document.getElementById('num02').onclick = elem_num_onclick;
+	document.getElementById('num1').onclick = elem_num_onclick;
+	document.getElementById('num12').onclick = elem_num_onclick;
+	document.getElementById('num2').onclick = elem_num_onclick;
+	document.getElementById('num22').onclick = elem_num_onclick;
+	document.getElementById('num3').onclick = elem_num_onclick;
+	document.getElementById('num32').onclick = elem_num_onclick;
+	document.getElementById('num4').onclick = elem_num_onclick;
+	document.getElementById('num42').onclick = elem_num_onclick;
+	document.getElementById('num5').onclick = elem_num_onclick;
+	document.getElementById('num52').onclick = elem_num_onclick;
+	document.getElementById('num6').onclick = elem_num_onclick;
+	document.getElementById('num62').onclick = elem_num_onclick;
+	document.getElementById('num7').onclick = elem_num_onclick;
+	document.getElementById('num72').onclick = elem_num_onclick;
+	document.getElementById('num8').onclick = elem_num_onclick;
+	document.getElementById('num82').onclick = elem_num_onclick;
+	document.getElementById('num9').onclick = elem_num_onclick;
+	document.getElementById('num92').onclick = elem_num_onclick;
+
+	function elem_num_onclick()
 	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_0.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_0);
 		if (!first_click)
 		{
 			elem_newLength.value = "";
 			first_click = true;
 		}
-		elem_newLength.value += "0";
+		elem_newLength.value += this.innerHTML;
 	};
-	var elem_num_1 = document.getElementById('num1');
-	elem_nums.push(elem_num_1);
-	elem_num_1.onclick = function()
+
+	document.getElementById('numback').onclick = elem_numback_onclick;
+	document.getElementById('numback2').onclick = elem_numback_onclick;
+
+	function elem_numback_onclick()
 	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_1.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_1);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "1";
-	};
-	var elem_num_2 = document.getElementById('num2');
-	elem_nums.push(elem_num_2);
-	elem_num_2.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_2.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_2);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "2";
-	};
-	var elem_num_3 = document.getElementById('num3');
-	elem_nums.push(elem_num_3);
-	elem_num_3.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_3.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_3);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "3";
-	};
-	var elem_num_4 = document.getElementById('num4');
-	elem_nums.push(elem_num_4);
-	elem_num_4.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_4.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_4);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "4";
-	};
-	var elem_num_5 = document.getElementById('num5');
-	elem_nums.push(elem_num_5);
-	elem_num_5.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_5.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_5);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "5";
-	};
-	var elem_num_6 = document.getElementById('num6');
-	elem_nums.push(elem_num_6);
-	elem_num_6.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_6.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_6);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "6";
-	};
-	var elem_num_7 = document.getElementById('num7');
-	elem_nums.push(elem_num_7);
-	elem_num_7.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_7.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_7);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "7";
-	};
-	var elem_num_8 = document.getElementById('num8');
-	elem_nums.push(elem_num_8);
-	elem_num_8.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_8.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_8);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "8";
-	};
-	var elem_num_9 = document.getElementById('num9');
-	elem_nums.push(elem_num_9);
-	elem_num_9.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_num_9.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_num_9);
-		if (!first_click)
-		{
-			elem_newLength.value = "";
-			first_click = true;
-		}
-		elem_newLength.value += "9";
-	};
-	var elem_numback = document.getElementById('numback');
-	elem_nums.push(elem_numback);
-	elem_numback.onclick = function()
-	{
-		clearInterval(timer_button_color);
-		for (var key = elem_nums.length; key--;)
-		{
-			elem_nums[key].style.background = '';
-		}
-		elem_numback.style.background = '#E0FFFF';
-		timer_button_color = setInterval(sbros_but_color, 1000, elem_numback);
 		if (!first_click)
 		{
 			elem_newLength.value = "";
@@ -7298,13 +7932,40 @@ function clicks()
 			break;
 		}
 	};
-	document.oncontextmenu = function()
+	document.getElementById('myCanvas').oncontextmenu = function()
 	{
 		if (elem_useGrid.checked)
 		{
 			elem_useGrid.checked = false;
 		}
 		return false;
+	};
+	document.getElementById('triangulate_auto').onclick = function()
+	{
+		triangulate_rezhim = 1;
+		document.getElementById('popup2').style.display = 'none';
+		elem_window.style.display = 'block';
+		resize_canvas();
+		ok_enter_all();
+	};
+	document.getElementById('triangulate_manual').onclick = function()
+	{
+		triangulate_rezhim = 2;
+		document.getElementById('popup2').style.display = 'none';
+		elem_window.style.display = 'none';
+		resize_canvas();
+
+		var cir, op;
+		for (var i = text_points.length; i--;)
+		{
+			op = obshaya_point(lines[text_points[i].data.id_line1], lines[text_points[i].data.id_line2]);
+			cir = new Path.Circle(op, 5);
+			cir.fillColor = 'blue';
+			text_points[i].data.circle = cir;
+		}
+
+		clicks_pt();
+		save_cancel();
 	};
 }
 
@@ -7643,12 +8304,6 @@ function migalka(path)
 	}
 }
 
-function sbros_but_color(elem)
-{
-	elem.style.background = '';
-	clearInterval(timer_button_color);
-}
-
 var square_tkan, lines_tkan = [];
 function tkan()
 {
@@ -7835,16 +8490,12 @@ function tkan()
 	}
 
 	var angle_final, j_f, sq_min = 100222, sq_polo, sq_obr;
-	for (var i = lines_tkan.length; i--;)
+	/*for (var i = lines_tkan.length; i--;)
 	{
 		lines_tkan[i].rotate(-1, view.center);
-	}
-	for (var angle_rotate = 0; angle_rotate < 181; angle_rotate++)
+	}*/
+	for (var angle_rotate = 0; angle_rotate < 360; angle_rotate++)
 	{
-		for (var i = lines_tkan.length; i--;)
-		{
-			lines_tkan[i].rotate(1, view.center);
-		}
 		for (var j = 0; j < width_polotna.length; j++)
 		{
 			g_points = getPathsPoints(lines_tkan);
@@ -7867,11 +8518,15 @@ function tkan()
 				//console.log(sq_obr, angle_final);
 			}
 		}
+		for (var i = lines_tkan.length; i--;)
+		{
+			lines_tkan[i].rotate(1, view.center);
+		}
 	}
-	for (var i = lines_tkan.length; i--;)
+	/*for (var i = lines_tkan.length; i--;)
 	{
 		lines_tkan[i].rotate(180, view.center);
-	}
+	}*/
 	if (j_f === undefined)
 	{
 		alert('Ошибка! Этот чертеж не вместится ни в одно доступное полотно.');
@@ -7889,6 +8544,7 @@ function tkan()
 		clear_elem();
 		return false;
 	}
+
 	for (var i = lines_tkan.length; i--;)
 	{
 		lines_tkan[i].rotate(angle_final, view.center);
@@ -8207,7 +8863,7 @@ var qw = fun_canv.get_diags_points();
 var qw = fun_canv.get_pt_points();
         qw = JSON.parse(qw);
         pt_points_rec = qw;
-        
+
 	ready = true;
 	triangulate_bool = true;
 	var obj, pt_name;
@@ -8228,6 +8884,7 @@ var qw = fun_canv.get_pt_points();
 		obj.strokeColor = 'green';
 		obj.strokeWidth = 1;
 		diag_sort.push(obj);
+		diag.push(obj);
 	}
 
 	var code_char = 64, alfavit_num = 0, id1, id2, op;
@@ -8283,4 +8940,5 @@ var qw = fun_canv.get_pt_points();
 	zerkalo(1);
 	close_sketch_click_all();
 }
+//build_chert();
 });

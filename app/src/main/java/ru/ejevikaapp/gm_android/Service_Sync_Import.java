@@ -312,7 +312,7 @@ public class Service_Sync_Import extends Service {
 
                         try {
 
-                            ContentValues values = new ContentValues();
+                            ContentValues values;
 
                             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             Date change_max = ft.parse(change_time_global);
