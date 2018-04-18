@@ -522,7 +522,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_marginTop="5dp"
@@ -614,12 +614,12 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:id="@+id/list_ecola">
-                    </ListView>
+                    </ru.ejevikaapp.gm_android.Class.NonScrollListView>
 
                 </LinearLayout>
 
@@ -842,7 +842,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -942,7 +942,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -1363,7 +1363,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -1468,7 +1468,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -1614,7 +1614,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -1942,7 +1942,7 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
@@ -2046,7 +2046,9 @@
                         android:background="@drawable/rounded_button"
                         android:textColor="#ffffff"/>
 
-                    <ListView
+
+
+                    <ru.ejevikaapp.gm_android.Class.NonScrollListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"

@@ -141,6 +141,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                 do {
                     String n3 = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
+                    try {
                     String title1 = null;
                     int n1 = 0, n2 = 0;
 
@@ -166,7 +167,6 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     TextView mat_1 = (TextView) view.findViewById(R.id.mat_1);
                     mat_1.setText(mat_1.getText() + "  " + title1);
 
-                    try {
                         sqlQuewy = "SELECT  texture_title "
                                 + "FROM rgzbn_gm_ceiling_textures" +
                                 " WHERE _id = ?";
@@ -227,7 +227,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     sqlQuewy = "SELECT hex "
                             + "FROM rgzbn_gm_ceiling_colors" +
                             " WHERE _id = ?";
-                    k = db.rawQuery(sqlQuewy, new String[]{color});
+                    Cursor k = db.rawQuery(sqlQuewy, new String[]{color});
 
                     if (k != null) {
                         if (k.moveToFirst()) {

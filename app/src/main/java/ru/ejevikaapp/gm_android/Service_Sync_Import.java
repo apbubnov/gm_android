@@ -52,6 +52,8 @@ public class Service_Sync_Import extends Service {
 
     static String domen;
 
+    static int count_project1 = 0;
+
     public Service_Sync_Import() {
     }
 
@@ -432,7 +434,6 @@ public class Service_Sync_Import extends Service {
 
                             for (int i = 0; i < rgzbn_gm_ceiling_projects.length(); i++) {
 
-
                                 values = new ContentValues();
                                 org.json.JSONObject porject_tmp = rgzbn_gm_ceiling_projects.getJSONObject(i);
                                 count = 0;
@@ -581,7 +582,9 @@ public class Service_Sync_Import extends Service {
                                     if (count == 0) {
 
                                         if (project_status.equals("0")){
-                                        } else  if (project_status.equals("1")){
+                                        } else if (project_status.equals("1")){
+
+                                            count_project1 ++;
 
                                             Intent resultIntent = new Intent(ctx, Activity_empty.class);
                                             ArrayList group_id = new ArrayList();
@@ -631,8 +634,7 @@ public class Service_Sync_Import extends Service {
                                                             .setSmallIcon(R.raw.gm_ico2)
                                                             .setContentIntent(resultPendingIntent)
                                                             .setContentTitle("ГМ")
-                                                            .setContentText("У Вас новый замер (" + (i + 1) + ")");
-
+                                                            .setContentText("У Вас новый замер (" + count_project1 + ")");
                                             Notification notification = builder.build();
 
                                             NotificationManager notificationManager = (NotificationManager) ctx

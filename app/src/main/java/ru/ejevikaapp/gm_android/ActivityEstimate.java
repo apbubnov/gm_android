@@ -102,48 +102,52 @@ public class ActivityEstimate extends AppCompatActivity {
         TextView nameCeiling = (TextView)findViewById(R.id.nameCeiling);
         nameCeiling.setText("Потолок: " + calculation_title);
 
-        int id_m = 0;
-        int id_t = 0;
-        sqlQuewy = "select manufacturer_id, texture_id "
-                + "FROM rgzbn_gm_ceiling_canvases " +
-                "where _id = ?";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    id_m = c.getInt(c.getColumnIndex(c.getColumnName(0)));
-                    id_t = c.getInt(c.getColumnIndex(c.getColumnName(1)));
-                } while (c.moveToNext());
+        try {
+            int id_m = 0;
+            int id_t = 0;
+            sqlQuewy = "select manufacturer_id, texture_id "
+                    + "FROM rgzbn_gm_ceiling_canvases " +
+                    "where _id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        id_m = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                        id_t = c.getInt(c.getColumnIndex(c.getColumnName(1)));
+                    } while (c.moveToNext());
+                }
             }
-        }
-        c.close();
+            c.close();
 
-        sqlQuewy = "select name, country "
-                + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                "where _id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_m)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    canvases = c.getString(c.getColumnIndex(c.getColumnName(0))) + " "
-                            + c.getString(c.getColumnIndex(c.getColumnName(1)));
-                } while (c.moveToNext());
+            sqlQuewy = "select name, country "
+                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                    "where _id = ?";
+            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_m)});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        canvases = c.getString(c.getColumnIndex(c.getColumnName(0))) + " "
+                                + c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    } while (c.moveToNext());
+                }
             }
-        }
-        c.close();
+            c.close();
 
-        sqlQuewy = "select texture_title "
-                + "FROM rgzbn_gm_ceiling_textures " +
-                "where _id = ?";
-        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_t)});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    texture = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                } while (c.moveToNext());
+            sqlQuewy = "select texture_title "
+                    + "FROM rgzbn_gm_ceiling_textures " +
+                    "where _id = ?";
+            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_t)});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        texture = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    } while (c.moveToNext());
+                }
             }
+            c.close();
+
+        }catch (Exception e){
         }
-        c.close();
 
         JSONObject result = HelperClass.calculation(this, dealer_id_str, colorIndex, id_calculation, canvases, texture, rb_vstavka,
                 n1, n2, n3, S, P, n6, n7, n8, n9,
@@ -153,12 +157,17 @@ public class ActivityEstimate extends AppCompatActivity {
                 final_comp, final_mount);
 
         ImageView id_image = (ImageView) findViewById(R.id.imageView);
+        TextView textCalcData = (TextView) findViewById(R.id.calcData);
 
-        Log.d("mLog", String.valueOf(result));
-
-        try {
-            Sharp.loadString(calc_image).into(id_image);
-        } catch (Exception e) {
+        if (calc_image.length()<10){
+            id_image.setVisibility(View.GONE);
+            textCalcData.setVisibility(View.GONE);
+        } else {
+            try {
+                Sharp.loadString(calc_image).into(id_image);
+                textCalcData.setText(calcData);
+            } catch (Exception e) {
+            }
         }
 
         String components = "";
@@ -177,8 +186,6 @@ public class ActivityEstimate extends AppCompatActivity {
             LinearLayout linearComp = (LinearLayout)findViewById(R.id.linearComp);
             linearComp.setVisibility(View.GONE);
         } else {
-            TextView textCalcData = (TextView) findViewById(R.id.calcData);
-            textCalcData.setText(calcData);
 
             ListView listComponents = (ListView) findViewById(R.id.listComponents);
 

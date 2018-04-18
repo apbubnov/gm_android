@@ -116,7 +116,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         ed.commit();
     }
 
-    void clients (){
+    void clients () {
 
         SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
@@ -127,12 +127,12 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE); // если зашёл после выбора клиента (Дилер)
         String activity_client = SP.getString("", "");
 
-        dbHelper = new DBHelper(getActivity());
+        Log.d("mLog", user_id + " " + activity_client);
 
+        dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         ArrayList client = new ArrayList();
-
         String usergroup = "";
         String sqlQuewy = "SELECT group_id "
                 + "FROM rgzbn_user_usergroup_map" +
@@ -148,7 +148,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         }
         c.close();
 
-        if (usergroup.equals("21") || usergroup.equals("22")){ // замерщик
+        if (usergroup.equals("21") || usergroup.equals("22")) { // замерщик
 
             sqlQuewy = "SELECT client_id "
                     + "FROM rgzbn_gm_ceiling_projects " +
@@ -192,7 +192,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                 c.close();
             }
         }
-        for (int g = 0; g<client.size(); g++) {
+
+        for (int g = 0; g < client.size(); g++) {
 
             if (activity_client.equals("")) {
                 sqlQuewy = "SELECT _id "
@@ -207,28 +208,22 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                         "order by project_calculation_date";
                 c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(client.get(g))});
             }
-
-            int i = 0;
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
                         sqlQuewy = "SELECT * "
                                 + "FROM rgzbn_gm_ceiling_projects" +
                                 " WHERE _id = ?";
-
                         Cursor k = db.rawQuery(sqlQuewy, new String[]{id});
                         if (k.moveToFirst()) {
                             int kdIndex = k.getColumnIndex(DBHelper.KEY_ID);
-
                             do {
                                 String p_info = "";
                                 String project_calculation_date = "";
                                 String id_client = "";
                                 String fio = "";
                                 String project_note = "";
-                                i++;
 
                                 sqlQuewy = "SELECT project_info, client_id, project_calculation_date, gm_manager_note "
                                         + "FROM rgzbn_gm_ceiling_projects " +
@@ -249,14 +244,10 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 }
                                 cursor_1.close();
 
-                                Log.d("spisok", id_client + " " + k.getString(kdIndex));
-
                                 SimpleDateFormat out_format = null;
                                 SimpleDateFormat out_format_time = null;
-                                SimpleDateFormat out_format_minute = null;
+                                SimpleDateFormat out_format_minute;
                                 Date change_max = null;
-                                Date minute = null;
-
                                 int hours = 0;
 
                                 try {
@@ -269,10 +260,12 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                     hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
                                     out_format_time = new SimpleDateFormat("HH:mm");
+
                                 } catch (Exception e) {
                                 }
 
                                 String tempId = k.getString(kdIndex);
+
                                 String tempDate =
                                         String.valueOf(out_format.format(change_max)
                                                 + "\n" + out_format_time.format(change_max))
@@ -282,9 +275,13 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 /* Обработка адреса */
                                 p_info = p_info.replace("Воронеж, ", "");
 
-                                if (project_note.equals("null")){
-                                    project_note = "-";
+                                try {
+                                    if (project_note.equals("null")) {
+                                        project_note = "-";
+                                    }
+                                } catch (Exception e) {
                                 }
+
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(
                                         tempId, tempDate, p_info, tempIdClient, project_note, null);
                                 client_mas.add(fc);
@@ -299,9 +296,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
             }
         }
 
-
         BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
-
         dict.addStringField(R.id.c_number, new StringExtractor<Frag_client_schedule_class>() {
             @Override
             public String getStringValue(Frag_client_schedule_class nc, int position) {
@@ -331,7 +326,9 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item3, dict);
         list_clients.setAdapter(adapter);
 
-        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        mSwipeRefreshLayout.setRefreshing(false);
+
+        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
@@ -370,7 +367,6 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
             }
         });
 
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

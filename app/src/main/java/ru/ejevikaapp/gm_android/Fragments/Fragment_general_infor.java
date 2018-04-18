@@ -2415,24 +2415,30 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         btnEstimate.setLayoutParams(lin_btn);
         btnEstimate.setId(ch_i);
         btnEstimate.setOnClickListener(getEstimate);
+        btnEstimate.setBackgroundResource(R.drawable.rounded_button);
+        btnEstimate.setTextColor(Color.parseColor("#ffffff"));
         mainC.addView(btnEstimate);
         estimate.add(Integer.valueOf(id));
 
         ch_i++;
 
+        LinearLayout.LayoutParams ViewParams = new LinearLayout.LayoutParams(200, 200, 1);
+
         ImageView image = new ImageView(getActivity());
-        LinearLayout.LayoutParams ViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        ViewParams.weight = 1;
-        ViewParams.width = 120;
-        ViewParams.height = 120;
         image.setLayoutParams(ViewParams);
 
-        try {
-            Sharp.loadString(imag)
-                    .into(image);
-            mainC2.addView(image);
-        }catch (Exception e){
+        if (imag.length()>10) {
+            try {
+                Sharp.loadString(imag)
+                        .into(image);
+                mainC2.addView(image);
+            } catch (Exception e) {
+            }
+        } else {
+            View view = new View(getActivity());
+            view.setLayoutParams(ViewParams);
+            mainC2.addView(view);
+
         }
 
     }

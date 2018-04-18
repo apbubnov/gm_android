@@ -61,6 +61,8 @@ public class Service_Sync extends Service {
 
     static String domen;
 
+    static Context ctx;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -101,6 +103,7 @@ public class Service_Sync extends Service {
         public void onReceive(final Context context, Intent intent) {
             Log.v(TAG, "Alarm received: " + intent.getAction());
 
+            ctx = context;
             SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
             domen = SP.getString("", "");
 
@@ -1698,6 +1701,7 @@ public class Service_Sync extends Service {
 
                         check_client = "[" + String.valueOf(jsonObjectClient) + "]";
                     }
+                    Service_Sync.Alarm.setAlarm(ctx);
                     new CheckClientsData().execute();
                 }
 
@@ -1876,6 +1880,7 @@ public class Service_Sync extends Service {
                         } catch (Exception e) {
                         }
 
+                        Service_Sync.Alarm.setAlarm(ctx);
 
                     }
 
@@ -2045,6 +2050,7 @@ public class Service_Sync extends Service {
                             }
                         } catch (Exception e) {
                         }
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
                 }
             }, new Response.ErrorListener() {
@@ -2184,6 +2190,8 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_mounters_map"});
 
+                        Service_Sync.Alarm.setAlarm(ctx);
+
                     }
 
                     delete();
@@ -2238,6 +2246,7 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_mount"});
 
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
 
                     delete();
@@ -2291,6 +2300,7 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_dealer_info"});
 
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
 
                     delete();
@@ -2385,6 +2395,7 @@ public class Service_Sync extends Service {
                             new CheckClientsContactsData().execute();
                         } catch (Exception e) {
                         }
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
                 }
 
@@ -2607,6 +2618,7 @@ public class Service_Sync extends Service {
 
                         } catch (Exception e) {
                         }
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
                     new CheckProjectsData().execute();
                 }
@@ -2997,6 +3009,7 @@ public class Service_Sync extends Service {
 
                         } catch (Exception e) {
                         }
+                        Service_Sync.Alarm.setAlarm(ctx);
                     }
                 }
 
@@ -3097,92 +3110,6 @@ public class Service_Sync extends Service {
             return null;
         }
     }
-
-
-    static class SendCalculation_ImageData extends AsyncTask<Void, Void, Void> {
-
-        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.addImagesFromAndroid";
-        Map<String, String> parameters = new HashMap<String, String>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            // try {
-
-            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String res) {
-
-                    Log.d(TAG, "res " + res);
-                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
-                        Log.d("responce", "SendCalculationData пусто");
-                    } else {
-                        SQLiteDatabase db;
-                        db = dbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        String new_id = "";
-                        try {
-                            res = res.substring(1, res.length() - 1);
-
-                            String sqlQuewy = "SELECT * "
-                                    + "FROM history_send_to_server " +
-                                    "where id_new = ? and sync = ? and (name_table = ? or name_table = ?)";
-                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "0",
-                                    "rgzbn_gm_ceiling_calculations_cal", "rgzbn_gm_ceiling_calculations_cut"});
-                            if (cursor != null) {
-                                cursor.moveToFirst();
-                                do {
-
-                                    values = new ContentValues();
-                                    values.put(DBHelper.KEY_SYNC, "1");
-                                    values.put(DBHelper.KEY_STATUS, "1");
-                                    db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=?",
-                                            new String[]{res, "rgzbn_gm_ceiling_calculations_cal"});
-
-                                    values = new ContentValues();
-                                    values.put(DBHelper.KEY_SYNC, "1");
-                                    values.put(DBHelper.KEY_STATUS, "1");
-                                    db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=?",
-                                            new String[]{res, "rgzbn_gm_ceiling_calculations_cut"});
-
-                                } while (cursor.moveToNext());
-                            }
-                            cursor.close();
-
-                        } catch (Exception e) {
-                        }
-                    }
-                    delete();
-
-                }
-
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "error " + error);
-
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("calculation_images", jsonImage);
-
-                    Log.d(TAG, String.valueOf(parameters));
-                    return parameters;
-                }
-            };
-
-            requestQueue.add(request);
-
-            return null;
-        }
-    }
-
 
     static class SendComponents extends AsyncTask<Void, Void, Void> {
 
@@ -3505,6 +3432,8 @@ public class Service_Sync extends Service {
                         } catch (Exception e) {
                         }
                         components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
+
+                        Service_Sync.Alarm.setAlarm(ctx);
 
                         new CheckComponents().execute();
                     }

@@ -58,6 +58,7 @@
                 android:layout_marginLeft="5dp"
                 style="@style/text_style_spisok"
                 android:id="@+id/t_fio"/>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="40dp"

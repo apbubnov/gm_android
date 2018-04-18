@@ -550,18 +550,21 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         extra_comp(extra_components_2);
                         extra_mount(extra_mounting_2);
 
-                        sqlQuewy = "select texture_id "
-                                + "FROM rgzbn_gm_ceiling_canvases " +
-                                "where _id = ? ";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    n2 = c.getInt(c.getColumnIndex(c.getColumnName(0)));
-                                } while (c.moveToNext());
+                        try{
+                            sqlQuewy = "select texture_id "
+                                    + "FROM rgzbn_gm_ceiling_canvases " +
+                                    "where _id = ? ";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{n3});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        n2 = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                    } while (c.moveToNext());
+                                }
                             }
+                            c.close();
+                        } catch (Exception e){
                         }
-                        c.close();
 
                         name_project.setText(calculation_title);
                         area.setText(" S = " + n4_2 + " м2");
@@ -667,7 +670,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         sqlQuewy = "select hex "
                                 + "FROM rgzbn_gm_ceiling_colors " +
                                 "where title = ? ";
-                        c = db.rawQuery(sqlQuewy, new String[]{color_2});
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{color_2});
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 do {
@@ -4868,8 +4871,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         }
 
-        Log.d("mLog",canvases + " " + texture);
-
         JSONObject result = HelperClass.calculation(getActivity(), dealer_id_str, colorIndex, id_calculation, canvases, texture, rb_vstavka,
                 n1, n2, n3, S, P, n6, n7, n8, n9,
                 n11, n12, n16, n17, n18, n19,
@@ -4889,7 +4890,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         double total_with_dealer_margin = 0;
 
         Log.d("mLog", String.valueOf(result));
-
 
         try {
             JSONObject project = result.getJSONObject("project");
@@ -4966,8 +4966,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
         String dealer_calc = SP.getString("", "");
-
-        Log.d("mLog", "dealer_calc  _ " + dealer_calc + " _ " + user_id_int);
 
         if (dealer_calc.equals("true")) {
             btn_save.setVisibility(View.VISIBLE);
@@ -5225,32 +5223,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_EXTRA_MOUNTING, final_mount);
 
             if (chertezh_bool) {
-                int max_id_contac = 0;
-                try {
-                    sqlQuewy = "select MAX(_id) "
-                            + "FROM rgzbn_gm_ceiling_calculations " +
-                            "where _id>? and _id<?";
-                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                max_id_contac++;
-                            } while (c.moveToNext());
-                        }
-                    }
-                } catch (Exception e) {
-                    max_id_contac = user_id_int + 1;
-                }
-                values.put(DBHelper.KEY_ID, max_id_contac);
+                values.put(DBHelper.KEY_ID, id_calculation);
                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-                id_calculation = String.valueOf(max_id_contac);
                 chertezh_bool = false;
 
             } else {
                 int max_id_contac = 0;
-                //id_calculation = getActivity().getIntent().getStringExtra("id_calculation");  // id_calculation
-                if (id_calculation != null) {
+                if (id_calculation.length()<6) {
 
                     if (dealer_calc.equals("true")) {
 
@@ -5269,24 +5248,24 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     //values.put(DBHelper.KEY_ID, max_id);
                     db = dbHelper.getReadableDatabase();
                     //values = new ContentValues();
-                    try {
-                        sqlQuewy = "select MAX(_id) "
-                                + "FROM rgzbn_gm_ceiling_calculations " +
-                                "where _id>? and _id<?";
-                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                    max_id_contac++;
-                                } while (c.moveToNext());
-                            }
-                        }
-                    } catch (Exception e) {
-                        max_id_contac = user_id_int + 1;
-                    }
+                    //try {
+                    //    sqlQuewy = "select MAX(_id) "
+                    //            + "FROM rgzbn_gm_ceiling_calculations " +
+                    //            "where _id>? and _id<?";
+                    //    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
+                    //    if (c != null) {
+                    //        if (c.moveToFirst()) {
+                    //            do {
+                    //                max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                    //                max_id_contac++;
+                    //            } while (c.moveToNext());
+                    //        }
+                    //    }
+                    //} catch (Exception e) {
+                    //    max_id_contac = user_id_int + 1;
+                    //}
 
-                    values.put(DBHelper.KEY_ID, max_id_contac);
+                    values.put(DBHelper.KEY_ID, id_calculation);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
 
                     Toast toast = Toast.makeText(getActivity().getApplicationContext(),
@@ -5708,12 +5687,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
+        if (n3 == null){
+            spinner1.setSelection(0);
+        }
+
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent,
                                        View itemSelected, int selectedItemPosition, long selectedId) {
 
                 texture = spinner1.getSelectedItem().toString();
-                Log.d("mLog", texture);
 
                 SQLiteDatabase db;
                 db = dbHelper.getWritableDatabase();
@@ -5879,6 +5861,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         spinner2.setSelection(0);
                     }
                 } catch (Exception e) {
+                    spinner2.setSelection(0);
                 }
 
                 spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

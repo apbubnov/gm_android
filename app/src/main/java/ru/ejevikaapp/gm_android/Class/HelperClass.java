@@ -1128,7 +1128,8 @@ public class HelperClass {
         }
 
         // пожарная сигнализация
-        if (n21 < 0) {
+        Log.d("mLog", String.valueOf(n21));
+        if (n21 > 0) {
             component_count.set(items_9, component_count.get(items_9) + n21 * 3);
             component_count.set(items_10, component_count.get(items_10) + n21 * 6);
             component_count.set(items_495, component_count.get(items_495) + n21);
@@ -1449,7 +1450,6 @@ public class HelperClass {
 
         //Сюда считаем итоговую сумму обрезков
         try {
-
             if (width_final.equals("") && offcut_square.equals("0")) {
             } else {
                 double wf = Double.valueOf(width_final) / 100;
@@ -1545,7 +1545,7 @@ public class HelperClass {
         }
 
         if (rb_vstavka.equals("0")) {
-            if (n11 > 0 && n31 > 0) {
+            if (n11 > 0 || n31 > 0) {
                 sqlQuewy = "select * "
                         + "FROM rgzbn_gm_ceiling_components_option " +
                         "where title = ? and component_id = 15";
@@ -1554,16 +1554,12 @@ public class HelperClass {
                     if (c.moveToFirst()) {
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        String full_name = "Вставка " + n6;
+                        String full_name = "Вставка 303 белая" ;
                         String stack = "0";
 
-                        String unit = "м.п.";
-
                         String self_price = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                        double quantity = 0;
 
-                        Log.d("mLog", "id_color_vs " + n6);
-                        quantity = component_count.get(n6);
+                        double quantity = n11 + n31;
 
                         String self_total = String.valueOf(Math.round((Double.parseDouble(self_price) * quantity) * 100.0) / 100.0);
 
@@ -1586,7 +1582,6 @@ public class HelperClass {
                         values.put(DBHelper.KEY_DEALER_PRICE, dealer_price);
                         values.put(DBHelper.KEY_DEALER_TOTAL, dealer_total);
                         db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
-
                     }
                 }
             }

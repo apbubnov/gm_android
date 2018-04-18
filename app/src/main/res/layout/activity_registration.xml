@@ -27,7 +27,8 @@
         android:inputType="phone"
         android:textColor="#43358c"
         android:maxLines="1"
-        android:textColorHint="#414099" />
+        android:hint="(Пример:79009009090)"
+        android:textColorHint="#d1d1d1" />
 
     <TextView
         android:layout_width="match_parent"
@@ -44,7 +45,8 @@
         android:inputType="textWebEmailAddress"
         android:textColor="#43358c"
         android:maxLines="1"
-        android:textColorHint="#43358c" />
+        android:hint="(Пример:example@mail.com)"
+        android:textColorHint="#d1d1d1" />
 
     <TextView
         android:layout_width="match_parent"

@@ -418,14 +418,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
                     db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"material"});
                 } while (c.moveToNext());
+            } else {
+                values = new ContentValues();
+                values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                values.put(DBHelper.KEY_TITLE, "material");
+                db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
             }
         }
-        {
-            values = new ContentValues();
-            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
-            values.put(DBHelper.KEY_TITLE, "material");
-            db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
-        }
+
         c.close();
 
         values = new ContentValues();
@@ -439,14 +439,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
                     db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"mount"});
                 } while (c.moveToNext());
+            } else {
+                values = new ContentValues();
+                values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                values.put(DBHelper.KEY_TITLE, "mount");
+                db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
             }
         }
-        {
-            values = new ContentValues();
-            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
-            values.put(DBHelper.KEY_TITLE, "mount");
-            db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
-        }
+
         c.close();
 
         values = new ContentValues();
@@ -460,14 +460,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
                     db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
                 } while (c.moveToNext());
+            } else {
+                values = new ContentValues();
+                values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
+                values.put(DBHelper.KEY_TITLE, "dealer");
+                db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
             }
         }
-        {
-            values = new ContentValues();
-            values.put(DBHelper.KEY_CHANGE_TIME, "0000-00-00 00:00:00");
-            values.put(DBHelper.KEY_TITLE, "dealer");
-            db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
-        }
+
         c.close();
 
         sqlQuewy = "SELECT group_id "
