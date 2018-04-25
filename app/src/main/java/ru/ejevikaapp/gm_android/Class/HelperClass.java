@@ -1261,16 +1261,16 @@ public class HelperClass {
 
 
         //Обработка 1 угла
-        if (n1.equals("28") && n9 > 4) {
+        if (n1.equals("28") && n9 > 6) {
 
             canvases_data.set(0, "Oбработка 1 угла");                         // название
-            canvases_data.set(1, n9 - 4);                                             // кол-во
+            canvases_data.set(1, n9 - 6);                                             // кол-во
             canvases_data.set(2, results.get(19));                                                         // цена
-            canvases_data.set(3, (n9 - 4) * results.get(19));                                     // Кол-во * Себестоимость
+            canvases_data.set(3, (n9 - 6) * results.get(19));                                     // Кол-во * Себестоимость
             canvases_data.set(4, margin(results.get(19), dealer_can_marg));                                    //Стоимость с маржой ГМ (для дилера)
-            canvases_data.set(5, Math.rint(100.0 * (margin(results.get(19), dealer_can_marg)) * (n9 - 4)) / 100.0);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+            canvases_data.set(5, Math.rint(100.0 * (margin(results.get(19), dealer_can_marg)) * (n9 - 6)) / 100.0);   //Кол-во * Стоимость с маржой ГМ (для дилера)
             canvases_data.set(6, double_margin(results.get(19), dealer_can_marg, gm_can_marg));            //Стоимость с маржой ГМ и дилера (для клиента)
-            canvases_data.set(7, Math.rint(100 * (double_margin(results.get(19), dealer_can_marg, gm_can_marg)) * (n9 - 4)) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+            canvases_data.set(7, Math.rint(100 * (double_margin(results.get(19), dealer_can_marg, gm_can_marg)) * (n9 - 6)) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
 
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_COMP_ID, "canv");
@@ -1318,6 +1318,19 @@ public class HelperClass {
         } catch (Exception e){
         }
 
+        boolean canvases_price = false;
+
+        sqlQuewy = "select * "
+                + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
+                "where user_id = ? ";
+        c = db.rawQuery(sqlQuewy, new String[]{dealer_id_str});         // заполняем массивы из таблицы
+        if (c != null) {
+            if (c.moveToFirst()) {
+                canvases_price = true;
+            }
+        }
+        c.close();
+
         //Сюда считаем итоговую сумму полотна
         if (width_final.equals("")) {
             if (n3 == null) { //если новый расчёт
@@ -1337,6 +1350,13 @@ public class HelperClass {
                     }
                 }
                 c.close();
+
+                Log.d("mLog", "price1 = " + String.valueOf(canvases_price));
+
+                if (canvases_price) {
+                    price = new_price("canvases", dealer_id_str, id_n3, price);
+                    Log.d("mLog", "price1 = " + String.valueOf(price));
+                }
 
                 //price = double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40;
                 canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
@@ -1407,8 +1427,6 @@ public class HelperClass {
             }
             c.close();
 
-            Log.d("mLog", "canva = " +  str_sb + " " + n2 + " " + id + " " + wf);
-
             sqlQuewy = "select _id, price "
                     + "FROM rgzbn_gm_ceiling_canvases " +
                     "where texture_id = ? and manufacturer_id = ? and width =?";
@@ -1417,12 +1435,17 @@ public class HelperClass {
                 if (c.moveToFirst()) {
                     do {
                         id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                        Log.d("perera", "else " + id_n3);
                         price = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
                     } while (c.moveToNext());
                 }
             }
             c.close();
+
+            Log.d("mLog", "id_n3 = " + String.valueOf(id_n3));
+
+            if (canvases_price) {
+                price = new_price("canvases", dealer_id_str, id_n3, price);
+            }
 
             canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
             canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -1482,6 +1505,19 @@ public class HelperClass {
         } catch (Exception e) {
         }
 
+        boolean components_price = false;
+
+        sqlQuewy = "select * "
+                + "FROM rgzbn_gm_ceiling_components_dealer_price " +
+                "where user_id = ? ";
+        c = db.rawQuery(sqlQuewy, new String[]{dealer_id_str});         // заполняем массивы из таблицы
+        if (c != null) {
+            if (c.moveToFirst()) {
+                components_price = true;
+            }
+        }
+        c.close();
+
         //Сюда считаем итоговую сумму компонентов
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_components_option";
@@ -1489,13 +1525,17 @@ public class HelperClass {
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
-                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    Integer id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
 
-                    if (component_count.get(Integer.parseInt(id)) != 0) {
+                    if (component_count.get(id) != 0) {
                         String title = c.getString(c.getColumnIndex(c.getColumnName(2)));
                         String stack = "0";
                         String component_id = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        String self_price = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                        Double self_price = c.getDouble(c.getColumnIndex(c.getColumnName(3)));
+
+                        if (components_price){
+                            self_price = new_price("components", dealer_id_str, id, self_price);
+                        }
 
                         sqlQuewy = "select * "
                                 + "FROM rgzbn_gm_ceiling_components " +
@@ -1509,17 +1549,17 @@ public class HelperClass {
                                     String unit = k.getString(k.getColumnIndex(k.getColumnName(2)));
                                     String quantity = "";
                                     if (unit.equals("шт.")) {
-                                        quantity = String.valueOf(Math.ceil(component_count.get(Integer.parseInt(id))));
+                                        quantity = String.valueOf(Math.ceil(component_count.get(id)));
                                     } else {
-                                        quantity = String.valueOf(component_count.get(Integer.parseInt(id)));
+                                        quantity = String.valueOf(component_count.get(id));
                                     }
 
-                                    String self_total = String.valueOf(Math.round((Double.parseDouble(self_price) * Double.parseDouble(quantity)) * 100.0) / 100.0);
+                                    String self_total = String.valueOf(Math.round((self_price * Double.parseDouble(quantity)) * 100.0) / 100.0);
 
-                                    String gm_price = String.valueOf(margin(Double.parseDouble(self_price), dealer_comp_marg));
+                                    String gm_price = String.valueOf(margin(self_price, dealer_comp_marg));
                                     String gm_total = String.valueOf(Math.round((Double.parseDouble(gm_price) * Double.parseDouble(quantity)) * 100.0) / 100.0);
 
-                                    String dealer_price = String.valueOf(double_margin(Double.parseDouble(self_price), dealer_comp_marg, gm_comp_marg));
+                                    String dealer_price = String.valueOf(double_margin(self_price, dealer_comp_marg, gm_comp_marg));
                                     String dealer_total = String.valueOf(Math.round((Double.parseDouble(dealer_price) * Double.parseDouble(quantity)) * 100.0) / 100.0);
 
                                     ContentValues values = new ContentValues();
@@ -2194,6 +2234,8 @@ public class HelperClass {
 
         JSONObject array = new JSONObject();
         try {
+            array.put("canvases_sum_total", canvases_sum_total);
+            array.put("components_sum", components_sum);
             array.put("total_with_dealer_margin", total_with_dealer_margin);
             array.put("total_gm_mounting", total_gm_mounting);
             array.put("total_sum", total_sum);
@@ -2206,6 +2248,61 @@ public class HelperClass {
         }
 
         return result;
+    }
+
+    static Double new_price(String table, String user_id, Integer id, Double old_price){
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Integer type = 0;
+        Double price = 0.0, value = 0.0;
+        Double newPrice = 0.0;
+        String sqlQuewy;
+
+        if(table.equals("canvases")) {
+            sqlQuewy = "select price, value, type "
+                    + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
+                    "where user_id = ? and canvas_id = ? ";
+        } else {
+            sqlQuewy = "select price, value, type "
+                    + "FROM rgzbn_gm_ceiling_components_dealer_price " +
+                    "where user_id = ? and component_id = ? ";
+        }
+
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, String.valueOf(id)});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    price = c.getDouble(c.getColumnIndex(c.getColumnName(0)));
+                    value = c.getDouble(c.getColumnIndex(c.getColumnName(1)));
+                    type = c.getInt(c.getColumnIndex(c.getColumnName(2)));
+
+                } while (c.moveToNext());
+            }
+        }
+
+        switch (type){
+            case 0:
+                newPrice = old_price;
+                break;
+            case 1:
+                newPrice = price;
+                break;
+            case 2:
+                newPrice = old_price + value;
+                break;
+            case 3:
+                newPrice = old_price + (old_price * (value/100));
+                break;
+            case 4:
+                newPrice = price + value;
+                break;
+            case 5:
+                newPrice = price + (price * (value/100));
+                break;
+        }
+
+        return newPrice;
     }
 
     static void rouding(int id, double coun, double value) {

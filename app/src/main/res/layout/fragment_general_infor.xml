@@ -27,26 +27,38 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
                     android:textColor="#000000"
                     android:text="Клиент"
+                    android:layout_gravity="center"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
                     android:id="@+id/name_cl"
                     android:clickable="true"
+                    android:layout_gravity="center"
                     style="@style/text_style_spisok"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/edit"
+                    android:id="@+id/edit_name"/>
+
             </LinearLayout>
 
             <View
@@ -57,7 +69,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
@@ -77,22 +89,38 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/phone_lay2"
+                        android:layout_weight="1"
                         android:orientation="vertical">
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/phone_lay1"
+                        android:layout_weight="1"
                         android:layout_marginLeft="10dp"
                         android:orientation="vertical">
                     </LinearLayout>
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center|right">
+
+                    <ImageButton
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/plus"
+                        android:background="@drawable/white_btn_blue_text"
+                        android:scaleType="fitCenter"
+                        android:id="@+id/add_phone"/>
+
+                </LinearLayout>
             </LinearLayout>
 
             <View
@@ -109,21 +137,31 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="Адрес"
                     android:textColor="#000000"
                     android:gravity="center|left"
                     android:textSize="15dp"
+                    android:layout_gravity="center"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     style="@style/text_style_spisok"
                     android:clickable="true"
+                    android:layout_gravity="center"
                     android:id="@+id/c_address"/>
 
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/edit"
+                    android:id="@+id/edit_address"/>
             </LinearLayout>
 
             <View
@@ -134,25 +172,37 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
+
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="15dp"
+                    android:layout_gravity="center"
                     android:text="Дата и время замера"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
                     style="@style/text_style_spisok"
                     android:clickable="true"
                     android:id="@+id/data_cl"
+                    android:layout_gravity="center"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/edit"
+                    android:id="@+id/edit_date"/>
             </LinearLayout>
 
             <View
@@ -530,25 +580,22 @@
 
                 <Button
                     android:id="@+id/contract"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:text=" Договор "
-                    android:layout_marginRight="5dp"
+                    android:text="Запустить в производство"
+                    android:layout_marginRight="2dp"
                     android:background="@drawable/rounded_button_green"
                     android:textColor="#ffffff" />
 
                 <Button
-                    android:id="@+id/failure"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:id="@+id/leave"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:text=" Отказ "
-                    android:background="@drawable/rounded_button_red"
+                    android:layout_marginLeft="2dp"
+                    android:text="Сохранить и выйти"
+                    android:background="@drawable/rounded_button_green"
                     android:textColor="#ffffff" />
 
             </LinearLayout>

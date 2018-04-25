@@ -182,7 +182,6 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                                     String name = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
                                     String phone = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
 
-                                    Log.d("mLog", "123  " + id + " " + name + " " + phone);
                                     Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
                                             name, null, id, phone, null);
                                     mount_mas.add(fc);
@@ -290,7 +289,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
                     values.put(DBHelper.KEY_SYNC, "0");
                     values.put(DBHelper.KEY_TYPE, "send");
-                    values.put(DBHelper.KEY_STATUS, "1");
+                    values.put(DBHelper.KEY_STATUS, "0");
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     list();
@@ -345,6 +344,24 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_TYPE, "send");
                     values.put(DBHelper.KEY_STATUS, "1");
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                    String sqlQuewy = "select _id "
+                            + "FROM history_send_to_server " +
+                            "where name_table = ?";
+
+                    Cursor c = db.rawQuery(sqlQuewy, new String[]{"rgzbn_gm_ceiling_mounters"});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+
+                                int id = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "_id = ?", new String[]{String.valueOf(id)});
+
+                            } while (c.moveToNext());
+                        }
+                    }
 
                     Toast toast = Toast.makeText(this,
                             "Бригада создана", Toast.LENGTH_SHORT);

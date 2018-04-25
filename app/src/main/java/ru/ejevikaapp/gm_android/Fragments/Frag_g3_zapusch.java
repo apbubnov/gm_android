@@ -126,16 +126,6 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
     public void onDestroy() {
         super.onDestroy();
 
-        SP = this.getActivity().getSharedPreferences("activity_mounting_1", MODE_PRIVATE);
-        SharedPreferences.Editor ed = SP.edit();
-        ed.putString("", "");
-        ed.commit();
-
-        SP = this.getActivity().getSharedPreferences("activity_mounting_2", MODE_PRIVATE);
-        ed = SP.edit();
-        ed.putString("", "");
-        ed.commit();
-
     }
 
     void clients_gager (){
@@ -349,24 +339,11 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         c.close();
 
         for (int g = 0; g<client.size(); g++) {
-            if (activity_mounting_1.equals("true")){
+            sqlQuewy = "SELECT _id "
+                    + "FROM rgzbn_gm_ceiling_projects" +
+                    " WHERE client_id = ? and (project_status = 10 or  project_status = 5 or project_status = 4)" +
+                    " order by _id desc";
 
-                sqlQuewy = "SELECT _id "
-                        + "FROM rgzbn_gm_ceiling_projects" +
-                        " WHERE client_id = ? and (project_status = 10 or project_status = 5)" +
-                        " order by _id desc";
-            } else if (activity_mounting_2.equals("true")) {
-
-                sqlQuewy = "SELECT _id "
-                        + "FROM rgzbn_gm_ceiling_projects" +
-                        " WHERE client_id = ? and project_status = 4" +
-                        " order by _id desc";
-            } else {
-                sqlQuewy = "SELECT _id "
-                        + "FROM rgzbn_gm_ceiling_projects" +
-                        " WHERE client_id = ? and project_status = 5" +
-                        " order by _id desc";
-            }
             c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(client.get(g))});
             if (c != null) {
                 if (c.moveToFirst()) {
@@ -431,17 +408,17 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                     out_format = new SimpleDateFormat("dd.MM.yyyy");
                                     out_format_minute = new SimpleDateFormat("HH");
 
-                                    hours = Integer.parseInt(out_format_minute.format(change_max))+1;
+                                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
                                     out_format_time = new SimpleDateFormat("HH:mm");
 
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                 }
 
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
                                         p_info,
-                                        String.valueOf(out_format.format(change_max) +" "+ out_format_time.format(change_max))
-                                        + " - " + hours + ":00",
+                                        String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                                                + " - " + hours + ":00",
                                         project_status_title, null);
                                 client_mas.add(fc);
 

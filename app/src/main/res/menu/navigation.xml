@@ -9,7 +9,7 @@
     <item
         android:id="@+id/start_projects"
         android:icon="@drawable/ic_factory"
-        android:title="Клиенты" />
+        android:title="Заказы" />
 
     <item
         android:id="@+id/start_home"

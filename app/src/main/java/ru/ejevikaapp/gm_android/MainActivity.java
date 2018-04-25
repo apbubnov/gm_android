@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     final Toast toast = Toast.makeText(getApplicationContext(),
                             "При первом запуске приложения возможны торможения или зависания, " +
-                                    "это происходит из-за большого количества проектов, которые скачиваются...", Toast.LENGTH_LONG);
+                                    "это происходит из-за проектов, полотен, производителей и т.д., которые скачиваются...", Toast.LENGTH_LONG);
                     toast.show();
 
                     Handler handler = new Handler();
@@ -777,7 +777,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     final Toast toast = Toast.makeText(getApplicationContext(),
                             "При первом запуске приложения возможны торможения или зависания, " +
-                                    "это происходит из-за большого количества проектов, которые скачиваются...", Toast.LENGTH_LONG);
+                                    "это происходит из-за проектов, полотен, производителей и т.д., которые скачиваются...", Toast.LENGTH_LONG);
                     toast.show();
 
                     //Handler handler = new Handler();

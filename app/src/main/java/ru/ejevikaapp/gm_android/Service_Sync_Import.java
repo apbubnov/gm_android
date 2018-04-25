@@ -560,6 +560,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_TRANSPORT, transport);
                                     values.put(DBHelper.KEY_DISTANCE, distance);
                                     values.put(DBHelper.KEY_DISTANCE_COL, distance_col);
+                                    values.put(DBHelper.KEY_CHANGE_TIME, change_time);
 
                                     String sqlQuewy = "SELECT * "
                                             + "FROM rgzbn_gm_ceiling_projects" +

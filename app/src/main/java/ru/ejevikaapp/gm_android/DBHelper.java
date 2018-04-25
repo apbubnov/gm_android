@@ -10,7 +10,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 18;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     private Context mContext;
@@ -95,10 +95,9 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_NAME = "name";
     public static final String KEY_COUNTRY = "country";
 
-    public static final String TABLE_RGZBN_GM_CEILING_CANVASES_ALL = "rgzbn_gm_ceiling_canvases_all";
-    public static final String KEY_PURCHASING_PRICE = "purchasing_price";
-    public static final String KEY_DATE = "date";
-    public static final String KEY_USER_ACCEPTED_ID = "user_accepted_id";
+    public static final String TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE = "rgzbn_gm_ceiling_canvases_dealer_price";
+    public static final String KEY_CANVAS_ID = "canvas_id";
+    public static final String KEY_VALUE = "value";
 
     public static final String TABLE_RGZBN_GM_CEILING_CLIENTS = "rgzbn_gm_ceiling_clients";
     public static final String KEY_CLIENT_NAME = "client_name";
@@ -120,6 +119,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_RGZBN_GM_CEILING_COMPONENTS = "rgzbn_gm_ceiling_components";
     public static final String KEY_UNIT = "unit";
     public static final String KEY_CODE = "code";
+
+    public static final String TABLE_RGZBN_GM_CEILING_COMPONENTS_DEALER_PRICE = "rgzbn_gm_ceiling_components_dealer_price";
 
     public static final String TABLE_RGZBN_GM_CEILING_COMPONENTS_OPTION = "rgzbn_gm_ceiling_components_option";
     public static final String KEY_COMPONENT_ID = "component_id";
@@ -326,9 +327,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_DEALER_PRICE = "dealer_price";
     public static final String KEY_DEALER_TOTAL = "dealer_total";
 
-    public static final String TABLE_OTHER_COMP = "table_other_comp";
-    public static final String TABLE_OTHER_WORK = "table_other_work";
-
     public static final String TABLE_USERS = "rgzbn_users";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_EMAIL = "email";
@@ -426,8 +424,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_manufacturers (_id INTEGER, " +
                 "name TEXT, country TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_all (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "id_canvas INTEGER, length TEXT, purchasing_price TEXT, date TEXT, user_accepted_id INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_dealer_price (user_id INTEGER, " +
+                "canvas_id INTEGER, price FLOAT, value FLOAT, type INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_clients (_id INTEGER, " +
                 "client_name TEXT, client_data_id INTEGER, type_id INTEGER, dealer_id INTEGER, manager_id INTEGER, " +
@@ -445,6 +443,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_components (_id INTEGER, " +
                 "title TEXT, unit TEXT, code TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_components_dealer_price (user_id INTEGER, " +
+                "component_id INTEGER, price FLOAT, value FLOAT, type INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_components_option (_id INTEGER, " +
                 "component_id INTEGER, title TEXT, price TEXT, count INTEGER, count_sale TEXT)");
@@ -591,7 +592,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
         }
 
-        if (oldVersion < 17) {
+        if (oldVersion < 18) {
 
             //1
             db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_canvases");
@@ -605,7 +606,6 @@ public class DBHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"material"});
-
 
             //2
             db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_calculations");
@@ -631,6 +631,43 @@ public class DBHelper extends SQLiteOpenHelper {
             values = new ContentValues();
             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
+        }
+
+        if (oldVersion < 19) {
+            //1
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_projects");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects (_id INTEGER, " +
+                    "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
+                    "client_id INTEGER, project_info TEXT, project_status INTEGER, project_mounting_date TEXT, " +
+                    "project_mounting_start TEXT, project_mounting_end TEXT, project_mounter INTEGER, project_note TEXT, " +
+                    "gm_calculator_note TEXT, dealer_calculator_note TEXT, gm_manager_note TEXT, gm_chief_note TEXT, " +
+                    "dealer_chief_note TEXT, dealer_manager_note TEXT, buh_note TEXT, project_calculation_date TEXT, " +
+                    "project_calculator INTEGER, who_calculate TEXT, project_verdict INTEGER, project_discount INTEGER, " +
+                    "created TEXT, closed TEXT, project_check TEXT, sum_check TEXT, cost_check TEXT, spend_check TEXT, " +
+                    "mounting_check TEXT, new_project_sum TEXT, new_project_spend TEXT, new_project_mounting TEXT, new_extra_spend TEXT, " +
+                    "gm_canvases_margin INTEGER, gm_components_margin INTEGER, gm_mounting_margin INTEGER, dealer_canvases_margin INTEGER, " +
+                    "dealer_components_margin INTEGER, dealer_mounting_margin INTEGER, project_sum TEXT, salary_sum TEXT, extra_spend TEXT, " +
+                    "penalty TEXT, bonus TEXT, calculated_by INTEGER, approved_by INTEGER, checked_by INTEGER, read_by_manager INTEGER, api_phone_id TEXT, read_by_mounter TEXT, " +
+                    " change_time TEXT, new_mount_sum TEXT, new_material_sum TEXT, transport TEXT, distance TEXT, distance_col TEXT)");
+
+
+            SharedPreferences SP_end = mContext.getSharedPreferences("user_id", MODE_PRIVATE);
+            String user_id = SP_end.getString("", "");
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
+
+            //2
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_canvases_dealer_price (user_id INTEGER, " +
+                    "canvas_id INTEGER, price INTEGER, value INTEGER, type INTEGER)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_components_dealer_price (user_id INTEGER, " +
+                    "canvas_id INTEGER, price INTEGER, value INTEGER, type INTEGER)");
+
+            values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
         }
     }
 

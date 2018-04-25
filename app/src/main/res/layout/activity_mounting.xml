@@ -12,72 +12,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/relative1">
-    <Button
-        android:id="@+id/btn_mounting_1"
-        android:layout_marginBottom="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
-        android:text="\n Назначенные на монтаж и запущенные в производство \n"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textColor="#ffffff"/>
-
-    </RelativeLayout>
-
-    <TextView
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:gravity="center"
-        android:background="@drawable/ic_menu_cart"
-        android:textColor="#ffffff"
-        android:layout_alignRight="@id/relative1"
-        android:id="@+id/count_btn1"
-        android:visibility="gone"/>
-
-</RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/relative2">
-    <Button
-        android:id="@+id/btn_mounting_2"
-        android:layout_marginBottom="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
-        android:text="\n Не назначенные на монтаж или не запущенные в производство \n"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textColor="#ffffff"/>
-
-    </RelativeLayout>
-
-    <TextView
-        android:gravity="center"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:background="@drawable/ic_menu_cart"
-        android:textColor="#ffffff"
-        android:layout_alignRight="@id/relative2"
-        android:id="@+id/count_btn2"
-        android:visibility="gone"/>
-
-</RelativeLayout>
-
     <Button
         android:id="@+id/btn_brigade"
         android:layout_width="match_parent"
@@ -87,6 +21,15 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:textColor="#ffffff"/>
+
+    <fragment
+        android:id="@+id/fragment_empty_activity"
+        android:name="ru.ejevikaapp.gm_android.Fragments.Frag_g3_zapusch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/frag_g3_zapusch">
+    </fragment>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

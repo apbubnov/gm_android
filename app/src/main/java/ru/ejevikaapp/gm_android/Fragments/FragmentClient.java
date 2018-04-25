@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,6 +121,7 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
             list_clients = (ListView) view.findViewById(R.id.list_client);
             clients("");
         } catch (Exception e) {
+            Log.d("mLog", String.valueOf(e));
         }
     }
 

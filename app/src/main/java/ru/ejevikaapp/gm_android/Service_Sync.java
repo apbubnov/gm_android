@@ -115,16 +115,20 @@ public class Service_Sync extends Service {
             int count_line = 0;
             dbHelper = new DBHelper(context);
             final SQLiteDatabase db = dbHelper.getReadableDatabase();
-            String sqlQuewy = "SELECT _id "
-                    + "FROM history_send_to_server ";
-            Cursor cursor = db.rawQuery(sqlQuewy,
-                    new String[]{});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        count_line++;
-                    } while (cursor.moveToNext());
+
+            try {
+                String sqlQuewy = "SELECT _id "
+                        + "FROM history_send_to_server ";
+                Cursor cursor = db.rawQuery(sqlQuewy,
+                        new String[]{});
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            count_line++;
+                        } while (cursor.moveToNext());
+                    }
                 }
+            }catch(Exception e){
             }
 
             if (!isRunning(context)) {
@@ -256,6 +260,8 @@ public class Service_Sync extends Service {
                             if (cursor.moveToFirst()) {
                                 do {
                                     String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                    Log.d(TAG, "jsonClient_Contacts " + id_old);
 
                                     //try {
                                     sqlQuewy = "SELECT * "
@@ -1231,6 +1237,7 @@ public class Service_Sync extends Service {
                                                     for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_mounters"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
                                                         if (j == 0) {
                                                             status = "android_id";
                                                         }
@@ -1561,38 +1568,41 @@ public class Service_Sync extends Service {
 
     static void delete() {
 
-        SQLiteDatabase db;
-        db = dbHelper.getWritableDatabase();
+        try {
+            SQLiteDatabase db;
+            db = dbHelper.getWritableDatabase();
 
-        int count_line = 0;
-        String sqlQuewy = "SELECT _id "
-                + "FROM history_send_to_server ";
-        Cursor cursor = db.rawQuery(sqlQuewy,
-                new String[]{});
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    count_line++;
-                } while (cursor.moveToNext());
+            int count_line = 0;
+            String sqlQuewy = "SELECT _id "
+                    + "FROM history_send_to_server ";
+            Cursor cursor = db.rawQuery(sqlQuewy,
+                    new String[]{});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        count_line++;
+                    } while (cursor.moveToNext());
+                }
             }
-        }
 
-        int count_line_sync = 0;
-        sqlQuewy = "SELECT _id "
-                + "FROM history_send_to_server " +
-                "where sync=?";
-        cursor = db.rawQuery(sqlQuewy,
-                new String[]{"1"});
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    count_line_sync++;
-                } while (cursor.moveToNext());
+            int count_line_sync = 0;
+            sqlQuewy = "SELECT _id "
+                    + "FROM history_send_to_server " +
+                    "where sync=?";
+            cursor = db.rawQuery(sqlQuewy,
+                    new String[]{"1"});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        count_line_sync++;
+                    } while (cursor.moveToNext());
+                }
             }
-        }
 
-        if (count_line == count_line_sync) {
-            db.delete(DBHelper.HISTORY_SEND_TO_SERVER, null, null);
+            if (count_line == count_line_sync) {
+                db.delete(DBHelper.HISTORY_SEND_TO_SERVER, null, null);
+            }
+        }catch (Exception e){
         }
     }
 

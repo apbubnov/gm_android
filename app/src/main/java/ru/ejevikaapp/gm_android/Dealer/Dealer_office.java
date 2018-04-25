@@ -36,6 +36,7 @@ import java.sql.Statement;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Fragments.Frag_g3_zapusch;
+import ru.ejevikaapp.gm_android.Fragments.Frag_spisok;
 import ru.ejevikaapp.gm_android.Fragments.FragmentClient;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
 import ru.ejevikaapp.gm_android.MainActivity;
@@ -77,7 +78,7 @@ public class Dealer_office extends AppCompatActivity {
                     ed = SP.edit();
                     ed.putString("", "");
                     ed.commit();
-                    loadFragment(FragmentClient.newInstance());
+                    loadFragment(Frag_spisok.newInstance());
 
                     return true;
             }

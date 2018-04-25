@@ -67,6 +67,8 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         SharedPreferences SP_end = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         String user_id = SP_end.getString("", "");
 
+        Log.d("mLog", user_id);
+
         DBHelper dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 

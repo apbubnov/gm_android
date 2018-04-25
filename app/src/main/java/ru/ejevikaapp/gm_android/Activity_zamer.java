@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -309,7 +310,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                     Log.d("mLog", "id = " + id);
                     sqlQuewy = "select * "
                             + "FROM rgzbn_user_usergroup_map " +
-                            "where user_id = ? and group_id = 22 ";
+                            "where user_id = ? and (group_id = 22 or group_id = 21)";
                     Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
                     if (cc != null) {
                         if (cc.moveToFirst()) {
@@ -393,6 +394,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
     }
 
     void cal_preview() {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         dday = 0;
         max_day = 0;
@@ -509,33 +512,47 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                     }
                     c.close();
 
-                    for (int g = 0; client.size() > g; g ++) {
-                        sqlQuewy = "select * "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where project_calculation_date > ? and project_calculation_date < ? and project_calculator <> ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", ""});
-                        if (cc != null) {
-                            if (cc.moveToFirst()) {
-                                do {
-                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
-                                    btn.setTextColor(Color.BLACK);
-                                } while (cc.moveToNext());
-                            } else {
-                                btn.setBackgroundResource(R.drawable.calendar_btn);
-                                btn.setTextColor(R.style.text_style_spisok);
-                            }
-                        }
-                        cc.close();
-                    }
+                    if(today.equals(mount_day)){
 
-                    count++;
-                    flag = true;
-                    BtnList.add(btn);
-                    btn.setId(dday - 1);
-                    btn.setText(String.valueOf(dday));
-                    btn.setLayoutParams(tableParams);
-                    btn.setOnClickListener(getPhone);
-                    tableRow.addView(btn, j);
+                        btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        flag = true;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getPhone);
+                        tableRow.addView(btn, j);
+                    } else {
+                        for (int g = 0; client.size() > g; g++) {
+                            sqlQuewy = "select * "
+                                    + "FROM rgzbn_gm_ceiling_projects " +
+                                    "where project_calculation_date > ? and project_calculation_date < ? and project_calculator <> ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", ""});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                                        btn.setTextColor(Color.BLACK);
+                                    } while (cc.moveToNext());
+                                } else {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn);
+                                    btn.setTextColor(R.style.text_style_spisok);
+                                }
+                            }
+                            cc.close();
+                        }
+
+                        count++;
+                        flag = true;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getPhone);
+                        tableRow.addView(btn, j);
+                    }
                 } else {
                     Button btn = new Button(this);
                     btn.setText("");
@@ -1008,6 +1025,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 values.put(DBHelper.KEY_TRANSPORT, "1");
                                 values.put(DBHelper.KEY_DISTANCE, "0");
                                 values.put(DBHelper.KEY_DISTANCE_COL, "1");
+                                String change_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                                values.put(DBHelper.KEY_CHANGE_TIME, change_time);
                                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
                                 values = new ContentValues();

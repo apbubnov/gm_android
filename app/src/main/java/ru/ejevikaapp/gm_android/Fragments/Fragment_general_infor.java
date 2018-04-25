@@ -65,11 +65,7 @@ import static android.content.Context.MODE_PRIVATE;
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.pixplicity.sharp.Sharp;
 
@@ -79,7 +75,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
     TextView id_proj, dealer_cl, canvases_sum, components_sum_total, mounting_sum, total_sum, final_amount,
             final_amount_disc, final_transport, final_transport_sum, text2, text3, text;
-    Calendar dateAndTime =  new GregorianCalendar();
+    Calendar dateAndTime = new GregorianCalendar();
     Calendar dateAndTime2 = Calendar.getInstance();
     TextView name_cl, contact_cl, notes_cl, notes_gm_chief, notes_gm_calc, ed_discount, edit_transport_1, edit_transport_21,
             edit_transport_22, c_address, c_house, с_body, c_porch, c_floor, c_room, c_code;
@@ -99,7 +95,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     String distance = "";
     String time_h = "", time_brig, id_b, id_z;
 
-    Button new_calc, btn_date, contract, failure, add_contact, btn_transport_ok, btn_discount_ok, btn_date_mount, save_proj, btn_save_m;
+    Button new_calc, btn_date, contract, leave, add_contact, btn_transport_ok, btn_discount_ok, btn_date_mount, save_proj, btn_save_m;
 
     static DBHelper dbHelper;
     View view;
@@ -165,14 +161,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         view = inflater.inflate(R.layout.fragment_general_infor, container, false);
 
         mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
-        titleViewParams = new LinearLayout.LayoutParams(80,80);
-        titleViewParams.weight = 1;
+        titleViewParams = new LinearLayout.LayoutParams(80, 80, 1);
         titleViewParams.setMargins(0, 0, 0, 20);
 
         mainL2 = (LinearLayout) view.findViewById(R.id.phone_lay2);
         titleViewParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        titleViewParams2.weight = 1;
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1);
         titleViewParams2.setMargins(0, 0, 0, 20);
 
         visible_potolok = (LinearLayout) view.findViewById(R.id.visible_potolok);
@@ -332,8 +326,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         new_calc.setOnClickListener(this);
         contract = (Button) view.findViewById(R.id.contract);
         contract.setOnClickListener(this);
-        failure = (Button) view.findViewById(R.id.failure);
-        failure.setOnClickListener(this);
+        leave = (Button) view.findViewById(R.id.leave);
+        leave.setOnClickListener(this);
         btn_transport_ok = (Button) view.findViewById(R.id.btn_transport_ok);
         btn_transport_ok.setOnClickListener(this);
         btn_discount_ok = (Button) view.findViewById(R.id.btn_discount_ok);
@@ -388,7 +382,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             if (c.moveToFirst()) {
                 do {
                     pro_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    if (pro_info.equals("-") || pro_info.equals("null")){
+                    if (pro_info.equals("-") || pro_info.equals("null")) {
                         c_address.setText("(редактировать)");
                     } else {
                         c_address.setText(pro_info);
@@ -411,19 +405,19 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         out_format = new SimpleDateFormat("dd.MM.yyyy");
                         out_format_minute = new SimpleDateFormat("HH");
 
-                        hours = Integer.parseInt(out_format_minute.format(change_max))+1;
+                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
                         out_format_time = new SimpleDateFormat("HH:mm");
 
-                        DateTime.setText(String.valueOf(out_format.format(change_max) +" "+ out_format_time.format(change_max))
+                        DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
                                 + " - " + hours + ":00");
 
-                    }catch (Exception e){
+                    } catch (Exception e) {
                     }
 
                     String note = c.getString(c.getColumnIndex(c.getColumnName(2)));
 
-                    if (note.equals("null")){
+                    if (note.equals("null")) {
                         note = "";
                     }
 
@@ -445,15 +439,15 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         for (int j = 0; count_calc > j; j++) {
             final CheckBox chb = CheckBoxList.get(j);
 
-            Log.d("mLog","cc = " + CheckBoxList.size());
+            Log.d("mLog", "cc = " + CheckBoxList.size());
             chb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("mLog"," тут ");
+                    Log.d("mLog", " тут ");
                     if (chb.isChecked()) {
                         id_calcul.add(chb.getId());
                         count_calc++;
-                        Log.d("mLog","count_calc2 " );
+                        Log.d("mLog", "count_calc2 ");
                         calc(id_calcul);
                     } else {
                         for (int in = 0; count_calc > in; in++) {
@@ -462,7 +456,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             int str3 = str1.compareTo(str2);
                             if (str3 == 0) {
                                 id_calcul.remove(in);
-                                Log.d("mLog","count_calc3 " );
+                                Log.d("mLog", "count_calc3 ");
                                 calc(id_calcul);
                                 count_calc--;
                                 break;
@@ -488,7 +482,411 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         calendar_plus = (ImageButton) view.findViewById(R.id.calendar_plus);
         calendar_plus.setOnClickListener(this);
 
+        ImageButton edit_name = (ImageButton) view.findViewById(R.id.edit_name);
+        edit_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Context context = getActivity();
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
+                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+
+                pass.setVisibility(View.GONE);
+                email.setVisibility(View.GONE);
+                ava.setVisibility(View.GONE);
+                ed_name_text.setVisibility(View.GONE);
+                ed_password_text.setVisibility(View.GONE);
+
+                name.setText(name_cl.getText().toString());
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                                new String[]{id_cl});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
+                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
+            }
+        });
+
+        ImageButton edit_address = (ImageButton) view.findViewById(R.id.edit_address);
+        edit_address.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Context context = getActivity();
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
+                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
+                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
+                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
+                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
+                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
+                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
+
+                String str = "";
+
+                for (String retval : pro_info.split(",")) {
+
+                    int indexJava = retval.indexOf("дом:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_house.setText(retval.substring(6));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("корпус:");
+                    if (indexJava == -1) {
+                    } else {
+                        с_body.setText(retval.substring(9));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("квартира:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_room.setText(retval.substring(11));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("подъезд:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_porch.setText(retval.substring(10));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("этаж:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_floor.setText(retval.substring(7));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("код:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_code.setText(retval.substring(6));
+                        continue;
+                    }
+                    str += retval + ",";
+                }
+                str = str.substring(0, str.length() - 1);
+                c_address.setText(str);
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        String address = c_address.getText().toString().trim();
+                                        String house = c_house.getText().toString().trim();
+                                        String body = с_body.getText().toString().trim();
+                                        String porch = c_porch.getText().toString().trim();
+                                        String floor = c_floor.getText().toString().trim();
+                                        String room = c_room.getText().toString().trim();
+                                        String code = c_code.getText().toString().trim();
+
+                                        String full_address = address + ", дом: " + house;
+
+                                        if (body.equals("")) {
+                                        } else {
+                                            full_address += ", корпус: " + body;
+                                        }
+
+                                        if (porch.equals("")) {
+                                        } else {
+                                            full_address += ", подъезд: " + porch;
+                                        }
+
+                                        if (floor.equals("")) {
+                                        } else {
+                                            full_address += ", этаж: " + floor;
+                                        }
+
+                                        if (room.equals("")) {
+                                        } else {
+                                            full_address += ", квартира: " + room;
+                                        }
+
+                                        if (code.equals("")) {
+                                        } else {
+                                            full_address += ", код: " + code;
+                                        }
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                new String[]{id_project});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                        values.put(DBHelper.KEY_ID_NEW, 0);
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
+
+            }
+        });
+
+        ImageButton edit_date = (ImageButton) view.findViewById(R.id.edit_date);
+
+        edit_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Context context = getActivity();
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_edit_date_zamer, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+
+                Calendar cl = Calendar.getInstance();
+                day_week = cl.get(Calendar.DAY_OF_WEEK);
+                year = cl.get(Calendar.YEAR);
+                day = cl.get(Calendar.DAY_OF_MONTH);
+                month = cl.get(Calendar.MONTH);
+                calendar_month = (TextView) promptsView.findViewById(R.id.calendar_month);
+                tableLayout = (TableLayout) promptsView.findViewById(R.id.tableLayout);
+
+                ImageButton calendar_minus = (ImageButton) promptsView.findViewById(R.id.calendar_minus);
+                calendar_minus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        month--;
+                        if (month < 0) {
+                            month = 11;
+                            year--;
+                        }
+                        tableLayout.removeAllViews();
+                        cal_preview();
+                    }
+                });
+
+                ImageButton calendar_plus = (ImageButton) promptsView.findViewById(R.id.calendar_plus);
+                calendar_plus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        month++;
+                        if (month == 12) {
+                            month = 0;
+                            year++;
+                        }
+                        tableLayout.removeAllViews();
+                        cal_preview();
+                    }
+                });
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        Log.d("mLog", "vybor = " + id_z);
+                                        values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
+                                        values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                new String[]{id_project});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
+
+                cal_preview();
+            }
+        });
+
+        ImageButton add_phone = (ImageButton) view.findViewById(R.id.add_phone);
+        add_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Context context = getActivity();
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_dialog_number_phone, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+
+                final EditText phone = (EditText) promptsView.findViewById(R.id.phone);
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        if (phone.getText().toString().length() == 11) {
+                                            DBHelper dbHelper = new DBHelper(getActivity());
+                                            SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                            ContentValues values = new ContentValues();
+                                            int max_id_contac = 0;
+                                            int user_id_int = Integer.parseInt(dealer_id);
+
+                                            try {
+                                                String sqlQuewy = "select MAX(_id) "
+                                                        + "FROM rgzbn_gm_ceiling_clients_contacts " +
+                                                        "where _id>? and _id<?";
+                                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000),
+                                                        String.valueOf(user_id_int * 1000000 + 999999)});
+                                                if (c != null) {
+                                                    if (c.moveToFirst()) {
+                                                        do {
+                                                            max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                                            max_id_contac++;
+                                                        } while (c.moveToNext());
+                                                    }
+                                                }
+                                            } catch (Exception e) {
+                                                max_id_contac = user_id_int * 1000000 + 1;
+                                            }
+
+                                            values.put(DBHelper.KEY_ID, max_id_contac);
+                                            values.put(DBHelper.KEY_CLIENT_ID, id_cl);
+                                            values.put(DBHelper.KEY_PHONE, phone.getText().toString());
+                                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+
+                                            values = new ContentValues();
+                                            values.put(DBHelper.KEY_ID_OLD, max_id_contac);
+                                            values.put(DBHelper.KEY_ID_NEW, 0);
+                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                                            values.put(DBHelper.KEY_SYNC, "0");
+                                            values.put(DBHelper.KEY_TYPE, "send");
+                                            values.put(DBHelper.KEY_STATUS, "1");
+                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                            getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                            Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                            startActivity(intent);
+                                            getActivity().finish();
+
+                                        }
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
+
+            }
+        });
+
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        SharedPreferences SP = getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
+        SharedPreferences.Editor ed = SP.edit();
+        ed.putString("", "");
+        ed.commit();
+
     }
 
     void calc(ArrayList id_calcul) {
@@ -531,7 +929,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                         try {
                             dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             dis = 0;
                         }
 
@@ -677,7 +1075,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     do {
                         try {
                             discount += Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                        }catch (Exception e){
+                        } catch (Exception e) {
                         }
                     } while (c.moveToNext());
                 }
@@ -685,11 +1083,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             c.close();
         }
 
-        if (discount > 0){
+        if (discount > 0) {
             sum_transport = sum_transport / 100 * (100 - discount);
         }
 
-        final_transport_sum.setText( String.valueOf((Math.round(sum_transport) * 100.0) / 100));
+        final_transport_sum.setText(String.valueOf((Math.round(sum_transport) * 100.0) / 100));
 
         total += sum_transport;
         total_d += sum_transport;
@@ -698,20 +1096,20 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             final_amount_disc.setText("Итого/ \n" + "  - %");
             final_amount.setText(String.valueOf((Math.round(total_d) * 100.0) / 100) + "/ \n" + String.valueOf((Math.round(total) * 100.0) / 100));
         } else {
-            final_amount.setText(String.valueOf(Math.round(total_d * 100)/100));
+            final_amount.setText(String.valueOf(Math.round(total_d * 100) / 100));
         }
 
         if (total_d == 0) {
             final_amount.setText(String.valueOf(total_d));
         } else if (total_d < min_sum && count_calc > 0) {
             total_d = min_sum;
-            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа "+ min_sum +" р.");
+            final_amount.setText(String.valueOf(total_d) + " * минимальная сумма заказа " + min_sum + " р.");
         }
 
-        canvases_sum.setText("П "+String.valueOf((Math.round(tmp2_d) * 100.0) / 100));
-        components_sum_total.setText("К "+String.valueOf((Math.round(tmp_d) * 100.0) / 100));
-        mounting_sum.setText("М "+String.valueOf((Math.round(tmp3_d) * 100.0) / 100));
-        total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100 + trans ));
+        canvases_sum.setText("П " + String.valueOf((Math.round(tmp2_d) * 100.0) / 100));
+        components_sum_total.setText("К " + String.valueOf((Math.round(tmp_d) * 100.0) / 100));
+        mounting_sum.setText("М " + String.valueOf((Math.round(tmp3_d) * 100.0) / 100));
+        total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100 + trans));
 
         S_and_P.setText(Math.round(s * 100.0) / 100.0 + " м2 / \n" + Math.round(p * 100.0) / 100.0 + " м");
     }
@@ -753,7 +1151,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         }
         c.close();
 
-        if (id_calcul.size() == 0 ){
+        if (id_calcul.size() == 0) {
             visible_potolok.setVisibility(View.GONE);
         }
     }
@@ -857,7 +1255,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         }
     };
 
-    void brigade(){
+    void brigade() {
 
         sel_work.clear();
         time_free.clear();
@@ -918,7 +1316,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         cc.close();
 
                     } while (c.moveToNext());
-                }  else {
+                } else {
 
                     time_free.add(" " + i + ":00");
 
@@ -937,11 +1335,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                        View itemSelected, int selectedItemPosition, long selectedId) {
                 time_brig = sp_brigade_free.getSelectedItem().toString();
             }
+
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        if (count==0){
+        if (count == 0) {
             sel_work.add(new Select_work(null, null,
                     null, null, null));
         }
@@ -973,7 +1372,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                view_general_inform.scrollTo(0,6400);
+                view_general_inform.scrollTo(0, 6400);
 
             }
         }, 1);
@@ -985,11 +1384,166 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         public void onClick(View v) {
             int editId = v.getId();
 
-            Button btnn = BtnList.get(editId);
+            final Button btnn = BtnList.get(editId);
 
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:+" + btnn.getText().toString()));
-            startActivity(intent);
+            String[] array = new String[]{"Изменить", "Позвонить"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Выберите действие")
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+            builder.setItems(array, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    // TODO Auto-generated method stub
+
+                    switch (item) {
+                        case 0:
+
+                            final Context context = getActivity();
+                            View promptsView;
+                            LayoutInflater li = LayoutInflater.from(context);
+                            promptsView = li.inflate(R.layout.layout_dialog_number_phone, null);
+                            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                            mDialogBuilder.setView(promptsView);
+
+                            final EditText phone = (EditText) promptsView.findViewById(R.id.phone);
+                            phone.setText(btnn.getText().toString());
+                            final String old_number = btnn.getText().toString();
+                            String number_id = "";
+
+                            SQLiteDatabase db = dbHelper.getReadableDatabase();
+                            String sqlQuewy = "select _id "
+                                    + "FROM rgzbn_gm_ceiling_clients_contacts " +
+                                    "where phone = ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{btnn.getText().toString()});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        number_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    } while (cc.moveToNext());
+                                }
+                            }
+                            cc.close();
+
+                            final String finalNumber_id = number_id;
+                            mDialogBuilder
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+
+                                                    if (phone.getText().toString().length() == 11) {
+
+                                                        if (old_number.equals(phone.getText().toString())) {
+
+                                                        } else {
+                                                            DBHelper dbHelper = new DBHelper(getActivity());
+                                                            SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                                            ContentValues values = new ContentValues();
+                                                            values.put(DBHelper.KEY_PHONE, phone.getText().toString());
+                                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "_id = ?",
+                                                                    new String[]{finalNumber_id});
+
+                                                            values = new ContentValues();
+                                                            values.put(DBHelper.KEY_ID_OLD, finalNumber_id);
+                                                            values.put(DBHelper.KEY_ID_NEW, "0");
+                                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients_contacts");
+                                                            values.put(DBHelper.KEY_SYNC, "0");
+                                                            values.put(DBHelper.KEY_TYPE, "send");
+                                                            values.put(DBHelper.KEY_STATUS, "1");
+                                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                            getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                                            Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                            startActivity(intent);
+                                                            getActivity().finish();
+                                                        }
+                                                    } else {
+
+                                                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                                                                "Номер изменён ", Toast.LENGTH_SHORT);
+                                                        toast.show();
+                                                    }
+
+                                                }
+                                            })
+                                    .setNegativeButton("Отмена",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                            AlertDialog alertDialog = mDialogBuilder.create();
+                            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                            alertDialog.show();
+
+                            break;
+                        case 1:
+                            Intent intent = new Intent(Intent.ACTION_DIAL);
+                            intent.setData(Uri.parse("tel:+" + btnn.getText().toString()));
+                            startActivity(intent);
+                            break;
+                        case 2:
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Удалить номер " + btnn.getText().toString() + " ?")
+                                    .setMessage(null)
+                                    .setIcon(null)
+                                    .setCancelable(false)
+                                    .setPositiveButton("Да",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+
+                                                    dbHelper = new DBHelper(getActivity());
+                                                    SQLiteDatabase db = dbHelper.getReadableDatabase();
+                                                    String id_phone = "";
+                                                    String sqlQuewy = "SELECT _id "
+                                                            + "FROM rgzbn_gm_ceiling_clients_contacts" +
+                                                            " WHERE phone = ? ";
+                                                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{btnn.getText().toString()});
+                                                    if (cc != null) {
+                                                        if (cc.moveToFirst()) {
+                                                            id_phone = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+
+                                                        }
+                                                    }
+                                                    cc.close();
+
+                                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "_id = ?", new String[]{id_phone});
+
+                                                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                    getActivity().finish();
+                                                    startActivity(intent);
+
+                                                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                                                            "Номер удалён ", Toast.LENGTH_SHORT);
+                                                    toast.show();
+                                                }
+                                            })
+                                    .setNegativeButton("Отмена",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                            break;
+                    }
+                }
+            });
+
+            builder.setCancelable(false);
+            builder.create();
+            builder.show();
         }
     };
 
@@ -1096,7 +1650,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 break;
 
             case R.id.c_address:
-                String[] array ={"Изменить", "Построить маршрут"};
+                String[] array = {"Изменить", "Построить маршрут"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Выберите действие")
@@ -1195,27 +1749,27 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                                                         String full_address = address + ", дом: " + house;
 
-                                                        if (body.equals("")){
+                                                        if (body.equals("")) {
                                                         } else {
                                                             full_address += ", корпус: " + body;
                                                         }
 
-                                                        if (porch.equals("")){
+                                                        if (porch.equals("")) {
                                                         } else {
                                                             full_address += ", подъезд: " + porch;
                                                         }
 
-                                                        if (floor.equals("")){
+                                                        if (floor.equals("")) {
                                                         } else {
                                                             full_address += ", этаж: " + floor;
                                                         }
 
-                                                        if (room.equals("")){
+                                                        if (room.equals("")) {
                                                         } else {
                                                             full_address += ", квартира: " + room;
                                                         }
 
-                                                        if (code.equals("")){
+                                                        if (code.equals("")) {
                                                         } else {
                                                             full_address += ", код: " + code;
                                                         }
@@ -1252,6 +1806,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                 });
 
                                 AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                                 alertDialog.show();
 
                                 break;
@@ -1301,20 +1856,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 dog();
 
                 break;
-            case R.id.failure:
-                values = new ContentValues();
-                values.put(DBHelper.KEY_PROJECT_STATUS, "3");
-                values.put(DBHelper.KEY_PROJECT_VERDICT, "0");
-                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
-
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID_OLD, id_project);
-                values.put(DBHelper.KEY_ID_NEW, 0);
-                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                values.put(DBHelper.KEY_SYNC, "0");
-                values.put(DBHelper.KEY_TYPE, "send");
-                values.put(DBHelper.KEY_STATUS, "1");
-                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+            case R.id.leave:
 
                 getActivity().finish();
 
@@ -1399,6 +1941,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                 });
 
                                 AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                                 alertDialog.show();
 
                                 break;
@@ -1446,7 +1989,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     @Override
                     public void onClick(View v) {
                         month--;
-                        if (month<0) {
+                        if (month < 0) {
                             month = 11;
                             year--;
                         }
@@ -1460,9 +2003,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     @Override
                     public void onClick(View v) {
                         month++;
-                        if (month==12){
+                        if (month == 12) {
                             month = 0;
-                            year ++;
+                            year++;
                         }
                         tableLayout.removeAllViews();
                         cal_preview();
@@ -1509,6 +2052,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 });
 
                 AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                 alertDialog.show();
 
                 cal_preview();
@@ -1516,7 +2060,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 break;
             case R.id.calendar_minus:
                 month--;
-                if (month<0) {
+                if (month < 0) {
                     month = 11;
                     year--;
                 }
@@ -1527,9 +2071,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             case R.id.calendar_plus:
                 month++;
-                if (month==12){
+                if (month == 12) {
                     month = 0;
-                    year ++;
+                    year++;
                 }
                 tableLayout.removeAllViews();
                 cal_preview_mount();
@@ -1539,6 +2083,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     }
 
     void cal_preview() {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         dday = 0;
         max_day = 0;
@@ -1655,33 +2201,48 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     }
                     c.close();
 
-                    for (int g = 0; client.size() > g; g ++) {
-                        sqlQuewy = "select * "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where project_calculation_date > ? and project_calculation_date < ? and project_calculator <> ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", ""});
-                        if (cc != null) {
-                            if (cc.moveToFirst()) {
-                                do {
-                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
-                                    btn.setTextColor(Color.BLACK);
-                                } while (cc.moveToNext());
-                            } else {
-                                btn.setBackgroundResource(R.drawable.calendar_btn);
-                                btn.setTextColor(R.style.text_style_spisok);
+                    if (today.equals(mount_day)) {
+                        btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        flag = true;
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDate);
+                        tableRow.addView(btn, j);
+                    } else {
+                        for (int g = 0; client.size() > g; g++) {
+                            sqlQuewy = "select * "
+                                    + "FROM rgzbn_gm_ceiling_projects " +
+                                    "where project_calculation_date > ? and project_calculation_date < ? and project_calculator <> ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", ""});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                                        btn.setTextColor(Color.BLACK);
+                                    } while (cc.moveToNext());
+                                } else {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn);
+                                    btn.setTextColor(R.style.text_style_spisok);
+                                }
                             }
+                            cc.close();
                         }
-                        cc.close();
+
+                        count++;
+                        flag = true;
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDate);
+                        tableRow.addView(btn, j);
+
                     }
 
-                    count++;
-                    flag = true;
-                    BtnList_mount_zamer.add(btn);
-                    btn.setId(dday-1);
-                    btn.setText(String.valueOf(dday));
-                    btn.setLayoutParams(tableParams);
-                    btn.setOnClickListener(getDate);
-                    tableRow.addView(btn, j);
                 } else {
                     Button btn = new Button(getActivity());
                     btn.setText("");
@@ -1731,6 +2292,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             date();
 
             final AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
             alertDialog.show();
 
             BindDictionary<Select_work> dict = new BindDictionary<>();
@@ -1857,11 +2419,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     brigade();
 
                 }
+
                 public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
 
             final AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
             alertDialog.show();
 
             BindDictionary<Select_work> dict = new BindDictionary<>();
@@ -1908,7 +2472,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     Log.d("mLog", "id = " + id);
                     sqlQuewy = "select * "
                             + "FROM rgzbn_user_usergroup_map " +
-                            "where user_id = ? and group_id = 22 ";
+                            "where user_id = ? and (group_id = 22 or group_id = 21)";
                     Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
                     if (cc != null) {
                         if (cc.moveToFirst()) {
@@ -1996,7 +2560,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         db = dbHelper.getWritableDatabase();
 
         ContentValues values;
-        if (id_b==null) {
+        if (id_b == null) {
             values = new ContentValues();
             values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(notes_cl.getText()));
             values.put(DBHelper.KEY_GM_CALCULATOR_NOTE, String.valueOf(notes_gm_calc.getText()));
@@ -2043,13 +2607,15 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-        view_general_inform.scrollTo(0,2200);
+                view_general_inform.scrollTo(0, 2200);
 
             }
         }, 1);
     }
 
     void cal_preview_mount() {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         dday = 0;
         max_day = 0;
@@ -2199,31 +2765,44 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             mount_day = year + "-" + (month + 1) + "-" + dday;
                         }
 
-                        sqlQuewy = "select _id, read_by_mounter "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where project_mounter = ? and project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_brigade.get(id_b), mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
-                        if (cc != null) {
-                            if (cc.moveToFirst()) {
-                                do {
-                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                        if (today.equals(mount_day)) {
+                            count++;
+                            flag = true;
+                            btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                            btn.setTextColor(Color.BLACK);
+                            BtnList_mount_zamer.add(btn);
+                            btn.setId(dday - 1);
+                            btn.setText(String.valueOf(dday));
+                            btn.setLayoutParams(tableParams);
+                            btn.setOnClickListener(getDateMount);
+                            tableRow.addView(btn, j);
+                        } else {
+                            sqlQuewy = "select _id, read_by_mounter "
+                                    + "FROM rgzbn_gm_ceiling_projects " +
+                                    "where project_mounter = ? and project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_brigade.get(id_b), mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                                        btn.setTextColor(Color.BLACK);
+                                    } while (cc.moveToNext());
+                                } else {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn);
                                     btn.setTextColor(Color.BLACK);
-                                } while (cc.moveToNext());
-                            } else {
-                                btn.setBackgroundResource(R.drawable.calendar_btn);
-                                btn.setTextColor(Color.BLACK);
+                                }
                             }
-                        }
-                        cc.close();
+                            cc.close();
 
-                        count++;
-                        flag = true;
-                        BtnList_mount_zamer.add(btn);
-                        btn.setId(dday - 1);
-                        btn.setText(String.valueOf(dday));
-                        btn.setLayoutParams(tableParams);
-                        btn.setOnClickListener(getDateMount);
-                        tableRow.addView(btn, j);
+                            count++;
+                            flag = true;
+                            BtnList_mount_zamer.add(btn);
+                            btn.setId(dday - 1);
+                            btn.setText(String.valueOf(dday));
+                            btn.setLayoutParams(tableParams);
+                            btn.setOnClickListener(getDateMount);
+                            tableRow.addView(btn, j);
+                        }
                     }
                 } else {
                     Button btn = new Button(getActivity());
@@ -2273,26 +2852,35 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     @SuppressLint("ResourceType")
     void btn(String title) {
 
+        mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
+        titleViewParams = new LinearLayout.LayoutParams(80, 80, 1);
+        titleViewParams.setMargins(0, 0, 0, 20);
+
         int txt_i = bt_i;
         btn = new Button(getActivity());
         BtnList.add(bt_i, btn);
         btn.setId(bt_i++);
         btn.setLayoutParams(titleViewParams);
-        btn.setBackgroundResource(R.drawable.rounded_button_green);
+        btn.setBackgroundResource(R.drawable.white_btn_blue_text);
         btn.setTextSize(1);
         btn.setText(title);
-        btn.setTextColor(Color.argb(0,0,0,0));
-        btn.setOnLongClickListener(longGetPhone);
+        btn.setTextColor(Color.argb(0, 0, 0, 0));
+        //btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
-        btn.setBackgroundResource(R.raw.phone2);
+        btn.setBackgroundResource(R.drawable.edit);
         mainL.addView(btn);
 
+        lin_calc = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        lin_calc.weight = 1;
+        lin_calc.setMargins(0, 2, 0, 20);
+
         TextView txt = new TextView(getActivity());
-        txt.setLayoutParams(titleViewParams2);
+        txt.setLayoutParams(lin_calc);
         txt.setTextSize(14);
         txt.setText(title);
         txt.setId(txt_i);
-        txt.setOnLongClickListener(longGetPhone);
+        //txt.setOnLongClickListener(longGetPhone);
         txt.setOnClickListener(getPhone);
         txt.setGravity(Gravity.CENTER_VERTICAL);
         txt.setTextColor(Color.parseColor("#414099"));
@@ -2427,7 +3015,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         ImageView image = new ImageView(getActivity());
         image.setLayoutParams(ViewParams);
 
-        if (imag.length()>10) {
+        if (imag.length() > 10) {
             try {
                 Sharp.loadString(imag)
                         .into(image);
