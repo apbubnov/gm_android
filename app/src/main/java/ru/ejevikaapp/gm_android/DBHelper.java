@@ -550,7 +550,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_usergroups (_id INTEGER, parent_id INTEGER, lft INTEGER, rgt INTEGER, title TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_user_usergroup_map (user_id TEXT, group_id TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_user_usergroup_map (_id INTEGER, user_id TEXT, group_id TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS history_send_to_server (_id INTEGER PRIMARY KEY AUTOINCREMENT, id_new INTEGER, id_old INTEGER, " +
                 "name_table TEXT, sync INTEGER, type TEXT, date TEXT, date_sync TEXT, status TEXT)");
@@ -664,6 +664,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
             db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_components_dealer_price (user_id INTEGER, " +
                     "canvas_id INTEGER, price INTEGER, value INTEGER, type INTEGER)");
+
+            //3
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_user_usergroup_map");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_user_usergroup_map (_id INTEGER, user_id TEXT, group_id TEXT)");
 
             values = new ContentValues();
             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));

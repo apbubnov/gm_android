@@ -35,6 +35,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
+            android:inputType="textCapWords"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="введите название бригады"/>
@@ -52,11 +53,11 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
-            android:maxLength="12"
-            android:inputType="phone"
+            android:maxLength="11"
+            android:hint="Пример(79009090909)"
+            android:inputType="number"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="введите телефон (логин)"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -71,7 +72,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:gravity="center"
-            android:inputType="textEmailAddress"
+            android:inputType="textWebEmailAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="введите адрес элетронной почты"/>
@@ -121,6 +122,7 @@
                 android:layout_marginLeft="20dp"
                 android:gravity="center"
                 android:layout_weight="1"
+                android:inputType="textCapWords"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="введите фио"/>
@@ -131,10 +133,11 @@
                 android:layout_marginLeft="20dp"
                 android:gravity="center"
                 android:layout_weight="1"
-                android:inputType="phone"
+                android:maxLength="11"
+                android:hint="(79009090909)"
+                android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="введите номер"/>
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 

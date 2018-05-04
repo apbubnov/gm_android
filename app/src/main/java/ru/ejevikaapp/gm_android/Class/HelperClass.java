@@ -1319,6 +1319,7 @@ public class HelperClass {
         }
 
         boolean canvases_price = false;
+        boolean canvases_price_dealer = false;
 
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
@@ -1331,35 +1332,136 @@ public class HelperClass {
         }
         c.close();
 
-        //Сюда считаем итоговую сумму полотна
-        if (width_final.equals("")) {
-            if (n3 == null) { //если новый расчёт
-            } else {
+        if (!canvases_price) {
+            sqlQuewy = "select * "
+                    + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
+                    "where user_id = ? ";
+            c = db.rawQuery(sqlQuewy, new String[]{"1"});         // заполняем массивы из таблицы
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    canvases_price_dealer = true;
+                }
+            }
+            c.close();
+        }
 
-                sqlQuewy = "select _id, price, width "
-                        + "FROM rgzbn_gm_ceiling_canvases " +
-                        "where _id = ? ";
-                c = db.rawQuery(sqlQuewy, new String[]{n3});         // заполняем массивы из таблицы
+        //Сюда считаем итоговую сумму полотна
+        if (P == 0.0) {
+        } else {
+            if (width_final.equals("")) {
+
+                if (n3 == null) { //если новый расчёт
+                } else {
+
+                    sqlQuewy = "select _id, price, width "
+                            + "FROM rgzbn_gm_ceiling_canvases " +
+                            "where _id = ? ";
+                    c = db.rawQuery(sqlQuewy, new String[]{n3});         // заполняем массивы из таблицы
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                price = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
+                                width = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                            } while (c.moveToNext());
+                        }
+                    }
+                    c.close();
+
+                    if (canvases_price) {
+                        price = new_price("canvases", dealer_id_str, id_n3, price);
+                    }
+
+                    canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
+                    canvases_data.set(1, Double.valueOf(S));                                             // кол-во
+                    canvases_data.set(2, price);                                                         // цена
+                    canvases_data.set(3, price * Double.valueOf(S));                                     // Кол-во * Себестоимость
+                    canvases_data.set(4, margin(price, dealer_can_marg));                                    //Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(5, Math.rint(100.0 * (margin(price, dealer_can_marg)) * S) / 100.0);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+                    canvases_data.set(6, double_margin(price, dealer_can_marg, gm_can_marg));            //Стоимость с маржой ГМ и дилера (для клиента)
+                    canvases_data.set(7, Math.rint(100 * (double_margin(price, dealer_can_marg, gm_can_marg)) * S) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+
+                    can_sum = Double.parseDouble(String.valueOf(canvases_data.get(3)));
+
+                    ContentValues values = new ContentValues();
+                    values.put(DBHelper.KEY_COMP_ID, "canv");
+                    values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
+                    values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
+                    values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
+                    values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
+                    values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
+                    values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
+                    values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
+                    values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
+                    db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+
+                    try {
+                        //Сюда считаем итоговую сумму обрезков
+                        canvases_data.set(0, "Количесво обрезков");                 // название
+                        canvases_data.set(1, Double.valueOf(offcut_square));           // кол-во
+                        canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
+                        canvases_data.set(3, Math.rint(100 * (Double.valueOf(offcut_square) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
+                        canvases_data.set(4, Math.rint(100 * (margin(price, dealer_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
+                        canvases_data.set(5, Math.rint(100 * Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+                        canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, dealer_can_marg, gm_can_marg) / 100 * 40, dealer_can_marg, gm_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
+                        canvases_data.set(7, Math.rint(100 * (Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+
+                    } catch (Exception e) {
+                    }
+
+                    can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_COMP_ID, "canv");
+                    values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
+                    values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
+                    values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
+                    values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
+                    values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
+                    values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
+                    values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
+                    values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
+                    db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+                }
+            } else {    //если изменён чертёж, то сюда
+
+                double wf = Double.valueOf(width_final) / 100;
+
+                int id = 0;
+                sqlQuewy = "select _id "
+                        + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                        "where name LIKE('%"+str_sb+"%')";
+                c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
                 if (c != null) {
                     if (c.moveToFirst()) {
                         do {
-                            id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                            price = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
-                            width = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                            id = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
                         } while (c.moveToNext());
                     }
                 }
                 c.close();
 
-                Log.d("mLog", "price1 = " + String.valueOf(canvases_price));
+                sqlQuewy = "select _id, price "
+                        + "FROM rgzbn_gm_ceiling_canvases " +
+                        "where texture_id = ? and manufacturer_id = ? and width =?";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), String.valueOf(wf)});         // заполняем массивы из таблицы
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                            price = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
+                        } while (c.moveToNext());
+                    }
+                }
+                c.close();
 
                 if (canvases_price) {
                     price = new_price("canvases", dealer_id_str, id_n3, price);
-                    Log.d("mLog", "price1 = " + String.valueOf(price));
+                } else {
+                    price = new_price("canvases", "1", id_n3, price);
                 }
 
-                //price = double_margin(price, gm_can_marg, dealer_can_marg) / 100 * 40;
-                canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
+                canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
                 canvases_data.set(1, Double.valueOf(S));                                             // кол-во
                 canvases_data.set(2, price);                                                         // цена
                 canvases_data.set(3, price * Double.valueOf(S));                                     // Кол-во * Себестоимость
@@ -1381,142 +1483,69 @@ public class HelperClass {
                 values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
                 values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
                 db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+            }
 
-                try {
-                    //Сюда считаем итоговую сумму обрезков
-                    canvases_data.set(0, "Количесво обрезков");                 // название
-                    canvases_data.set(1, Double.valueOf(offcut_square));           // кол-во
-                    canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
-                    canvases_data.set(3, Math.rint(100 * (Double.valueOf(offcut_square) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
-                    canvases_data.set(4, Math.rint(100 * (margin(price, dealer_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
-                    canvases_data.set(5, Math.rint(100 * Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-                    canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, dealer_can_marg, gm_can_marg) / 100 * 40, dealer_can_marg, gm_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
-                    canvases_data.set(7, Math.rint(100 * (Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+            //Сюда считаем итоговую сумму обрезков
+            try {
+                if (width_final.equals("") && (offcut_square.equals("0") || offcut_square.equals("null"))) {
+                } else {
+                    double wf = Double.valueOf(width_final) / 100;
+                    try {
+                        canvases_data.set(0, "Количесво обрезков");                 // название
+                        canvases_data.set(1, Double.valueOf(offcut_square));           // кол-во
+                        canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
+                        canvases_data.set(3, Math.rint(100 * (Double.valueOf(offcut_square) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
+                        canvases_data.set(4, Math.rint(100 * (margin(price, dealer_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
+                        canvases_data.set(5, Math.rint(100 * Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
+                        canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, dealer_can_marg, gm_can_marg) / 100 * 40, dealer_can_marg, gm_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
+                        canvases_data.set(7, Math.rint(100 * (Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
+                    } catch (Exception e) {
+                    }
 
-                } catch (Exception e) {
+                    can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
+
+                    ContentValues values = new ContentValues();
+                    values.put(DBHelper.KEY_COMP_ID, "canv");
+                    values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
+                    values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
+                    values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
+                    values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
+                    values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
+                    values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
+                    values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
+                    values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
+                    db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
                 }
-
-                can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
-
-                values = new ContentValues();
-                values.put(DBHelper.KEY_COMP_ID, "canv");
-                values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
-                values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
-                values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
-                values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
-                values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
-                values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
-                values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
-                values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
-                db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+            } catch (Exception e) {
             }
-        } else {    //если изменён чертёж, то сюда
-            double wf = Double.valueOf(width_final) / 100;
-
-            int id = 0;
-            sqlQuewy = "select _id "
-                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                    "where name LIKE('%"+str_sb+"%')";
-            c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        id = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-
-            sqlQuewy = "select _id, price "
-                    + "FROM rgzbn_gm_ceiling_canvases " +
-                    "where texture_id = ? and manufacturer_id = ? and width =?";
-            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), String.valueOf(wf)});         // заполняем массивы из таблицы
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        id_n3 = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                        price = Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-
-            Log.d("mLog", "id_n3 = " + String.valueOf(id_n3));
-
-            if (canvases_price) {
-                price = new_price("canvases", dealer_id_str, id_n3, price);
-            }
-
-            canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
-            canvases_data.set(1, Double.valueOf(S));                                             // кол-во
-            canvases_data.set(2, price);                                                         // цена
-            canvases_data.set(3, price * Double.valueOf(S));                                     // Кол-во * Себестоимость
-            canvases_data.set(4, margin(price, dealer_can_marg));                                    //Стоимость с маржой ГМ (для дилера)
-            canvases_data.set(5, Math.rint(100.0 * (margin(price, dealer_can_marg)) * S) / 100.0);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-            canvases_data.set(6, double_margin(price, dealer_can_marg, gm_can_marg));            //Стоимость с маржой ГМ и дилера (для клиента)
-            canvases_data.set(7, Math.rint(100 * (double_margin(price, dealer_can_marg, gm_can_marg)) * S) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
-
-            can_sum = Double.parseDouble(String.valueOf(canvases_data.get(3)));
-
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_COMP_ID, "canv");
-            values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
-            values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
-            values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
-            values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
-            values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
-            values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
-            values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
-            values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
-            db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
-        }
-
-        //Сюда считаем итоговую сумму обрезков
-        try {
-            if (width_final.equals("") && offcut_square.equals("0")) {
-            } else {
-                double wf = Double.valueOf(width_final) / 100;
-                try {
-                    canvases_data.set(0, "Количесво обрезков");                 // название
-                    canvases_data.set(1, Double.valueOf(offcut_square));           // кол-во
-                    canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
-                    canvases_data.set(3, Math.rint(100 * (Double.valueOf(offcut_square) * Double.valueOf(String.valueOf(canvases_data.get(2))))) / 100);       // Кол-во * Себестоимость
-                    canvases_data.set(4, Math.rint(100 * (margin(price, dealer_can_marg)) / 2) / 100);                                    //Стоимость с маржой ГМ (для дилера)
-                    canvases_data.set(5, Math.rint(100 * Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(4)))) / 100);   //Кол-во * Стоимость с маржой ГМ (для дилера)
-                    canvases_data.set(6, Math.rint(100 * (double_margin(double_margin(price, dealer_can_marg, gm_can_marg) / 100 * 40, dealer_can_marg, gm_can_marg)) / 2) / 100);            //Стоимость с маржой ГМ и дилера (для клиента)
-                    canvases_data.set(7, Math.rint(100 * (Double.parseDouble(offcut_square) * Double.parseDouble(String.valueOf(canvases_data.get(6))))) / 100);  //Кол-во * Стоимость с маржой ГМ и дилера (для клиента)
-                } catch (Exception e) {
-                }
-
-                can_sum += Double.parseDouble(String.valueOf(canvases_data.get(3)));
-
-                ContentValues values = new ContentValues();
-                values.put(DBHelper.KEY_COMP_ID, "canv");
-                values.put(DBHelper.KEY_TITLE, String.valueOf(canvases_data.get(0)));
-                values.put(DBHelper.KEY_QUANTITY, String.valueOf(canvases_data.get(1)));
-                values.put(DBHelper.KEY_SELF_PRICE, String.valueOf(canvases_data.get(2)));
-                values.put(DBHelper.KEY_SELF_TOTAL, String.valueOf(canvases_data.get(3)));
-                values.put(DBHelper.KEY_GM_PRICE, String.valueOf(canvases_data.get(4)));
-                values.put(DBHelper.KEY_GM_TOTAL, String.valueOf(canvases_data.get(5)));
-                values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
-                values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
-                db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
-            }
-        } catch (Exception e) {
         }
 
         boolean components_price = false;
+        boolean components_price_dealer = false;
 
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_components_dealer_price " +
                 "where user_id = ? ";
-        c = db.rawQuery(sqlQuewy, new String[]{dealer_id_str});         // заполняем массивы из таблицы
+        c = db.rawQuery(sqlQuewy, new String[]{dealer_id_str});
         if (c != null) {
             if (c.moveToFirst()) {
                 components_price = true;
             }
         }
         c.close();
+
+        if (!components_price) {
+            sqlQuewy = "select * "
+                    + "FROM rgzbn_gm_ceiling_components_dealer_price " +
+                    "where user_id = ? ";
+            c = db.rawQuery(sqlQuewy, new String[]{"1"});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    components_price_dealer = true;
+                }
+            }
+            c.close();
+        }
 
         //Сюда считаем итоговую сумму компонентов
         sqlQuewy = "select * "
@@ -1535,6 +1564,8 @@ public class HelperClass {
 
                         if (components_price){
                             self_price = new_price("components", dealer_id_str, id, self_price);
+                        } else {
+                            self_price = new_price("components", "1", id, self_price);
                         }
 
                         sqlQuewy = "select * "
@@ -1672,7 +1703,8 @@ public class HelperClass {
         }
 
         String components = "";
-        Cursor cursor = db.query(DBHelper.TABLE_COMPONENT_ITEM, null, null, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.TABLE_COMPONENT_ITEM, null, null,
+                null, null, null, null);
         if (cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
             int title = cursor.getColumnIndex(DBHelper.KEY_TITLE);

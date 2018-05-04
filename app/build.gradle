@@ -4,6 +4,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
+            keyAlias 'it-ceiling_key'
+            keyPassword 'b0lx9fqg'
+            storeFile file('E:/it-ceiling_key.jks')
+            storePassword 'b0lx9fqg'
         }
         release {
             keyAlias 'it-ceiling_key'
@@ -17,8 +21,8 @@ android {
         applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 9
-        versionName '1.0.0418'
+        versionCode 10
+        versionName '1.0.0503'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
     }
@@ -51,12 +55,14 @@ dependencies {
     compile 'com.android.support:support-v4:25.4.0'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.github.amigold.fundapter:library:1.0'// list с выбором
+    compile 'com.github.amigold.fundapter:library:1.0'
+    // list с выбором
     compile 'it.neokree:MaterialTabs:0.11'
     testCompile 'junit:junit:4.12'
     compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile files('libs/GenAsync.jar')
-    compile 'com.android.volley:volley:1.0.0'//передача данных
+    compile 'com.android.volley:volley:1.0.0'
+    //передача данных
     compile 'io.nlopez.smartlocation:library:3.3.3'
     compile 'cn.zhaiyifan:rememberedittext:0.9.0'
     compile 'com.android.support:support-v4:25.0.0'
@@ -64,5 +70,6 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     implementation files('libs/svg-android.jar')
     implementation files('libs/androidsvg-1.2.1.jar')
-    compile 'com.pixplicity.sharp:library:1.1.0'    // svg чертеж
+    compile 'com.pixplicity.sharp:library:1.1.0'
+    // svg чертеж
 }

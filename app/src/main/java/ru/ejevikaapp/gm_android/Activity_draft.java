@@ -16,15 +16,12 @@ public class Activity_draft extends AppCompatActivity {
 
     private WebView mWebView;
 
-    String str;
-
     static String canvases, textures, diags_points, walls_points, pt_points, auto;
 
     SharedPreferences sPref, SP4, SP5, SP9, SPI, SPSO, SPW;
 
     final String SAVED_TEXT = "saved_text", SAVED_N4 = "", SAVED_N5 = "", SAVED_N9 = "", SAVED_I = "", SAVED_SO = "",
             SAVED_WIDTH = "";
-
 
     public class myJavaScriptInterface {
         Context mContext;
@@ -162,7 +159,6 @@ public class Activity_draft extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         mWebView.destroy();
     }
 
@@ -247,15 +243,16 @@ public class Activity_draft extends AppCompatActivity {
         mWebView.loadUrl("file:///android_asset/index.html");
         mWebView.setWebChromeClient(new WebChromeClient());
 
-        mWebView.addJavascriptInterface(new myJavaScriptInterface(this), "AndroidFunction");
+        mWebView.addJavascriptInterface(new myJavaScriptInterface(this),
+                "AndroidFunction");
 
-        mWebView.addJavascriptInterface(new MyJavaInterface(), "fun_canv"); // отдаёт в js
-        mWebView.addJavascriptInterface(new MyJavaInterface(), "fun_tre"); // отдаёт в js
+        mWebView.addJavascriptInterface(new MyJavaInterface(),
+                "fun_canv"); // отдаёт в js
+        mWebView.addJavascriptInterface(new MyJavaInterface(),
+                "fun_tre"); // отдаёт в js
 
         SP4 = PreferenceManager.getDefaultSharedPreferences(this);
         SP5 = PreferenceManager.getDefaultSharedPreferences(this);
         SP9 = PreferenceManager.getDefaultSharedPreferences(this);
-
     }
-
 }

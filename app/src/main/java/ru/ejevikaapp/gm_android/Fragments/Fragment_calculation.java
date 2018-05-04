@@ -84,7 +84,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     Button buguette_help, vstavka_help, lustr_help, svetiln_help, cabling_help, karniz_help, pipes_help, bond_beam_help, separator_help,
             mount_wall_help, mount_granite_help, wall_help, fasteners_help, fire_help, add_vent_help, diff_acc_help, soaring_ceiling_help,
             add_profile_help, in_cut_help, in_cut_shop_help, drain_the_water_help, height_help, add_other_comp_help, add_other_mount_help,
-            add_diff_help, mounting_help;
+            add_diff_help, mounting_help, name_help;
 
     LinearLayout buguette_layout, vstavka_layout, lustr_layout, svetiln_layout, karniz_layout, pipes_layout, add_vent_layout,
             add_other_comp_layout, add_other_mount_layout, add_profile_layout, add_diff_layout, general_layout, second_layout;
@@ -144,7 +144,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     EditText lustr, karniz, name_project, ed_discount, count_comp, price_comp;
 
-    boolean calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true, chertezh_bool = false, countComponents = false;
+    boolean calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true,
+            chertezh_bool = false, countComponents = false, double_chertezh_bool = false;
 
     double n7 = 0, n8 = 0, n10 = 0, n11 = 0, n12 = 0, n16 = 0, n17 = 0, n18 = 0, n19 = 0, n20 = 0, n21 = 0, n24 = 0, n25 = 0,
             n27 = 0, n28 = 0, n30 = 0, n31 = 0, n32 = 0, height = 0, dop_krepezh = 0, discount = 0;
@@ -178,7 +179,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
-        user_id_int = Integer.parseInt(user_id) * 1000000;
+        user_id_int = Integer.parseInt(user_id) * 100000;
 
         SP = getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id_str = SP.getString("", "");
@@ -289,6 +290,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         add_other_comp_help = (Button) view.findViewById(R.id.add_other_comp_help);
         add_other_mount_help = (Button) view.findViewById(R.id.add_other_mount_help);
         mounting_help = (Button) view.findViewById(R.id.mounting_help);
+        name_help = (Button) view.findViewById(R.id.name_help);
 
         mounting_help.setOnClickListener(this);
         add_other_comp_help.setOnClickListener(this);
@@ -318,6 +320,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         bond_beam_help.setOnClickListener(this);
         in_cut_shop_help.setOnClickListener(this);
         drain_the_water_help.setOnClickListener(this);
+        name_help.setOnClickListener(this);
 
         buguette_layout = (LinearLayout) view.findViewById(R.id.buguette_layout);
         vstavka_layout = (LinearLayout) view.findViewById(R.id.vstavka_layout);
@@ -1053,6 +1056,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
 
             id_project = String.valueOf(max_id_proj);
+
+            Log.d("mLog", "id_project " + id_project);
         }
 
     }
@@ -3484,7 +3489,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String sqlQuewy = "select MAX(_id) "
                                 + "FROM rgzbn_gm_ceiling_hoods " +
                                 "where _id>? and _id<?";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int),
+                                String.valueOf(user_id_int + 999999)});
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 do {
@@ -4212,7 +4218,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 fun_builder();
                 break;
             case R.id.vstavka_help:
-                s_setMessage = "    Между стеной и натяжным потолком после монтажа остаётся технологический засор 5мм, который закрывается декоративной вставкой";
+                s_setMessage = "    Между стеной и натяжным потолком после монтажа остаётся технологический зазор 5мм, который закрывается декоративной вставкой";
                 s_setMessage1 = "";
                 s_setMessage2 = "";
                 s_setdrawable = String.valueOf(R.raw.vstavka);
@@ -4286,7 +4292,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             case R.id.pipes_help:
                 s_setMessage = "    В расчет на 1 трубу входит 1 пластина\n" +
                         "+ монтажная работа по обводу трубы";
-                s_setMessage1 = "(Чтобы удалить ненужный светильник, нажмите на него в таблице)";
+                s_setMessage1 = "(Чтобы удалить ненужную трубу, нажмите на неё в таблице)";
                 s_setMessage2 = "";
                 s_setdrawable = "";
                 s_setdrawable1 = "";
@@ -4509,9 +4515,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 fun_builder();
                 break;
             case R.id.add_other_comp_help:
-                s_setMessage = "    Это поле предназначено для введения непредусмотренных программной комплектующих. Вы можете произвольно написать названия " +
+                s_setMessage = "    Это поле предназначено для введения непредусмотренных программой комплектующих. Вы можете произвольно написать названия " +
                         "комплектующих и их себестоимость. Программа сама сделает наценку, как и на все остальные комплектующие и выдаст введенное Вами название " +
-                        "в прайсе для клиента.";
+                        "в прайсе для клиента";
                 s_setMessage1 = "";
                 s_setMessage2 = "";
                 s_setdrawable = "";
@@ -4519,9 +4525,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 fun_builder();
                 break;
             case R.id.add_other_mount_help:
-                s_setMessage = "    Это поле предназначено для введения непредусмотренных программной монтажных работ. Вы можете произвольно написать названия " +
-                        "монтажных работ и их себестоимость. Программа сама сделает наценку, как и на все остальные монтажных работ и выдаст введенное Вами " +
-                        "название в прайсе для клиента.";
+                s_setMessage = "    Это поле предназначено для введения непредусмотренных программой монтажных работ. Вы можете произвольно написать названия " +
+                        "монтажных работ и их себестоимость. Программа сама сделает наценку, как и на все остальные монтажные работы и выдаст введенное Вами " +
+                        "название в прайсе для клиента";
                 s_setMessage1 = "";
                 s_setMessage2 = "";
                 s_setdrawable = "";
@@ -4530,6 +4536,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 break;
             case R.id.mounting_help:
                 s_setMessage = "    Данная кнопка может отменить все монтажные работы";
+                s_setMessage1 = "";
+                s_setMessage2 = "";
+                s_setdrawable = "";
+                s_setdrawable1 = "";
+                fun_builder();
+                break;
+            case R.id.name_help:
+                s_setMessage = "    Назовите чертёж, по названию комнаты, в которой производится замер, что бы легче было потом ориентироваться. Например: \"Спальня\"";
                 s_setMessage1 = "";
                 s_setMessage2 = "";
                 s_setdrawable = "";
@@ -5312,20 +5326,18 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_EXTRA_COMPONENTS, final_comp);
             values.put(DBHelper.KEY_EXTRA_MOUNTING, final_mount);
 
+            Log.d("mLog", chertezh_bool + " " + id_calculation.length() + " " + dealer_calc);
+
             if (chertezh_bool) {
                 values.put(DBHelper.KEY_ID, id_calculation);
                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
                 chertezh_bool = false;
-
+                double_chertezh_bool = true;
             } else {
-                int max_id_contac = 0;
-                if (id_calculation.length()<6) {
-
+                if (!double_chertezh_bool) {
                     if (dealer_calc.equals("true")) {
-
                         values.put(DBHelper.KEY_ID, id_calculation);
                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-
                     } else {
                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                         Toast toast = Toast.makeText(getActivity().getApplicationContext(),
@@ -5335,25 +5347,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     sync(Integer.parseInt(id_calculation));
 
                 } else {
-                    //values.put(DBHelper.KEY_ID, max_id);
                     db = dbHelper.getReadableDatabase();
-                    //values = new ContentValues();
-                    //try {
-                    //    sqlQuewy = "select MAX(_id) "
-                    //            + "FROM rgzbn_gm_ceiling_calculations " +
-                    //            "where _id>? and _id<?";
-                    //    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
-                    //    if (c != null) {
-                    //        if (c.moveToFirst()) {
-                    //            do {
-                    //                max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    //                max_id_contac++;
-                    //            } while (c.moveToNext());
-                    //        }
-                    //    }
-                    //} catch (Exception e) {
-                    //    max_id_contac = user_id_int + 1;
-                    //}
 
                     values.put(DBHelper.KEY_ID, id_calculation);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
@@ -5370,7 +5364,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     ed.commit();
                 }
 
-                Log.d("mLog", "dealer_calc " + dealer_calc);
                 delete_comp = false;
                 if (dealer_calc.equals("true")) {
 
@@ -5481,7 +5474,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-                    sync(max_id_contac);
+                    sync(Integer.valueOf(id_calculation));
 
                     SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
                     SharedPreferences.Editor ed = SP.edit();
@@ -5497,7 +5490,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     ed.commit();
 
                 } else {
-                    sync(max_id_contac);
+                    sync(Integer.valueOf(id_calculation));
                     getActivity().finish();
                 }
             }

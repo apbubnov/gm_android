@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -38,8 +39,6 @@ public class Activity_inform_proj extends AppCompatActivity {
     ArrayList id_calc = new ArrayList();
     ArrayList title_calc = new ArrayList();
 
-    Bundle saved;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +50,6 @@ public class Activity_inform_proj extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        //setupViewPager(mViewPager);
-        //tabLayout.setupWithViewPager(mViewPager);
-
     }
 
     @Override
@@ -71,6 +66,19 @@ public class Activity_inform_proj extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+
+        SharedPreferences SP = getSharedPreferences("finishInform", MODE_PRIVATE);
+        String finishInform = SP.getString("", "");
+
+        if (finishInform.equals("1")){
+
+            SP = getSharedPreferences("finishInform", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SP.edit();
+            ed.putString("", "0");
+            ed.commit();
+
+            finish();
+        }
 
         tabLayout.setupWithViewPager(mViewPager);
         setupViewPager(mViewPager);
@@ -142,9 +150,7 @@ public class Activity_inform_proj extends AppCompatActivity {
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
-
         public ViewPagerAdapter(FragmentManager manager) {
-
             super(manager);
         }
 
@@ -153,7 +159,6 @@ public class Activity_inform_proj extends AppCompatActivity {
 
             String i = String.valueOf(id_calc.get(position));
             if (position != 0){
-
                 return(Fragment_inform_proj.newInstance(Integer.parseInt(i)));
             }
             return mFragmentList.get(position);

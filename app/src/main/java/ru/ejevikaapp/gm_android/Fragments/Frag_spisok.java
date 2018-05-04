@@ -40,14 +40,14 @@ import static android.content.Context.MODE_PRIVATE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Frag_spisok extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener{
+public class Frag_spisok extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     DBHelper dbHelper;
     ListView list_clients;
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID="", user_id;
+    String SAVED_ID = "", user_id;
     View view;
 
     Button btn_add_zamer;
@@ -71,7 +71,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
         view = inflater.inflate(R.layout.frag_spisok, container, false);
 
-        btn_add_zamer = (Button)view.findViewById(R.id.btn_add_zamer);
+        btn_add_zamer = (Button) view.findViewById(R.id.btn_add_zamer);
         btn_add_zamer.setOnClickListener(this);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
@@ -79,7 +79,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorBlue);
 
-        return view ;
+        return view;
 
     }
 
@@ -120,7 +120,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         ed.commit();
     }
 
-    void clients () {
+    void clients() {
 
         SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
@@ -128,10 +128,9 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
 
-        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE); // если зашёл после выбора клиента (Дилер)
+        // если зашёл после выбора клиента (Дилер)
+        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
         String activity_client = SP.getString("", "");
-
-        Log.d("mLog", user_id + " " + activity_client);
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -170,22 +169,22 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
         } else if (usergroup.equals("14")) {    // дилер
 
-            sqlQuewy = "SELECT client_id "
-                    + "FROM rgzbn_gm_ceiling_projects " +
-                    "group by client_id " +
-                    "order by _id desc";
-            c = db.rawQuery(sqlQuewy, new String[]{});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        client_project.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                    } while (c.moveToNext());
+            if (activity_client.equals("")) {
+                sqlQuewy = "SELECT client_id "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "group by client_id " +
+                        "order by _id desc";
+                c = db.rawQuery(sqlQuewy, new String[]{});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            client_project.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        } while (c.moveToNext());
+                    }
                 }
-            }
-            c.close();
+                c.close();
 
-            for (int i = 0; client_project.size() > i; i++) {
-                if (activity_client.equals("")) {
+                for (int i = 0; client_project.size() > i; i++) {
                     sqlQuewy = "SELECT _id "
                             + "FROM rgzbn_gm_ceiling_clients " +
                             "where dealer_id = ? and _id = ? ";
@@ -198,20 +197,10 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                         }
                     }
                     c.close();
-                } else {
-                    sqlQuewy = "SELECT _id "
-                            + "FROM rgzbn_gm_ceiling_clients " +
-                            "where dealer_id = ? and _id = ? ";
-                    c = db.rawQuery(sqlQuewy, new String[]{user_id, activity_client});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                client.add(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                            } while (c.moveToNext());
-                        }
-                    }
-                    c.close();
                 }
+            } else {
+
+                client.add(activity_client);
             }
         }
 
@@ -393,11 +382,9 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add_zamer:
-
                 Intent intent = new Intent(getActivity(), Activity_zamer.class);
                 startActivity(intent);
                 break;
-
         }
-        }
+    }
 }

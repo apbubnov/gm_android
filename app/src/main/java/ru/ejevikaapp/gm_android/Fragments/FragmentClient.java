@@ -104,11 +104,13 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
                 @Override
                 public void run() {
                     onResume();
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
             }, 3000);
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getActivity().getApplicationContext(), "проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "проверьте подключение к интернету", Toast.LENGTH_LONG).show();
         }
     }
 

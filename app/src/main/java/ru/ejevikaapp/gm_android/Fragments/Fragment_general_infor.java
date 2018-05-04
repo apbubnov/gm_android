@@ -67,6 +67,7 @@ import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.pixplicity.sharp.Sharp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -95,15 +96,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     String distance = "";
     String time_h = "", time_brig, id_b, id_z;
 
-    Button new_calc, btn_date, contract, leave, add_contact, btn_transport_ok, btn_discount_ok, btn_date_mount, save_proj, btn_save_m;
+    Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj;
 
     static DBHelper dbHelper;
     View view;
 
     TextView DateTime, S_and_P, DateTime_mount, currentDateTime;
-
-    String[] time_zam = {"9:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
-            "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"};
 
     int discount = 0, count_calc = 0, bt_i = 0, ch_i = 0;
 
@@ -131,7 +129,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     TableLayout table_l;
 
     LinearLayout.LayoutParams lin_calc;
-    LinearLayout mainL, mainL2, mainC, mainC2, mainC3, visible_potolok;
+    LinearLayout mainL, mainL2, mainC, mainC2, mainC3, visible_potolok, notes;
 
     ArrayList<String> time_free = new ArrayList<String>();
     ArrayList<Select_work> sel_work = new ArrayList<>();
@@ -190,10 +188,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
-        SharedPreferences SPI = this.getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
-        id_cl = SPI.getString("", "");
+        //SharedPreferences SPI = this.getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
+        //id_cl = SPI.getString("", "");
 
-        SPI = this.getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
+        SharedPreferences SPI = this.getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
         id_project = SPI.getString("", "");
 
         SPI = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
@@ -229,7 +227,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sqlQuewy = "select transport, distance, distance_col "
+        String sqlQuewy = "select transport, distance, distance_col, client_id "
                 + "FROM rgzbn_gm_ceiling_projects " +
                 "where _id=?";
         Cursor c = db.rawQuery(sqlQuewy, new String[]{id_project});
@@ -239,6 +237,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     transport = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     distance = c.getString(c.getColumnIndex(c.getColumnName(1)));
                     distance_col = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                    id_cl = c.getString(c.getColumnIndex(c.getColumnName(3)));
                 } while (c.moveToNext());
             }
         }
@@ -334,9 +333,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         btn_discount_ok.setOnClickListener(this);
         save_proj = (Button) view.findViewById(R.id.save_proj);
         save_proj.setOnClickListener(this);
+        open_notes = (Button) view.findViewById(R.id.open_notes);
+        open_notes.setOnClickListener(this);
 
         dbHelper = new DBHelper(getActivity());
         db = dbHelper.getReadableDatabase();
+
         sqlQuewy = "SELECT client_name "
                 + "FROM rgzbn_gm_ceiling_clients" +
                 " WHERE _id = ?";
@@ -728,7 +730,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             year--;
                         }
                         tableLayout.removeAllViews();
-                        cal_preview();
+                        cal_preview(0);
                     }
                 });
 
@@ -742,7 +744,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             year++;
                         }
                         tableLayout.removeAllViews();
-                        cal_preview();
+                        cal_preview(0);
                     }
                 });
 
@@ -789,7 +791,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                 alertDialog.show();
 
-                cal_preview();
+                cal_preview(0);
             }
         });
 
@@ -823,8 +825,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                 String sqlQuewy = "select MAX(_id) "
                                                         + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                                         "where _id>? and _id<?";
-                                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000),
-                                                        String.valueOf(user_id_int * 1000000 + 999999)});
+                                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000),
+                                                        String.valueOf(user_id_int * 100000 + 999999)});
                                                 if (c != null) {
                                                     if (c.moveToFirst()) {
                                                         do {
@@ -834,7 +836,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                     }
                                                 }
                                             } catch (Exception e) {
-                                                max_id_contac = user_id_int * 1000000 + 1;
+                                                max_id_contac = user_id_int * 100000 + 1;
                                             }
 
                                             values.put(DBHelper.KEY_ID, max_id_contac);
@@ -873,7 +875,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             }
         });
-
 
         return view;
     }
@@ -1386,7 +1387,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             final Button btnn = BtnList.get(editId);
 
-            String[] array = new String[]{"Изменить", "Позвонить"};
+            String[] array = new String[]{"Изменить", "Позвонить", "Удалить"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder = new AlertDialog.Builder(getActivity());
@@ -1994,7 +1995,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             year--;
                         }
                         tableLayout.removeAllViews();
-                        cal_preview();
+                        cal_preview(0);
                     }
                 });
 
@@ -2008,7 +2009,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             year++;
                         }
                         tableLayout.removeAllViews();
-                        cal_preview();
+                        cal_preview(0);
                     }
                 });
 
@@ -2055,7 +2056,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                 alertDialog.show();
 
-                cal_preview();
+                cal_preview(0);
 
                 break;
             case R.id.calendar_minus:
@@ -2065,7 +2066,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     year--;
                 }
                 tableLayout.removeAllViews();
-                cal_preview_mount();
+                cal_preview_mount(0);
 
                 break;
 
@@ -2076,13 +2077,31 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     year++;
                 }
                 tableLayout.removeAllViews();
-                cal_preview_mount();
+                cal_preview_mount(0);
 
+                break;
+
+            case R.id.open_notes:
+                notes = (LinearLayout) view.findViewById(R.id.notes);
+                if (notes.getVisibility() == View.GONE){
+                    open_notes.setText("Закрыть примечания");
+                    notes.setVisibility(View.VISIBLE);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            view_general_inform.scrollTo(0, 10000);
+
+                        }
+                    }, 1);
+                } else {
+                    open_notes.setText("Открыть примечания");
+                    notes.setVisibility(View.GONE);
+                }
                 break;
         }
     }
 
-    void cal_preview() {
+    void cal_preview(int btn_id) {
 
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -2201,8 +2220,20 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     }
                     c.close();
 
-                    if (today.equals(mount_day)) {
+                    if (dday == btn_id && btn_id != 0) {
+                        flag = true;
                         btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDate);
+                        tableRow.addView(btn, j);
+                    }
+                    else if (today.equals(mount_day)) {
+                        btn.setBackgroundResource(R.drawable.calendar_today);
                         btn.setTextColor(Color.BLACK);
                         count++;
                         flag = true;
@@ -2333,6 +2364,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 "Замер выбран на " + time, Toast.LENGTH_SHORT);
                         toast.show();
 
+                        tableLayout.removeAllViews();
+
+                        @SuppressLint("ResourceType") int getid = btnn.getId()+1;
+                        cal_preview(getid);
                         btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
                         alertDialog.dismiss();
                     } else {
@@ -2393,6 +2428,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
+                                    tableLayout.removeAllViews();
+                                    @SuppressLint("ResourceType") int getid = btnn.getId()+1;
+                                    cal_preview_mount(getid);
                                     btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
 
                                 }
@@ -2598,22 +2636,28 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         getActivity().startService(new Intent(getActivity(), Service_Sync.class));
         getActivity().finish();
+
+        SharedPreferences SP = getActivity().getSharedPreferences("finishInform", MODE_PRIVATE);
+        SharedPreferences.Editor ed = SP.edit();
+        ed.putString("", "1");
+        ed.commit();
+
     }
 
     void alert() {
 
-        cal_preview_mount();
+        cal_preview_mount(0);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                view_general_inform.scrollTo(0, 2200);
+                view_general_inform.scrollTo(0, 4100);
 
             }
         }, 1);
     }
 
-    void cal_preview_mount() {
+    void cal_preview_mount(int btn_id) {
 
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -2765,10 +2809,22 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             mount_day = year + "-" + (month + 1) + "-" + dday;
                         }
 
-                        if (today.equals(mount_day)) {
-                            count++;
+                        if (dday == btn_id && btn_id != 0) {
                             flag = true;
                             btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                            btn.setTextColor(Color.BLACK);
+                            count++;
+                            BtnList.add(btn);
+                            btn.setId(dday - 1);
+                            btn.setText(String.valueOf(dday));
+                            btn.setLayoutParams(tableParams);
+                            btn.setOnClickListener(getDateMount);
+                            tableRow.addView(btn, j);
+                        }
+                        else if (today.equals(mount_day)) {
+                            count++;
+                            flag = true;
+                            btn.setBackgroundResource(R.drawable.calendar_today);
                             btn.setTextColor(Color.BLACK);
                             BtnList_mount_zamer.add(btn);
                             btn.setId(dday - 1);

@@ -15,5 +15,4 @@
         tools:layout="@layout/frag_spisok">
     </fragment>
 
-
 </android.support.constraint.ConstraintLayout>

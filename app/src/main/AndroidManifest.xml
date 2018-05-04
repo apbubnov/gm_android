@@ -4,12 +4,6 @@
     package="ru.ejevikaapp.gm_android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACTION_LOCATION_SOURCE_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -70,10 +64,11 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Fragments.Activity_calcul"
-            android:label="Расчётная страница"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity_inform_zapysch"
+            android:label="Просмотр проекта"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Manager.Activity_started_projects"
@@ -114,7 +109,8 @@
 
         <activity
             android:name=".Crew.Activity_crew"
-            android:label="Кабинет монтажника" />
+            android:label="Кабинет монтажника"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Crew.Activity_calendar"
             android:label="Календарь работ"
@@ -126,17 +122,31 @@
         <activity
             android:name=".Crew.Activity_mounting_info"
             android:screenOrientation="portrait" />
-        <activity android:name=".Dealer.Activity_client" />
-        <activity android:name=".Dealer.Activity_empty" />
-        <activity android:name=".Dealer.Activity_spisok_brigade" />
-        <activity android:name=".Dealer.Activity_add_brigade" />
-        <activity android:name=".Dealer.Activity_for_spisok" />
-        <activity android:name=".Dealer.Activity_margin" />
-        <activity android:name=".Dealer.Activity_mounting" />
-        <activity android:name=".Dealer.Activity_empty_mounting" />
-        <activity android:name=".RegistrationActivity" />
-        <activity android:name=".ActivityEstimate" />
-        <activity android:name=".ActivityPrice"></activity>
+        <activity android:name=".Dealer.Activity_client"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Dealer.Activity_empty"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Dealer.Activity_spisok_brigade"
+            android:screenOrientation="portrait"
+            android:label="Бригады"/>
+        <activity android:name=".Dealer.Activity_add_brigade"
+            android:screenOrientation="portrait"
+            android:label="Новая бригады"/>
+        <activity android:name=".Dealer.Activity_for_spisok"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Dealer.Activity_margin"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Dealer.Activity_mounting"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Dealer.Activity_empty_mounting"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegistrationActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ActivityEstimate"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ActivityPrice"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

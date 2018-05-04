@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +24,7 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
             mp12, mp13, mp14, mp15, mp16, mp17, mp18, mp19;
 
     String str_distance, str_transport, str_mp43, str_mp22, str_mp23, str_mp24, str_mp25, str_mp26, str_mp27, str_mp33, str_mp30, str_mp34,
-            str_mp36, str_mp37, str_mp38, str_mp40,str_mp41, str_mp42, str_canvases_margin, str_components_margin, str_mounting_margin,
+            str_mp36, str_mp37, str_mp38, str_mp40, str_mp41, str_mp42, str_canvases_margin, str_components_margin, str_mounting_margin,
             str_mp1, str_mp31, str_mp32, str_mp2, str_mp4, str_mp5, str_mp6, str_mp7, str_mp3, str_mp8, str_mp9, str_mp10, str_mp11, str_mp12,
             str_mp13, str_mp14, str_mp15, str_mp16, str_mp17, str_mp18, str_mp19;
 
@@ -197,16 +198,16 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_margin:
-                if (mp1.getText().toString().equals("") && mp2.getText().toString().equals("") && mp3.getText().toString().equals("") && mp4.getText().toString().equals("") &&
-                mp5.getText().toString().equals("") && mp6.getText().toString().equals("") && mp7.getText().toString().equals("") && mp8.getText().toString().equals("") &&
-                mp9.getText().toString().equals("") && mp10.getText().toString().equals("") && mp11.getText().toString().equals("") && mp12.getText().toString().equals("") &&
-                mp13.getText().toString().equals("") && mp14.getText().toString().equals("") && mp15.getText().toString().equals("") && mp16.getText().toString().equals("") &&
-                mp17.getText().toString().equals("") && mp18.getText().toString().equals("") && mp19.getText().toString().equals("") && mp22.getText().toString().equals("") &&
-                mp23.getText().toString().equals("") && mp24.getText().toString().equals("") && mp25.getText().toString().equals("") && mp26.getText().toString().equals("") &&
-                mp27.getText().toString().equals("") && mp30.getText().toString().equals("") && mp31.getText().toString().equals("") && mp32.getText().toString().equals("") &&
-                mp33.getText().toString().equals("") && mp34.getText().toString().equals("") && mp36.getText().toString().equals("") && mp37.getText().toString().equals("") &&
-                mp38.getText().toString().equals("") && mp40.getText().toString().equals("") && mp41.getText().toString().equals("") && mp42.getText().toString().equals("") &&
-                mp43.getText().toString().equals("") && transport.getText().toString().equals("") && distance.getText().toString().equals("")){
+                if (mp1.getText().toString().equals("") || mp2.getText().toString().equals("") || mp3.getText().toString().equals("") || mp4.getText().toString().equals("") ||
+                        mp5.getText().toString().equals("") || mp6.getText().toString().equals("") || mp7.getText().toString().equals("") || mp8.getText().toString().equals("") ||
+                        mp9.getText().toString().equals("") || mp10.getText().toString().equals("") || mp11.getText().toString().equals("") || mp12.getText().toString().equals("") ||
+                        mp13.getText().toString().equals("") || mp14.getText().toString().equals("") || mp15.getText().toString().equals("") || mp16.getText().toString().equals("") ||
+                        mp17.getText().toString().equals("") || mp18.getText().toString().equals("") || mp19.getText().toString().equals("") || mp22.getText().toString().equals("") ||
+                        mp23.getText().toString().equals("") || mp24.getText().toString().equals("") || mp25.getText().toString().equals("") || mp26.getText().toString().equals("") ||
+                        mp27.getText().toString().equals("") || mp30.getText().toString().equals("") || mp31.getText().toString().equals("") || mp32.getText().toString().equals("") ||
+                        mp33.getText().toString().equals("") || mp34.getText().toString().equals("") || mp36.getText().toString().equals("") || mp37.getText().toString().equals("") ||
+                        mp38.getText().toString().equals("") || mp40.getText().toString().equals("") || mp41.getText().toString().equals("") || mp42.getText().toString().equals("") ||
+                        mp43.getText().toString().equals("") || transport.getText().toString().equals("") || distance.getText().toString().equals("")) {
 
                     Toast toast = Toast.makeText(this,
                             "Вы что-то пропустили ", Toast.LENGTH_SHORT);
@@ -218,45 +219,45 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
                     db = dbHelper.getWritableDatabase();
 
                     ContentValues values = new ContentValues();
-                    values.put(DBHelper.KEY_MP1, str_mp1);
-                    values.put(DBHelper.KEY_MP2, str_mp2);
-                    values.put(DBHelper.KEY_MP3, str_mp3);
-                    values.put(DBHelper.KEY_MP4, str_mp4);
-                    values.put(DBHelper.KEY_MP5, str_mp5);
-                    values.put(DBHelper.KEY_MP6, str_mp6);
-                    values.put(DBHelper.KEY_MP7, str_mp7);
-                    values.put(DBHelper.KEY_MP8, str_mp8);
-                    values.put(DBHelper.KEY_MP9, str_mp9);
-                    values.put(DBHelper.KEY_MP10, str_mp10);
-                    values.put(DBHelper.KEY_MP11, str_mp11);
-                    values.put(DBHelper.KEY_MP12, str_mp12);
-                    values.put(DBHelper.KEY_MP13, str_mp13);
-                    values.put(DBHelper.KEY_MP14, str_mp14);
-                    values.put(DBHelper.KEY_MP15, str_mp15);
-                    values.put(DBHelper.KEY_MP16, str_mp16);
-                    values.put(DBHelper.KEY_MP17, str_mp17);
-                    values.put(DBHelper.KEY_MP18, str_mp18);
-                    values.put(DBHelper.KEY_MP19, str_mp19);
-                    values.put(DBHelper.KEY_MP22, str_mp22);
-                    values.put(DBHelper.KEY_MP23, str_mp23);
-                    values.put(DBHelper.KEY_MP24, str_mp24);
-                    values.put(DBHelper.KEY_MP25, str_mp25);
-                    values.put(DBHelper.KEY_MP26, str_mp26);
-                    values.put(DBHelper.KEY_MP27, str_mp27);
-                    values.put(DBHelper.KEY_MP30, str_mp30);
-                    values.put(DBHelper.KEY_MP31, str_mp31);
-                    values.put(DBHelper.KEY_MP32, str_mp32);
-                    values.put(DBHelper.KEY_MP33, str_mp33);
-                    values.put(DBHelper.KEY_MP34, str_mp34);
-                    values.put(DBHelper.KEY_MP36, str_mp36);
-                    values.put(DBHelper.KEY_MP37, str_mp37);
-                    values.put(DBHelper.KEY_MP38, str_mp38);
-                    values.put(DBHelper.KEY_MP40, str_mp40);
-                    values.put(DBHelper.KEY_MP41, str_mp41);
-                    values.put(DBHelper.KEY_MP42, str_mp42);
-                    values.put(DBHelper.KEY_MP43, str_mp43);
-                    values.put(DBHelper.KEY_TRANSPORT, str_transport);
-                    values.put(DBHelper.KEY_DISTANCE, str_distance);
+                    values.put(DBHelper.KEY_MP1, mp1.getText().toString());
+                    values.put(DBHelper.KEY_MP2, mp2.getText().toString());
+                    values.put(DBHelper.KEY_MP3, mp3.getText().toString());
+                    values.put(DBHelper.KEY_MP4, mp4.getText().toString());
+                    values.put(DBHelper.KEY_MP5, mp5.getText().toString());
+                    values.put(DBHelper.KEY_MP6, mp6.getText().toString());
+                    values.put(DBHelper.KEY_MP7, mp7.getText().toString());
+                    values.put(DBHelper.KEY_MP8, mp8.getText().toString());
+                    values.put(DBHelper.KEY_MP9, mp9.getText().toString());
+                    values.put(DBHelper.KEY_MP10, mp10.getText().toString());
+                    values.put(DBHelper.KEY_MP11, mp11.getText().toString());
+                    values.put(DBHelper.KEY_MP12, mp12.getText().toString());
+                    values.put(DBHelper.KEY_MP13, mp13.getText().toString());
+                    values.put(DBHelper.KEY_MP14, mp14.getText().toString());
+                    values.put(DBHelper.KEY_MP15, mp15.getText().toString());
+                    values.put(DBHelper.KEY_MP16, mp16.getText().toString());
+                    values.put(DBHelper.KEY_MP17, mp17.getText().toString());
+                    values.put(DBHelper.KEY_MP18, mp18.getText().toString());
+                    values.put(DBHelper.KEY_MP19, mp19.getText().toString());
+                    values.put(DBHelper.KEY_MP22, mp22.getText().toString());
+                    values.put(DBHelper.KEY_MP23, mp23.getText().toString());
+                    values.put(DBHelper.KEY_MP24, mp24.getText().toString());
+                    values.put(DBHelper.KEY_MP25, mp25.getText().toString());
+                    values.put(DBHelper.KEY_MP26, mp26.getText().toString());
+                    values.put(DBHelper.KEY_MP27, mp27.getText().toString());
+                    values.put(DBHelper.KEY_MP30, mp30.getText().toString());
+                    values.put(DBHelper.KEY_MP31, mp31.getText().toString());
+                    values.put(DBHelper.KEY_MP32, mp32.getText().toString());
+                    values.put(DBHelper.KEY_MP33, mp33.getText().toString());
+                    values.put(DBHelper.KEY_MP34, mp34.getText().toString());
+                    values.put(DBHelper.KEY_MP36, mp36.getText().toString());
+                    values.put(DBHelper.KEY_MP37, mp37.getText().toString());
+                    values.put(DBHelper.KEY_MP38, mp38.getText().toString());
+                    values.put(DBHelper.KEY_MP40, mp40.getText().toString());
+                    values.put(DBHelper.KEY_MP41, mp41.getText().toString());
+                    values.put(DBHelper.KEY_MP42, mp42.getText().toString());
+                    values.put(DBHelper.KEY_MP43, mp43.getText().toString());
+                    values.put(DBHelper.KEY_TRANSPORT, transport.getText().toString());
+                    values.put(DBHelper.KEY_DISTANCE, distance.getText().toString());
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, values, "user_id = ?", new String[]{user_id});
 
                     values = new ContentValues();
@@ -267,8 +268,9 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
                     values.put(DBHelper.KEY_TYPE, "send");
                     values.put(DBHelper.KEY_STATUS, "1");
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                    finish();
                 }
-                finish();
                 break;
         }
     }

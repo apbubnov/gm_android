@@ -25,6 +25,8 @@ public class Activity_mounting extends AppCompatActivity implements View.OnClick
         Button btn_brigade = (Button) findViewById(R.id.btn_brigade);
         btn_brigade.setOnClickListener(this);
 
+        setTitle("Монтажи");
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);

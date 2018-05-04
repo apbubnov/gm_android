@@ -44,7 +44,7 @@ public class Service_Sync extends Service {
 
     static String jsonProjects = "", jsonCalc = "", jsonImage = "", jsonClient = "", jsonClient_Contacts = "", jsonFixtures = "", jsonEcola = "", jsonCornice = "",
             jsonPipes = "", jsonHoods = "", jsonDiffusers = "", global_results = "", check_client = "", check_clients_contacts = "", check_users = "", jsonUsers = "",
-            jsonMounters = "", check_mounters = "", check_mounters_map = "", jsonDealer_info="", jsonMount="";
+            jsonUserGroup = "", jsonMounters = "", check_mounters = "", check_mounters_map = "", jsonDealer_info = "", jsonMount = "";
 
     static org.json.simple.JSONObject jsonObjectClient = new org.json.simple.JSONObject();
     static org.json.simple.JSONObject jsonObjectClient_Contacts = new org.json.simple.JSONObject();
@@ -52,6 +52,7 @@ public class Service_Sync extends Service {
     static org.json.simple.JSONObject jsonObjectCalculation = new org.json.simple.JSONObject();
     static org.json.simple.JSONObject jsonObjectComponents = new org.json.simple.JSONObject();
     static JSONObject jsonObjectUsers = new JSONObject();
+    static JSONObject jsonObjectUserGroup = new JSONObject();
     static JSONObject jsonObjectMounters = new JSONObject();
     static JSONObject jsonObjectMounters_map = new JSONObject();
     static JSONObject jsonObjectDealer_info = new JSONObject();
@@ -128,7 +129,7 @@ public class Service_Sync extends Service {
                         } while (cursor.moveToNext());
                     }
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
             }
 
             if (!isRunning(context)) {
@@ -140,8 +141,8 @@ public class Service_Sync extends Service {
                 int gager_id_int = 0;
                 SP = context.getSharedPreferences("gager_id", MODE_PRIVATE);
                 String gager_id = SP.getString("", "");
-                if (gager_id.length()<5){
-                    gager_id_int = Integer.parseInt(gager_id) * 1000000;
+                if (gager_id.length() < 5) {
+                    gager_id_int = Integer.parseInt(gager_id) * 100000;
                 } else {
                     gager_id_int = Integer.parseInt(gager_id);
                 }
@@ -182,7 +183,7 @@ public class Service_Sync extends Service {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
-                                                        Log.d(TAG, status + " " +status1);
+                                                        Log.d(TAG, status + " " + status1);
                                                         if (j == 0) {
                                                             status = "android_id";
                                                         }
@@ -190,7 +191,7 @@ public class Service_Sync extends Service {
                                                         } else {
                                                             jsonObjectClient.put(status, status1);
                                                         }
-                                                        Log.d(TAG, status + " " +status1);
+                                                        Log.d(TAG, status + " " + status1);
                                                     }
                                                     jsonClient += String.valueOf(jsonObjectClient) + ",";
                                                 } while (cursor.moveToNext());
@@ -353,7 +354,7 @@ public class Service_Sync extends Service {
                                         if (c.moveToFirst()) {
                                             do {
                                                 JSONObject jsonObjectClient = new JSONObject();
-                                                for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_projects"); j++) {
+                                                for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_projects"); j++) {
                                                     String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
                                                     String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
                                                     if (j == 0) {
@@ -437,7 +438,7 @@ public class Service_Sync extends Service {
                                     if (c != null) {
                                         if (c.moveToFirst()) {
                                             do {
-                                                for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_calculations"); j++) {
+                                                for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_calculations"); j++) {
                                                     try {
                                                         String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
                                                         String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
@@ -943,7 +944,7 @@ public class Service_Sync extends Service {
                         if ((components_diffusers.equals("]") && components_ecola.equals("]") && components_fixtures.equals("]") && components_hoods.equals("]") &&
                                 components_pipes.equals("]") && components_corn.equals("]") && components_profil.equals("]")) ||
                                 (components_diffusers.equals("[]") && components_ecola.equals("[]") && components_fixtures.equals("[]") && components_hoods.equals("[]") &&
-                                components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))){
+                                        components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))) {
                         } else {
                             new SendComponents().execute();
                         }
@@ -1128,8 +1129,9 @@ public class Service_Sync extends Service {
                         if (cursor != null) {
                             if (cursor.moveToFirst()) {
                                 do {
-                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
 
+
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
                                     try {
                                         sqlQuewy = "SELECT * "
                                                 + "FROM rgzbn_users " +
@@ -1139,7 +1141,7 @@ public class Service_Sync extends Service {
                                             if (cursor.moveToFirst()) {
                                                 do {
                                                     jsonObjectUsers = new JSONObject();
-                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_users"); j++) {
+                                                    for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_users"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         if (j == 0) {
@@ -1165,6 +1167,7 @@ public class Service_Sync extends Service {
                                     } catch (Exception e) {
                                         Log.d(TAG, String.valueOf(e));
                                     }
+
 
                                 } while (cursor.moveToNext());
                             }
@@ -1211,6 +1214,69 @@ public class Service_Sync extends Service {
 
                 handler.postDelayed(new Runnable() {
                     public void run() {
+                        Log.d(TAG, "--------------------------UserGroup------------------------");
+                        //клиент send
+                        jsonUserGroup = "[";
+                        String sqlQuewy = "SELECT id_old "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                        Cursor cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
+                                        "send", "0", "rgzbn_user_usergroup_map", "1"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    try {
+                                        sqlQuewy = "SELECT * "
+                                                + "FROM rgzbn_user_usergroup_map " +
+                                                "where _id = ?";
+                                        cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectUserGroup = new JSONObject();
+                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_user_usergroup_map"); j++) {
+                                                        String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                        String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                        if (j == 0) {
+                                                            status = "android_id";
+                                                        }
+                                                        try {
+                                                            if (status1.equals("") || (status1 == null)) {
+                                                            } else {
+                                                                jsonObjectUserGroup.put(status, status1);
+                                                            }
+                                                        } catch (Exception e) {
+                                                        }
+
+                                                        Log.d(TAG, j + " " + String.valueOf(jsonObjectUserGroup));
+                                                    }
+                                                    Log.d(TAG, " end " + String.valueOf(jsonObjectUserGroup));
+                                                    jsonUserGroup += String.valueOf(jsonObjectUserGroup) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+                                    } catch (Exception e) {
+                                        Log.d(TAG, String.valueOf(e));
+                                    }
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        jsonUserGroup = jsonUserGroup.substring(0, jsonUserGroup.length() - 1) + "]";
+
+                        if (jsonUserGroup.equals("]") || jsonUserGroup.equals("[]") || jsonUserGroup.equals("[")) {
+                        } else {
+                            new CheckUserGroupData().execute();
+                        }
+
+                        cursor.close();
+                    }
+                }, 5000);
+
+                handler.postDelayed(new Runnable() {
+                    public void run() {
                         Log.d(TAG, "--------------------------МОНТАЖНИКИ------------------------");
                         //монтажники send
                         jsonMounters = "[";
@@ -1234,7 +1300,7 @@ public class Service_Sync extends Service {
                                             if (cursor.moveToFirst()) {
                                                 do {
                                                     jsonObjectMounters = new JSONObject();
-                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_mounters"); j++) {
+                                                    for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_mounters"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
@@ -1386,7 +1452,7 @@ public class Service_Sync extends Service {
                                             if (cursor.moveToFirst()) {
                                                 do {
                                                     jsonObjectDealer_info = new JSONObject();
-                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_dealer_info"); j++) {
+                                                    for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_dealer_info"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         if (j == 0) {
@@ -1420,39 +1486,11 @@ public class Service_Sync extends Service {
 
                         if (jsonDealer_info.equals("]")) {
                         } else {
-                             new SendDealerData().execute();
+                            new SendDealerData().execute();
                         }
 
                         cursor.close();
 
-                        //клиент check
-
-                       //check_users = "[";
-                       //sqlQuewy = "SELECT id_new "
-                       //        + "FROM history_send_to_server " +
-                       //        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                       //cursor = db.rawQuery(sqlQuewy,
-                       //        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
-                       //                "check", "0", "rgzbn_users"});
-                       //if (cursor != null) {
-                       //    if (cursor.moveToFirst()) {
-                       //        do {
-                       //            try {
-                       //                jsonObjectUsers = new JSONObject();
-                       //                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                       //                jsonObjectUsers.put("id", id_new);
-                       //                check_users += String.valueOf(jsonObjectUsers) + ",";
-                       //            } catch (Exception e) {
-                       //            }
-                       //        } while (cursor.moveToNext());
-                       //    }
-                       //}
-                       //check_users = check_users.substring(0, check_users.length() - 1) + "]";
-                       //if (check_users.equals("]")) {
-                       //} else {
-                       //    new CheckUsersData().execute();
-                       //}
-                       //cursor.close();
                     }
                 }, 5000);
 
@@ -1475,13 +1513,13 @@ public class Service_Sync extends Service {
                                     try {
                                         sqlQuewy = "SELECT * "
                                                 + "FROM rgzbn_gm_ceiling_mount " +
-                                                "where user_id = ?";
+                                                "where _id = ?";
                                         cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (cursor != null) {
                                             if (cursor.moveToFirst()) {
                                                 do {
                                                     jsonObjectMount = new JSONObject();
-                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_gm_ceiling_mount"); j++) {
+                                                    for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_mount"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         if (j == 0) {
@@ -1495,10 +1533,7 @@ public class Service_Sync extends Service {
                                                             }
                                                         } catch (Exception e) {
                                                         }
-
-                                                        Log.d(TAG, j + " " + String.valueOf(jsonObjectMount));
                                                     }
-                                                    Log.d(TAG, " end " + String.valueOf(jsonObjectMount));
                                                     jsonMount += String.valueOf(jsonObjectMount) + ",";
                                                 } while (cursor.moveToNext());
                                             }
@@ -1602,7 +1637,7 @@ public class Service_Sync extends Service {
             if (count_line == count_line_sync) {
                 db.delete(DBHelper.HISTORY_SEND_TO_SERVER, null, null);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
         }
     }
 
@@ -1871,10 +1906,14 @@ public class Service_Sync extends Service {
                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, values, "id_brigade = ?",
                                         new String[]{old_id});
 
+                                //values = new ContentValues();
+                                //values.put(DBHelper.KEY_ID_NEW, new_id);
+                                //db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ? ",
+                                //        new String[]{old_id, "rgzbn_user_usergroup_map", "0"});
+
                                 values = new ContentValues();
                                 values.put(DBHelper.KEY_USER_ID, new_id);
-                                db.update(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, values, "user_id = ?",
-                                        new String[]{old_id});
+                                db.update(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, values, "user_id = ?", new String[]{old_id});
 
                                 values = new ContentValues();
                                 values.put(DBHelper.KEY_ID, new_id);
@@ -1889,13 +1928,9 @@ public class Service_Sync extends Service {
                             }
                         } catch (Exception e) {
                         }
-
                         Service_Sync.Alarm.setAlarm(ctx);
-
                     }
-
                 }
-
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -1973,6 +2008,8 @@ public class Service_Sync extends Service {
                     } catch (Exception e) {
                     }
 
+                    Service_Sync.Alarm.setAlarm(ctx);
+
                     delete();
                 }
             }, new Response.ErrorListener() {
@@ -1996,6 +2033,81 @@ public class Service_Sync extends Service {
         }
     }
 
+    static class CheckUserGroupData extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "SendUserGroupData " + res);
+
+                    if (res.equals("")) {
+                    } else {
+
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        String new_id = "";
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_user_usergroup_map");
+                            for (int i = 0; i < dat.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                new_id = client_contact.getString("new_id");
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ? ",
+                                        new String[]{old_id, "rgzbn_user_usergroup_map", "0"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, values, "_id = ?",
+                                        new String[]{old_id});
+                            }
+                        } catch (Exception e) {
+                            Log.d(TAG, "error " + e);
+                        }
+
+                        Service_Sync.Alarm.setAlarm(ctx);
+
+                    }
+
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_user_usergroup_map", jsonUserGroup);
+                    Log.d(TAG, String.valueOf(parameters));
+                    return parameters;
+                }
+            };
+
+            requestQueue.add(request);
+
+            return null;
+        }
+    }
 
     static class SendMountersData extends AsyncTask<Void, Void, Void> {
 
@@ -2755,7 +2867,7 @@ public class Service_Sync extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d(TAG,"CALCULATOR пришло " + res);
+                    Log.d(TAG, "CALCULATOR пришло " + res);
 
                     if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
                         Log.d("responce", "SendCalculationData пусто");
@@ -3034,7 +3146,7 @@ public class Service_Sync extends Service {
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("rgzbn_gm_ceiling_calculations", jsonCalc);
 
-                    Log.d(TAG,"CALCULATOR отправил " + jsonCalc);
+                    Log.d(TAG, "CALCULATOR отправил " + jsonCalc);
                     return parameters;
                 }
             };
@@ -3466,7 +3578,7 @@ public class Service_Sync extends Service {
                     parameters.put("rgzbn_gm_ceiling_pipes", components_pipes);
                     parameters.put("rgzbn_gm_ceiling_profil", components_profil);
 
-                    Log.d(TAG,"comp send = " + parameters);
+                    Log.d(TAG, "comp send = " + parameters);
 
                     return parameters;
                 }

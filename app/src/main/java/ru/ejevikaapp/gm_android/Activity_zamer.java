@@ -1,6 +1,7 @@
 package ru.ejevikaapp.gm_android;
 
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -83,12 +84,12 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
     Button btn_date, btn_add_zamer, btn_search, btn_selection;
     DBHelper dbHelper;
-    EditText c_fio, c_phone, c_note, c_search, c_address, c_house, с_body, c_porch, c_floor, c_code, c_room ;
+    EditText c_fio, c_phone, c_note, c_search, c_address, c_house, с_body, c_porch, c_floor, c_code, c_room;
     Spinner sp_date;
 
     TextView t_fio, t_phone, text;
 
-    String date_zam, date_created, jsonClient = "", user_id = "",time_h = "", dealer_id = "", id_z;
+    String date_zam, date_created, jsonClient = "", user_id = "", time_h = "", dealer_id = "", id_z;
 
     Integer user_id_int = 0, max_id = 0;
 
@@ -120,7 +121,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
     String date = df.format(date_cr.getTime());
     String date_zamera = df.format(dateAndTime.getTime());
 
-    int id_cl, sp_i = 0, ch_i=0;
+    int id_cl, sp_i = 0, ch_i = 0;
 
     boolean bool = false;
 
@@ -135,6 +136,8 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zamer);
+
+        setTitle("Добавить замеры");
 
         dbHelper = new DBHelper(this);
         db = dbHelper.getReadableDatabase();
@@ -194,13 +197,13 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         year = cl.get(Calendar.YEAR);
         day = cl.get(Calendar.DAY_OF_MONTH);
         month = cl.get(Calendar.MONTH);
-        calendar_minus = (ImageButton)findViewById(R.id.calendar_minus);
+        calendar_minus = (ImageButton) findViewById(R.id.calendar_minus);
         calendar_minus.setOnClickListener(this);
-        calendar_plus = (ImageButton)findViewById(R.id.calendar_plus);
+        calendar_plus = (ImageButton) findViewById(R.id.calendar_plus);
         calendar_plus.setOnClickListener(this);
-        calendar_month = (TextView)findViewById(R.id.calendar_month);
+        calendar_month = (TextView) findViewById(R.id.calendar_month);
         tableLayout = (TableLayout) findViewById(R.id.tableLayout);
-        cal_preview();
+        cal_preview(0);
 
         date_created = DateUtils.formatDateTime(this,                  //дата создания
                 dateAndTime.getTimeInMillis(),
@@ -393,7 +396,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    void cal_preview() {
+    void cal_preview(int btn_id) {
 
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -512,9 +515,20 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                     }
                     c.close();
 
-                    if(today.equals(mount_day)){
-
+                    if (dday == btn_id && btn_id != 0) {
+                        flag = true;
                         btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getPhone);
+                        tableRow.addView(btn, j);
+                    }
+                    else if (today.equals(mount_day)) {
+                        btn.setBackgroundResource(R.drawable.calendar_today);
                         btn.setTextColor(Color.BLACK);
                         count++;
                         flag = true;
@@ -524,6 +538,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                         btn.setLayoutParams(tableParams);
                         btn.setOnClickListener(getPhone);
                         tableRow.addView(btn, j);
+
                     } else {
                         for (int g = 0; client.size() > g; g++) {
                             sqlQuewy = "select * "
@@ -554,6 +569,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                         tableRow.addView(btn, j);
                     }
                 } else {
+
                     Button btn = new Button(this);
                     btn.setText("");
                     btn.setBackgroundResource(R.drawable.calendar_other_month);
@@ -569,7 +585,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
             Pattern.compile("^[7]{1}[0-9]{10}$", Pattern.CASE_INSENSITIVE);
 
     public static boolean validatePhone(String phoneStr) {
-        Matcher matcher = VALID_PHONE_NUMBER_REGEX .matcher(phoneStr);
+        Matcher matcher = VALID_PHONE_NUMBER_REGEX.matcher(phoneStr);
         return matcher.find();
     }
 
@@ -650,6 +666,10 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 "Замер выбран на " + time, Toast.LENGTH_SHORT);
                         toast.show();
 
+                        tableLayout.removeAllViews();
+                        @SuppressLint("ResourceType") int getid = btnn.getId()+1;
+                        cal_preview(getid);
+
                         btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
                         alertDialog.dismiss();
                     } else {
@@ -675,7 +695,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
         for (int i = 0; i < listAdapter.getCount(); i++) {
             View listItem = listAdapter.getView(i, null, listView);
 
-            if(listItem != null){
+            if (listItem != null) {
                 // This next line is needed before you call measure or else you won't get measured height at all. The listitem needs to be drawn first to know the height.
                 listItem.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
                 listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
@@ -825,33 +845,33 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 String code = c_code.getText().toString().trim();
                 String full_address = address + ", дом: " + house;
 
-                if (body.equals("")){
+                if (body.equals("")) {
                 } else {
                     full_address += ", корпус: " + body;
                 }
 
-                if (porch.equals("")){
+                if (porch.equals("")) {
                 } else {
                     full_address += ", подъезд: " + porch;
                 }
 
-                if (floor.equals("")){
+                if (floor.equals("")) {
                 } else {
                     full_address += ", этаж: " + floor;
                 }
 
-                if (room.equals("")){
+                if (room.equals("")) {
                 } else {
                     full_address += ", квартира: " + room;
                 }
 
-                if (code.equals("")){
+                if (code.equals("")) {
                 } else {
                     full_address += ", код: " + code;
                 }
 
                 if (!bool) {
-                    if(validatePhone(phone)) {
+                    if (validatePhone(phone)) {
                         if (fio.length() > 0 && address.length() > 0 && house.length() > 0 && time_h.length() > 0) {
                             ContentValues values = new ContentValues();
                             try {
@@ -862,7 +882,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     sqlQuewy = "select MAX(_id) "
                                             + "FROM rgzbn_gm_ceiling_clients " +
                                             "where _id>? and _id<?";
-                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 999999)});
                                     if (c != null) {
                                         if (c.moveToFirst()) {
                                             do {
@@ -872,7 +892,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                         }
                                     }
                                 } catch (Exception e) {
-                                    max_id = user_id_int * 1000000 + 1;
+                                    max_id = user_id_int * 100000 + 1;
                                 }
 
                                 values.put(DBHelper.KEY_ID, max_id);
@@ -906,7 +926,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     sqlQuewy = "select MAX(_id) "
                                             + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                             "where _id>? and _id<?";
-                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 999999)});
                                     if (c != null) {
                                         if (c.moveToFirst()) {
                                             do {
@@ -916,7 +936,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                         }
                                     }
                                 } catch (Exception e) {
-                                    max_id_contac = user_id_int * 1000000 + 1;
+                                    max_id_contac = user_id_int * 100000 + 1;
                                 }
 
                                 values.put(DBHelper.KEY_ID, max_id_contac);
@@ -985,7 +1005,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                         sqlQuewy = "select MAX(_id) "
                                                 + "FROM rgzbn_gm_ceiling_projects " +
                                                 "where _id>? and _id<?";
-                                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
+                                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 99999)});
                                         if (c != null) {
                                             if (c.moveToFirst()) {
                                                 do {
@@ -995,7 +1015,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                             }
                                         }
                                     } catch (Exception e) {
-                                        max_id_proj = user_id_int * 1000000 + 1;
+                                        max_id_proj = user_id_int * 100000 + 1;
                                     }
                                 }
 
@@ -1063,7 +1083,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                         toast.show();
                     }
                 } else {
-                    if (search.length() > 0 && address.length() > 0 && time_h.length()>0) {
+                    if (search.length() > 0 && address.length() > 0 && time_h.length() > 0) {
                         ContentValues values = new ContentValues();
                         try {
                             String sqlQuewy = "";
@@ -1099,7 +1119,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 sqlQuewy = "select MAX(_id) "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id>? and _id<?";
-                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
+                                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 99999)});
                                 if (c != null) {
                                     if (c.moveToFirst()) {
                                         do {
@@ -1109,7 +1129,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
                             } catch (Exception e) {
-                                max_id_proj = user_id_int * 1000000 + 1;
+                                max_id_proj = user_id_int * 100000 + 1;
                             }
 
                             String usergroup = "";
@@ -1128,7 +1148,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             }
                             c.close();
 
-                            if (usergroup.equals("21") || usergroup.equals("22")){ // замерщик
+                            if (usergroup.equals("21") || usergroup.equals("22")) { // замерщик
                                 who_calc = "1";
                             } else if (usergroup.equals("14")) {    // дилер
                                 who_calc = "0";
@@ -1196,23 +1216,23 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
             case R.id.calendar_minus:
                 month--;
-                if (month<0) {
+                if (month < 0) {
                     month = 11;
                     year--;
                 }
                 tableLayout.removeAllViews();
-                cal_preview();
+                cal_preview(0);
 
                 break;
 
             case R.id.calendar_plus:
                 month++;
-                if (month==12){
+                if (month == 12) {
                     month = 0;
-                    year ++;
+                    year++;
                 }
                 tableLayout.removeAllViews();
-                cal_preview();
+                cal_preview(0);
 
                 break;
         }

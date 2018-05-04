@@ -87,7 +87,7 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                         String sqlQuewy = "select MAX(_id) "
                                 + "FROM rgzbn_gm_ceiling_clients " +
                                 "where _id>? and _id<?";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 999999)});
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 do {
@@ -97,7 +97,7 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                             }
                         }
                     } catch (Exception e) {
-                        max_id = user_id_int * 1000000 + 1;
+                        max_id = user_id_int * 100000 + 1;
                     }
 
                     values.put(DBHelper.KEY_ID, max_id);
@@ -124,7 +124,7 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                         String sqlQuewy = "select MAX(_id) "
                                 + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                 "where _id>? and _id<?";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 999999)});
                         if (c != null) {
                             if (c.moveToFirst()) {
                                 do {
@@ -134,7 +134,7 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                             }
                         }
                     } catch (Exception e) {
-                        max_id_contac = user_id_int * 1000000 + 1;
+                        max_id_contac = user_id_int * 100000 + 1;
                     }
 
                     values.put(DBHelper.KEY_ID, max_id_contac);

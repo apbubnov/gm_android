@@ -50,6 +50,7 @@ public class Activity_inform_zapysch extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
 

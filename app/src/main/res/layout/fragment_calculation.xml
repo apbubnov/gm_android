@@ -2181,6 +2181,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_button"
                         android:text="\?"
+                        android:id="@+id/name_help"
                         android:layout_marginLeft="5dp"
                         android:textColor="#ffffff"
                         android:stateListAnimator="@null"

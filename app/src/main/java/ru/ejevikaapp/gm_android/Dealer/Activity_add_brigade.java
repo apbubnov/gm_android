@@ -68,7 +68,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
 
         SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
-        user_id_int = Integer.parseInt(user_id) * 1000000;
+        user_id_int = Integer.parseInt(user_id) * 100000;
 
         list_mount = (ListView) findViewById(R.id.list_mount);
 
@@ -131,7 +131,6 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
             String sqlQuewy = "select MAX(_id) "
                     + "FROM rgzbn_users " +
                     "where _id>? and _id<?";
-            ;
             Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
             if (c != null) {
                 if (c.moveToFirst()) {
@@ -332,6 +331,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     db.insert(DBHelper.TABLE_USERS, null, values);
 
                     values = new ContentValues();
+                    values.put(DBHelper.KEY_ID, max_id_brigade);
                     values.put(DBHelper.KEY_USER_ID, max_id_brigade);
                     values.put(DBHelper.KEY_GROUP_ID, "11");
                     db.insert(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, null, values);
@@ -340,6 +340,15 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_ID_OLD, max_id_brigade);
                     values.put(DBHelper.KEY_ID_NEW, "0");
                     values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                    values.put(DBHelper.KEY_SYNC, "0");
+                    values.put(DBHelper.KEY_TYPE, "send");
+                    values.put(DBHelper.KEY_STATUS, "1");
+                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_ID_OLD, max_id_brigade);
+                    values.put(DBHelper.KEY_ID_NEW, "0");
+                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_user_usergroup_map");
                     values.put(DBHelper.KEY_SYNC, "0");
                     values.put(DBHelper.KEY_TYPE, "send");
                     values.put(DBHelper.KEY_STATUS, "1");

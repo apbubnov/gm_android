@@ -39,7 +39,7 @@ public class Activity_client extends AppCompatActivity {
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-
+        setTitle("Клиенты");
     }
 
     @Override
