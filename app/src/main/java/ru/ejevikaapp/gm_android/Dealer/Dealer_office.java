@@ -18,27 +18,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 
-import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
-import ru.ejevikaapp.gm_android.Fragments.Frag_g3_zapusch;
-import ru.ejevikaapp.gm_android.Fragments.Frag_spisok;
 import ru.ejevikaapp.gm_android.Fragments.FragmentAllProjects;
-import ru.ejevikaapp.gm_android.Fragments.FragmentClient;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
 import ru.ejevikaapp.gm_android.MainActivity;
 import ru.ejevikaapp.gm_android.R;
@@ -59,10 +49,9 @@ public class Dealer_office extends AppCompatActivity {
 
                     SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
                     SharedPreferences.Editor ed = SP.edit();
-                    ed.putString("", "");
+                    ed.putString("", "false");
                     ed.commit();
                     loadFragment(Fragment_Home.newInstance());
-
                     return true;
                 case R.id.start_calculation:
 
@@ -71,16 +60,14 @@ public class Dealer_office extends AppCompatActivity {
                     ed.putString("", "true");
                     ed.commit();
                     loadFragment(Fragment_calculation.newInstance());
-
                     return true;
                 case R.id.start_projects:
 
                     SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
                     ed = SP.edit();
-                    ed.putString("", "");
+                    ed.putString("", "false");
                     ed.commit();
                     loadFragment(FragmentAllProjects.newInstance());
-
                     return true;
             }
             return false;
@@ -124,7 +111,7 @@ public class Dealer_office extends AppCompatActivity {
 
             SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
             ed = SP.edit();
-            ed.putString("", "");
+            ed.putString("", "false");
             ed.commit();
 
             Intent intent = new Intent(Dealer_office.this, MainActivity.class);
@@ -407,6 +394,25 @@ public class Dealer_office extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
+        String entryCalcDealer = SP.getString("", "");
+
+        if (entryCalcDealer.equals("1")){
+            BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+            navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+            navigation.setSelectedItemId(R.id.start_projects);
+
+            SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SP.edit();
+            ed.putString("", "0");
+            ed.commit();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dealer_office);
@@ -445,6 +451,11 @@ public class Dealer_office extends AppCompatActivity {
             ed.commit();
 
         }
+
+        SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
+        ed = SP.edit();
+        ed.putString("", "0");
+        ed.commit();
 
     }
 

@@ -149,7 +149,10 @@ public class Service_Sync extends Service {
 
                 final int finalGager_id_int = gager_id_int;
 
-                requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                try {
+                    requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                } catch (Exception e) {
+                }
 
                 Log.v(TAG, "don't start service: already running... " + finalGager_id_int);
 
@@ -195,6 +198,11 @@ public class Service_Sync extends Service {
                                                     }
                                                     jsonClient += String.valueOf(jsonObjectClient) + ",";
                                                 } while (cursor.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients"});
+
                                             }
                                         }
                                         cursor.close();
@@ -286,6 +294,11 @@ public class Service_Sync extends Service {
                                                 jsonClient_Contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
 
                                             } while (cursor.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients_contacts"});
+
                                         }
                                     }
                                     cursor.close();
@@ -371,6 +384,11 @@ public class Service_Sync extends Service {
                                                 }
                                                 jsonProjects += String.valueOf(jsonObjectClient) + ",";
                                             } while (c.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects"});
+
                                         }
                                     }
                                     c.close();
@@ -462,6 +480,10 @@ public class Service_Sync extends Service {
                                                 }
                                                 jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
                                             } while (c.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_calculations"});
                                         }
                                     }
 
@@ -503,61 +525,6 @@ public class Service_Sync extends Service {
                     }
                 }, 5000);
 
-                //handler = new Handler();
-                //handler.postDelayed(new Runnable() {
-                //    public void run() {
-                //        Log.d(TAG, "--------------------------картинки------------------------");
-                //        //картинки send
-                //        try {
-                //            org.json.simple.JSONObject jsonObjectCalculation_image = new org.json.simple.JSONObject();
-                //            String sqlQuewy = "SELECT id_new "
-                //                    + "FROM history_send_to_server " +
-                //                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                //            Cursor cursor = db.rawQuery(sqlQuewy,
-                //                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                //                            "send", "0", "rgzbn_gm_ceiling_calculations_cal", "1"});
-                //            if (cursor != null) {
-                //                if (cursor.moveToFirst()) {
-                //                    do {
-                //                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                //                        sqlQuewy = "SELECT _id, calc_image, cut_image "
-                //                                + "FROM rgzbn_gm_ceiling_calculations " +
-                //                                "where _id = ? ";
-                //                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                //                        if (c != null) {
-                //                            c.moveToFirst();
-                //                            do {
-                //                                jsonObjectCalculation_image = new org.json.simple.JSONObject();
-                //                                String status = "android_id";
-                //                                String status1 = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                //                                Log.d(TAG, status1);
-                //                                jsonObjectCalculation_image.put(status, status1);
-                //                                status = c.getColumnName(c.getColumnIndex(c.getColumnName(1)));
-                //                                status1 = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                //                                jsonObjectCalculation_image.put(status, status1);
-                //                                status = c.getColumnName(c.getColumnIndex(c.getColumnName(2)));
-                //                                status1 = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                //                                jsonObjectCalculation_image.put(status, status1);
-
-                //                                jsonImage = String.valueOf(jsonObjectCalculation_image);
-                //                                new SendCalculation_ImageData().execute();
-
-                //                            } while (c.moveToNext());
-                //                        }
-                //                        c.close();
-                //                    } while (cursor.moveToNext());
-                //                }
-                //                cursor.close();
-                //            }
-
-                //        } catch (Exception e) {
-                //        }
-
-                //    }
-
-                //}, 5000);
-
                 handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
@@ -591,25 +558,31 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_fixtures += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_fixtures += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_fixtures"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -640,25 +613,31 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_ecola += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_ecola += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_ecola"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -689,22 +668,28 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_diffusers += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_diffusers += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_diffusers"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -735,25 +720,31 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_hoods += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_hoods += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_hoods"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -784,22 +775,28 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_pipes += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_pipes += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_pipes"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -830,25 +827,30 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_corn += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_corn += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_cornice"});
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -879,22 +881,28 @@ public class Service_Sync extends Service {
                                                 "where _id = ? ";
                                         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                         if (c != null) {
-                                            c.moveToFirst();
-                                            do {
-                                                String status = "android_id";
-                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                                jsonObjectComponents.put(status, status1);
-                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                                jsonObjectComponents.put(status, status1);
-                                                components_profil += String.valueOf(jsonObjectComponents) + ",";
-                                            } while (c.moveToNext());
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    String status = "android_id";
+                                                    String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                    status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                    jsonObjectComponents.put(status, status1);
+                                                    components_profil += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_profil"});
+
+                                            }
                                         }
                                         c.close();
                                     } catch (Exception e) {
@@ -1236,7 +1244,7 @@ public class Service_Sync extends Service {
                                             if (cursor.moveToFirst()) {
                                                 do {
                                                     jsonObjectUserGroup = new JSONObject();
-                                                    for (int j = 0; j <HelperClass.countColumns(context, "rgzbn_user_usergroup_map"); j++) {
+                                                    for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_user_usergroup_map"); j++) {
                                                         String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
                                                         if (j == 0) {

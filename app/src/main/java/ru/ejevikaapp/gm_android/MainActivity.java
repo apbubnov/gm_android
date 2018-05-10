@@ -780,14 +780,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     "это происходит из-за проектов, полотен, производителей и т.д., которые скачиваются...", Toast.LENGTH_LONG);
                     toast.show();
 
-                    //Handler handler = new Handler();
-                    //handler.postDelayed(new Runnable() {
-                    //    @Override
-                    //    public void run() {
-                    //        toast.cancel();
-                    //    }
-                    //}, 10000);
-
                     Intent intent = new Intent(MainActivity.this, Dealer_office.class);
                     startActivity(intent);
                     finish();

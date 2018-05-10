@@ -28,7 +28,7 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
             str_mp1, str_mp31, str_mp32, str_mp2, str_mp4, str_mp5, str_mp6, str_mp7, str_mp3, str_mp8, str_mp9, str_mp10, str_mp11, str_mp12,
             str_mp13, str_mp14, str_mp15, str_mp16, str_mp17, str_mp18, str_mp19;
 
-    Button save_margin;
+    Button save_margin, default_margin, reset_margin;
 
     String user_id, id_dealer_info, id_mount;
 
@@ -86,6 +86,10 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
 
         save_margin = (Button) findViewById(R.id.save_margin);
         save_margin.setOnClickListener(this);
+        default_margin = (Button) findViewById(R.id.default_margin);
+        default_margin.setOnClickListener(this);
+        reset_margin = (Button) findViewById(R.id.reset_margin);
+        reset_margin.setOnClickListener(this);
 
         DBHelper dbHelper = new DBHelper(this);
         SQLiteDatabase db;
@@ -271,6 +275,88 @@ public class Activity_margin extends AppCompatActivity implements View.OnClickLi
 
                     finish();
                 }
+                break;
+            case R.id.reset_margin:
+                mp1.setText("0");
+                mp2.setText("0");
+                mp3.setText("0");
+                mp4.setText("0");
+                mp5.setText("0");
+                mp6.setText("0");
+                mp7.setText("0");
+                mp8.setText("0");
+                mp9.setText("0");
+                mp10.setText("0");
+                mp11.setText("0");
+                mp12.setText("0");
+                mp13.setText("0");
+                mp14.setText("0");
+                mp15.setText("0");
+                mp16.setText("0");
+                mp17.setText("0");
+                mp18.setText("0");
+                mp19.setText("0");
+                mp22.setText("0");
+                mp23.setText("0");
+                mp24.setText("0");
+                mp25.setText("0");
+                mp26.setText("0");
+                mp27.setText("0");
+                mp30.setText("0");
+                mp31.setText("0");
+                mp32.setText("0");
+                mp33.setText("0");
+                mp34.setText("0");
+                mp36.setText("0");
+                mp37.setText("0");
+                mp38.setText("0");
+                mp40.setText("0");
+                mp41.setText("0");
+                mp42.setText("0");
+                mp43.setText("0");
+                transport.setText("0");
+                distance.setText("0");
+                break;
+            case R.id.default_margin:
+                mp1.setText("80");
+                mp2.setText("100");
+                mp3.setText("150");
+                mp4.setText("100");
+                mp5.setText("150");
+                mp6.setText("100");
+                mp7.setText("150");
+                mp8.setText("100");
+                mp9.setText("150");
+                mp10.setText("10");
+                mp11.setText("100");
+                mp12.setText("150");
+                mp13.setText("40");
+                mp14.setText("100");
+                mp15.setText("40");
+                mp16.setText("100");
+                mp17.setText("100");
+                mp18.setText("10");
+                mp19.setText("100");
+                mp22.setText("100");
+                mp23.setText("200");
+                mp24.setText("280");
+                mp25.setText("230");
+                mp26.setText("370");
+                mp27.setText("1250");
+                mp30.setText("120");
+                mp31.setText("90");
+                mp32.setText("110");
+                mp33.setText("150");
+                mp34.setText("150");
+                mp36.setText("150");
+                mp37.setText("150");
+                mp38.setText("150");
+                mp40.setText("150");
+                mp41.setText("150");
+                mp42.setText("150");
+                mp43.setText("100");
+                transport.setText("250");
+                distance.setText("11");
                 break;
         }
     }

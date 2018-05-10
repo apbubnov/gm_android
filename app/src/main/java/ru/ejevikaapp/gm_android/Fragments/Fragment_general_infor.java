@@ -344,7 +344,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 " WHERE _id = ?";
 
         c = db.rawQuery(sqlQuewy, new String[]{id_cl});
-
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
@@ -484,61 +483,16 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         calendar_plus = (ImageButton) view.findViewById(R.id.calendar_plus);
         calendar_plus.setOnClickListener(this);
 
+
         ImageButton edit_name = (ImageButton) view.findViewById(R.id.edit_name);
         edit_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Context context = getActivity();
-                View promptsView;
-                LayoutInflater li = LayoutInflater.from(context);
-                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
-                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-                mDialogBuilder.setView(promptsView);
-                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
-                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
-                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
-                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
-                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
-                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
-                pass.setVisibility(View.GONE);
-                email.setVisibility(View.GONE);
-                ava.setVisibility(View.GONE);
-                ed_name_text.setVisibility(View.GONE);
-                ed_password_text.setVisibility(View.GONE);
+                String[] array = new String[]{"Изменить", "Открыть"};
 
-                name.setText(name_cl.getText().toString());
-
-                mDialogBuilder
-                        .setCancelable(false)
-                        .setPositiveButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                        DBHelper dbHelper = new DBHelper(getActivity());
-                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                        ContentValues values = new ContentValues();
-                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
-                                                new String[]{id_cl});
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
-                                        values.put(DBHelper.KEY_ID_NEW, "0");
-                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                                        values.put(DBHelper.KEY_SYNC, "0");
-                                        values.put(DBHelper.KEY_TYPE, "send");
-                                        values.put(DBHelper.KEY_STATUS, "1");
-                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
-                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                                        startActivity(intent);
-                                        getActivity().finish();
-
-                                    }
-                                })
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Выберите действие")
                         .setNegativeButton("Отмена",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -546,9 +500,97 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                 });
 
-                AlertDialog alertDialog = mDialogBuilder.create();
-                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
-                alertDialog.show();
+                builder.setItems(array, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        // TODO Auto-generated method stub
+
+                        switch (item) {
+                            case 0:
+
+                                final Context context = getActivity();
+                                View promptsView;
+                                LayoutInflater li = LayoutInflater.from(context);
+                                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                                mDialogBuilder.setView(promptsView);
+                                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+                                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+                                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
+                                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+
+                                pass.setVisibility(View.GONE);
+                                email.setVisibility(View.GONE);
+                                ava.setVisibility(View.GONE);
+                                ed_name_text.setVisibility(View.GONE);
+                                ed_password_text.setVisibility(View.GONE);
+
+                                name.setText(name_cl.getText().toString());
+
+                                mDialogBuilder
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
+                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                                                new String[]{id_cl});
+
+                                                        values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "send");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                        startActivity(intent);
+                                                        getActivity().finish();
+
+                                                    }
+                                                })
+                                        .setNegativeButton("Отмена",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                                alertDialog.show();
+
+                                break;
+                            case 1:
+
+                                SharedPreferences SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+                                SharedPreferences.Editor ed = SP.edit();
+                                ed.putString("", String.valueOf(id_cl));
+                                ed.commit();
+
+                                Intent intent = new Intent(getActivity(), Activity_for_spisok.class);
+                                startActivity(intent);
+
+                                break;
+                        }
+
+
+                    }
+                });
+                builder.setCancelable(false);
+                builder.create();
+                builder.show();
+
             }
         });
 
@@ -557,135 +599,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             @Override
             public void onClick(View v) {
 
-                final Context context = getActivity();
-                View promptsView;
-                LayoutInflater li = LayoutInflater.from(context);
-                promptsView = li.inflate(R.layout.layout_edit_address, null);
-                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-                mDialogBuilder.setView(promptsView);
-                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
-                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
-                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
-                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
-                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
-                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
-                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
 
-                String str = "";
+                String[] array = {"Изменить", "Построить маршрут"};
 
-                for (String retval : pro_info.split(",")) {
-
-                    int indexJava = retval.indexOf("дом:");
-                    if (indexJava == -1) {
-                    } else {
-                        c_house.setText(retval.substring(6));
-                        continue;
-                    }
-
-                    indexJava = retval.indexOf("корпус:");
-                    if (indexJava == -1) {
-                    } else {
-                        с_body.setText(retval.substring(9));
-                        continue;
-                    }
-
-                    indexJava = retval.indexOf("квартира:");
-                    if (indexJava == -1) {
-                    } else {
-                        c_room.setText(retval.substring(11));
-                        continue;
-                    }
-
-                    indexJava = retval.indexOf("подъезд:");
-                    if (indexJava == -1) {
-                    } else {
-                        c_porch.setText(retval.substring(10));
-                        continue;
-                    }
-
-                    indexJava = retval.indexOf("этаж:");
-                    if (indexJava == -1) {
-                    } else {
-                        c_floor.setText(retval.substring(7));
-                        continue;
-                    }
-
-                    indexJava = retval.indexOf("код:");
-                    if (indexJava == -1) {
-                    } else {
-                        c_code.setText(retval.substring(6));
-                        continue;
-                    }
-                    str += retval + ",";
-                }
-                str = str.substring(0, str.length() - 1);
-                c_address.setText(str);
-
-                mDialogBuilder
-                        .setCancelable(false)
-                        .setPositiveButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                        String address = c_address.getText().toString().trim();
-                                        String house = c_house.getText().toString().trim();
-                                        String body = с_body.getText().toString().trim();
-                                        String porch = c_porch.getText().toString().trim();
-                                        String floor = c_floor.getText().toString().trim();
-                                        String room = c_room.getText().toString().trim();
-                                        String code = c_code.getText().toString().trim();
-
-                                        String full_address = address + ", дом: " + house;
-
-                                        if (body.equals("")) {
-                                        } else {
-                                            full_address += ", корпус: " + body;
-                                        }
-
-                                        if (porch.equals("")) {
-                                        } else {
-                                            full_address += ", подъезд: " + porch;
-                                        }
-
-                                        if (floor.equals("")) {
-                                        } else {
-                                            full_address += ", этаж: " + floor;
-                                        }
-
-                                        if (room.equals("")) {
-                                        } else {
-                                            full_address += ", квартира: " + room;
-                                        }
-
-                                        if (code.equals("")) {
-                                        } else {
-                                            full_address += ", код: " + code;
-                                        }
-
-                                        DBHelper dbHelper = new DBHelper(getActivity());
-                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                        ContentValues values = new ContentValues();
-                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
-                                                new String[]{id_project});
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_ID_OLD, id_project);
-                                        values.put(DBHelper.KEY_ID_NEW, 0);
-                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                                        values.put(DBHelper.KEY_SYNC, "0");
-                                        values.put(DBHelper.KEY_TYPE, "send");
-                                        values.put(DBHelper.KEY_STATUS, "1");
-                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
-                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                                        startActivity(intent);
-                                        getActivity().finish();
-
-                                    }
-                                })
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Выберите действие")
                         .setNegativeButton("Отмена",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -693,9 +611,168 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                 });
 
-                AlertDialog alertDialog = mDialogBuilder.create();
-                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
-                alertDialog.show();
+                builder.setItems(array, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        // TODO Auto-generated method stub
+
+                        switch (item) {
+                            case 0:
+
+                                View promptsView;
+                                LayoutInflater li = LayoutInflater.from(getActivity());
+                                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+                                mDialogBuilder.setView(promptsView);
+                                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
+                                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
+                                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
+                                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
+                                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
+                                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
+                                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
+
+                                String str = "";
+
+                                for (String retval : pro_info.split(",")) {
+
+                                    int indexJava = retval.indexOf("дом:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_house.setText(retval.substring(6));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("корпус:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        с_body.setText(retval.substring(9));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("квартира:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_room.setText(retval.substring(11));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("подъезд:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_porch.setText(retval.substring(10));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("этаж:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_floor.setText(retval.substring(7));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("код:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_code.setText(retval.substring(6));
+                                        continue;
+                                    }
+                                    str += retval + ",";
+                                }
+                                str = str.substring(0, str.length() - 1);
+                                c_address.setText(str);
+
+                                mDialogBuilder
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                        String address = c_address.getText().toString().trim();
+                                                        String house = c_house.getText().toString().trim();
+                                                        String body = с_body.getText().toString().trim();
+                                                        String porch = c_porch.getText().toString().trim();
+                                                        String floor = c_floor.getText().toString().trim();
+                                                        String room = c_room.getText().toString().trim();
+                                                        String code = c_code.getText().toString().trim();
+
+                                                        String full_address = address + ", дом: " + house;
+
+                                                        if (body.equals("")) {
+                                                        } else {
+                                                            full_address += ", корпус: " + body;
+                                                        }
+
+                                                        if (porch.equals("")) {
+                                                        } else {
+                                                            full_address += ", подъезд: " + porch;
+                                                        }
+
+                                                        if (floor.equals("")) {
+                                                        } else {
+                                                            full_address += ", этаж: " + floor;
+                                                        }
+
+                                                        if (room.equals("")) {
+                                                        } else {
+                                                            full_address += ", квартира: " + room;
+                                                        }
+
+                                                        if (code.equals("")) {
+                                                        } else {
+                                                            full_address += ", код: " + code;
+                                                        }
+
+                                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                                new String[]{id_project});
+
+                                                        values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                                        values.put(DBHelper.KEY_ID_NEW, 0);
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "send");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                        startActivity(intent);
+                                                        getActivity().finish();
+
+                                                    }
+                                                })
+                                        .setNegativeButton("Отмена",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                                alertDialog.show();
+
+                                break;
+                            case 1:
+                                String uri = "geo:0,0?q=" + pro_info;
+                                Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                                startActivity(mapIntent);
+                                break;
+                        }
+
+
+                    }
+                });
+
+                builder.setCancelable(false);
+                builder.create();
+                builder.show();
 
             }
         });
@@ -925,8 +1002,16 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     do {
                         S = c.getString(c.getColumnIndex(c.getColumnName(0)));
                         P = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        s += Double.parseDouble(S);
-                        p += Double.parseDouble(P);
+                        if (S.equals("")) {
+                            s += 0;
+                        } else {
+                            s += Double.parseDouble(S);
+                        }
+                        if (P.equals("")) {
+                            p += 0;
+                        } else {
+                            p += Double.parseDouble(P);
+                        }
 
                         try {
                             dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
@@ -1109,7 +1194,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         canvases_sum.setText("П " + String.valueOf((Math.round(tmp2_d) * 100.0) / 100));
         components_sum_total.setText("К " + String.valueOf((Math.round(tmp_d) * 100.0) / 100));
-        mounting_sum.setText("М " + String.valueOf((Math.round(tmp3_d) * 100.0) / 100));
+        mounting_sum.setText("М " + String.valueOf((Math.round(tmp3_d + trans) * 100.0) / 100));
         total_sum.setText(String.valueOf((Math.round(tmp_d + tmp2_d + tmp3_d) * 100.0) / 100 + trans));
 
         S_and_P.setText(Math.round(s * 100.0) / 100.0 + " м2 / \n" + Math.round(p * 100.0) / 100.0 + " м");
@@ -1605,6 +1690,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         SQLiteDatabase db;
         db = dbHelper.getWritableDatabase();
         ContentValues values;
+        final Context context = getActivity();
 
         switch (v.getId()) {
             case R.id.btn_transport_ok:
@@ -1651,10 +1737,135 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 break;
 
             case R.id.c_address:
-                String[] array = {"Изменить", "Построить маршрут"};
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
+                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
+                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
+                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
+                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
+                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
+                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Выберите действие")
+                String str = "";
+
+                for (String retval : pro_info.split(",")) {
+
+                    int indexJava = retval.indexOf("дом:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_house.setText(retval.substring(6));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("корпус:");
+                    if (indexJava == -1) {
+                    } else {
+                        с_body.setText(retval.substring(9));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("квартира:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_room.setText(retval.substring(11));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("подъезд:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_porch.setText(retval.substring(10));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("этаж:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_floor.setText(retval.substring(7));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("код:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_code.setText(retval.substring(6));
+                        continue;
+                    }
+                    str += retval + ",";
+                }
+                str = str.substring(0, str.length() - 1);
+                c_address.setText(str);
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+
+                                        String address = c_address.getText().toString().trim();
+                                        String house = c_house.getText().toString().trim();
+                                        String body = с_body.getText().toString().trim();
+                                        String porch = c_porch.getText().toString().trim();
+                                        String floor = c_floor.getText().toString().trim();
+                                        String room = c_room.getText().toString().trim();
+                                        String code = c_code.getText().toString().trim();
+
+                                        String full_address = address + ", дом: " + house;
+
+                                        if (body.equals("")) {
+                                        } else {
+                                            full_address += ", корпус: " + body;
+                                        }
+
+                                        if (porch.equals("")) {
+                                        } else {
+                                            full_address += ", подъезд: " + porch;
+                                        }
+
+                                        if (floor.equals("")) {
+                                        } else {
+                                            full_address += ", этаж: " + floor;
+                                        }
+
+                                        if (room.equals("")) {
+                                        } else {
+                                            full_address += ", квартира: " + room;
+                                        }
+
+                                        if (code.equals("")) {
+                                        } else {
+                                            full_address += ", код: " + code;
+                                        }
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                new String[]{id_project});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                        values.put(DBHelper.KEY_ID_NEW, 0);
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
                         .setNegativeButton("Отмена",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -1662,169 +1873,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                 });
 
-                builder.setItems(array, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int item) {
-                        // TODO Auto-generated method stub
-
-                        switch (item) {
-                            case 0:
-
-                                final Context context = getActivity();
-                                View promptsView;
-                                LayoutInflater li = LayoutInflater.from(context);
-                                promptsView = li.inflate(R.layout.layout_edit_address, null);
-                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-                                mDialogBuilder.setView(promptsView);
-                                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
-                                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
-                                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
-                                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
-                                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
-                                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
-                                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
-
-                                String str = "";
-
-                                for (String retval : pro_info.split(",")) {
-
-                                    int indexJava = retval.indexOf("дом:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        c_house.setText(retval.substring(6));
-                                        continue;
-                                    }
-
-                                    indexJava = retval.indexOf("корпус:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        с_body.setText(retval.substring(9));
-                                        continue;
-                                    }
-
-                                    indexJava = retval.indexOf("квартира:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        c_room.setText(retval.substring(11));
-                                        continue;
-                                    }
-
-                                    indexJava = retval.indexOf("подъезд:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        c_porch.setText(retval.substring(10));
-                                        continue;
-                                    }
-
-                                    indexJava = retval.indexOf("этаж:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        c_floor.setText(retval.substring(7));
-                                        continue;
-                                    }
-
-                                    indexJava = retval.indexOf("код:");
-                                    if (indexJava == -1) {
-                                    } else {
-                                        c_code.setText(retval.substring(6));
-                                        continue;
-                                    }
-                                    str += retval + ",";
-                                }
-                                str = str.substring(0, str.length() - 1);
-                                c_address.setText(str);
-
-                                mDialogBuilder
-                                        .setCancelable(false)
-                                        .setPositiveButton("OK",
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-
-                                                        String address = c_address.getText().toString().trim();
-                                                        String house = c_house.getText().toString().trim();
-                                                        String body = с_body.getText().toString().trim();
-                                                        String porch = c_porch.getText().toString().trim();
-                                                        String floor = c_floor.getText().toString().trim();
-                                                        String room = c_room.getText().toString().trim();
-                                                        String code = c_code.getText().toString().trim();
-
-                                                        String full_address = address + ", дом: " + house;
-
-                                                        if (body.equals("")) {
-                                                        } else {
-                                                            full_address += ", корпус: " + body;
-                                                        }
-
-                                                        if (porch.equals("")) {
-                                                        } else {
-                                                            full_address += ", подъезд: " + porch;
-                                                        }
-
-                                                        if (floor.equals("")) {
-                                                        } else {
-                                                            full_address += ", этаж: " + floor;
-                                                        }
-
-                                                        if (room.equals("")) {
-                                                        } else {
-                                                            full_address += ", квартира: " + room;
-                                                        }
-
-                                                        if (code.equals("")) {
-                                                        } else {
-                                                            full_address += ", код: " + code;
-                                                        }
-
-                                                        DBHelper dbHelper = new DBHelper(getActivity());
-                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                                        ContentValues values = new ContentValues();
-                                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
-                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
-                                                                new String[]{id_project});
-
-                                                        values = new ContentValues();
-                                                        values.put(DBHelper.KEY_ID_OLD, id_project);
-                                                        values.put(DBHelper.KEY_ID_NEW, 0);
-                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                                                        values.put(DBHelper.KEY_SYNC, "0");
-                                                        values.put(DBHelper.KEY_TYPE, "send");
-                                                        values.put(DBHelper.KEY_STATUS, "1");
-                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
-                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                                                        startActivity(intent);
-                                                        getActivity().finish();
-
-                                                    }
-                                                })
-                                        .setNegativeButton("Отмена",
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        dialog.cancel();
-                                                    }
-                                                });
-
-                                AlertDialog alertDialog = mDialogBuilder.create();
-                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
-                                alertDialog.show();
-
-                                break;
-                            case 1:
-                                String uri = "geo:0,0?q=" + pro_info;
-                                Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
-                                startActivity(mapIntent);
-                                break;
-                        }
-
-
-                    }
-                });
-
-                builder.setCancelable(false);
-                builder.create();
-                builder.show();
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
 
                 break;
 
@@ -1858,16 +1909,59 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                 break;
             case R.id.leave:
-
                 getActivity().finish();
-
                 break;
             case R.id.name_cl:
 
-                array = new String[]{"Изменить", "Открыть"};
+                li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+                mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
+                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
-                builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Выберите действие")
+                pass.setVisibility(View.GONE);
+                email.setVisibility(View.GONE);
+                ava.setVisibility(View.GONE);
+                ed_name_text.setVisibility(View.GONE);
+                ed_password_text.setVisibility(View.GONE);
+
+                name.setText(name_cl.getText().toString());
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                                new String[]{id_cl});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
+                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                })
                         .setNegativeButton("Отмена",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -1875,106 +1969,17 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                 });
 
-                builder.setItems(array, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int item) {
-                        // TODO Auto-generated method stub
-
-                        switch (item) {
-                            case 0:
-
-                                final Context context = getActivity();
-                                View promptsView;
-                                LayoutInflater li = LayoutInflater.from(context);
-                                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
-                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-                                mDialogBuilder.setView(promptsView);
-                                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
-                                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
-                                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
-                                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
-                                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
-                                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
-
-                                pass.setVisibility(View.GONE);
-                                email.setVisibility(View.GONE);
-                                ava.setVisibility(View.GONE);
-                                ed_name_text.setVisibility(View.GONE);
-                                ed_password_text.setVisibility(View.GONE);
-
-                                name.setText(name_cl.getText().toString());
-
-                                mDialogBuilder
-                                        .setCancelable(false)
-                                        .setPositiveButton("OK",
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-
-                                                        DBHelper dbHelper = new DBHelper(getActivity());
-                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                                        ContentValues values = new ContentValues();
-                                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
-                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
-                                                                new String[]{id_cl});
-
-                                                        values = new ContentValues();
-                                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
-                                                        values.put(DBHelper.KEY_ID_NEW, "0");
-                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                                                        values.put(DBHelper.KEY_SYNC, "0");
-                                                        values.put(DBHelper.KEY_TYPE, "send");
-                                                        values.put(DBHelper.KEY_STATUS, "1");
-                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
-                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                                                        startActivity(intent);
-                                                        getActivity().finish();
-
-                                                    }
-                                                })
-                                        .setNegativeButton("Отмена",
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        dialog.cancel();
-                                                    }
-                                                });
-
-                                AlertDialog alertDialog = mDialogBuilder.create();
-                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
-                                alertDialog.show();
-
-                                break;
-                            case 1:
-
-                                SharedPreferences SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
-                                SharedPreferences.Editor ed = SP.edit();
-                                ed.putString("", String.valueOf(id_cl));
-                                ed.commit();
-
-                                Intent intent = new Intent(getActivity(), Activity_for_spisok.class);
-                                startActivity(intent);
-
-                                break;
-                        }
-
-
-                    }
-                });
-                builder.setCancelable(false);
-                builder.create();
-                builder.show();
+                alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
 
                 break;
 
             case R.id.data_cl:
 
-                final Context context = getActivity();
-                View promptsView;
-                LayoutInflater li = LayoutInflater.from(context);
+                li = LayoutInflater.from(context);
                 promptsView = li.inflate(R.layout.layout_edit_date_zamer, null);
-                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder = new AlertDialog.Builder(context);
                 mDialogBuilder.setView(promptsView);
 
                 Calendar cl = Calendar.getInstance();
@@ -2052,7 +2057,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                 });
 
-                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog = mDialogBuilder.create();
                 alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                 alertDialog.show();
 
@@ -2083,7 +2088,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
             case R.id.open_notes:
                 notes = (LinearLayout) view.findViewById(R.id.notes);
-                if (notes.getVisibility() == View.GONE){
+                if (notes.getVisibility() == View.GONE) {
                     open_notes.setText("Закрыть примечания");
                     notes.setVisibility(View.VISIBLE);
                     Handler handler = new Handler();
@@ -2231,8 +2236,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         btn.setLayoutParams(tableParams);
                         btn.setOnClickListener(getDate);
                         tableRow.addView(btn, j);
-                    }
-                    else if (today.equals(mount_day)) {
+                    } else if (today.equals(mount_day)) {
                         btn.setBackgroundResource(R.drawable.calendar_today);
                         btn.setTextColor(Color.BLACK);
                         count++;
@@ -2366,7 +2370,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                         tableLayout.removeAllViews();
 
-                        @SuppressLint("ResourceType") int getid = btnn.getId()+1;
+                        @SuppressLint("ResourceType") int getid = btnn.getId() + 1;
                         cal_preview(getid);
                         btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
                         alertDialog.dismiss();
@@ -2429,7 +2433,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 public void onClick(DialogInterface dialog, int id) {
 
                                     tableLayout.removeAllViews();
-                                    @SuppressLint("ResourceType") int getid = btnn.getId()+1;
+                                    @SuppressLint("ResourceType") int getid = btnn.getId() + 1;
                                     cal_preview_mount(getid);
                                     btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
 
@@ -2820,8 +2824,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             btn.setLayoutParams(tableParams);
                             btn.setOnClickListener(getDateMount);
                             tableRow.addView(btn, j);
-                        }
-                        else if (today.equals(mount_day)) {
+                        } else if (today.equals(mount_day)) {
                             count++;
                             flag = true;
                             btn.setBackgroundResource(R.drawable.calendar_today);
@@ -2961,11 +2964,14 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         rb.setTypeface(null, Typeface.BOLD);
         mainC.addView(rb);
 
-        TextView tx = new TextView(getActivity());
-        tx.setText("S/P = " + n4 + " м2 / " + n5 + " м");
-        tx.setLayoutParams(lin_calc);
-        tx.setTextColor(Color.parseColor("#414099"));
-        mainC.addView(tx);
+        if (n4.equals("") || n4.equals("0.0")) {
+        } else {
+            TextView tx = new TextView(getActivity());
+            tx.setText("S/P = " + n4 + " м2 / " + n5 + " м");
+            tx.setLayoutParams(lin_calc);
+            tx.setTextColor(Color.parseColor("#414099"));
+            mainC.addView(tx);
+        }
 
         SQLiteDatabase db;
         db = dbHelper.getWritableDatabase();
@@ -2974,12 +2980,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 " WHERE _id = ?";
 
         Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
-
         double tmp = 0;     // компоненты
         double tmp2 = 0;    // канвас
         double tmp3 = 0;    // монтаж
         double dis = 0.0;
-
         if (c != null) {
             if (c.moveToFirst()) {
                 do {

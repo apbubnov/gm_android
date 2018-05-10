@@ -1,6 +1,8 @@
 package ru.ejevikaapp.gm_android.Fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -139,7 +141,7 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
 
         dbHelper = new DBHelper(getActivity());
 
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         ArrayList client = new ArrayList();
 
@@ -306,6 +308,81 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
                 startActivity(intent);
             }
         });
+
+        list_clients.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id) {
+                // TODO Auto-generated method stub
+
+                Frag_client_schedule_class selectedid = client_mas.get(pos);
+                final String cId = selectedid.getId_client();
+                String name = selectedid.getFio();
+
+                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+                ad.setMessage("Удалить клиента "+name+"?"); // сообщение
+                ad.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, "_id = ?", new String[]{String.valueOf(cId)});
+                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "client_id = ?", new String[]{String.valueOf(cId)});
+
+                        String sqlQuewy = "SELECT _id "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where client_id = ? ";
+                        Cursor c1 = db.rawQuery(sqlQuewy, new String[]{cId});
+                        if (c1 != null) {
+                            if (c1.moveToFirst()) {
+                                do {
+                                    int pId = c1.getInt(c1.getColumnIndex(c1.getColumnName(0)));
+
+                                    sqlQuewy = "SELECT _id "
+                                            + "FROM rgzbn_gm_ceiling_calculations " +
+                                            "where project_id = ? ";
+                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(pId)});
+                                    if (c != null) {
+                                        if (c.moveToFirst()) {
+                                            do {
+
+                                                int calcId = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+
+                                            } while (c.moveToNext());
+                                        }
+                                    }
+                                    c.close();
+
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(pId)});
+
+                                } while (c1.moveToNext());
+                            }
+                        }
+                        c1.close();
+
+                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "client_id = ?", new String[]{String.valueOf(cId)});
+
+                        Intent intent = new Intent(getActivity(), Activity_client.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                });
+                ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                    }
+                });
+                ad.setCancelable(true);
+                ad.show();
+                return true;
+            }
+        });
+
     }
 
 }

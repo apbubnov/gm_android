@@ -1,20 +1,20 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/backgroun"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="5dp"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    style="@style/backgroun">
+    android:orientation="vertical"
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp">
 
     <ScrollView
+        android:id="@+id/scroll_calc"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="true"
-        android:id="@+id/scroll_calc">
+        android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/frag_calcul"
@@ -23,39 +23,41 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/text_style_spisok"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:layout_marginBottom="7dp"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:text="Характеристики полотна"
-                android:textStyle="bold"
-                style="@style/text_style_spisok"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <TableLayout
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
                 android:stretchColumns="0,3,5">
+
                 <TableRow>
+
                     <TextView
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Выберите фактуру полотна"
-                        style="@style/text_style_spisok"
+                        android:layout_span="7"
                         android:layout_weight="1"
-                        android:layout_span="7"/>
+                        android:text="Выберите фактуру полотна" />
 
                     <Button
                         android:id="@+id/canvas_help"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:layout_span="1"
                         android:background="@drawable/rounded_button_question"
                         android:stateListAnimator="@null"
                         android:text="\?"
                         android:textColor="#ffffff"
-                        android:textSize="20dp"
-                        android:layout_span="1"/>
+                        android:textSize="20dp" />
                 </TableRow>
             </TableLayout>
 
@@ -78,34 +80,36 @@
                 android:layout_marginTop="7dp"
                 android:background="#ffffff"
                 android:enabled="false"
-                android:visibility="gone"
                 android:text="ЦВЕT"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:visibility="gone" />
 
             <TableLayout
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="5dp"
                 android:stretchColumns="0,3,5">
+
                 <TableRow>
+
                     <TextView
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Выберите производителя"
-                        style="@style/text_style_spisok"
+                        android:layout_span="7"
                         android:layout_weight="1"
-                        android:layout_span="7"/>
+                        android:text="Выберите производителя" />
 
                     <Button
                         android:id="@+id/texture_help"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
+                        android:layout_span="1"
                         android:background="@drawable/rounded_button_question"
+                        android:stateListAnimator="@null"
                         android:text="\?"
                         android:textColor="#ffffff"
-                        android:stateListAnimator="@null"
-                        android:textSize="20dp"
-                        android:layout_span="1"/>
+                        android:textSize="20dp" />
                 </TableRow>
             </TableLayout>
 
@@ -129,19 +133,19 @@
                 android:textColor="#ffffff" />
 
             <LinearLayout
+                android:id="@+id/linear_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/linear_image"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
+                    style="@style/text_style_spisok"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="15dp"
                     android:text="ЧЕРТЁЖ ВАШЕЙ КОМНАТЫ:"
-                    style="@style/text_style_spisok"
                     android:textSize="20dp" />
 
                 <ImageView
@@ -152,27 +156,27 @@
 
                 <TextView
                     android:id="@+id/area"
+                    style="@style/text_style_spisok"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="S = "
-                    style="@style/text_style_spisok" />
+                    android:text="S = " />
 
                 <TextView
                     android:id="@+id/perimetr"
+                    style="@style/text_style_spisok"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="P = "
-                    style="@style/text_style_spisok"/>
+                    android:text="P = " />
 
                 <TextView
                     android:id="@+id/corners"
+                    style="@style/text_style_spisok"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Кол-во углов = "
-                    style="@style/text_style_spisok" />
+                    android:text="Кол-во углов = " />
 
             </LinearLayout>
 
@@ -182,53 +186,91 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
-                android:text="Добавить монтаж и комплектующие"
                 android:background="@drawable/rounded_button_question"
-                android:textColor="#ffffff"/>
+                android:text="Добавить монтаж и комплектующие"
+                android:textColor="#ffffff" />
 
             <LinearLayout
+                android:id="@+id/general_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:visibility="gone"
-                android:id="@+id/general_layout">
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="ВНИМАНИЕ!
+Все комплектующие расчитываются с крепежем (саморезы, дюбеля, подвесы и т.д.) и работой. "
+                    android:textColor="#43358c" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:paddingTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="Изменить прайс монтажа"
+                        android:layout_weight="1"
+                        android:textColor="#43358c" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_button_question"
+                        android:gravity="center"
+                        android:stateListAnimator="@null"
+                        android:text="Изменить"
+                        android:id="@+id/priceMount"
+                        android:textColor="#ffffff" />
+                </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
+
                         <Button
                             android:id="@+id/buguette_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Изменить багет"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Крепёжный профиль"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/buguette_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/buguette_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
                     android:orientation="horizontal"
-                    android:id="@+id/buguette_layout"
-                    android:visibility="gone"
-                    android:layout_marginTop="5dp">
+                    android:visibility="gone">
 
                     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/radios_b"
@@ -239,71 +281,72 @@
 
                         <RadioButton
                             android:id="@+id/rb_b_no"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Без багета"
                             android:checked="true"
-                            style="@style/text_style_spisok"/>
+                            android:text="Без багета" />
 
                         <RadioButton
                             android:id="@+id/rb_b_norm"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Обычный багет"
-                            style="@style/text_style_spisok"/>
+                            android:text="Стеновой багет ПВХ" />
 
                         <RadioButton
                             android:id="@+id/rb_b_potol"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Потолочный багет"
-                            style="@style/text_style_spisok"/>
+                            android:text="Потолочный багет Al" />
 
                         <RadioButton
                             android:id="@+id/rb_b_all"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Алюминиевый багет"
-                            style="@style/text_style_spisok" />
+                            android:text="Стеновой багет Al" />
                     </RadioGroup>
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/vstavka_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Декоративная вставка"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Декоративная вставка"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/vstavka_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/vstavka_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
                     android:layout_marginTop="5dp"
-                    android:id="@+id/vstavka_layout"
+                    android:orientation="horizontal"
                     android:visibility="gone">
 
                     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
@@ -315,25 +358,25 @@
 
                         <RadioButton
                             android:id="@+id/rb_v_white"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Белая вставка"
-                            style="@style/text_style_spisok" />
+                            android:text="Белая вставка" />
 
                         <RadioButton
                             android:id="@+id/rb_v_color"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Цветная вставка"
-                            style="@style/text_style_spisok"/>
+                            android:text="Цветная вставка" />
 
                         <RadioButton
                             android:id="@+id/rb_v_no"
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Вставка не нужна"
                             android:checked="true"
-                            style="@style/text_style_spisok"/>
+                            android:text="Вставка не нужна" />
                     </RadioGroup>
 
                     <Button
@@ -348,133 +391,135 @@
                 </LinearLayout>
 
                 <TextView
-                    android:layout_marginTop="10dp"
+                    style="@style/text_style_spisok"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:text="Освещение"
-                    android:textStyle="bold"
-                    style="@style/text_style_spisok"
-                    android:textSize="20dp" />
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
+                            android:id="@+id/lustr_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Добавить люстры"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"
-                            android:id="@+id/lustr_hide"/>
+                            android:text="Добавить люстры"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/lustr_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/lustr_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical"
-                    android:id="@+id/lustr_layout"
-                    android:visibility="gone"
-                    android:layout_marginTop="5dp">
+                    android:visibility="gone">
 
                     <TextView
+                        style="@style/text_style_spisok"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Введите кол-во люстр:"
-                        style="@style/text_style_spisok"/>
+                        android:text="Введите кол-во люстр:" />
 
                     <EditText
                         android:id="@+id/lustr"
                         android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/edit_text_style"
                         android:hint="шт."
                         android:inputType="number"
-                        android:layout_height="40dp"
                         android:paddingLeft="5dp"
-                        android:textColor="#000000"
-                        android:background="@drawable/edit_text_style"/>
+                        android:textColor="#000000" />
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/svetiln_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Добавить светильники"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Добавить светильники"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/svetiln_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/svetiln_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical"
-                    android:id="@+id/svetiln_layout"
-                    android:visibility="gone"
-                    android:layout_marginTop="5dp">
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Кол-во"
-                            style="@style/text_style_spisok"/>
+                            android:text="Кол-во" />
 
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Вид"
-                            style="@style/text_style_spisok"/>
+                            android:text="Вид" />
 
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="Диаметр"
-                            style="@style/text_style_spisok"/>
+                            android:text="Диаметр" />
 
                     </LinearLayout>
 
@@ -491,70 +536,73 @@
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:paddingLeft="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_vid_fixtures"
                             style="@style/spinner_style"
-                            android:layout_height="40dp"
                             android:layout_width="wrap_content"
+                            android:layout_height="40dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
-                            android:layout_weight="1"/>
+                            android:layout_weight="1" />
 
                         <Spinner
                             android:id="@+id/spinner_diametr_fixtures"
+                            style="@style/spinner_style"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:layout_marginLeft="5dp"
-                            style="@style/spinner_style"
-                            android:layout_weight="1"/>
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_svetilnik"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_svetilnik"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_svetilnik"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_svetilnik"/>
+                        android:layout_marginTop="5dp" />
 
                     <TextView
+                        style="@style/text_style_spisok"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="Можете приобрести \nсветильники у нас: "
-                        style="@style/text_style_spisok"
-                        android:textSize="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:textSize="20dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Кол-во"/>
+                            android:text="Кол-во" />
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Цвет"/>
+                            android:text="Цвет" />
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -564,92 +612,93 @@
                             android:id="@+id/count_ecola"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_vid_ecola"
+                            style="@style/spinner_style"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
-                            android:layout_weight="1"
+                            android:layout_gravity="center"
                             android:layout_marginRight="5dp"
-                            android:layout_gravity="center"/>
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Лампа"
-                            style="@style/text_style_spisok"
+                            android:layout_marginBottom="5dp"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginBottom="5dp"/>
+                            android:text="Лампа" />
 
                         <Spinner
                             android:id="@+id/spinner_diametr_ecola"
+                            style="@style/spinner_style"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
                             android:layout_marginLeft="5dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_ecola"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_ecola"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_ecola"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_ecola">
-                    </ru.ejevikaapp.gm_android.Class.NonScrollListView>
+                        android:layout_marginTop="5dp"></ru.ejevikaapp.gm_android.Class.NonScrollListView>
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/cabling_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Провод"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Провод"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/cabling_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -658,70 +707,71 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginTop="5dp"
-                    android:paddingLeft="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TextView
-                    android:layout_marginTop="10dp"
+                    style="@style/text_style_spisok"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:text="Прочий монтаж"
-                    android:textStyle="bold"
-                    style="@style/text_style_spisok"
-                    android:textSize="20dp" />
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/karniz_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Добавить шторный карниз"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Добавить шторный карниз"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/karniz_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/karniz_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/karniz_layout"
-                    android:visibility="gone"
                     android:layout_marginTop="5dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <EditText
                         android:id="@+id/karniz"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:paddingLeft="5dp"
+                        android:background="@drawable/edit_text_style"
                         android:hint="м."
-                        android:textColor="#000000"
                         android:inputType="numberDecimal"
-                        android:background="@drawable/edit_text_style" />
+                        android:paddingLeft="5dp"
+                        android:textColor="#000000" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -729,11 +779,11 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="Скрытый карниз"
-                            style="@style/text_style_spisok" />
+                            android:text="Скрытый карниз" />
 
                         <CheckBox
                             android:id="@+id/RB_karniz"
@@ -746,24 +796,24 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
                         android:orientation="horizontal">
 
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="Можете приобрести карнизы у нас: "
-                            style="@style/text_style_spisok" />
+                            android:text="Можете приобрести карнизы у нас: " />
 
                         <Button
                             android:id="@+id/btn_add_cornice"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
                             android:background="@drawable/white_btn_blue_text"
-                            android:text="\?"
                             android:stateListAnimator="@null"
+                            android:text="\?"
                             android:textColor="#414099"
                             android:textSize="20dp" />
                     </LinearLayout>
@@ -771,18 +821,20 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Кол-во"/>
+                            android:text="Кол-во" />
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Тип"/>
+                            android:text="Тип" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -794,117 +846,122 @@
                             android:id="@+id/count_cornice"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_vid_cornice"
-                            android:layout_width="wrap_content"
                             style="@style/spinner_style"
+                            android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:layout_weight="1"
+                            android:layout_gravity="center"
                             android:layout_marginRight="5dp"
-                            android:layout_gravity="center"/>
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Длина"
-                            style="@style/text_style_spisok"
-                            android:layout_marginBottom="5dp"/>
+                            android:layout_marginBottom="5dp"
+                            android:text="Длина" />
 
                         <Spinner
                             android:id="@+id/spinner_diametr_cornice"
-                            android:layout_width="match_parent"
                             style="@style/spinner_style"
+                            android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_cornices"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_cornices"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_cornice"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_cornice"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/pipes_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Добавить трубы, входящие в потолок "
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Добавить трубы входящие в потолок "
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/pipes_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/pipes_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:id="@+id/pipes_layout"
                     android:layout_marginTop="5dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Кол-во"/>
+                            android:text="Кол-во" />
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Диаметр"/>
+                            android:text="Диаметр" />
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -914,69 +971,70 @@
                             android:id="@+id/count_pipes"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_diametr_pipes"
+                            style="@style/spinner_style"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
-                            android:layout_weight="1"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
-                            android:layout_gravity="center"/>
+                            android:layout_weight="1" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_pipes"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_pipes"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_pipes"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_pipes"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/bond_beam_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Закладная брусом"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Закладная брусом"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/bond_beam_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -985,40 +1043,41 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginTop="5dp"
-                    android:paddingLeft="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/separator_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Разделитель"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Разделитель"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/separator_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1026,41 +1085,42 @@
                     android:id="@+id/ed_separator"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/edit_text_style"
                     android:hint="м."
-                    android:textColor="#000000"
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/mount_wall_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Метраж стен с плиткой"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Метраж стен с плиткой"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/mount_wall_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1068,41 +1128,42 @@
                     android:id="@+id/mount_wall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
                     android:background="@drawable/edit_text_style"
-                    android:textColor="#000000"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/mount_granite_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Метраж стен с керамогранитом"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Метраж стен с керамогранитом"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/mount_granite_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1110,41 +1171,42 @@
                     android:id="@+id/mount_granite"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/wall_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Усиление стен"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Усиление стен"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/wall_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1152,41 +1214,42 @@
                     android:id="@+id/ed_wall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/fasteners_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Дополнительный крепеж"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Дополнительный крепеж"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/fasteners_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1194,41 +1257,42 @@
                     android:id="@+id/ed_fasteners"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/fire_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Пожарная сигнализация"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Пожарная сигнализация"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/fire_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1236,41 +1300,42 @@
                     android:id="@+id/ed_fire"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="шт"
                     android:background="@drawable/edit_text_style"
+                    android:hint="шт"
                     android:inputType="numberDecimal"
+                    android:paddingLeft="5dp"
                     android:textColor="#000000"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/add_vent_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Вентиляция "
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Вентиляция "
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/add_vent_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1278,26 +1343,28 @@
                     android:id="@+id/add_vent_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:layout_marginTop="10dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
+                            style="@style/text_style_spisok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:text="Кол-во" />
+
+                        <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Кол-во"
-                            android:layout_marginLeft="10dp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Тип"/>
+                            android:text="Тип" />
 
                     </LinearLayout>
 
@@ -1310,199 +1377,203 @@
                             android:id="@+id/count_hoods"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:layout_weight="1"
                             android:minWidth="100dp"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_type_hoods"
+                            style="@style/spinner_style"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
-                            android:layout_weight="1"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
-                            android:layout_gravity="center"/>
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginTop="20dp"
+                        android:orientation="vertical">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
                             android:layout_marginBottom="5dp"
-                            style="@style/text_style_spisok"
-                            android:text="Размер"/>
+                            android:layout_marginLeft="10dp"
+                            android:text="Размер" />
 
                         <Spinner
                             android:id="@+id/spinner_razmer_hoods"
+                            style="@style/spinner_style"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
                             android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:layout_marginRight="5dp" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_hoods"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_hoods"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_hoods"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_hoods"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/add_diff_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Диффузор "
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Диффузор "
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/add_diff_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_diff_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:id="@+id/add_diff_layout"
                     android:layout_marginTop="10dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Кол-во"
-                            style="@style/text_style_spisok"
-                            android:layout_marginLeft="10dp"/>
 
                         <TextView
+                            style="@style/text_style_spisok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:text="Кол-во" />
+
+                        <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Размер"/>
+                            android:text="Размер" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="5dp">
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
 
                         <EditText
                             android:id="@+id/count_diffuzor"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Кол-во"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <Spinner
                             android:id="@+id/spinner_diffuzor"
+                            style="@style/spinner_style"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            style="@style/spinner_style"
-                            android:layout_weight="1"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
-                            android:layout_gravity="center"/>
+                            android:layout_weight="1" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_diffuzor"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_diffuzor"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_diffuzor"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_diffuzor"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/soaring_ceiling_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Парящий потолок"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Парящий потолок"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/soaring_ceiling_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1510,69 +1581,72 @@
                     android:id="@+id/soaring_ceiling"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/add_profile_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Переход уровня "
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Переход уровня "
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/add_profile_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_profile_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:id="@+id/add_profile_layout"
                     android:layout_marginTop="5dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Кол-во"
                             android:gravity="center"
-                            style="@style/text_style_spisok"/>
+                            android:text="Кол-во" />
+
                         <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Тип"
                             android:gravity="center"
-                            style="@style/text_style_spisok"/>
+                            android:text="Тип" />
 
                     </LinearLayout>
 
@@ -1595,8 +1669,8 @@
                         <Spinner
                             android:id="@+id/spinner_vid_profile"
                             style="@style/spinner_style"
-                            android:layout_height="40dp"
                             android:layout_width="wrap_content"
+                            android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
@@ -1605,50 +1679,51 @@
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_profiles"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_profiles"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_profile"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_profile"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/in_cut_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Внутренний вырез (на месте)"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Внутренний вырез (на месте)"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/in_cut_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1656,41 +1731,42 @@
                     android:id="@+id/ed_in_cut"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/in_cut_shop_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Внутренний вырез (в цеху)"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Внутренний вырез (в цеху)"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/in_cut_shop_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1698,41 +1774,42 @@
                     android:id="@+id/ed_in_cut_shop"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="м."
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/drain_the_water_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Слив воды"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Слив воды"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/drain_the_water_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1740,42 +1817,43 @@
                     android:id="@+id/ed_drain_the_water"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
-                    android:hint="Кол-во комнат"
-                    android:textColor="#000000"
                     android:background="@drawable/edit_text_style"
+                    android:hint="Кол-во комнат"
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/height_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Высота помещения"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Высота помещения"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/height_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1784,53 +1862,54 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:orientation="vertical"
                     android:layout_marginTop="5dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <RadioButton
                         android:id="@+id/rb_h_yes"
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Больше 3ех метров"
                         android:checked="true"
-                        style="@style/text_style_spisok"/>
+                        android:text="Больше 3ех метров" />
 
                     <RadioButton
                         android:id="@+id/rb_h_no"
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Меньше 3ех метров"
-                        style="@style/text_style_spisok" />
+                        android:text="Меньше 3ех метров" />
                 </RadioGroup>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/diff_acc_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Сложность доступа"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Сложность доступа"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/diff_acc_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1838,41 +1917,42 @@
                     android:id="@+id/ed_diff_acc"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="м."
-                    android:textColor="#000000"
-                    android:paddingLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/edit_text_style"
+                    android:hint="м."
                     android:inputType="numberDecimal"
-                    android:visibility="gone"/>
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:visibility="gone" />
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/add_other_comp_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Другие комплектующие"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Другие комплектующие"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/add_other_comp_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -1880,29 +1960,31 @@
                     android:id="@+id/add_other_comp_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:layout_marginTop="5dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Название "
-                            style="@style/text_style_spisok"
-                            android:layout_marginLeft="10dp"/>
 
                         <TextView
+                            style="@style/text_style_spisok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:text="Название " />
+
+                        <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Стоимость"/>
+                            android:text="Стоимость" />
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1912,101 +1994,104 @@
                             android:id="@+id/count_comp"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Название"
-                            android:layout_weight="1"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <EditText
                             android:id="@+id/price_comp"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Стоимость"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_comp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_comp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_comp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_comp"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
 
                         <Button
                             android:id="@+id/add_other_mount_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Другие монтажные работы"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Другие монтажные работы"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/add_other_mount_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_other_mount_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:id="@+id/add_other_mount_layout"
                     android:layout_marginTop="5dp"
+                    android:orientation="vertical"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Название "
-                            style="@style/text_style_spisok"
-                            android:layout_marginLeft="10dp"/>
 
                         <TextView
+                            style="@style/text_style_spisok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_weight="1"
+                            android:text="Название " />
+
+                        <TextView
+                            style="@style/text_style_spisok"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            style="@style/text_style_spisok"
-                            android:text="Стоимость"/>
+                            android:text="Стоимость" />
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -2016,72 +2101,73 @@
                             android:id="@+id/count_mount"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Название"
-                            android:layout_weight="1"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
 
                         <EditText
                             android:id="@+id/price_mount"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
-                            android:paddingLeft="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1"
                             android:background="@drawable/edit_text_style"
                             android:hint="Стоимость"
                             android:inputType="number"
-                            android:layout_weight="1"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"/>
+                            android:paddingLeft="5dp" />
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/btn_add_mount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Добавить"
                         android:layout_gravity="center"
-                        android:id="@+id/btn_add_mount"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/rounded_button"
-                        android:textColor="#ffffff"/>
-
+                        android:text="Добавить"
+                        android:textColor="#ffffff" />
 
 
                     <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                        android:id="@+id/list_mount"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="5dp"
-                        android:id="@+id/list_mount"/>
+                        android:layout_marginTop="5dp" />
 
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
                     android:layout_height="40dp"
-                    android:stretchColumns="0,3,5"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
+
                     <TableRow>
+
                         <Button
                             android:id="@+id/mounting_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Отменить монтаж"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:textColor="#ffffff"/>
+                            android:text="Отменить монтаж"
+                            android:textColor="#ffffff" />
 
                         <Button
                             android:id="@+id/mounting_help"
                             android:layout_width="50dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="\?"
                             android:layout_marginLeft="5dp"
-                            android:textColor="#ffffff"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
-                            android:textSize="20dp"
-                            android:layout_span="1"/>
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
                     </TableRow>
                 </TableLayout>
 
@@ -2096,41 +2182,41 @@
 
                     <RadioButton
                         android:id="@+id/rb_m_yes"
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Нужен"
                         android:checked="true"
-                        style="@style/text_style_spisok"/>
+                        android:text="Нужен" />
 
                     <RadioButton
                         android:id="@+id/rb_m_no"
+                        style="@style/text_style_spisok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Не нужен"
-                        style="@style/text_style_spisok" />
+                        android:text="Не нужен" />
                 </RadioGroup>
 
             </LinearLayout>
 
             <TextView
-                android:layout_marginTop="10dp"
+                style="@style/text_style_spisok"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Новый процент скидки"
-                android:textStyle="bold"
-                style="@style/text_style_spisok"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/ed_discount"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:hint="Введите %"
-                android:textColor="#000000"
                 android:background="@drawable/edit_text_style"
-                android:inputType="numberDecimal" />
+                android:hint="Введите %"
+                android:inputType="numberDecimal"
+                android:paddingLeft="5dp"
+                android:textColor="#000000" />
 
             <Button
                 android:id="@+id/btn_calculate"
@@ -2144,73 +2230,74 @@
 
             <TextView
                 android:id="@+id/text_calculate"
+                style="@style/text_style_spisok"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="0 руб."
-                style="@style/text_style_spisok"
-                android:textStyle="bold"
-                android:textSize="25dp" />
+                android:textSize="25dp"
+                android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/second_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="gone"
-                android:id="@+id/second_layout">
+                android:visibility="gone">
 
-            <TableLayout
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:stretchColumns="0,3,5"
-                android:layout_marginTop="10dp">
-                <TableRow>
+                <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:stretchColumns="0,3,5">
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="Название расчета:"
-                        android:layout_span="7"
-                        android:gravity="center|left"
-                        style="@style/text_style_spisok"/>
+                    <TableRow>
 
-                    <Button
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/rounded_button"
-                        android:text="\?"
-                        android:id="@+id/name_help"
-                        android:layout_marginLeft="5dp"
-                        android:textColor="#ffffff"
-                        android:stateListAnimator="@null"
-                        android:textSize="20dp"
-                        android:layout_span="1"/>
-                </TableRow>
-            </TableLayout>
+                        <TextView
+                            style="@style/text_style_spisok"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_span="7"
+                            android:gravity="center|left"
+                            android:text="Название расчета:" />
 
-            <EditText
-                android:id="@+id/name_project"
-                android:layout_width="match_parent"
-                android:layout_gravity="center"
-                android:hint="Введите название расчёта"
-                android:paddingLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:inputType="textCapWords"
-                android:textColor="#000000"
-                android:layout_height="40dp"
-                android:background="@drawable/edit_text_style"/>
+                        <Button
+                            android:id="@+id/name_help"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_span="1"
+                            android:background="@drawable/rounded_button"
+                            android:stateListAnimator="@null"
+                            android:text="\?"
+                            android:textColor="#ffffff"
+                            android:textSize="20dp" />
+                    </TableRow>
+                </TableLayout>
 
-            <Button
-                android:id="@+id/btn_save"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_button"
-                android:text="Сохранить"
-                android:textColor="#ffffff" />
+                <EditText
+                    android:id="@+id/name_project"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="Введите название расчёта"
+                    android:inputType="textCapWords"
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000" />
+
+                <Button
+                    android:id="@+id/btn_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rounded_button"
+                    android:text="Сохранить"
+                    android:textColor="#ffffff" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

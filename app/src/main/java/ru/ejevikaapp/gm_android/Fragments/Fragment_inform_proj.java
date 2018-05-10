@@ -257,13 +257,13 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     }
 
                     if (imag.equals("")) {
-                    } else if (n28.equals("0")) {
+                    } else if (n28.equals("3")||n28.equals("3.0")) {
                         textt("Багет");
                         textv("Обычный багет");
-                    } else if (n28.equals("1")) {
+                    } else if (n28.equals("1")||n28.equals("1.0")) {
                         textt("Багет");
                         textv("Потолочный багет");
-                    } else if (n28.equals("2")) {
+                    } else if (n28.equals("2")||n28.equals("2.0")) {
                         textt("Багет");
                         textv("Аллюминиевый багет");
                     }
@@ -638,8 +638,15 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     }
                     k.close();
 
+                    int angle = 0;
+                    if (c.getString(c.getColumnIndex(c.getColumnName(6))).equals("")){
+
+                    } else {
+                        angle = c.getInt(c.getColumnIndex(c.getColumnName(6)));
+                    }
+
                     if ((Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(4)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(5)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(6)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(7)))) > 0) ||
+                            (angle > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(7)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(8)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(13)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(14)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
                             (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||
@@ -806,7 +813,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                 break;
             case R.id.delete_ceiling:
 
-                s_setMessage = "Вы действительно хотите дулать потолок";
+                s_setMessage = "Вы действительно хотите удалить потолок ?";
                 s_setTitle = "";
                 fun_builder();
 

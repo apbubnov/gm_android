@@ -29,6 +29,7 @@ import ru.ejevikaapp.gm_android.Class.classEstimate;
 
 public class ActivityEstimate extends AppCompatActivity {
 
+    int circle_count, square_count;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +100,10 @@ public class ActivityEstimate extends AppCompatActivity {
             }
         }
 
-        TextView nameCeiling = (TextView)findViewById(R.id.nameCeiling);
+        TextView nameCeiling = (TextView) findViewById(R.id.nameCeiling);
         nameCeiling.setText("Потолок: " + calculation_title);
+
+        countingComponents(id_calculation);
 
         try {
             int id_m = 0;
@@ -146,7 +149,19 @@ public class ActivityEstimate extends AppCompatActivity {
             }
             c.close();
 
-        }catch (Exception e){
+            if (id_t < 29) {
+                n1 = "28";
+            } else {
+                n1 = "29";
+            }
+
+        } catch (Exception e) {
+        }
+
+        if (n6 > 0){
+            rb_vstavka = "1";
+        } else {
+            rb_vstavka = "0";
         }
 
         JSONObject result = HelperClass.calculation(this, dealer_id_str, colorIndex, id_calculation, canvases, texture, rb_vstavka,
@@ -154,12 +169,12 @@ public class ActivityEstimate extends AppCompatActivity {
                 n11, n12, n16, n17, n18, n19,
                 n20, n21, n24, n27, n28,
                 n30, n31, n32, dop_krepezh, height, offcut_square, width_final,
-                final_comp, final_mount);
+                final_comp, final_mount, circle_count, square_count);
 
         ImageView id_image = (ImageView) findViewById(R.id.imageView);
         TextView textCalcData = (TextView) findViewById(R.id.calcData);
 
-        if (calc_image.length()<10){
+        if (calc_image.length() < 10) {
             id_image.setVisibility(View.GONE);
             textCalcData.setVisibility(View.GONE);
         } else {
@@ -182,8 +197,8 @@ public class ActivityEstimate extends AppCompatActivity {
         FunDapter Fun_adapter;
         BindDictionary<classEstimate> dict = new BindDictionary<>();
 
-        if (components.equals("")){
-            LinearLayout linearComp = (LinearLayout)findViewById(R.id.linearComp);
+        if (components.equals("")) {
+            LinearLayout linearComp = (LinearLayout) findViewById(R.id.linearComp);
             linearComp.setVisibility(View.GONE);
         } else {
 
@@ -278,8 +293,8 @@ public class ActivityEstimate extends AppCompatActivity {
 
         ListView listMounters = (ListView) findViewById(R.id.listMounters);
 
-        if (mounters.equals("")){
-            LinearLayout linearMount = (LinearLayout)findViewById(R.id.linearMount);
+        if (mounters.equals("")) {
+            LinearLayout linearMount = (LinearLayout) findViewById(R.id.linearMount);
             linearMount.setVisibility(View.GONE);
         } else {
             final ArrayList<classEstimate> estimate_mount = new ArrayList<>();
@@ -313,49 +328,98 @@ public class ActivityEstimate extends AppCompatActivity {
                 estimate_mount.add(fix_class);
             }
 
-        dict.addStringField(R.id.name, new StringExtractor<classEstimate>() {
-            @Override
-            public String getStringValue(classEstimate nc, int position) {
-                return nc.getName();
+            dict.addStringField(R.id.name, new StringExtractor<classEstimate>() {
+                @Override
+                public String getStringValue(classEstimate nc, int position) {
+                    return nc.getName();
+                }
+            });
+            dict.addStringField(R.id.price, new StringExtractor<classEstimate>() {
+                @Override
+                public String getStringValue(classEstimate nc, int position) {
+                    return nc.getPrice();
+                }
+            });
+            dict.addStringField(R.id.count, new StringExtractor<classEstimate>() {
+                @Override
+                public String getStringValue(classEstimate nc, int position) {
+                    return nc.getCount();
+                }
+            });
+            dict.addStringField(R.id.totalPrice, new StringExtractor<classEstimate>() {
+                @Override
+                public String getStringValue(classEstimate nc, int position) {
+                    return nc.getTotalPrice();
+                }
+            });
+
+            Fun_adapter = new FunDapter(this, estimate_mount, R.layout.activity_estimate2, dict);
+            listMounters.setAdapter(Fun_adapter);
+
+            TextView totalTextMount = (TextView) findViewById(R.id.totalMount);
+
+
+            String totalMount = "";
+            try {
+                JSONObject project = result.getJSONObject("project");
+                totalMount = project.getString("total_with_dealer_margin");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        });
-        dict.addStringField(R.id.price, new StringExtractor<classEstimate>() {
-            @Override
-            public String getStringValue(classEstimate nc, int position) {
-                return nc.getPrice();
-            }
-        });
-        dict.addStringField(R.id.count, new StringExtractor<classEstimate>() {
-            @Override
-            public String getStringValue(classEstimate nc, int position) {
-                return nc.getCount();
-            }
-        });
-        dict.addStringField(R.id.totalPrice, new StringExtractor<classEstimate>() {
-            @Override
-            public String getStringValue(classEstimate nc, int position) {
-                return nc.getTotalPrice();
-            }
-        });
 
-        Fun_adapter = new FunDapter(this, estimate_mount, R.layout.activity_estimate2, dict);
-        listMounters.setAdapter(Fun_adapter);
+            totalTextMount.setText(String.valueOf(Math.round(Double.valueOf(totalMount) * 100d) / 100d));
 
-        TextView totalTextMount = (TextView) findViewById(R.id.totalMount);
-
-
-        String totalMount = "";
-        try {
-            JSONObject project = result.getJSONObject("project");
-            totalMount = project.getString("total_with_dealer_margin");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
-        totalTextMount.setText(String.valueOf(Math.round(Double.valueOf(totalMount) * 100d) / 100d));
+    }
 
+    void countingComponents(String id_calculation) {
+
+        DBHelper dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sqlQuewy = "SELECT * "
+                + "FROM rgzbn_gm_ceiling_fixtures" +
+                " WHERE calculation_id = ?";
+        Cursor cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int vidIndex = cursor.getColumnIndex(cursor.getColumnName(3));
+                int kol_voIndex = cursor.getColumnIndex(cursor.getColumnName(2));
+
+                do {
+                    String vid_c = cursor.getString(vidIndex);
+                    if (vid_c.equals("2")) {
+                        circle_count += cursor.getInt(kol_voIndex);
+                    } else if (vid_c.equals("3")) {
+                        square_count += cursor.getInt(kol_voIndex);
+                    }
+                } while (cursor.moveToNext());
+            }
         }
+        cursor.close();
+
+        sqlQuewy = "SELECT * "
+         + "FROM rgzbn_gm_ceiling_fixtures" +
+         " WHERE calculation_id = ?";
+        cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int vidIndex = cursor.getColumnIndex(cursor.getColumnName(3));
+                int kol_voIndex = cursor.getColumnIndex(cursor.getColumnName(2));
+
+                do {
+                    String vid_c = cursor.getString(vidIndex);
+                    if (vid_c.equals("2")) {
+                        circle_count += cursor.getInt(kol_voIndex);
+                    } else if (vid_c.equals("3")) {
+                        square_count += cursor.getInt(kol_voIndex);
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        cursor.close();
 
     }
 

@@ -231,7 +231,7 @@ public class Fragment_inform_zapysch extends Fragment {
                     }
 
                     if (imag.equals("")) {
-                    } else if (n28.equals("0")) {
+                    } else if (n28.equals("3")) {
                         textt("Багет");
                         textv("Обычный багет");
                     } else if (n28.equals("1")) {

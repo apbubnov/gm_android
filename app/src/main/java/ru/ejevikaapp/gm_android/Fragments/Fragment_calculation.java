@@ -65,6 +65,7 @@ import ru.ejevikaapp.gm_android.Class.Svetiln_class;
 import ru.ejevikaapp.gm_android.Class.Truby_class;
 import ru.ejevikaapp.gm_android.Class.Ventil_class;
 import ru.ejevikaapp.gm_android.DBHelper;
+import ru.ejevikaapp.gm_android.Dealer.Activity_margin;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync;
 
@@ -72,9 +73,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class Fragment_calculation extends Fragment implements View.OnClickListener {
 
-    Button chertezh, texture_help, canvas_help, btn_light, btn_add_kupit_svetiln, btn_rb_v;
+    Button chertezh, texture_help, canvas_help, btn_rb_v;
 
-    Button btn_color_canvases, btn_save, btn_add_cornice, btn_calculate;
+    Button btn_color_canvases, btn_save, btn_add_cornice, btn_calculate, priceMount;
 
     Button buguette_hide, vstavka_hide, lustr_hide, svetiln_hide, cabling_hide, karniz_hide, pipes_hide, bond_beam_hide, separator_hide,
             mount_wall_hide, mount_granite_hide, wall_hide, fasteners_hide, fire_hide, add_vent_hide, diff_acc_hide, soaring_ceiling_hide,
@@ -108,8 +109,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     ArrayList s_t = new ArrayList();
 
     String texture = "", canvases = "", s_setMessage, s_setMessage1, s_setMessage2, s_setdrawable, s_setdrawable1, offcut_square, s_sp5 = "", s_spa = "",
-            id_project, id_calculation, canvases_id;
-    String width_final = "", cut_image = "", calc_image = "", rb_vstavka = "0", save_n3 = "", n3, lines_length, user_id = "", dealer_id_str = "", final_comp = "", final_mount = "",
+            id_project, id_calculation, old_canvases = "", old_texture = "";
+    String width_final = "", cut_image = "", calc_image = "", rb_vstavka = "0", save_n2 = "", save_n3 = "", n3, lines_length, user_id = "", dealer_id_str = "", final_comp = "", final_mount = "",
             original_sketch = "", cut_data = "", calc_data = "";
 
     SharedPreferences sPref;
@@ -145,11 +146,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     EditText lustr, karniz, name_project, ed_discount, count_comp, price_comp;
 
     boolean calculat = false, btn_color_canvases_visible = false, mounting = true, delete_comp = true,
-            chertezh_bool = false, countComponents = false, double_chertezh_bool = false;
+            chertezh_bool = false, countComponents = false, double_chertezh_bool = false, first_enter = false;
 
     double n7 = 0, n8 = 0, n10 = 0, n11 = 0, n12 = 0, n16 = 0, n17 = 0, n18 = 0, n19 = 0, n20 = 0, n21 = 0, n24 = 0, n25 = 0,
             n27 = 0, n28 = 0, n30 = 0, n31 = 0, n32 = 0, height = 0, dop_krepezh = 0, discount = 0;
-    int n2 =0, n6 = 0, color = 0;
+    int n2 = 0, n6 = 0, color = 0;
 
     RadioButton rb_v_white, rb_v_color, rb_v_no, rb_m_yes, rb_m_no, rb_b_no, rb_b_norm, rb_b_potol, rb_b_all, rb_h_no, rb_h_yes;
 
@@ -161,7 +162,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     ScrollView scroll_calc;
 
-    boolean bool_resume = false;
+    boolean bool_resume = false, new_id_calculation = false;
 
     LinearLayout linear_image;
 
@@ -187,8 +188,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
         dealer_calc = SP.getString("", "");
 
-        Log.d("mLog", dealer_calc);
-
         scroll_calc = (ScrollView) view.findViewById(R.id.scroll_calc);
         linear_image = (LinearLayout) view.findViewById(R.id.linear_image);
 
@@ -198,6 +197,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_add_cornice = (Button) view.findViewById(R.id.btn_add_cornice);
         btn_rb_v = (Button) view.findViewById(R.id.btn_rb_v);
         btn_calculate = (Button) view.findViewById(R.id.btn_calculate);
+        priceMount = (Button) view.findViewById(R.id.priceMount);
 
         chertezh.setOnClickListener(this);
         btn_color_canvases.setOnClickListener(this);
@@ -205,6 +205,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_add_cornice.setOnClickListener(this);
         btn_rb_v.setOnClickListener(this);
         btn_calculate.setOnClickListener(this);
+        priceMount.setOnClickListener(this);
 
         buguette_hide = (Button) view.findViewById(R.id.buguette_hide);
         vstavka_hide = (Button) view.findViewById(R.id.vstavka_hide);
@@ -463,7 +464,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         rb_b_potol = (RadioButton) view.findViewById(R.id.rb_b_potol);
         rb_b_all = (RadioButton) view.findViewById(R.id.rb_b_all);
 
-        n28 = 3;
+        n28 = 0;
 
         RadioGroup radios_b = (RadioGroup) view.findViewById(R.id.radios_b);
         radios_b.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -471,11 +472,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             public void onCheckedChanged(RadioGroup group, int id) {
                 switch (id) {
                     case R.id.rb_b_no:
-                        n28 = 3;
+                        n28 = 0;
                         break;
 
                     case R.id.rb_b_norm:
-                        n28 = 0;
+                        n28 = 3;
                         break;
 
                     case R.id.rb_b_potol:
@@ -567,7 +568,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         extra_comp(extra_components_2);
                         extra_mount(extra_mounting_2);
 
-                        try{
+                        try {
                             sqlQuewy = "select texture_id "
                                     + "FROM rgzbn_gm_ceiling_canvases " +
                                     "where _id = ? ";
@@ -580,7 +581,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                 }
                             }
                             c.close();
-                        } catch (Exception e){
+                        } catch (Exception e) {
                         }
 
                         name_project.setText(calculation_title);
@@ -595,13 +596,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         ed.commit();
 
                         mount_wall.setText(n7_2);
-                        if(n7_2.equals("0") || n7_2.equals("") || n7_2.equals("0.0")){
+                        if (n7_2.equals("0") || n7_2.equals("") || n7_2.equals("0.0")) {
                         } else {
                             mount_wall.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         mount_granite.setText(n8_2);
-                        if(n8_2.equals("0") || n8_2.equals("") || n8_2.equals("0.0")){
+                        if (n8_2.equals("0") || n8_2.equals("") || n8_2.equals("0.0")) {
                         } else {
                             mount_granite.setVisibility(View.VISIBLE);
                             countComponents = true;
@@ -609,25 +610,25 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         corners.setText(" Количество углов =   " + n9_2);
                         n9 = Double.valueOf(n9_2);
                         ed_in_cut.setText(n11_2);
-                        if(n11_2.equals("0") || n11_2.equals("") || n11_2.equals("0.0")){
+                        if (n11_2.equals("0") || n11_2.equals("") || n11_2.equals("0.0")) {
                         } else {
                             ed_in_cut.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_in_cut_shop.setText(n31_2);
-                        if(n31_2.equals("0") || n31_2.equals("") || n31_2.equals("0.0")){
+                        if (n31_2.equals("0") || n31_2.equals("") || n31_2.equals("0.0")) {
                         } else {
                             ed_in_cut_shop.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_drain_the_water.setText(n32_2);
-                        if(n32_2.equals("0") || n32_2.equals("") || n32_2.equals("0.0")){
+                        if (n32_2.equals("0") || n32_2.equals("") || n32_2.equals("0.0")) {
                         } else {
                             ed_drain_the_water.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         lustr.setText(n12_2);
-                        if(n12_2.equals("0") || n12_2.equals("") || n12_2.equals("0.0")){
+                        if (n12_2.equals("0") || n12_2.equals("") || n12_2.equals("0.0")) {
                         } else {
                             lustr_layout.setVisibility(View.VISIBLE);
                             countComponents = true;
@@ -637,32 +638,32 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
                         ed_wall.setText(n18_2);
                         ed_cabling.setText(n19_2);
-                        if(n19_2.equals("0") || n19_2.equals("") || n19_2.equals("0.0")){
+                        if (n19_2.equals("0") || n19_2.equals("") || n19_2.equals("0.0")) {
                         } else {
                             ed_cabling.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_separator.setText(n20_2);
-                        if(n20_2.equals("0") || n20_2.equals("") || n20_2.equals("0.0")){
+                        if (n20_2.equals("0") || n20_2.equals("") || n20_2.equals("0.0")) {
                         } else {
                             ed_separator.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_fire.setText(n21_2);
-                        if(n21_2.equals("0") || n21_2.equals("") || n21_2.equals("0.0")){
+                        if (n21_2.equals("0") || n21_2.equals("") || n21_2.equals("0.0")) {
                         } else {
                             ed_fire.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_diff_acc.setText(n24_2);
                         bond_beam.setText(n17_2);
-                        if(n17_2.equals("0") || n17_2.equals("") || n17_2.equals("0.0")){
+                        if (n17_2.equals("0") || n17_2.equals("") || n17_2.equals("0.0")) {
                         } else {
                             bond_beam.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
                         ed_fasteners.setText(dop_krepezh_2);
-                        if(dop_krepezh_2.equals("0") || dop_krepezh_2.equals("") || dop_krepezh_2.equals("0.0")){
+                        if (dop_krepezh_2.equals("0") || dop_krepezh_2.equals("") || dop_krepezh_2.equals("0.0")) {
                         } else {
                             ed_fasteners.setVisibility(View.VISIBLE);
                             countComponents = true;
@@ -677,7 +678,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
 
                         karniz.setText(n27_2);
-                        if(n27_2.equals("0") || n27_2.equals("") || n27_2.equals("0.0")){
+                        if (n27_2.equals("0") || n27_2.equals("") || n27_2.equals("0.0")) {
                         } else {
                             karniz_layout.setVisibility(View.VISIBLE);
                             countComponents = true;
@@ -748,28 +749,28 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             n28_2 = "0";
                         }
 
-                        if (n28_2.equals("0")) {
-                            n28 = 0;
+                        if (n28_2.equals("3") || n28_2.equals("3.0")) {
+                            n28 = 3;
                             rb_b_norm.setChecked(true);
                             buguette_layout.setVisibility(View.VISIBLE);
                             countComponents = true;
-                        } else if (n28_2.equals("1")) {
+                        } else if (n28_2.equals("1") || n28_2.equals("1.0")) {
                             n28 = 1;
                             rb_b_potol.setChecked(true);
                             buguette_layout.setVisibility(View.VISIBLE);
                             countComponents = true;
-                        } else if (n28_2.equals("2")) {
+                        } else if (n28_2.equals("2") || n28_2.equals("2.0")) {
                             n28 = 2;
                             rb_b_all.setChecked(true);
                             buguette_layout.setVisibility(View.VISIBLE);
                             countComponents = true;
-                        } else if (n28_2.equals("3")) {
-                            n28 = 3;
+                        } else if (n28_2.equals("0") || n28_2.equals("0.0")) {
+                            n28 = 0;
                             rb_b_no.setChecked(true);
                         }
 
                         soaring_ceiling.setText(n30_2);
-                        if(n30_2.equals("0") || n30_2.equals("") || n30_2.equals("0.0")){
+                        if (n30_2.equals("0") || n30_2.equals("") || n30_2.equals("0.0")) {
                         } else {
                             soaring_ceiling.setVisibility(View.VISIBLE);
                             countComponents = true;
@@ -795,12 +796,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             max_id_contac = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
                             max_id_contac++;
                             id_calculation = String.valueOf(max_id_contac);
+                            new_id_calculation = true;
                         } while (c.moveToNext());
                     }
                 }
             } catch (Exception e) {
                 max_id_contac = user_id_int + 1;
                 id_calculation = String.valueOf(max_id_contac);
+                new_id_calculation = true;
             }
         }
 
@@ -839,7 +842,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         Log.d("mLog", "countComponents = " + countComponents);
 
-        if (countComponents){
+        if (countComponents) {
             general_layout.setVisibility(View.VISIBLE);
         }
 
@@ -1060,6 +1063,63 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             Log.d("mLog", "id_project " + id_project);
         }
 
+        SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
+        if (SPSO.getString("", "").equals("") || SPSO.getString("", "").equals("0")) {
+        } else {
+            String color = SPSO.getString("", "");
+            int id = 0;
+            sqlQuewy = "select * " +
+             " FROM rgzbn_gm_ceiling_canvases_manufacturers";
+            c = db.rawQuery(sqlQuewy, new String[]{});
+            if (c.moveToFirst()) {
+                do {
+
+                    String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    String country = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                    if (name.equals(canvases)) {
+                        id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                    }
+                } while (c.moveToNext());
+            }
+
+            String str = "[";
+            sqlQuewy = "select price, width, _id " +
+                    " FROM rgzbn_gm_ceiling_canvases " +
+                    " where texture_id = ? and manufacturer_id = ? and count > 0 and color_id = ?" +
+                    " order by width desc";
+            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), color});
+            if (c.moveToFirst()) {
+                do {
+
+                    int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                    float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
+
+                    float width = widthIndex * 100;
+                    int price = priceIndex;
+                    str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
+
+                } while (c.moveToNext());
+            }
+
+            String strr = "";
+
+            for (int i = 0; i < str.length() - 1; i++)
+                strr += str.charAt(i);
+
+            strr += "]";
+
+            c.close();
+
+            sPref = getActivity().getSharedPreferences("canvases", MODE_PRIVATE);
+            SharedPreferences.Editor ed = sPref.edit();
+            ed.putString("", String.valueOf(strr)); // передача выбранных полотен на чертилку
+            ed.commit();
+
+            SP = getActivity().getSharedPreferences("textures_draft", MODE_PRIVATE);
+            ed = SP.edit();
+            ed.putString("", String.valueOf(n2));
+            ed.commit();
+        }
     }
 
     @Override
@@ -1136,6 +1196,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             cursor.close();
         }
 
+        if (id_calculation == null) {
+        } else {
+            Log.d("mLog", "destroy _ sync");
+            sync(Integer.valueOf(id_calculation));
+        }
         SP = getActivity().getSharedPreferences("SAVED_SO", MODE_PRIVATE);
         SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "");
@@ -1248,7 +1313,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
         ed = SP.edit();
-        ed.putString("", "");
+        ed.putString("", "false");
         ed.commit();
     }
 
@@ -1596,6 +1661,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void fixtures() {
 
+        circle_count = 0;
+        square_count = 0;
+
         final DBHelper[] dbHelper = new DBHelper[1];
         final EditText count_fixtures;
 
@@ -1746,9 +1814,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String diam = "";
 
                         if (vid_c.equals("2")) {
-                            circle_count++;
+                            circle_count += cursor.getInt(kol_voIndex);
                         } else if (vid_c.equals("3")) {
-                            square_count++;
+                            square_count += cursor.getInt(kol_voIndex);
                         }
                         sqlQuewy = "SELECT * "
                                 + "FROM rgzbn_gm_ceiling_type" +
@@ -3821,19 +3889,20 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 calculation();
                 break;
             case R.id.btn_calculate:
-                second_layout.setVisibility(View.VISIBLE);
 
+                second_layout.setVisibility(View.VISIBLE);
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                int old_n2 = 0;
-                int old_n3 = 0;
-                int old_n4 = 0;
-                int old_n5 = 0;
-                try {
-                    String sqlQuewy = "select n3, n4, n5 "
-                            + "FROM rgzbn_gm_ceiling_calculations " +
-                            "where _id=? ";
-                    Cursor c = db.rawQuery(sqlQuewy, new String[]{id_calculation});
+                String sqlQuewy;
+                Cursor c;
+
+                if (!first_enter) {
+                    int old_n3 = 0;
+
+                    sqlQuewy = "select n3 "
+                            + "FROM rgzbn_gm_ceiling_calculations "
+                            + "where _id=? ";
+                    c = db.rawQuery(sqlQuewy, new String[]{id_calculation});
                     if (c != null) {
                         if (c.moveToFirst()) {
                             do {
@@ -3842,157 +3911,66 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                 } catch (Exception e) {
                                     old_n3 = 0;
                                 }
-                                try {
-                                    old_n4 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(1))));
-                                } catch (Exception e) {
-                                    old_n4 = 0;
-                                }
-                                try {
-                                    old_n5 = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                                } catch (Exception e) {
-                                    old_n5 = 0;
-                                }
                             } while (c.moveToNext());
                         }
                     }
-                } catch (Exception e) {
-                }
 
-                String nc = "_";
-                String sqlQuewy = "select name, country "
-                        + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                        "where _id = ? ";
-                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_n3)});         // заполняем массивы из таблицы
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            String name = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                            String country = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                            nc = name + " " + country;
-                            if (nc.equals(canvases)) {
-                                id_n3 = Integer.valueOf(old_n3);
-                            } else {
-                                id_n3 = 0;
-                            }
-                        } while (c.moveToNext());
-                    }
-                }
-                c.close();
+                    sqlQuewy = "select manufacturer_id, texture_id "
+                            + "FROM rgzbn_gm_ceiling_canvases " +
+                            "where _id = ? ";
+                    c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_n3)});         // заполняем массивы из таблицы
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            int manufacturer_id = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                            int texture_id = c.getInt(c.getColumnIndex(c.getColumnName(1)));
 
-                Log.d("perera", old_n3 + " " + old_n2);
-                Log.d("perera", old_n3 + " " + id_n3);
-                Log.d("perera", save_n3 + " " + id_n3);
-                Log.d("perera", save_n3 + " " + canvases);
-
-                if ((((old_n3 == 0) || (old_n3 == id_n3))
-                        && (save_n3.equals(id_n3) || save_n3.equals(""))
-                        || (save_n3.equals(canvases) || save_n3.equals(""))) || calc_image.length()<10) {
-                    Log.d("perera","then");
-
-                    if (old_n3 == 0 || old_n4 == 0 || old_n5 == 0 || old_n4 == 0 || old_n5 == 0) {
-                        calculat = false;
-                        calculation();
-                        save_n3 = String.valueOf(canvases);
-                    } else {
-                        if (old_n3 == id_n3) {
-                            calculat = false;
-                            calculation();
-                            save_n3 = String.valueOf(canvases);
-                        } else if (id_calculation == null) {
-                            calculat = false;
-                            calculation();
-                            save_n3 = String.valueOf(canvases);
-                        } else {
-                            SP = getActivity().getSharedPreferences("draft_auto", MODE_PRIVATE);
-                            SharedPreferences.Editor ed = SP.edit();
-                            ed.putString("", String.valueOf(1));
-                            ed.commit();
-
-                            int i = 0;
-                            String walls_points = "";
-                            String diags_points = "";
-                            String pt_points = "";
-
-                            for (String retval : original_sketch.split("\\|\\|")) {
-                                if (i == 0) {
-                                    int j = 0;
-                                    for (String retval1 : retval.split(";")) {
-                                        j++;
-                                        if (j % 4 == 1) {
-                                            walls_points += "{\"s0_x\":" + retval1 + ",";
-                                        } else if (j % 4 == 2) {
-                                            walls_points += "\"s0_y\":" + retval1 + ",";
-                                        } else if (j % 4 == 3) {
-                                            walls_points += "\"s1_x\":" + retval1 + ",";
-                                        } else if (j % 4 == 0) {
-                                            walls_points += "\"s1_y\":" + retval1 + "},";
-                                        }
-                                    }
-
-                                } else if (i == 1) {
-                                    int j = 0;
-                                    for (String retval1 : retval.split(";")) {
-                                        j++;
-                                        if (j % 4 == 1) {
-                                            diags_points += "{\"s0_x\":" + retval1 + ",";
-                                        } else if (j % 4 == 2) {
-                                            diags_points += "\"s0_y\":" + retval1 + ",";
-                                        } else if (j % 4 == 3) {
-                                            diags_points += "\"s1_x\":" + retval1 + ",";
-                                        } else if (j % 4 == 0) {
-                                            diags_points += "\"s1_y\":" + retval1 + "},";
-                                        }
-                                    }
-
-                                } else if (i == 2) {
-                                    int j = 0;
-                                    for (String retval1 : retval.split(";")) {
-                                        j++;
-                                        if (j % 2 == 1) {
-                                            pt_points += "{\"x\":" + retval1 + ",";
-                                        } else if (j % 2 == 0) {
-                                            pt_points += "\"y\":" + retval1 + "},";
-                                        }
-                                    }
-                                } else if (i == 3) {
-
-                                } else if (i == 4) {
+                            sqlQuewy = "select name "
+                                    + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
+                                    "where _id = ? ";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(manufacturer_id)});         // заполняем массивы из таблицы
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    old_canvases = c.getString(c.getColumnIndex(c.getColumnName(0)));
                                 }
-                                i++;
                             }
+                            c.close();
 
-                            walls_points = "[" + walls_points.substring(0, walls_points.length() - 1) + "]";
-                            diags_points = "[" + diags_points.substring(0, diags_points.length() - 1) + "]";
-                            pt_points = "[" + pt_points.substring(0, pt_points.length() - 1) + "]";
-
-                            SP = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
-                            ed = SP.edit();
-                            ed.putString("", diags_points);
-                            ed.commit();
-
-                            SP = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
-                            ed = SP.edit();
-                            ed.putString("", walls_points);
-                            ed.commit();
-
-                            SP = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
-                            ed = SP.edit();
-                            ed.putString("", pt_points);
-                            ed.commit();
-
-                            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                                    "Осуществляется перерасчёт ", Toast.LENGTH_SHORT);
-                            toast.show();
-
-                            intent = new Intent(getActivity(), Activity_draft.class);
-                            startActivity(intent);
+                            sqlQuewy = "select texture_title "
+                                    + "FROM rgzbn_gm_ceiling_textures " +
+                                    "where _id = ? ";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(texture_id)});         // заполняем массивы из таблицы
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    old_texture = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                }
+                            }
+                            c.close();
                         }
                     }
+                    c.close();
+                    first_enter = true;
+                } else {
+                }
 
+
+                Log.d("perera", "old_canvases = " + old_canvases);
+                Log.d("perera", "canvases = " + canvases);
+                Log.d("perera", "old_texture = " + old_texture);
+                Log.d("perera", "texture = " + texture);
+
+                if ((old_canvases.equals(canvases) &&
+                        old_texture.equals(texture)) ||
+                        (old_canvases.equals("") &&
+                                old_texture.equals(""))) {
+
+                    calculat = false;
+                    calculation();
+                    old_canvases = canvases;
+                    old_texture = texture;
                 } else {
 
-                    save_n3 = String.valueOf(canvases);
-
+                    old_canvases = canvases;
+                    old_texture = texture;
                     int id = 0;
                     sqlQuewy = "select * " +
                             " FROM rgzbn_gm_ceiling_canvases_manufacturers";
@@ -4024,7 +4002,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
                             float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
 
-                            Log.d("mLog", String.valueOf(widthIndex) + "  " +priceIndex);
+                            Log.d("mLog", String.valueOf(widthIndex) + "  " + priceIndex);
 
                             float width = widthIndex * 100;
                             int price = priceIndex;
@@ -4152,39 +4130,77 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                     intent = new Intent(getActivity(), Activity_draft.class);
                     startActivity(intent);
-
                 }
+
                 break;
             case R.id.chertezh:
 
-                SP = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
-                SharedPreferences.Editor ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
+                SPSO = getActivity().getSharedPreferences("color_title", MODE_PRIVATE);
+                color = Integer.parseInt(SPSO.getString("", ""));
 
-                SP = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
-                ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
+                if (btn_color_canvases_visible) {
+                    if (color == 0){
+                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                                "Выберите цвет ", Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else {
+                        SP = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
+                        SharedPreferences.Editor ed = SP.edit();
+                        ed.putString("", "");
+                        ed.commit();
 
-                SP = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
-                ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
+                        SP = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", "");
+                        ed.commit();
 
-                SP = getActivity().getSharedPreferences("draft_auto", MODE_PRIVATE);
-                ed = SP.edit();
-                ed.putString("", "");
-                ed.commit();
+                        SP = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", "");
+                        ed.commit();
 
-                intent = new Intent(getActivity(), Activity_draft.class);
-                startActivity(intent);
+                        SP = getActivity().getSharedPreferences("draft_auto", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", "");
+                        ed.commit();
 
-                if (id_project == null || dealer_calc.equals("true")) {
+                        intent = new Intent(getActivity(), Activity_draft.class);
+                        startActivity(intent);
+
+                        if (id_project == null || dealer_calc.equals("true")) {
+                        } else {
+                            chertezh_bool = true;
+                        }
+                    }
                 } else {
-                    chertezh_bool = true;
-                }
+                    SP = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
+                    SharedPreferences.Editor ed = SP.edit();
+                    ed.putString("", "");
+                    ed.commit();
 
+                    SP = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
+                    ed = SP.edit();
+                    ed.putString("", "");
+                    ed.commit();
+
+                    SP = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
+                    ed = SP.edit();
+                    ed.putString("", "");
+                    ed.commit();
+
+                    SP = getActivity().getSharedPreferences("draft_auto", MODE_PRIVATE);
+                    ed = SP.edit();
+                    ed.putString("", "");
+                    ed.commit();
+
+                    intent = new Intent(getActivity(), Activity_draft.class);
+                    startActivity(intent);
+
+                    if (id_project == null || dealer_calc.equals("true")) {
+                    } else {
+                        chertezh_bool = true;
+                    }
+                }
                 break;
             case R.id.canvas_help:
                 s_setMessage = "    Выберите фактуру для Вашего будущего потолка \n  " +
@@ -4196,6 +4212,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 s_setdrawable = "";
                 s_setdrawable1 = "";
                 fun_builder();
+                break;
+            case R.id.priceMount:
+
+                intent = new Intent(getActivity(), Activity_margin.class);
+                startActivity(intent);
+
                 break;
             case R.id.texture_help:
                 s_setMessage = "    От производителя материала зависит качество потолка и его цена!";
@@ -4833,14 +4855,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         // парящий потоолок
         if (soaring_ceiling.getText().toString().equals("") || soaring_ceiling.getText().toString().equals("0")) {
-            n30=0;
+            n30 = 0;
         } else {
             n30 = Double.valueOf(soaring_ceiling.getText().toString());
         }
 
         //карниз
         if (karniz.getText().toString().equals("") || karniz.getText().toString().equals("0")) {
-            n27=0;
+            n27 = 0;
         } else {
             n27 = Double.parseDouble(karniz.getText().toString());
 
@@ -4848,28 +4870,28 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         //закладная брусом
         if (bond_beam.getText().toString().equals("") || bond_beam.getText().toString().equals("0")) {
-            n17=0;
+            n17 = 0;
         } else {
             n17 = Double.parseDouble(bond_beam.getText().toString());
         }
 
         //укрепление стен
         if (ed_wall.getText().toString().equals("") || ed_wall.getText().toString().equals("0")) {
-            n18=0;
+            n18 = 0;
         } else {
             n18 = Double.parseDouble(ed_wall.getText().toString());
         }
 
         // провод
         if (ed_cabling.getText().toString().equals("") || ed_cabling.getText().toString().equals("0")) {
-            n19=0;
+            n19 = 0;
         } else {
             n19 = Double.parseDouble(ed_cabling.getText().toString());
         }
 
         //разделитель только для ПВХ
         if (ed_separator.getText().toString().equals("") || ed_separator.getText().toString().equals("0")) {
-            n20=0;
+            n20 = 0;
         } else {
             if (n1.equals("28")) {
                 n20 = Double.parseDouble(ed_separator.getText().toString());
@@ -4878,14 +4900,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         // дополнительный крепеж
         if (ed_fasteners.getText().toString().equals("") || ed_fasteners.getText().toString().equals("0")) {
-            dop_krepezh=0;
+            dop_krepezh = 0;
         } else {
             dop_krepezh = Double.parseDouble(ed_fasteners.getText().toString());
         }
 
         // пожарная сигнализация
         if (ed_fire.getText().toString().equals("") || ed_fire.getText().toString().equals("0")) {
-            n21=0;
+            n21 = 0;
         } else {
             n21 = Double.parseDouble(ed_fire.getText().toString());
         }
@@ -4893,7 +4915,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         //--------------------------------------- ВОЗВРАЩАЕМ СТОИМОСТЬ КОМПЛЕКТУЮЩИХ ----------------------------------------//
 
         if (ed_in_cut_shop.getText().toString().equals("") || ed_in_cut_shop.getText().toString().equals("0")) {
-            n31=0;
+            n31 = 0;
         } else {
             n31 = Double.valueOf(ed_in_cut_shop.getText().toString());
         }
@@ -4901,56 +4923,52 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         //Слив воды
         if (ed_drain_the_water.getText().toString().equals("") || ed_drain_the_water.getText().toString().equals("0.0") ||
                 ed_drain_the_water.getText().toString().equals("0")) {
-            n32=0;
+            n32 = 0;
         } else {
             n32 = Math.ceil(Double.parseDouble(ed_drain_the_water.getText().toString()));
         }
 
         if (mount_wall.getText().toString().equals("") || mount_wall.getText().toString().equals("0") || mount_wall.getText().toString().equals("0.0")) {
-            n7=0;
+            n7 = 0;
         } else {
             n7 = Double.valueOf(mount_wall.getText().toString());
         }
 
         if (mount_granite.getText().toString().equals("") || mount_granite.getText().toString().equals("0") || mount_granite.getText().toString().equals("0.0")) {
-            n8=0;
+            n8 = 0;
         } else {
             n8 = Double.valueOf(mount_granite.getText().toString());
         }
 
         if (karniz.getText().toString().equals("")) {
-            n27=0;
+            n27 = 0;
         } else {
             n27 = Double.valueOf(karniz.getText().toString());
 
         }
 
         if (soaring_ceiling.getText().toString().equals("")) {
-            n30=0;
+            n30 = 0;
         } else {
             n30 = Double.parseDouble(soaring_ceiling.getText().toString());
 
         }
 
         if (ed_diff_acc.getText().toString().equals("")) {
-            n24=0;
+            n24 = 0;
         } else {
             n24 = Double.parseDouble(ed_diff_acc.getText().toString());
-
         }
-
-        Log.d("mLog", "n3 = " + n3);
 
         JSONObject result = HelperClass.calculation(getActivity(), dealer_id_str, colorIndex, id_calculation, canvases, texture, rb_vstavka,
                 n1, n2, n3, S, P, n6, n7, n8, n9,
                 n11, n12, n16, n17, n18, n19,
                 n20, n21, n24, n27, n28,
                 n30, n31, n32, dop_krepezh, height, offcut_square, width_final,
-                final_comp, final_mount);
+                final_comp, final_mount, circle_count, square_count);
 
         String sqlQuewy;
         Cursor c;
-
         try {
             int count_space = 0;
             char[] chars = canvases.toCharArray();
@@ -4970,7 +4988,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 } else {
                     sb.append(chars[s]);
                 }
-
                 if (chars[s] == ' ' && count_space == count) {
                     break;
                 }
@@ -5008,11 +5025,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
             }
             c.close();
-
-        }catch (Exception e){
+        } catch (Exception e) {
         }
-
-        Log.d("mLog", "n3 = " + n3);
 
         double canvases_sum_total = 0;
         double total_sum = 0;
@@ -5093,7 +5107,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
                 i++;
             }
-
             calc_data = String.valueOf(sb) + ";";
         } catch (Exception e) {
         }
@@ -5263,15 +5276,20 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                 } catch (Exception e) {
                 }
-
                 original_sketch += "||" + SAVED_CODE + "||" + SAVED_ALFAVIT;
             }
 
-            if (calc_image.equals("")) {
+            Integer end_n3 = null;
+            if (calc_image.length() < 10) {
                 id_n3 = null;
+                end_n3 = null;
+            } else {
+                if (id_n3 == 0) {
+                    end_n3 = Integer.valueOf(n3);
+                } else {
+                    end_n3 = id_n3;
+                }
             }
-
-            Integer n3 = id_n3;
 
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_ORDERING, 0);
@@ -5282,7 +5300,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_MODIFIED_BY, Integer.parseInt(user_id));
             values.put(DBHelper.KEY_CALCULATION_TITLE, name_project.getText().toString());
             values.put(DBHelper.KEY_PROJECT_ID, Integer.parseInt(id_project));
-            values.put(DBHelper.KEY_N3, n3);
+            values.put(DBHelper.KEY_N3, end_n3);
             values.put(DBHelper.KEY_N4, S);
             values.put(DBHelper.KEY_N5, P);
             values.put(DBHelper.KEY_N6, n6);
@@ -5326,47 +5344,52 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             values.put(DBHelper.KEY_EXTRA_COMPONENTS, final_comp);
             values.put(DBHelper.KEY_EXTRA_MOUNTING, final_mount);
 
-            Log.d("mLog", chertezh_bool + " " + id_calculation.length() + " " + dealer_calc);
-
-            if (chertezh_bool) {
-                values.put(DBHelper.KEY_ID, id_calculation);
-                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-                chertezh_bool = false;
-                double_chertezh_bool = true;
-            } else {
-                if (!double_chertezh_bool) {
-                    if (dealer_calc.equals("true")) {
-                        values.put(DBHelper.KEY_ID, id_calculation);
-                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-                    } else {
-                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
-                        Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                                "Расчёт обновлён ", Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                    sync(Integer.parseInt(id_calculation));
-
-                } else {
-                    db = dbHelper.getReadableDatabase();
-
+            //из проекта (новый)
+            if (dealer_calc.equals("false") && new_id_calculation) {
+                if (chertezh_bool && !double_chertezh_bool) {
                     values.put(DBHelper.KEY_ID, id_calculation);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
-
-                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                            "Расчёт добавлен ", Toast.LENGTH_SHORT);
-                    toast.show();
+                    chertezh_bool = false;
+                    double_chertezh_bool = true;
+                } else if (double_chertezh_bool) {
+                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+                    getActivity().finish();
+                    sync(Integer.valueOf(id_calculation));
+                } else if (!double_chertezh_bool) {
+                    values.put(DBHelper.KEY_ID, id_calculation);
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
+                    getActivity().finish();
                 }
+            }
 
-                if (id_project != null) {
-                    SharedPreferences SP = getActivity().getSharedPreferences("end_activity_inform_proj", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
-                    ed.putString("", "1");
-                    ed.commit();
+            //из проекта (обновить)
+            if (dealer_calc.equals("false") && !new_id_calculation) {
+                Log.d("mLog", " upd");
+                if (chertezh_bool && !double_chertezh_bool) {
+                    Log.d("mLog", " then ");
+                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+                    chertezh_bool = false;
+                    double_chertezh_bool = true;
+                } else if (double_chertezh_bool) {
+                    Log.d("mLog", " false ");
+                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+                    getActivity().finish();
+                } else if (!double_chertezh_bool) {
+                    Log.d("mLog", " false false ");
+                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
+                    getActivity().finish();
                 }
+            }
 
-                delete_comp = false;
-                if (dealer_calc.equals("true")) {
-
+            //из меню
+            delete_comp = false;
+            if (dealer_calc.equals("true")) {
+                if (chertezh_bool) {
+                    chertezh_bool = false;
+                    double_chertezh_bool = true;
+                } else {
+                    values.put(DBHelper.KEY_ID, id_calculation);
+                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
                     int max_id = 0;
                     try {
                         sqlQuewy = "select MAX(_id) "
@@ -5474,7 +5497,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                     getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-                    sync(Integer.valueOf(id_calculation));
 
                     SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
                     SharedPreferences.Editor ed = SP.edit();
@@ -5489,9 +5511,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     ed.putString("", "");
                     ed.commit();
 
-                } else {
-                    sync(Integer.valueOf(id_calculation));
-                    getActivity().finish();
+                    SP = getActivity().getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
+                    ed = SP.edit();
+                    ed.putString("", "1");
+                    ed.commit();
                 }
             }
         }
@@ -5742,7 +5765,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
             }
             c.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.d("mLog", "error " + String.valueOf(e));
         }
 
@@ -5777,7 +5800,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-        if (n3 == null){
+        if (n3 == null) {
             spinner1.setSelection(0);
         }
 
@@ -5803,15 +5826,28 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         do {
                             String c_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
                             if (c_id.equals("1")) {
+                                Log.d("mLog", "btn_color_canvases_visible = true;");
                                 btn_color_canvases_visible = true;
                             } else {
+                                Log.d("mLog", "btn_color_canvases_visible = false;");
                                 btn_color_canvases_visible = false;
+
+                                SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
+                                SharedPreferences.Editor ed = SPSO.edit();
+                                ed.putString("", "");
+                                ed.commit();
                             }
                         } while (c.moveToNext());
                     }
                 }
                 c.close();
+
                 if (btn_color_canvases_visible) {
+                    SP = getActivity().getSharedPreferences("color_title", MODE_PRIVATE);
+                    SharedPreferences.Editor ed = SP.edit();
+                    ed.putString("", "0");
+                    ed.commit();
+                    btn_color_canvases.setBackgroundResource(R.drawable.rounded_button);    // активность кнопки чертить
                     c = db.query(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, null, "texture_title = ?",
                             new String[]{texture}, null, null, null);
                     if (c.moveToFirst()) {
@@ -5833,6 +5869,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                     if (c.moveToFirst()) {
                                         do {
                                             String hex = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                            Log.d("mLog", "hex " + hex);
                                             btn_color_canvases.setBackgroundColor(Color.parseColor("#" + hex));
 
                                         } while (c.moveToNext());
@@ -5865,7 +5902,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 }
                 c.close();
 
-                if (n2 == 29){
+                if (n2 == 29) {
                     n1 = "29";
                 } else
                     n1 = "28";
@@ -5886,7 +5923,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             String id = k.getString(k.getColumnIndex(k.getColumnName(0)));
                             sqlQuewy = "select name "
                                     + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                                    "where _id = ? " ;
+                                    "where _id = ? ";
                             c = db.rawQuery(sqlQuewy, new String[]{id});
                             if (c != null) {
                                 if (c.moveToFirst()) {
@@ -5980,6 +6017,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
 
                         if (SPSO.getString("", "").equals("") || SPSO.getString("", "").equals("0")) {
+
+                            Log.d("mLog", "1 _ n2 = " + n2 + " id = " +id );
+
                             String str = "[";
                             sqlQuewy = "select price, width, _id " +
                                     " FROM rgzbn_gm_ceiling_canvases " +
@@ -6018,8 +6058,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             ed.putString("", String.valueOf(n2));
                             ed.commit();
                         } else {
-                            String color = SPSO.getString("", "");
 
+                            String color = SPSO.getString("", "");
                             String str = "[";
                             sqlQuewy = "select price, width, _id " +
                                     " FROM rgzbn_gm_ceiling_canvases " +

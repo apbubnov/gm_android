@@ -1,6 +1,8 @@
 package ru.ejevikaapp.gm_android.Fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -31,6 +33,7 @@ import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
+import ru.ejevikaapp.gm_android.Dealer.Activity_empty_mounting;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
@@ -322,7 +325,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         String activity_mounting_2 = SP[0].getString("", "");
 
         dbHelper = new DBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
         ArrayList client = new ArrayList();
 
         String sqlQuewy = "SELECT _id "
@@ -500,6 +503,60 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
                 Intent intent = new Intent(getActivity(), Activity_inform_zapysch.class);
                 startActivity(intent);
+            }
+        });
+
+        list_clients.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int pos, long id) {
+                // TODO Auto-generated method stub
+
+                Frag_client_schedule_class selectedid = client_mas.get(pos);
+                final String cId = selectedid.getId();
+
+                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+                ad.setMessage("Удалить проект № " + cId + "?"); // сообщение
+                ad.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                        String sqlQuewy = "SELECT _id "
+                                + "FROM rgzbn_gm_ceiling_calculations " +
+                                "where project_id = ? ";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(cId)});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    int calcId = c.getInt(c.getColumnIndex(c.getColumnName(0)));
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
+
+                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(cId)});
+                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "_id = ?", new String[]{String.valueOf(cId)});
+
+                        Intent intent = new Intent(getActivity(), Activity_empty_mounting.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                });
+                ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                    }
+                });
+                ad.setCancelable(true);
+                ad.show();
+                return true;
             }
         });
     }

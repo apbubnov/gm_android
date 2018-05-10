@@ -62,8 +62,8 @@ public class HelperClass {
     static ArrayList component_item = new ArrayList();
 
     static int items_9, items_5, items_11, items_vstavka_bel, items_vstavka, items_10, items_16, items_556, items_4, items_58, items_3,
-               items_2, items_1, items_8, items_6, items_14, items_430, items_35, items_360, items_236,
-               items_239, items_559, items_38, items_495, items_233, items_659, items_660;
+            items_2, items_1, items_8, items_6, items_14, items_430, items_35, items_360, items_236,
+            items_239, items_559, items_38, items_495, items_233, items_659, items_660;
 
     static int[] n13_count;
     static String[] n13_type;
@@ -103,14 +103,14 @@ public class HelperClass {
     static Integer gm_can_marg, gm_comp_marg, gm_mount_marg, dealer_can_marg, dealer_comp_marg, dealer_mount_marg, count_svet,
             count_vent, count_electr, count_diffus, count_pipes, id_n3 = 0;
 
-    static int profile_12_13, profile_15_16, circle_count = 0, square_count = 0;
+    static int profile_12_13, profile_15_16;
 
     public static JSONObject calculation(Context context, String dealer_id_str, int colorIndex, String id_calculation, String canvases, String texture, String rb_vstavka,
-                                     String n1, Integer n2, String n3, double S, double P, int n6, double n7, double n8, double n9,
-                                     double n11, double n12, double n16, double n17, double n18, double n19, double n20,
-                                     double n21, double n24, double n27, double n28,
-                                     double n30, double n31, double n32, double dop_krepezh, double height, String offcut_square, String width_final,
-                                     String final_comp, String final_mount) {
+                                         String n1, Integer n2, String n3, double S, double P, int n6, double n7, double n8, double n9,
+                                         double n11, double n12, double n16, double n17, double n18, double n19, double n20,
+                                         double n21, double n24, double n27, double n28,
+                                         double n30, double n31, double n32, double dop_krepezh, double height, String offcut_square, String width_final,
+                                         String final_comp, String final_mount, int circle_count, int square_count) {
 
         JSONObject result = new JSONObject();
         JSONObject comp_estimate = new JSONObject();
@@ -553,7 +553,7 @@ public class HelperClass {
 
         if (n1.equals("28") && P == 0.0) {
         } else {
-            if (n28 == 0) {
+            if (n28 == 3) {
                 component_count.set(items_11, component_count.get(items_11) + P);
                 component_count.set(items_9, component_count.get(items_9) + P * 10);
                 component_count.set(items_5, component_count.get(items_5) + P * 10);
@@ -569,7 +569,7 @@ public class HelperClass {
         }
 
         if (n1.equals("29") && P == 0.0) {
-            if (n28 == 3) {
+            if (n28 == 0) {
             } else {
                 component_count.set(items_9, component_count.get(items_9) + P * 10);
                 component_count.set(items_5, component_count.get(items_5) + P * 10);
@@ -586,7 +586,7 @@ public class HelperClass {
             component_count.set(items_1, component_count.get(items_1) + n11);
             if (n1.equals("29")) {
                 component_count.set(items_233, component_count.get(items_233) + n11);
-            } else if (n1.equals("28") && n28 == 0) {
+            } else if (n1.equals("28") && n28 == 3) {
                 component_count.set(items_11, component_count.get(items_11) + n11);
             } else if (n1.equals("28") && n28 == 1) {
                 component_count.set(items_236, component_count.get(items_236) + n11);
@@ -616,11 +616,11 @@ public class HelperClass {
             } catch (Exception e) {
             }
 
-            if (n1.equals("28") && n28 == 0) {
+            if (n1.equals("28") && n28 == 3) {
                 component_count.set(items_11, component_count.get(items_11) + n31);
             } else if (n1.equals("28") && n28 == 1) {
                 component_count.set(items_236, component_count.get(items_236) + n31);
-            } else if (n1.equals("28") && n28 == 1) {
+            } else if (n1.equals("28") && n28 == 2) {
                 component_count.set(items_239, component_count.get(items_239) + n31);
             }
             component_count.set(items_9, component_count.get(items_9) + n31 * 10);
@@ -1028,7 +1028,7 @@ public class HelperClass {
 
         // парящий потоолок
         if (n30 > 0) {
-            if (n28 == 0) {
+            if (n28 == 3) {
                 if (component_count.get(items_11) > n30) {
                     component_count.set(items_11, component_count.get(items_11) - n30);
                 } else {
@@ -1118,7 +1118,7 @@ public class HelperClass {
             component_count.set(items_9, component_count.get(items_9) + dop_krepezh * 10);
             if (n1.equals("29")) {
                 component_count.set(items_233, component_count.get(items_233) + (dop_krepezh / 2));
-            } else if (n1.equals("28") && n28 == 0) {
+            } else if (n1.equals("28") && n28 == 3) {
                 component_count.set(items_11, component_count.get(items_11) + (dop_krepezh / 2));
             } else if (n1.equals("28") && n28 == 1) {
                 component_count.set(items_236, component_count.get(items_236) + (dop_krepezh / 2));
@@ -1140,7 +1140,7 @@ public class HelperClass {
         }
 
         //стеновой багет 2.5м считается кусками, которые потребуются выложить весь периметр
-        if (n28 == 0) {
+        if (n28 == 3) {
             rouding(items_11, component_count.get(items_11), 2.5);
         } else if (n28 == 1) {
             rouding(items_236, component_count.get(items_236), 2.5);
@@ -1291,7 +1291,7 @@ public class HelperClass {
         char[] chars = canvases.toCharArray();
         for (int s = 0; s < canvases.length(); s++) {
             if (chars[s] == ' ') {
-                count_space ++;
+                count_space++;
             }
         }
 
@@ -1314,12 +1314,12 @@ public class HelperClass {
 
         String str_sb = String.valueOf(sb);
         try {
-            str_sb = str_sb.substring(0, str_sb.length() - 1);
-        } catch (Exception e){
+            str_sb = str_sb.substring(0, str_sb.length());
+        } catch (Exception e) {
         }
 
         boolean canvases_price = false;
-        boolean canvases_price_dealer = false;
+        boolean boolean_canvases = false;
 
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
@@ -1328,30 +1328,18 @@ public class HelperClass {
         if (c != null) {
             if (c.moveToFirst()) {
                 canvases_price = true;
+                boolean_canvases = true;
             }
         }
         c.close();
-
-        if (!canvases_price) {
-            sqlQuewy = "select * "
-                    + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
-                    "where user_id = ? ";
-            c = db.rawQuery(sqlQuewy, new String[]{"1"});         // заполняем массивы из таблицы
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    canvases_price_dealer = true;
-                }
-            }
-            c.close();
-        }
 
         //Сюда считаем итоговую сумму полотна
         if (P == 0.0) {
         } else {
             if (width_final.equals("")) {
 
-                if (n3 == null) { //если новый расчёт
-                } else {
+                if (n3 == null) {
+                } else {        //если новый расчёт
 
                     sqlQuewy = "select _id, price, width "
                             + "FROM rgzbn_gm_ceiling_canvases " +
@@ -1368,8 +1356,12 @@ public class HelperClass {
                     }
                     c.close();
 
-                    if (canvases_price) {
-                        price = new_price("canvases", dealer_id_str, id_n3, price);
+                    if (boolean_canvases) {
+                        if (canvases_price) {
+                            price = new_price("canvases", dealer_id_str, id_n3, price);
+                        } else {
+                            price = new_price("canvases", "1", id_n3, price);
+                        }
                     }
 
                     canvases_data.set(0, texture + ", " + canvases + ", " + width);                         // название
@@ -1427,10 +1419,12 @@ public class HelperClass {
 
                 double wf = Double.valueOf(width_final) / 100;
 
+                Log.d("mLog", "_________ " + str_sb + " " + width_final);
+
                 int id = 0;
                 sqlQuewy = "select _id "
                         + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                        "where name LIKE('%"+str_sb+"%')";
+                        "where name LIKE('%" + str_sb + "%')";
                 c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
                 if (c != null) {
                     if (c.moveToFirst()) {
@@ -1521,7 +1515,7 @@ public class HelperClass {
         }
 
         boolean components_price = false;
-        boolean components_price_dealer = false;
+        boolean boolean_components = false;
 
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_components_dealer_price " +
@@ -1530,22 +1524,10 @@ public class HelperClass {
         if (c != null) {
             if (c.moveToFirst()) {
                 components_price = true;
+                boolean_components = true;
             }
         }
         c.close();
-
-        if (!components_price) {
-            sqlQuewy = "select * "
-                    + "FROM rgzbn_gm_ceiling_components_dealer_price " +
-                    "where user_id = ? ";
-            c = db.rawQuery(sqlQuewy, new String[]{"1"});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    components_price_dealer = true;
-                }
-            }
-            c.close();
-        }
 
         //Сюда считаем итоговую сумму компонентов
         sqlQuewy = "select * "
@@ -1562,10 +1544,13 @@ public class HelperClass {
                         String component_id = c.getString(c.getColumnIndex(c.getColumnName(1)));
                         Double self_price = c.getDouble(c.getColumnIndex(c.getColumnName(3)));
 
-                        if (components_price){
-                            self_price = new_price("components", dealer_id_str, id, self_price);
-                        } else {
-                            self_price = new_price("components", "1", id, self_price);
+
+                        if (boolean_components) {
+                            if (components_price) {
+                                self_price = new_price("components", dealer_id_str, id, self_price);
+                            } else {
+                                self_price = new_price("components", "1", id, self_price);
+                            }
                         }
 
                         sqlQuewy = "select * "
@@ -1625,7 +1610,7 @@ public class HelperClass {
                     if (c.moveToFirst()) {
                         String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        String full_name = "Вставка 303 белая" ;
+                        String full_name = "Вставка 303 белая";
                         String stack = "0";
 
                         String self_price = c.getString(c.getColumnIndex(c.getColumnName(3)));
@@ -1720,7 +1705,7 @@ public class HelperClass {
                 components += "Hаименование = " + cursor.getString(title) +
                         "; количество = " + cursor.getString(quantity) +
                         "; цена, руб = " + cursor.getString(dealer_price) +
-                        "; стоимость, руб = " + cursor.getString(dealer_total)+" | ";
+                        "; стоимость, руб = " + cursor.getString(dealer_total) + " | ";
 
             } while (cursor.moveToNext());
         } else
@@ -1734,118 +1719,542 @@ public class HelperClass {
 
         //---------------------------------- РАСЧЕТ СТОИМОСТИ МОНТАЖА --------------------------------------//
 
-        //внутренний вырез ТОЛЬКО ДЛЯ ПВХ
-        if (n1.equals("28") && (n11 > 0)) {
-            ContentValues values = new ContentValues();
-
-            values.put(DBHelper.KEY_TITLE, "Внутренний вырез для ПВХ");
-            values.put(DBHelper.KEY_QUANTITY, n11);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(21));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n11 * results.get(21));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(21));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n11 * results.get(21));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        int cost = 0;
-        if (height == 1) {
-            cost = 10;
-        }
-
-        //периметр только для ПВХ
-        if (n1.equals("28") && P > 0 && n28 == 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Периметр");
-            values.put(DBHelper.KEY_QUANTITY, P);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(0) + cost);
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * (results.get(0) + cost));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(0) + cost);
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * (results.get(0) + cost));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        } else if (n1.equals("28") && P > 0 && n28 == 1) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Периметр");
-            values.put(DBHelper.KEY_QUANTITY, P);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(30));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(30));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(30));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(30));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        } else if (n1.equals("28") && P > 0 && n28 == 2) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Периметр");
-            values.put(DBHelper.KEY_QUANTITY, P);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(31));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(31));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(31));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(31));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n31 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
-            values.put(DBHelper.KEY_QUANTITY, n31);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(0));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(0));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(0));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(0));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        //вставка внутренний вырез
-        if (n31 > 0) {
-            try {
+        if (n1.equals("28")) {
+            //внутренний вырез ТОЛЬКО ДЛЯ ПВХ
+            if (n1.equals("28") && (n11 > 0)) {
                 ContentValues values = new ContentValues();
-                if (n6 == 0) {
-                    values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез)");
-                } else {
-                    values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез), цвет: " + n6);
-                }
-                values.put(DBHelper.KEY_QUANTITY, n31);
-                values.put(DBHelper.KEY_GM_SALARY, results.get(9));
-                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(9));
-                values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
-                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(9));
+
+                values.put(DBHelper.KEY_TITLE, "Внутренний вырез для ПВХ");
+                values.put(DBHelper.KEY_QUANTITY, n11);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(21));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n11 * results.get(21));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(21));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n11 * results.get(21));
                 db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-
-            } catch (Exception e) {
             }
-        }
 
-        if (rb_vstavka.equals("1")) {
-            try {
+            int cost = 0;
+            if (height == 1) {
+                cost = 10;
+            }
+
+            //периметр только для ПВХ
+            if (n1.equals("28") && P > 0 && n28 == 3) {
                 ContentValues values = new ContentValues();
-
-                if (n6 == 0) {
-                    values.put(DBHelper.KEY_TITLE, "Вставка");
-                } else {
-                    values.put(DBHelper.KEY_TITLE, "Вставка, цвет: " + n6);
-                }
-
+                values.put(DBHelper.KEY_TITLE, "Периметр (ПВХ)");
                 values.put(DBHelper.KEY_QUANTITY, P);
-                values.put(DBHelper.KEY_GM_SALARY, results.get(9));
-                values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(9));
-                values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
-                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(9));
+                values.put(DBHelper.KEY_GM_SALARY, results.get(0) + cost);
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * (results.get(0) + cost));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(0) + cost);
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * (results.get(0) + cost));
                 db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-
-            } catch (Exception e) {
+            } else if (n1.equals("28") && P > 0 && n28 == 1) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Периметр (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, P);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(30));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(30));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(30));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(30));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            } else if (n1.equals("28") && P > 0 && n28 == 2) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Периметр (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, P);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(31));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(31));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(31));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(31));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
             }
+
+            if (n31 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез) (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n31);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(0));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(0));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(0));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(0));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //вставка внутренний вырез
+            if (n31 > 0) {
+                try {
+                    ContentValues values = new ContentValues();
+                    if (n6 == 0) {
+                        values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез) (ПВХ)");
+                    } else {
+                        values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез), цвет: " + n6 + " (ПВХ)");
+                    }
+                    values.put(DBHelper.KEY_QUANTITY, n31);
+                    values.put(DBHelper.KEY_GM_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(9));
+                    db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+
+                } catch (Exception e) {
+                }
+            }
+
+            if (rb_vstavka.equals("1")) {
+                try {
+                    ContentValues values = new ContentValues();
+
+                    if (n6 == 0) {
+                        values.put(DBHelper.KEY_TITLE, "Вставка (ПВХ)");
+                    } else {
+                        values.put(DBHelper.KEY_TITLE, "Вставка, цвет: " + n6 + " (ПВХ)");
+                    }
+
+                    values.put(DBHelper.KEY_QUANTITY, P);
+                    values.put(DBHelper.KEY_GM_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(9));
+                    db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+
+                } catch (Exception e) {
+                }
+            }
+
+            //Слив воды
+            if (n32 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Слив воды (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n32);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(26));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n32 * results.get(26));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(26));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n32 * results.get(26));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n12 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка люстр (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n12);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(11));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n12 * results.get(11));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(11));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n12 * results.get(11));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (circle_count > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка круглых светильников (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, circle_count);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(35));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, circle_count * results.get(35));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(35));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, circle_count * results.get(35));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+            if (square_count > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка квадратных светильников (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, square_count);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(36));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, square_count * results.get(36));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(36));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, square_count * results.get(36));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (count_vent > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка вентиляции (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, count_vent);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(41));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_vent * results.get(41));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(41));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_vent * results.get(41));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (count_electr > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка электровытяжки (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, count_electr);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(15));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_electr * results.get(15));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(15));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_electr * results.get(15));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (profile_12_13 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, profile_12_13);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(22));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_12_13 * results.get(22));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(22));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_12_13 * results.get(22));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (profile_15_16 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой с нишей (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, profile_15_16);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(24));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_15_16 * results.get(24));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(24));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_15_16 * results.get(24));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+
+            if (count_diffus > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка диффузора (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, count_diffus);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(18));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_diffus * results.get(18));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(18));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_diffus * results.get(18));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (count_pipes > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Обвод трубы (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, count_pipes);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(7));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_pipes * results.get(7));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(7));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_pipes * results.get(7));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n27 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Шторный карниз (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n27);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(10));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n27 * results.get(10));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(10));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n27 * results.get(10));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n17 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Закладная брусом (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n17);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(10));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n17 * results.get(10));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(10));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n17 * results.get(10));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n20 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Разделитель (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n20);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(8));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n20 * results.get(8));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(8));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n20 * results.get(8));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n21 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Пожарная сигнализация (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n21);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(5));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n21 * results.get(5));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(5));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n21 * results.get(5));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            if (n30 > 0) {
+                Log.d("mLog", String.valueOf(results.get(29)));
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Парящий потолок (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, n30);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(29));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n30 * results.get(29));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(29));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n30 * results.get(29));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+        } else if (n1.equals("29")){
+            //внутренний вырез ТОЛЬКО ДЛЯ Ткани +
+            if (n1.equals("29") && (n11 > 0)) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Внутренний вырез (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, n11);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(32));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n11 * results.get(32));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(32));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n11 * results.get(32));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            int cost = 0;
+            if (height == 1) {
+                cost = 10;
+            }
+
+            //периметр только для ПВХ +
+            if (n1.equals("29") && P > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Периметр (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, P);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(32) + cost);
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * (results.get(32) + cost));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(32) + cost);
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * (results.get(32) + cost));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            // +
+            if (n31 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Периметр (внутренний вырез)");
+                values.put(DBHelper.KEY_QUANTITY, n31);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(0));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(0));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(0));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(0));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //вставка внутренний вырез -
+            if (n31 > 0) {
+                try {
+                    ContentValues values = new ContentValues();
+                    if (n6 == 0) {
+                        values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез)");
+                    } else {
+                        values.put(DBHelper.KEY_TITLE, "Вставка(внутренний вырез), цвет: " + n6);
+                    }
+                    values.put(DBHelper.KEY_QUANTITY, n31);
+                    values.put(DBHelper.KEY_GM_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_GM_SALARY_TOTAL, n31 * results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n31 * results.get(9));
+                    db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+
+                } catch (Exception e) {
+                }
+            }
+
+            //-
+            if (rb_vstavka.equals("1")) {
+                try {
+                    ContentValues values = new ContentValues();
+
+                    if (n6 == 0) {
+                        values.put(DBHelper.KEY_TITLE, "Вставка");
+                    } else {
+                        values.put(DBHelper.KEY_TITLE, "Вставка, цвет: " + n6);
+                    }
+
+                    values.put(DBHelper.KEY_QUANTITY, P);
+                    values.put(DBHelper.KEY_GM_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_GM_SALARY_TOTAL, P * results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY, results.get(9));
+                    values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, P * results.get(9));
+                    db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+
+                } catch (Exception e) {
+                }
+            }
+
+
+            //Слив воды -
+            if (n32 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Слив воды");
+                values.put(DBHelper.KEY_QUANTITY, n32);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(26));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n32 * results.get(26));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(26));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n32 * results.get(26));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (n12 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка люстр (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, n12);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(11));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n12 * results.get(11));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(11));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n12 * results.get(11));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (circle_count > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка круглых светильников (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, circle_count);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(3));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, circle_count * results.get(3));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(3));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, circle_count * results.get(3));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+            //+
+            if (square_count > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка квадратных светильников (ПВХ)");
+                values.put(DBHelper.KEY_QUANTITY, square_count);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(4));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, square_count * results.get(4));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(4));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, square_count * results.get(4));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (count_vent > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка вентиляции (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, count_vent);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(41));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_vent * results.get(41));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(41));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_vent * results.get(41));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (count_electr > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка электровытяжки");
+                values.put(DBHelper.KEY_QUANTITY, count_electr);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(15));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_electr * results.get(15));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(15));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_electr * results.get(15));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (profile_12_13 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, profile_12_13);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(22));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_12_13 * results.get(22));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(22));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_12_13 * results.get(22));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (profile_15_16 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой с нишей(Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, profile_15_16);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(24));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_15_16 * results.get(24));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(24));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_15_16 * results.get(24));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (count_diffus > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Установка диффузора");
+                values.put(DBHelper.KEY_QUANTITY, count_diffus);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(18));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_diffus * results.get(18));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(18));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_diffus * results.get(18));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (count_pipes > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Обвод трубы(Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, count_pipes);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(39));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_pipes * results.get(39));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(39));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_pipes * results.get(39));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (n27 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Шторный карниз (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, n27);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(40));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n27 * results.get(40));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(40));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n27 * results.get(40));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (n17 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Закладная брусом (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, n17);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(40));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n17 * results.get(40));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(40));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n17 * results.get(40));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            // -
+            if (n20 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Разделитель");
+                values.put(DBHelper.KEY_QUANTITY, n20);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(8));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n20 * results.get(8));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(8));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n20 * results.get(8));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //+
+            if (n21 > 0) {
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Пожарная сигнализация (Ткань)");
+                values.put(DBHelper.KEY_QUANTITY, n21);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(37));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n21 * results.get(37));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(37));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n21 * results.get(37));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
+            //-
+            if (n30 > 0) {
+                Log.d("mLog", String.valueOf(results.get(29)));
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_TITLE, "Парящий потолок");
+                values.put(DBHelper.KEY_QUANTITY, n30);
+                values.put(DBHelper.KEY_GM_SALARY, results.get(29));
+                values.put(DBHelper.KEY_GM_SALARY_TOTAL, n30 * results.get(29));
+                values.put(DBHelper.KEY_DEALER_SALARY, results.get(29));
+                values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n30 * results.get(29));
+                db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
+            }
+
         }
 
-        //Слив воды
-        if (n32 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Слив воды");
-            values.put(DBHelper.KEY_QUANTITY, n32);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(26));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n32 * results.get(26));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(26));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n32 * results.get(26));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
+        // общее
         if (n7 > 0) {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_TITLE, "Крепление в плитку");
@@ -1868,128 +2277,6 @@ public class HelperClass {
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
-
-        if (n12 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка люстр");
-            values.put(DBHelper.KEY_QUANTITY, n12);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(1));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n12 * results.get(1));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(1));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n12 * results.get(1));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (circle_count > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка круглых светильников");
-            values.put(DBHelper.KEY_QUANTITY, circle_count);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(3));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, circle_count * results.get(3));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(3));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, circle_count * results.get(3));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-        if (square_count > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка квадратных светильников");
-            values.put(DBHelper.KEY_QUANTITY, square_count);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(4));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, square_count * results.get(4));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(4));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, square_count * results.get(4));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (count_vent > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка вентиляции");
-            values.put(DBHelper.KEY_QUANTITY, count_vent);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(11));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_vent * results.get(11));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(11));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_vent * results.get(11));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (count_electr > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка электровытяжки");
-            values.put(DBHelper.KEY_QUANTITY, count_electr);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(15));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_electr * results.get(15));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(15));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_electr * results.get(15));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (profile_12_13 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой");
-            values.put(DBHelper.KEY_QUANTITY, profile_12_13);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(22));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_12_13 * results.get(22));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(22));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_12_13 * results.get(22));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (profile_15_16 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Переход уровня по прямой с нишей");
-            values.put(DBHelper.KEY_QUANTITY, profile_15_16);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(24));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, profile_15_16 * results.get(24));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(24));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, profile_15_16 * results.get(24));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-
-        if (count_diffus > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Установка диффузора");
-            values.put(DBHelper.KEY_QUANTITY, count_diffus);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(18));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_diffus * results.get(18));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(18));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_diffus * results.get(18));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (count_pipes > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Обвод трубы");
-            values.put(DBHelper.KEY_QUANTITY, count_pipes);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(7));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, count_pipes * results.get(7));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(7));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, count_pipes * results.get(7));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n27 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Шторный карниз");
-            values.put(DBHelper.KEY_QUANTITY, n27);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(10));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n27 * results.get(10));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(10));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n27 * results.get(10));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n17 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Закладная брусом");
-            values.put(DBHelper.KEY_QUANTITY, n17);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(10));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n17 * results.get(10));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(10));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n17 * results.get(10));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
         if (n18 > 0) {
             ContentValues values = new ContentValues();
             values.put(DBHelper.KEY_TITLE, "Укрепление стены");
@@ -1998,40 +2285,6 @@ public class HelperClass {
             values.put(DBHelper.KEY_GM_SALARY_TOTAL, n18 * results.get(14));
             values.put(DBHelper.KEY_DEALER_SALARY, results.get(14));
             values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n18 * results.get(14));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n20 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Разделитель");
-            values.put(DBHelper.KEY_QUANTITY, n20);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(8));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n20 * results.get(8));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(8));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n20 * results.get(8));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n21 > 0) {
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Пожарная сигнализация");
-            values.put(DBHelper.KEY_QUANTITY, n21);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(5));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n21 * results.get(5));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(5));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n21 * results.get(5));
-            db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
-        }
-
-        if (n30 > 0) {
-            Log.d("mLog", String.valueOf(results.get(29)));
-            ContentValues values = new ContentValues();
-            values.put(DBHelper.KEY_TITLE, "Парящий потолок");
-            values.put(DBHelper.KEY_QUANTITY, n30);
-            values.put(DBHelper.KEY_GM_SALARY, results.get(29));
-            values.put(DBHelper.KEY_GM_SALARY_TOTAL, n30 * results.get(29));
-            values.put(DBHelper.KEY_DEALER_SALARY, results.get(29));
-            values.put(DBHelper.KEY_DEALER_SALARY_TOTAL, n30 * results.get(29));
             db.insert(DBHelper.TABLE_MOUNTING_DATA, null, values);
         }
 
@@ -2151,7 +2404,7 @@ public class HelperClass {
                 } while (k.moveToNext());
             }
 
-            String mounting = "";
+        String mounting = "";
         cursor = db.query(DBHelper.TABLE_MOUNTING_DATA, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
@@ -2272,9 +2525,9 @@ public class HelperClass {
             array.put("total_gm_mounting", total_gm_mounting);
             array.put("total_sum", total_sum);
             array.put("dealer_components_sum", dealer_components_sum);
-            result.put("project",array);
+            result.put("project", array);
 
-            result.put("estimate",comp_estimate);
+            result.put("estimate", comp_estimate);
 
         } catch (JSONException e) {
         }
@@ -2282,7 +2535,7 @@ public class HelperClass {
         return result;
     }
 
-    static Double new_price(String table, String user_id, Integer id, Double old_price){
+    static Double new_price(String table, String user_id, Integer id, Double old_price) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -2291,7 +2544,7 @@ public class HelperClass {
         Double newPrice = 0.0;
         String sqlQuewy;
 
-        if(table.equals("canvases")) {
+        if (table.equals("canvases")) {
             sqlQuewy = "select price, value, type "
                     + "FROM rgzbn_gm_ceiling_canvases_dealer_price " +
                     "where user_id = ? and canvas_id = ? ";
@@ -2313,7 +2566,7 @@ public class HelperClass {
             }
         }
 
-        switch (type){
+        switch (type) {
             case 0:
                 newPrice = old_price;
                 break;
@@ -2324,13 +2577,13 @@ public class HelperClass {
                 newPrice = old_price + value;
                 break;
             case 3:
-                newPrice = old_price + (old_price * (value/100));
+                newPrice = old_price + (old_price * (value / 100));
                 break;
             case 4:
                 newPrice = price + value;
                 break;
             case 5:
-                newPrice = price + (price * (value/100));
+                newPrice = price + (price * (value / 100));
                 break;
         }
 

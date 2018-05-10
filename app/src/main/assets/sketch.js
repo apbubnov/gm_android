@@ -1,5 +1,16 @@
 jQuery(document).ready(function()
 {
+var reg_url = /gm-vrn/;
+if (!reg_url.test(location.href))
+{
+	window.history.back();
+}
+
+if (typeof(width_polotna) === "undefined" || typeof(diup) === "undefined" || typeof(url) === "undefined" || typeof(tre) === "undefined"
+	|| typeof(col) === "undefined" || typeof(man) === "undefined")
+{
+	window.history.back();
+}
 
 paper.install(window);
 paper.setup("myCanvas");
@@ -21,7 +32,6 @@ var text_v, text_h;
 var text_points = [];
 var g_points = [];
 var diag = [];
-var triangles = [];
 var vh = 'v';
 var points;
 var code = 64, alfavit = 0;
@@ -34,7 +44,7 @@ var diag_sort = [];
 var width_final, square_obrezkov = 0, angle_final, sq_polotna, cuts_json, p_usadki_final = 1;
 var arr_cancel = [], triangulate_rezhim = 0, begin_point_diag, end_point_diag, manual_diag, text_manual_diags = [];
 var str_all_lines = "ab=90;bc=176;cd=98;ad=167;ac=222", all_lines_length, lines_length = [];
-var seam = 0, code_og, alfavit_og, calc_img, cut_img, triangulator_pro = 0;
+var seam = 0, code_og, alfavit_og, calc_img, cut_img, seam_lines = [], triangulator_pro = 0;
 clicks();
 resize_canvas();
 jQuery(window).resize(resize_canvas);
@@ -69,7 +79,7 @@ if (triangulator_pro === 1)
 	{
 		build_chert_on_koordinats = build_chert_on_koordinats.process();
 		document.getElementById('preloader').style.display = 'block';
-		build_chert_on_koordinats();
+		setTimeout(build_chert_on_koordinats, 200);
 	};
 }
 
@@ -80,7 +90,7 @@ var build_chert_on_koordinats = function()
 		var arr1 = elem_koordinans.value.replace(/\s+/g, ' ').trim().split(' ');
 		var splited_str, splited_str2, name, x, y, chert_koordinats = [];
 		var line, pt;
-		
+
 		for (var i = arr1.length; i--;)
 		{
 			splited_str = arr1[i].split('(');
@@ -112,7 +122,7 @@ var build_chert_on_koordinats = function()
 	                justification: 'center',
 	                fontFamily: 'lucida console',
 	                fontWeight: 'bold',
-	                fontSize: 6
+	                fontSize: (14 / view.zoom).toFixed(2)-0
 	            });
 	        text_points.push(pt);
 		}
@@ -135,7 +145,7 @@ var build_chert_on_koordinats = function()
 	            justification: 'center',
 	            fontFamily: 'lucida console',
 	            fontWeight: 'bold',
-	            fontSize: 6
+	            fontSize: (14 / view.zoom).toFixed(2)-0
 	        });
 	    text_points.push(pt);
 
@@ -144,7 +154,7 @@ var build_chert_on_koordinats = function()
 	    for (var i = text_points.length; i--;)
 	    {
 	    	ptsr = new Point(text_points[i].point.x + 10, text_points[i].point.y + 5);
-	    	for (var key in lines)
+	    	for (var key = lines.length; key--;)
 	        {
 	        	for (var j in lines[key].segments)
 	        	{
@@ -154,7 +164,7 @@ var build_chert_on_koordinats = function()
 	        		}
 	        	}
 	        }
-	        for (var key in lines)
+	        for (var key = lines.length; key--;)
 	        {
 	        	if (key === id1)
 	        	{
@@ -170,24 +180,6 @@ var build_chert_on_koordinats = function()
 	        }
 	    	text_points[i].data.id_line1 = +id1;
 	    	text_points[i].data.id_line2 = +id2;
-
-	    	var f = 2;
-			while (f > view.zoom)
-			{
-				f = new Decimal(f).minus(0.05).toNumber();
-				if (f <= 0.4 && f > 0.2)
-				{
-					text_points[i].fontSize += 4;
-				}
-				else if (f < 1)
-				{
-					text_points[i].fontSize += 2;
-				}
-				else if (f < 2)
-				{
-					text_points[i].fontSize += 0.5;
-				}
-			}
 	    }
 
 	    draw_lines_text();
@@ -202,28 +194,28 @@ var build_chert_on_koordinats = function()
 		perimetr();
 
 	    triangulator();
-	    //console.log(triangles_count());
-		if (triangles_count() < k - 2)
+
+		if (diag.length < k - 3)
 		{
 			for (var key = 3; key--;)
 			{
 				pulemet();
 				//console.log('pulemet');
-				if (triangles_count() === k - 2)
+				if (diag.length === k - 3)
 				{
 					break;
 				}
 			}
 		}
-		if (triangles_count() < k - 2)
+		if (diag.length < k - 3)
 		{
 			alert('Ошибка в построении диагоналей!');
 			//console.log(diag);
 			//console.log(diag_sort);
-			//console.log(triangles_count());
 			elem_preloader.style.display = 'none';
 			return;
 		}
+
 		diag_sortirovka();
 
 		for (var key = diag_sort.length; key--;)
@@ -235,13 +227,15 @@ var build_chert_on_koordinats = function()
 
 	    ready = true;
 	    triangulate_bool = true;
+
 	    text_points_sdvig();
 
 		document.getElementById('popup3').style.display = 'none';
-		console.log(lines, diag, text_points);
+		//console.log(lines, diag, text_points);
 		align_center();
 		resize_canvas();
 		square();
+
 		save_cancel();
 	}
 	catch(e)
@@ -249,7 +243,7 @@ var build_chert_on_koordinats = function()
 		alert('Ошибка!');
 	}
 	document.getElementById('preloader').style.display = 'none';
-}
+};
 
 var build_chert = function()
 {
@@ -320,29 +314,12 @@ var build_chert = function()
 						console.log(all_lines_length[i], all_lines_length[j]);
 					}
 				}
-				
+
 			}
 		}
 	}
 	console.log(lines);
 };
-
-/*
-function obshaya_vertex(all_lines_length1, all_lines_length2, symbol = undefined)
-{
-	if ((all_lines_length1.v1 === all_lines_length2.v1 || all_lines_length1.v1 === all_lines_length2.v2) &&
-		all_lines_length1.v1 !== symbol)
-	{
-		return all_lines_length1.v1;
-	}
-	if ((all_lines_length1.v2 === all_lines_length2.v1 || all_lines_length1.v2 === all_lines_length2.v2) &&
-		all_lines_length1.v2 !== symbol)
-	{
-		return all_lines_length1.v2;
-	}
-	return false;
-}
-*/
 
 project.activeLayer.applyMatrix = false;
 jQuery('#myCanvas').css('resize', 'both');
@@ -381,12 +358,12 @@ function resize_canvas()
 		elem_newLength.value = nl_value;
 		elem_useGrid = document.getElementById('useGrid');
 	}
-	
+
 	view.center = new Point(Math.round(view.viewSize.width / 2), Math.round(view.viewSize.height / 2));
 
-	sdvig();
+	//sdvig();
 
-	zoom(1);
+	//zoom(1);
 }
 
 function go_back()
@@ -507,7 +484,6 @@ var close_sketch_click = function()
 	{
 		pt_points[key] = {x: text_points[key].point.x, y: text_points[key].point.y};
 	}
-
 	code_og = code;
 	alfavit_og = alfavit;
 
@@ -525,18 +501,17 @@ var close_sketch_click = function()
 			}
 			return;
 		}
-		find_obrezki_1pol(lines_tkan);
-		cuts_json = cuts_gen();
 		cut_img = svg_gen(2);
 	}
 	else
 	{
+		g_points = getPathsPointsBySort(lines_sort);
 		polotno();
-		if (polotna.length === 1)
-		{
-			find_obrezki_1pol(lines_sort);
-			cuts_json = cuts_gen();
-		}
+
+		//var time_end, time_start = performance.now();
+
+		cuts_gen();
+
 		cut_img = svg_gen(2);
 
 		remove_none_shvy();
@@ -545,14 +520,18 @@ var close_sketch_click = function()
 		remove_pt_intersects();
 		calc_img = svg_gen(1);
 
-
 		if (koordinats_poloten.length > 1)
 		{
 			seam = 1;
 		}
-	}
 
+		//time_end = performance.now() - time_start;
+		//console.log(time_end, 'images_time');
+	}
+	//console.log(cuts_json);
 	save_data();
+	//console.log(p_usadki_final, square_obrezkov, sq_polotna, width_final);
+	//console.log(polotna, koordinats_poloten);
 	elem_preloader.style.display = 'none';
 	close_sketch_click_bool = false;
 
@@ -593,7 +572,6 @@ function svg_gen(flag)
 {
 	view.zoom = 1;
 	text_points_sdvig();
-	align_center();
 
 	if (flag === 1)
 	{
@@ -624,27 +602,29 @@ function svg_gen(flag)
 			text_diag[i].position = diag_sort[i].position;
 			text_diag[i].bringToFront();
 		}
-		for(var i in lines)
+		for(var i = lines.length, l_i, tl; i--;)
 		{
-			text_lines[lines[i].id].fontSize = 14;
-			if (lines[i].length < 40)
+			l_i = lines[i];
+			tl = text_lines[l_i.data.id];
+			tl.fontSize = 14;
+			if (l_i.length < 40)
 			{
-				text_lines[lines[i].id].fontSize -= 1;
-				if (lines[i].length < 30)
+				tl.fontSize -= 1;
+				if (l_i.length < 30)
 				{
-					text_lines[lines[i].id].fontSize -= 1;
-					if (lines[i].length < 20)
+					tl.fontSize -= 1;
+					if (l_i.length < 20)
 					{
-						text_lines[lines[i].id].fontSize -= 1;
-						if (lines[i].length < 10)
+						tl.fontSize -= 1;
+						if (l_i.length < 10)
 						{
-							text_lines[lines[i].id].fontSize -= 1;
+							tl.fontSize -= 1;
 						}
 					}
 				}
 			}
-			text_lines[lines[i].id].position = lines[i].position;
-			text_lines[lines[i].id].bringToFront();
+			tl.position = lines[i].position;
+			tl.bringToFront();
 		}
 	}
 	else if (flag === 2)
@@ -655,7 +635,7 @@ function svg_gen(flag)
 			p_usadki_final = 1;
 			ptfs = 12;
 		}
-		
+
 		for(var i in text_points)
 		{
 			text_points[i].fontSize = ptfs;
@@ -678,7 +658,7 @@ function svg_gen(flag)
 	view.update();
 
 	var bounds = project.activeLayer.bounds.clone();
-	project.activeLayer.bounds = new Rectangle({from: [0,0], 
+	project.activeLayer.bounds = new Rectangle({from: [0,0],
 		to: [bounds.bottomRight.x - bounds.topLeft.x,bounds.bottomRight.y - bounds.topLeft.y]});
 	var rec = new Rectangle({from: bounds.topLeft, to: bounds.bottomRight});
 	var svg = project.activeLayer.exportSVG();
@@ -695,16 +675,18 @@ function sdvig()
 		var sx, sy;
 		add_granica();
 
-		for (var key in lines)
+		for (var key = lines.length, l_s0, l_s1; key--;)
 		{
-			lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-			lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-			lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-			lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
+			l_s0 = lines[key].segments[0].point;
+			l_s1 = lines[key].segments[1].point;
+			l_s0.x = l_s0.x.toFixed(2)-0;
+			l_s1.x = l_s1.x.toFixed(2)-0;
+			l_s0.y = l_s0.y.toFixed(2)-0;
+			l_s1.y = l_s1.y.toFixed(2)-0;
 		}
 		g_points = getPathsPoints(lines);
 		var points_m = findMinAndMaxCordinate_g();
-		
+
 		if (points_m.maxY > down_g.position.y)
 		{
 			sy = -Math.round(Decimal.abs(new Decimal(points_m.maxY).minus(down_g.position.y)).toNumber());
@@ -737,12 +719,14 @@ function sdvig()
 			sdvig_sy(sy);
 		}
 		clear_granica();
-		for (var key in lines)
+		for (var key = lines.length, l_s0, l_s1; key--;)
 		{
-			lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-			lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-			lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-			lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
+			l_s0 = lines[key].segments[0].point;
+			l_s1 = lines[key].segments[1].point;
+			l_s0.x = l_s0.x.toFixed(2)-0;
+			l_s1.x = l_s1.x.toFixed(2)-0;
+			l_s0.y = l_s0.y.toFixed(2)-0;
+			l_s1.y = l_s1.y.toFixed(2)-0;
 		}
 		g_points = getPathsPoints(lines);
 	}
@@ -766,8 +750,8 @@ function sdvig_sx(sx)
 
 function zoom(flag1)
 {
-	var l = 0;
-	for (var key in lines)
+	var z, l = 0;
+	for (var key = lines.length; key--;)
 	{
 		l++;
 	}
@@ -775,12 +759,14 @@ function zoom(flag1)
 	{
 		return;
 	}
-	for (var key in lines)
+	for (var key = lines.length, l_s0, l_s1; key--;)
 	{
-		lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-		lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-		lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-		lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
+		l_s0 = lines[key].segments[0].point;
+		l_s1 = lines[key].segments[1].point;
+		l_s0.x = l_s0.x.toFixed(2)-0;
+		l_s1.x = l_s1.x.toFixed(2)-0;
+		l_s0.y = l_s0.y.toFixed(2)-0;
+		l_s1.y = l_s1.y.toFixed(2)-0;
 	}
 	g_points = getPathsPoints(lines);
 	var points_m = findMinAndMaxCordinate_g();
@@ -804,62 +790,22 @@ function zoom(flag1)
 					clear_granica();
 					sdvig();
 					add_granica();
-					if (view.zoom < 0.4)
+					z = (14 / view.zoom).toFixed(2)-0;
+					for (var key = text_points.length; key--;)
 					{
-						for (var key = text_points.length; key--;)
-						{
-							text_points[key].fontSize += 4;
-						}
-						for (var key in text_lines)
-						{
-							text_lines[key].fontSize += 4;
-						}
-						for (var key = text_diag.length; key--;)
-						{
-							text_diag[key].fontSize += 4;
-						}
-						for (var key = text_contur.length; key--;)
-						{
-							text_contur[key].fontSize += 4;
-						}
+						text_points[key].fontSize = z;
 					}
-					else if (view.zoom < 1)
+					for (var key = text_lines.length; key--;)
 					{
-						for (var key = text_points.length; key--;)
-						{
-							text_points[key].fontSize += 2;
-						}
-						for (var key in text_lines)
-						{
-							text_lines[key].fontSize += 2;
-						}
-						for (var key = text_diag.length; key--;)
-						{
-							text_diag[key].fontSize += 2;
-						}
-						for (var key = text_contur.length; key--;)
-						{
-							text_contur[key].fontSize += 2;
-						}
+						text_lines[key].fontSize = z;
 					}
-					else if (view.zoom < 2)
+					for (var key = text_diag.length; key--;)
 					{
-						for (var key = text_points.length; key--;)
-						{
-							text_points[key].fontSize += 0.5;
-						}
-						for (var key in text_lines)
-						{
-							text_lines[key].fontSize += 0.5;
-						}
-						for (var key = text_diag.length; key--;)
-						{
-							text_diag[key].fontSize += 0.5;
-						}
-						for (var key = text_contur.length; key--;)
-						{
-							text_contur[key].fontSize += 0.5;
-						}
+						text_diag[key].fontSize = z;
+					}
+					for (var key = text_contur.length; key--;)
+					{
+						text_contur[key].fontSize = z;
 					}
 					points_m = findMinAndMaxCordinate_g();
 				}
@@ -884,62 +830,22 @@ function zoom(flag1)
 				clear_granica();
 				sdvig();
 				add_granica();
-				if (view.zoom <= 0.4)
+				z = (14 / view.zoom).toFixed(2)-0;
+				for (var key = text_points.length; key--;)
 				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 4;
-					}
-					for (var key = text_contur.length; key--;)
-					{
-						text_contur[key].fontSize -= 4;
-					}
+					text_points[key].fontSize = z;
 				}
-				else if (view.zoom <= 1)
+				for (var key = text_lines.length; key--;)
 				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 2;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 2;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 2;
-					}
-					for (var key = text_contur.length; key--;)
-					{
-						text_contur[key].fontSize -= 2;
-					}
+					text_lines[key].fontSize = z;
 				}
-				else if (view.zoom <= 2)
+				for (var key = text_diag.length; key--;)
 				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 0.5;
-					}
-					for (var key = text_contur.length; key--;)
-					{
-						text_contur[key].fontSize -= 0.5;
-					}
+					text_diag[key].fontSize = z;
+				}
+				for (var key = text_contur.length; key--;)
+				{
+					text_contur[key].fontSize = z;
 				}
 				points_m = findMinAndMaxCordinate_g();
 			}
@@ -1018,7 +924,7 @@ tool.onMouseDown = function(event)
 		line_h.strokeColor = 'blue';
 		line_h.strokeWidth = 3;
 		var l = 0;
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			l++;
 		}
@@ -1068,7 +974,7 @@ tool.onMouseDown = function(event)
 		line_v.strokeColor = 'blue';
 		line_v.strokeWidth = 3;
 		var l = 0;
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			l++;
 		}
@@ -1158,17 +1064,19 @@ function dvig_lines(napr)
 		end_point.x += 1;
 	    break;
 	}
-	for (var key in lines)
+	for (var key = lines.length, l_s0, l_s1; key--;)
 	{
-		lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-		lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-		lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-		lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
+		l_s0 = lines[key].segments[0].point;
+		l_s1 = lines[key].segments[1].point;
+		l_s0.x = l_s0.x.toFixed(2)-0;
+		l_s1.x = l_s1.x.toFixed(2)-0;
+		l_s0.y = l_s0.y.toFixed(2)-0;
+		l_s1.y = l_s1.y.toFixed(2)-0;
 	}
-	start_point.x = parseFloat(start_point.x.toFixed(2));
-	start_point.y = parseFloat(start_point.y.toFixed(2));
-	end_point.x = parseFloat(end_point.x.toFixed(2));
-	end_point.y = parseFloat(end_point.y.toFixed(2));
+	start_point.x = start_point.x.toFixed(2)-0;
+	start_point.y = start_point.y.toFixed(2)-0;
+	end_point.x = end_point.x.toFixed(2)-0;
+	end_point.y = end_point.y.toFixed(2)-0;
 	if (elem_useGrid.checked)
 	{
 		line_v.removeSegments();
@@ -1239,7 +1147,7 @@ function dvig_lines(napr)
 			line_v.strokeColor = 'red';
 		}
 	}
-
+	resize_canvas();
 }
 
 tool.onMouseDrag = function(event)
@@ -1257,23 +1165,23 @@ tool.onMouseDrag = function(event)
 			project.activeLayer.children[key].position.x -=  rast_x;
 			project.activeLayer.children[key].position.y -=  rast_y;
 		}
-		
+
 		if (start_point !== undefined && end_point !== undefined)
 		{
 			start_point.x -= rast_x;
 			end_point.x -= rast_x;
 			start_point.y -= rast_y;
-			end_point.y -= rast_y;		
+			end_point.y -= rast_y;
 		}
 		if (begin_point_diag !== undefined)
 		{
 			begin_point_diag.x -= rast_x;
-			begin_point_diag.y -= rast_y;	
+			begin_point_diag.y -= rast_y;
 		}
 		if (end_point_diag !== undefined)
 		{
 			end_point_diag.x -= rast_x;
-			end_point_diag.y -= rast_y;		
+			end_point_diag.y -= rast_y;
 		}
 		fix_point_dvig = event.point;
 		peredvig = true;
@@ -1335,7 +1243,7 @@ tool.onMouseDrag = function(event)
 			line_h.addSegments([begin_point, c_point]);
 			line_v.addSegments([c_point, move_point]);
 		}
-		
+
 		if (line_v.length < 40 && line_h.length < 40)
 		{
 			if (line_v.length < line_h.length)
@@ -1371,7 +1279,7 @@ tool.onMouseDrag = function(event)
 				line_h.addSegments([begin_point, c_point]);
 				line_v.addSegments([c_point, move_point]);
 			}
-			
+
 			line_bad = false;
 			proverka();
 			if (line_bad)
@@ -1442,7 +1350,7 @@ tool.onMouseDrag = function(event)
 		if (point_start_or_end === 'start' && point_ravny(move_point, end_point)
 			|| point_start_or_end === 'end' && point_ravny(move_point, start_point))
 		{
-			for (var key in lines)
+			for (var key = lines.length; key--;)
 			{
 				lines[key].strokeColor = 'darkorange';
 			}
@@ -1454,7 +1362,7 @@ tool.onMouseDrag = function(event)
 		}
 		else
 		{
-			for (var key in lines)
+			for (var key = lines.length; key--;)
 			{
 				lines[key].strokeColor = 'black';
 			}
@@ -1467,7 +1375,7 @@ tool.onMouseDrag = function(event)
 	}
 	else
 	{
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			lines[key].strokeColor = 'black';
 		}
@@ -1494,7 +1402,7 @@ function proverka()
 					line_bad = true;
 					break;
 				}
-			}	
+			}
 		}
 
 		point_near_lines_rez = point_near_lines(c_point);
@@ -1507,7 +1415,7 @@ function proverka()
 					line_bad = true;
 					break;
 				}
-			}	
+			}
 		}
 	}
 	else
@@ -1522,7 +1430,7 @@ function proverka()
 					line_bad = true;
 					break;
 				}
-			}	
+			}
 		}
 	}
 
@@ -1530,7 +1438,7 @@ function proverka()
 	{
 		line_on_lines_rez_v = line_on_lines(line_v);
 		line_on_lines_rez_h = line_on_lines(line_h);
-		if ((line_on_lines_rez_v.length + line_on_lines_rez_h.length >= 2 && opred_rez === null) 
+		if ((line_on_lines_rez_v.length + line_on_lines_rez_h.length >= 2 && opred_rez === null)
 			|| (line_on_lines_rez_v.length + line_on_lines_rez_h.length >= 3 && opred_rez !== null))
 		{
 			line_bad = true;
@@ -1539,14 +1447,14 @@ function proverka()
 	else
 	{
 		line_on_lines_rez_v = line_on_lines(line_v);
-		if ((line_on_lines_rez_v.length >= 2 && opred_rez === null) 
+		if ((line_on_lines_rez_v.length >= 2 && opred_rez === null)
 			|| (line_on_lines_rez_v.length >= 3 && opred_rez !== null))
 		{
 			line_bad = true;
 		}
 	}
 
-	for (var key in lines)
+	for (var key = lines.length; key--;)
 	{
 		line_point0 = lines[key].segments[0].point;
 		line_point1 = lines[key].segments[1].point;
@@ -1575,7 +1483,7 @@ tool.onMouseUp = function(event)
 	if (!peredvig && document.getElementById('popup2').style.display !== "block" && !close_sketch_click_bool)
 	{
 		var hitResults = project.hitTestAll(event.point, {class: Path, fill: true, stroke: true, tolerance: 3});
-		for (var key in hitResults)
+		for (var key = hitResults.length; key--;)
 		{
 			//console.log(hitResults);
 			for (var key2 in hitResults)
@@ -1646,7 +1554,7 @@ tool.onMouseUp = function(event)
 		good_lines = false;
 
 		var l = 0;
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			l++;
 		}
@@ -1656,8 +1564,8 @@ tool.onMouseUp = function(event)
 			krug_start.strokeColor = 'green';
 		}
 
-		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point) 
-			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point) 
+		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point)
+			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point)
 			|| line_v.length >= 10 && line_h.length >= 10)
 		{
 			if (line_v.length > 3 || line_prodolzhenie(line_v)[0] !== null)
@@ -1730,7 +1638,7 @@ tool.onMouseUp = function(event)
 			line_h.removeSegments();
 			line_h.remove();
 			var l = 0;
-			for (var key in lines)
+			for (var key = lines.length; key--;)
 			{
 				l++;
 			}
@@ -1740,7 +1648,7 @@ tool.onMouseUp = function(event)
 			}
 			return;
 		}
-		
+
 		if (line_v.length >= 10 && !good_lines)
 		{
 			line_h.removeSegments();
@@ -1756,7 +1664,7 @@ tool.onMouseUp = function(event)
 			line_v.remove();
 			line_h.strokeColor = 'black';
 			var l = 0;
-			for (var key in lines)
+			for (var key = lines.length; key--;)
 			{
 				l++;
 			}
@@ -1787,7 +1695,7 @@ tool.onMouseUp = function(event)
 		good_lines = false;
 
 		var l = 0;
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			l++;
 		}
@@ -1796,8 +1704,8 @@ tool.onMouseUp = function(event)
 			krug_start = new Path.Circle(begin_point, 20);
 			krug_start.strokeColor = 'green';
 		}
-		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point) 
-			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point) 
+		if (point_ravny(begin_point, start_point) && point_ravny(move_point, end_point)
+			|| point_ravny(move_point, start_point) && point_ravny(begin_point, end_point)
 			|| line_v.length >= 10)
 		{
 			if (line_v.length < 2)
@@ -1806,7 +1714,7 @@ tool.onMouseUp = function(event)
 				line_v.remove();
 
 				l = 0;
-				for (var key in lines)
+				for (var key = lines.length; key--;)
 				{
 					l++;
 				}
@@ -1826,7 +1734,7 @@ tool.onMouseUp = function(event)
 			line_v.remove();
 
 			l = 0;
-			for (var key in lines)
+			for (var key = lines.length; key--;)
 			{
 				l++;
 			}
@@ -1862,7 +1770,7 @@ tool.onMouseUp = function(event)
 		krug_end = undefined;
 		krug_start = undefined;
 		var l = 0;
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			l++;
 		}
@@ -1873,7 +1781,7 @@ tool.onMouseUp = function(event)
 			c_point = undefined;
 			return;
 		}
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			lines[key].strokeColor = 'black';
 		}
@@ -2017,7 +1925,7 @@ function draw_diag(cir)
 function text_points_sdvig()
 {
 	var angle_line = 0;
-	for (var key in lines)
+	for (var key = lines.length; key--;)
 	{
 		angle_line = get_angle(lines[key].segments[0].point, lines[key].segments[1].point);
 		if (angle_line > 60 && angle_line < 120 || angle_line > 240 && angle_line < 300)
@@ -2060,10 +1968,10 @@ function prodolzhit_line(line_pr, line)
 		{
 			for (var j = line_pr.segments.length; j--;)
 			{
-				if (max_rast < Math.sqrt(Math.pow(line.segments[i].point.x - line_pr.segments[j].point.x, 2) 
+				if (max_rast < Math.sqrt(Math.pow(line.segments[i].point.x - line_pr.segments[j].point.x, 2)
 							+ Math.pow(line.segments[i].point.y - line_pr.segments[j].point.y, 2)))
 				{
-					max_rast = Math.sqrt(Math.pow(line.segments[i].point.x - line_pr.segments[j].point.x, 2) 
+					max_rast = Math.sqrt(Math.pow(line.segments[i].point.x - line_pr.segments[j].point.x, 2)
 							+ Math.pow(line.segments[i].point.y - line_pr.segments[j].point.y, 2));
 					p1 = line_pr.segments[j].point;
 					p2 = line.segments[i].point;
@@ -2071,7 +1979,7 @@ function prodolzhit_line(line_pr, line)
 			}
 		}
 
-		
+
 		if (lines[line.id] !== undefined)
 		{
 			delete lines[line.id];
@@ -2089,7 +1997,7 @@ function prodolzhit_line(line_pr, line)
 
 function draw_lines_text()
 {
-	for (var key in lines)
+	for (var key = lines.length; key--;)
 	{
 		add_text_v_or_h(lines[key]);
 	}
@@ -2097,38 +2005,24 @@ function draw_lines_text()
 
 function add_text_v_or_h(line)
 {
-	if (text_lines[line.id] !== undefined)
+	t_l = text_lines[line.data.id];
+	if (t_l === undefined)
 	{
-		text_lines[line.id].remove();
+		text_lines[line.data.id] = new PointText();
+		t_l = text_lines[line.data.id];
 	}
-
-	text_lines[line.id] = new PointText();
-	text_lines[line.id].fontFamily = 'arial';
-	text_lines[line.id].fontWeight = 'bold';
-	text_lines[line.id].fontSize = 6;
-	var f = 2;
-	while (f > view.zoom)
-	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			text_lines[line.id].fontSize += 4;
-		}
-		else if (f < 1)
-		{
-			text_lines[line.id].fontSize += 2;
-		}
-		else if (f < 2)
-		{
-			text_lines[line.id].fontSize += 0.5;
-		}
-	}
-	text_lines[line.id].content = Math.round(line.length);
+	project.activeLayer.addChild(t_l);
+	t_l.fontFamily = 'arial';
+	t_l.fontWeight = 'bold';
+	t_l.fillColor = 'black';
+	t_l.fontSize = (14 / view.zoom).toFixed(2)-0;
+	t_l.content = Math.round(line.length);
+	t_l.rotation = 0;
 	var angle = (Math.atan((line.segments[1].point.y-line.segments[0].point.y)/(line.segments[1].point.x
 		-line.segments[0].point.x))*180)/Math.PI;
-    text_lines[line.id].rotate(angle);
-    text_lines[line.id].position = line.position;
-    text_lines[line.id].bringToFront();
+    t_l.rotate(angle);
+    t_l.position = line.position;
+    t_l.bringToFront();
 }
 
 function add_text_diag(index)
@@ -2140,24 +2034,7 @@ function add_text_diag(index)
 	text_diag[index] = new PointText();
 	text_diag[index].fontFamily = 'times';
 	text_diag[index].fontWeight = 'bold';
-	text_diag[index].fontSize = 6;
-	var f = 2;
-	while (f > view.zoom)
-	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			text_diag[index].fontSize += 4;
-		}
-		else if (f < 1)
-		{
-			text_diag[index].fontSize += 2;
-		}
-		else if (f < 2)
-		{
-			text_diag[index].fontSize += 0.5;
-		}
-	}
+	text_diag[index].fontSize = (14 / view.zoom).toFixed(2)-0;
 	text_diag[index].content = Math.round(diag_sort[index].length);
 	var angle = (Math.atan((diag_sort[index].segments[1].point.y-diag_sort[index].segments[0].point.y)/(diag_sort[index].segments[1].point.x
 			-diag_sort[index].segments[0].point.x))*180)/Math.PI;
@@ -2175,24 +2052,7 @@ function add_text_unfixed_length_diag(index)
 	text_manual_diags[index] = new PointText();
 	text_manual_diags[index].fontFamily = 'times';
 	text_manual_diags[index].fontWeight = 'bold';
-	text_manual_diags[index].fontSize = 6;
-	var f = 2;
-	while (f > view.zoom)
-	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			text_manual_diags[index].fontSize += 4;
-		}
-		else if (f < 1)
-		{
-			text_manual_diags[index].fontSize += 2;
-		}
-		else if (f < 2)
-		{
-			text_manual_diags[index].fontSize += 0.5;
-		}
-	}
+	text_manual_diags[index].fontSize = (14 / view.zoom).toFixed(2)-0;
 	text_manual_diags[index].content = diag[index].data.unfixed_length;
 	var angle = (Math.atan((diag[index].segments[1].point.y-diag[index].segments[0].point.y)/(diag[index].segments[1].point.x
 			-diag[index].segments[0].point.x))*180)/Math.PI;
@@ -2272,8 +2132,8 @@ function line_h_or_v(line)
 function point_opredelenie(point)
 {
 	var ret_rez = null;
-	var hitResults = project.hitTestAll(point, {class: Path, segments: true, tolerance: 20});
-	for (var key in hitResults)
+	var hitResults = project.hitTestAll(point, {class: Path, segments: true, tolerance: 22});
+	for (var key = hitResults.length; key--;)
 	{
 		if (hitResults[key].item.segments.length === 2)
 		{
@@ -2293,12 +2153,12 @@ function point_opredelenie(point)
 function line_on_lines(item)
 {
 	var ret_rez = [];
-	
-	for (var key in lines)
+
+	for (var key = lines.length; key--;)
 	{
 		if (lines[key].intersects(item))
 		{
-			ret_rez.push(lines[key]);	
+			ret_rez.push(lines[key]);
 		}
 	}
 	return ret_rez;
@@ -2306,7 +2166,7 @@ function line_on_lines(item)
 
 function point_ravny(point1, point2)
 {
-	if (point1.x > point2.x - 1 && point1.x < point2.x + 1 && point1.y > point2.y - 1 && point1.y < point2.y + 1)
+	if (point1.x > point2.x - 0.5 && point1.x < point2.x + 0.5 && point1.y > point2.y - 0.5 && point1.y < point2.y + 0.5)
 	{
 		return true;
 	}
@@ -2317,11 +2177,11 @@ function point_ravny(point1, point2)
 }
 function lines_ravny(line1, line2)
 {
-	if (line1.firstSegment.point.x === line2.firstSegment.point.x 
+	if (line1.firstSegment.point.x === line2.firstSegment.point.x
 		&& line1.firstSegment.point.y === line2.firstSegment.point.y
 		&& line1.lastSegment.point.x === line2.lastSegment.point.x
-		&& line1.lastSegment.point.y === line2.lastSegment.point.y 
-		|| line1.firstSegment.point.x === line2.lastSegment.point.x 
+		&& line1.lastSegment.point.y === line2.lastSegment.point.y
+		|| line1.firstSegment.point.x === line2.lastSegment.point.x
 		&& line1.firstSegment.point.y === line2.lastSegment.point.y
 		&& line1.lastSegment.point.x === line2.firstSegment.point.x
 		&& line1.lastSegment.point.y === line2.firstSegment.point.y)
@@ -2338,7 +2198,7 @@ function point_near_lines(point)
 {
 	var ret_rez = [];
 	var hitResults = project.hitTestAll(point, {class: Path, segments: true, stroke: true, tolerance: 10});
-	for (var key in hitResults)
+	for (var key = hitResults.length; key--;)
 	{
 		if (hitResults[key].item.segments.length === 2)
 		{
@@ -2359,9 +2219,11 @@ function cancel_last_action()
 
 	clearInterval(timer_mig);
 
-	elem_window.style.display = arr_cancel[arr_cancel.length - 1].elem_window_style_display;
+	var arr_cancel_last_elem = arr_cancel[arr_cancel.length - 1];
+
+	elem_window.style.display = arr_cancel_last_elem.elem_window_style_display;
 	resize_canvas();
-	elem_newLength.value = arr_cancel[arr_cancel.length - 1].elem_newLength_value;
+	elem_newLength.value = arr_cancel_last_elem.elem_newLength_value;
 	if (elem_window.style.display === "block")
 	{
 		first_click = false;
@@ -2369,58 +2231,58 @@ function cancel_last_action()
 		elem_newLength.select();
 	}
 
-	triangulate_bool = arr_cancel[arr_cancel.length - 1].triangulate_bool;
-	vh = arr_cancel[arr_cancel.length - 1].vh;
-	chert_close = arr_cancel[arr_cancel.length - 1].chert_close;
+	triangulate_bool = arr_cancel_last_elem.triangulate_bool;
+	vh = arr_cancel_last_elem.vh;
+	chert_close = arr_cancel_last_elem.chert_close;
 
-	view.zoom = arr_cancel[arr_cancel.length - 1].zoom;
+	view.zoom = arr_cancel_last_elem.zoom;
 
-	code = arr_cancel[arr_cancel.length - 1].code;
-	alfavit = arr_cancel[arr_cancel.length - 1].alfavit;
+	code = arr_cancel_last_elem.code;
+	alfavit = arr_cancel_last_elem.alfavit;
 
-	ready = arr_cancel[arr_cancel.length - 1].ready;
-	close_sketch_click_bool = arr_cancel[arr_cancel.length - 1].close_sketch_click_bool;
+	ready = arr_cancel_last_elem.ready;
+	close_sketch_click_bool = arr_cancel_last_elem.close_sketch_click_bool;
 
-	triangulate_rezhim = arr_cancel[arr_cancel.length - 1].triangulate_rezhim;
+	triangulate_rezhim = arr_cancel_last_elem.triangulate_rezhim;
 
 	manual_diag = undefined;
-	if (arr_cancel[arr_cancel.length - 1].manual_diag !== undefined)
+	if (arr_cancel_last_elem.manual_diag !== undefined)
 	{
-		manual_diag = arr_cancel[arr_cancel.length - 1].manual_diag.clone();
+		manual_diag = arr_cancel_last_elem.manual_diag.clone();
 		project.activeLayer.addChild(manual_diag);
 	}
 	krug_start = undefined;
-	if (arr_cancel[arr_cancel.length - 1].krug_start !== undefined)
+	if (arr_cancel_last_elem.krug_start !== undefined)
 	{
-		krug_start = arr_cancel[arr_cancel.length - 1].krug_start.clone();
+		krug_start = arr_cancel_last_elem.krug_start.clone();
 		project.activeLayer.addChild(krug_start);
 	}
 	krug_end = undefined;
-	if (arr_cancel[arr_cancel.length - 1].krug_end !== undefined)
+	if (arr_cancel_last_elem.krug_end !== undefined)
 	{
-		krug_end = arr_cancel[arr_cancel.length - 1].krug_end.clone();
+		krug_end = arr_cancel_last_elem.krug_end.clone();
 		project.activeLayer.addChild(krug_end);
 	}
 
-	if (arr_cancel[arr_cancel.length - 1].start_point !== undefined)
+	if (arr_cancel_last_elem.start_point !== undefined)
 	{
-		start_point = arr_cancel[arr_cancel.length - 1].start_point.clone();
+		start_point = arr_cancel_last_elem.start_point.clone();
 	}
 
-	if (arr_cancel[arr_cancel.length - 1].end_point !== undefined)
+	if (arr_cancel_last_elem.end_point !== undefined)
 	{
-		end_point = arr_cancel[arr_cancel.length - 1].end_point.clone();
+		end_point = arr_cancel_last_elem.end_point.clone();
 	}
 
 	lines_sort = [];
 	lines = [];
 	text_lines = [];
 
-	if (arr_cancel[arr_cancel.length - 1].lines_sort !== undefined && arr_cancel[arr_cancel.length - 1].lines_sort.length !== 0)
+	if (arr_cancel_last_elem.lines_sort !== undefined && arr_cancel_last_elem.lines_sort.length !== 0)
 	{
-		for (var key = arr_cancel[arr_cancel.length - 1].lines_sort.length; key--;)
+		for (var key = arr_cancel_last_elem.lines_sort.length; key--;)
 		{
-			lines_sort[key] = arr_cancel[arr_cancel.length - 1].lines_sort[key].clone();
+			lines_sort[key] = arr_cancel_last_elem.lines_sort[key].clone();
 			lines[lines_sort[key].data.id] = lines_sort[key];
 			if (chert_close)
 			{
@@ -2428,12 +2290,12 @@ function cancel_last_action()
 			}
 		}
 	}
-	else if (arr_cancel[arr_cancel.length - 1].lines !== undefined)
+	else if (arr_cancel_last_elem.lines !== undefined)
 	{
 		lines = [];
-		for (var key in arr_cancel[arr_cancel.length - 1].lines)
+		for (var key in arr_cancel_last_elem.lines)
 		{
-			lines[arr_cancel[arr_cancel.length - 1].lines[key].data.id] = arr_cancel[arr_cancel.length - 1].lines[key].clone();
+			lines[arr_cancel_last_elem.lines[key].data.id] = arr_cancel_last_elem.lines[key].clone();
 			if (chert_close)
 			{
 				add_text_v_or_h(lines[lines.length - 1]);
@@ -2447,64 +2309,62 @@ function cancel_last_action()
 
 	if (triangulate_bool)
 	{
-		if (arr_cancel[arr_cancel.length - 1].diag_sort !== undefined
-			&& arr_cancel[arr_cancel.length - 1].diag_sort.length !== 0)
+		if (arr_cancel_last_elem.diag_sort !== undefined
+			&& arr_cancel_last_elem.diag_sort.length !== 0)
 		{
-			for (var key = arr_cancel[arr_cancel.length - 1].diag_sort.length; key--;)
+			for (var key = arr_cancel_last_elem.diag_sort.length; key--;)
 			{
-				diag_sort[key] = arr_cancel[arr_cancel.length - 1].diag_sort[key].clone();
+				diag_sort[key] = arr_cancel_last_elem.diag_sort[key].clone();
 				diag[key] = diag_sort[key];
 			}
 		}
-		else if (arr_cancel[arr_cancel.length - 1].diag !== undefined)
+		else if (arr_cancel_last_elem.diag !== undefined)
 		{
 			diag = [];
-			for (var key in arr_cancel[arr_cancel.length - 1].diag)
+			for (var key in arr_cancel_last_elem.diag)
 			{
-				diag[key] = arr_cancel[arr_cancel.length - 1].diag[key].clone();
+				diag[key] = arr_cancel_last_elem.diag[key].clone();
 			}
 		}
 
-		for (var key in arr_cancel[arr_cancel.length - 1].text_diag)
+		for (var key in arr_cancel_last_elem.text_diag)
 		{
-			text_diag[key] = arr_cancel[arr_cancel.length - 1].text_diag[key].clone();
+			text_diag[key] = arr_cancel_last_elem.text_diag[key].clone();
 		}
 	}
 	else if (triangulate_rezhim === 2)
 	{
 		diag = [];
-		for (var key in arr_cancel[arr_cancel.length - 1].diag)
+		for (var key in arr_cancel_last_elem.diag)
 		{
-			diag[key] = arr_cancel[arr_cancel.length - 1].diag[key].clone();
+			diag[key] = arr_cancel_last_elem.diag[key].clone();
 		}
 		text_manual_diags = [];
-		for (var key in arr_cancel[arr_cancel.length - 1].text_manual_diags)
+		for (var key in arr_cancel_last_elem.text_manual_diags)
 		{
-			text_manual_diags[key] = arr_cancel[arr_cancel.length - 1].text_manual_diags[key].clone();
+			text_manual_diags[key] = arr_cancel_last_elem.text_manual_diags[key].clone();
 		}
 	}
 
 	text_points = [];
-	for (var key in arr_cancel[arr_cancel.length - 1].text_points)
+	for (var key in arr_cancel_last_elem.text_points)
 	{
-		text_points[key] = arr_cancel[arr_cancel.length - 1].text_points[key].clone();
-		if (arr_cancel[arr_cancel.length - 1].text_points[key].data.circle !== undefined)
+		text_points[key] = arr_cancel_last_elem.text_points[key].clone();
+		if (arr_cancel_last_elem.text_points[key].data.circle !== undefined)
 		{
-			text_points[key].data.circle = arr_cancel[arr_cancel.length - 1].text_points[key].data.circle.clone();
+			text_points[key].data.circle = arr_cancel_last_elem.text_points[key].data.circle.clone();
 		}
 	}
 
 	g_points = [];
-	for (var key in arr_cancel[arr_cancel.length - 1].g_points)
+	for (var key in arr_cancel_last_elem.g_points)
 	{
-		g_points[key] = arr_cancel[arr_cancel.length - 1].g_points[key].clone();
+		g_points[key] = arr_cancel_last_elem.g_points[key].clone();
 	}
 
-	triangles = [];
-
-	elem_jform_n4.value = arr_cancel[arr_cancel.length - 1].elem_jform_n4_value;
-	elem_jform_n5.value = arr_cancel[arr_cancel.length - 1].elem_jform_n5_value;
-	elem_jform_n9.value = arr_cancel[arr_cancel.length - 1].elem_jform_n9_value;
+	elem_jform_n4.value = arr_cancel_last_elem.elem_jform_n4_value;
+	elem_jform_n5.value = arr_cancel_last_elem.elem_jform_n5_value;
+	elem_jform_n9.value = arr_cancel_last_elem.elem_jform_n9_value;
 
 	project.activeLayer.addChildren(lines);
 	project.activeLayer.addChildren(diag);
@@ -2574,7 +2434,7 @@ function save_cancel()
 	else if (lines !== undefined)
 	{
 		obj.lines = [];
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			obj.lines[key] = lines[key].clone();
 		}
@@ -2596,8 +2456,8 @@ function save_cancel()
 			obj.diag[key] = diag[key].clone();
 		}
 	}
-	
-	
+
+
 	obj.text_points = [];
 	for (var key in text_points)
 	{
@@ -2619,7 +2479,7 @@ function save_cancel()
 	{
 		obj.text_manual_diags[key] = text_manual_diags[key].clone();
 	}
-	
+
 	obj.code = code;
 	obj.alfavit = alfavit;
 
@@ -2711,11 +2571,7 @@ function clear_elem()
 	}
 	diag = [];
 	diag_sort = [];
-	for (var key in triangles)
-	{
-		triangles[key].remove();
-	}
-	triangles = [];
+
 	manual_diag = undefined;
 	for (var key in text_manual_diags)
 	{
@@ -2733,19 +2589,20 @@ function clear_elem()
 
 function resize_wall_begin()
 {
-    for (var key = 0; key < lines_sort.length; key++)
+    for (var key = 0, l_k; key < lines_sort.length; key++)
     {
-    	if (!lines_sort[key].data.fixed)
+    	l_k = lines_sort[key];
+    	if (!l_k.data.fixed)
     	{
     		elem_window.style.display = 'block';
     		resize_canvas();
     		elem_newLength.focus();
-    		elem_newLength.value = Math.round(lines_sort[key].length);
+    		elem_newLength.value = Math.round(l_k.length);
     		elem_newLength.select();
     		first_click = false;
-    		lines_sort[key].strokeColor = 'red';
-    		text_lines[lines_sort[key].id].fillColor = 'Maroon';
-    		timer_mig = setInterval(migalka, 500, lines_sort[key]);
+    		l_k.strokeColor = 'red';
+    		text_lines[l_k.data.id].fillColor = 'Maroon';
+    		timer_mig = setInterval(migalka, 500, l_k);
     		return;
     	}
     }
@@ -2755,7 +2612,7 @@ function change_length(line, length, text_point_index)
 {
 	var rez_lines = line_on_lines(line);
 	var oldLength = line.length;
-	var Dx, Dy, can_ver, coef, smez_wall0, smez_wall1, line2, line3, cp1, cp2, point_s, point_sn, point_s2, point_s3, newPoint, 
+	var Dx, Dy, coef, smez_wall0, smez_wall1, line2, line3, cp1, cp2, point_s, point_sn, point_s2, point_s3, newPoint,
 		point_s_old, point_s2_old, smes, lx, ly;
 
 	for (var key in rez_lines)
@@ -2805,7 +2662,7 @@ function change_length(line, length, text_point_index)
 		line2 = smez_wall0;
 		point_s = line.segments[0].point;
 		cp1 = line.segments[1].point;
-		
+
 		for (var i in line2.segments)
 		{
 			if (!point_ravny(line2.segments[i].point, point_s))
@@ -2821,7 +2678,7 @@ function change_length(line, length, text_point_index)
 	   		line2 = smez_wall1;
 			point_s = line.segments[1].point;
 			cp1 = line.segments[0].point;
-			
+
 			for (var i in line2.segments)
 			{
 				if (!point_ravny(line2.segments[i].point, point_s))
@@ -2869,14 +2726,14 @@ function change_length(line, length, text_point_index)
 	for (var key in rez_lines)
 	{
 		if ((point_ravny(line2.segments[0].point, rez_lines[key].segments[0].point)
-			|| point_ravny(line2.segments[0].point, rez_lines[key].segments[1].point)) 
+			|| point_ravny(line2.segments[0].point, rez_lines[key].segments[1].point))
 			&& !point_ravny(line2.segments[0].point, point_s))
 		{
 			line3 = rez_lines[key];
 			point_s2 = line2.segments[0].point;
 		}
 		if ((point_ravny(line2.segments[1].point, rez_lines[key].segments[0].point)
-			|| point_ravny(line2.segments[1].point, rez_lines[key].segments[1].point)) 
+			|| point_ravny(line2.segments[1].point, rez_lines[key].segments[1].point))
 			&& !point_ravny(line2.segments[1].point, point_s))
 		{
 			line3 = rez_lines[key];
@@ -2922,7 +2779,7 @@ function change_length(line, length, text_point_index)
 		if (coef === undefined)
 		{
 			line.data.razv_wall_kos = {p1: cp1.clone(), p2: point_s.clone()};
-			var chis = new Decimal(new Decimal(line.segments[1].point.y).minus(line.segments[0].point.y)), 
+			var chis = new Decimal(new Decimal(line.segments[1].point.y).minus(line.segments[0].point.y)),
 				znam = new Decimal(new Decimal(line.segments[1].point.x).minus(line.segments[0].point.x));
 	    	coef = chis.dividedBy(znam);
 		}
@@ -2942,12 +2799,12 @@ function change_length(line, length, text_point_index)
 		}
 
     	newPoint = new Point(new Decimal(cp1.x).plus(Dx).toNumber(), new Decimal(cp1.y).plus(Dy).toNumber());
-	    
+
 	    if (line_h_or_v(line2) === 'v' && !line3.data.fixed)
 	    {
 	    	if (line_h_or_v(line3) === null)
 	    	{
-	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
+	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)),
 					znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
 		    	line3.data.coef_wall_kos = chis.dividedBy(znam);
 		    	if (point_ravny(cp2, line3.segments[0].point))
@@ -2965,7 +2822,7 @@ function change_length(line, length, text_point_index)
 	    {
 	    	if (line_h_or_v(line3) === null)
 	    	{
-	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
+	    		var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)),
 					znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
 		    	line3.data.coef_wall_kos = chis.dividedBy(znam);
 		    	if (point_ravny(cp2, line3.segments[0].point))
@@ -2981,22 +2838,22 @@ function change_length(line, length, text_point_index)
 	    }
 	    else
 	    {
-	    	var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)), 
+	    	var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)),
 				znam = new Decimal(new Decimal(line2.segments[1].point.x).minus(line2.segments[0].point.x));
 	    	line2.data.coef_wall_kos = chis.dividedBy(znam);
 	    	line2.data.razv_wall_kos = {p1: point_s.clone(), p2: cp2.clone()};
 	    }
 
-	    if (cp2.x > point_s.x && cp2.x < newPoint.x 
-    	|| cp2.y > point_s.y && cp2.y < newPoint.y 
-    	|| cp2.x < point_s.x && cp2.x > newPoint.x 
+	    if (cp2.x > point_s.x && cp2.x < newPoint.x
+    	|| cp2.y > point_s.y && cp2.y < newPoint.y
+    	|| cp2.x < point_s.x && cp2.x > newPoint.x
     	|| cp2.y < point_s.y && cp2.y > newPoint.y)
 	    {
 	    	line2.data.razv_wall = true;
 	    }
-	    if (cp2.x > point_s3.x && point_s2_old.x < point_s3.x 
-    	|| cp2.y > point_s3.y && point_s2_old.y < point_s3.y 
-    	|| cp2.x < point_s3.x && point_s2_old.x > point_s3.x 
+	    if (cp2.x > point_s3.x && point_s2_old.x < point_s3.x
+    	|| cp2.y > point_s3.y && point_s2_old.y < point_s3.y
+    	|| cp2.x < point_s3.x && point_s2_old.x > point_s3.x
     	|| cp2.y < point_s3.y && point_s2_old.y > point_s3.y)
 	    {
 	    	line3.data.razv_wall = true;
@@ -3022,7 +2879,7 @@ function change_length(line, length, text_point_index)
 	}
 
 
-	var chis = new Decimal(new Decimal(line.segments[1].point.y).minus(line.segments[0].point.y)), 
+	var chis = new Decimal(new Decimal(line.segments[1].point.y).minus(line.segments[0].point.y)),
 		znam = new Decimal(new Decimal(line.segments[1].point.x).minus(line.segments[0].point.x));
 	coef = chis.dividedBy(znam);
 
@@ -3080,9 +2937,9 @@ function change_length(line, length, text_point_index)
 		point_s2 = new Point(new Decimal(point_s2.x).minus(Dx).minus(lx).toNumber(), new Decimal(point_s2.y).minus(Dy).minus(ly).toNumber());
     }
 
-    if (point_s2.x > point_s3.x && point_s2_old.x < point_s3.x 
-    	|| point_s2.y > point_s3.y && point_s2_old.y < point_s3.y 
-    	|| point_s2.x < point_s3.x && point_s2_old.x > point_s3.x 
+    if (point_s2.x > point_s3.x && point_s2_old.x < point_s3.x
+    	|| point_s2.y > point_s3.y && point_s2_old.y < point_s3.y
+    	|| point_s2.x < point_s3.x && point_s2_old.x > point_s3.x
     	|| point_s2.y < point_s3.y && point_s2_old.y > point_s3.y)
     {
     	line3.data.razv_wall = true;
@@ -3095,7 +2952,7 @@ function change_length(line, length, text_point_index)
 	    line2.removeSegments();
 	    line2.addSegments([point_s, point_s2]);
 
-	    var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)), 
+	    var chis = new Decimal(new Decimal(line3.segments[1].point.y).minus(line3.segments[0].point.y)),
 				znam = new Decimal(new Decimal(line3.segments[1].point.x).minus(line3.segments[0].point.x));
 	    line3.data.coef_wall_kos = chis.dividedBy(znam);
 	    line3.data.razv_wall_kos = {p1: point_s2_old.clone(), p2: point_s3.clone()};
@@ -3109,7 +2966,7 @@ function change_length(line, length, text_point_index)
 	{
     	if (line2.data.coef_wall_kos === undefined)
     	{
-    		var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)), 
+    		var chis = new Decimal(new Decimal(line2.segments[1].point.y).minus(line2.segments[0].point.y)),
 				znam = new Decimal(new Decimal(line2.segments[1].point.x).minus(line2.segments[0].point.x));
 	    	line2.data.coef_wall_kos = chis.dividedBy(znam);
     		line2.data.razv_wall_kos = {p1: point_s_old.clone(), p2: point_s2_old.clone()};
@@ -3131,8 +2988,8 @@ function triangulator()
 	}
 	diag = [];
 	diag_sort = [];
-	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	g_points = getPathsPointsBySort(lines_sort);
+	//g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
 	var ctx1, ctx2, ctx3, d, kolvo_lines, kolvo_lines_2, kolvo_lines_4a, kolvo_lines_4b, kolvo_lines_2_y, kolvo_lines_4a_y, kolvo_lines_4b_y,
 		cx, cy, cp2, c0, chek_line_2, cp4a, chek_line_4a, cp4b, chek_line_4b, chek_line_2_y, chek_line_4a_y, chek_line_4b_y, bdel;
 	var vertices = [];
@@ -3140,7 +2997,7 @@ function triangulator()
 	{
 		vertices[key] = [g_points[key].x, g_points[key].y];
 	}
-	
+
 	var triangles_points = Delaunay.triangulate(vertices);
 
 	for(var i = triangles_points.length; i;)
@@ -3167,75 +3024,6 @@ function triangulator()
 		}
 	}
 }
-
-
-function triangles_count()
-{
-	var count = 0, op, tr_bool;
-
-	for (var key in triangles)
-	{
-		triangles[key].remove();
-	}
-	triangles = [];
-
-	for (var i in diag)
-	{
-		var hitResults0 = project.hitTestAll(diag[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
-		var hitResults1 = project.hitTestAll(diag[i].segments[1].point, {class: Path, segments: true, tolerance: 2});
-		for (var key0 = hitResults0.length; key0--;)
-		{
-			if (lines_ravny(hitResults0[key0].item, diag[i]) || hitResults0[key0].item.segments.length !== 2)
-			{
-				continue;
-			}
-			for (var key1 = hitResults1.length; key1--;)
-			{
-				if (!lines_ravny(hitResults1[key1].item, diag[i]) && hitResults1[key1].item.segments.length === 2)
-				{
-					op = obshaya_point(hitResults0[key0].item, hitResults1[key1].item);
-					if (op !== null)
-					{
-						var path1 = new CompoundPath({
-						    children: [
-						        diag[i].clone(),
-						        hitResults0[key0].item.clone(),
-						        hitResults1[key1].item.clone()
-						    ]
-						});
-						tr_bool = false;
-						for (var j = triangles.length; j--;)
-						{
-							if (path1.compare(triangles[j]))
-							{
-								tr_bool = true;
-								break;
-							}
-						}
-						if (!tr_bool)
-						{
-							triangles.push(path1);
-						}
-						else
-						{
-							path1.remove();
-						}
-					}
-				}
-			}
-		}
-		hitResults0.splice(0, hitResults0.length);
-		hitResults1.splice(0, hitResults1.length);
-	}
-	for (var key = triangles.length; key--;)
-	{
-		triangles[key].remove();
-		count++;
-	}
-	triangles = [];
-	return count;
-}
-
 
 function pulemet()
 {
@@ -3291,8 +3079,10 @@ function pulemet()
 
 function good_diag(diag_i)
 {
-	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	var diag_i_seg0 = diag_i.segments[0].point,
+		diag_i_seg1 = diag_i.segments[1].point;
+	g_points = getPathsPointsBySort(lines_sort);
+
 	var chertezh = new Path();
 	for (var key = g_points.length; key--;)
 	{
@@ -3338,52 +3128,58 @@ function good_diag(diag_i)
 		}
 	}
 
-	for (var key = lines_sort.length; key--;)
+	for (var key = lines_sort.length, ls_k, ls_k_s0, ls_k_s1; key--;)
 	{
-		if (isIntersect(diag_i.segments[0].point, diag_i.segments[1].point, lines_sort[key].segments[0].point, lines_sort[key].segments[1].point))
+		ls_k = lines_sort[key];
+		ls_k_s0 = ls_k.segments[0].point;
+		ls_k_s1 = ls_k.segments[1].point;
+
+		if (isIntersect(diag_i_seg0, diag_i_seg1, ls_k_s0, ls_k_s1))
 		{
 			return false;
 		}
-		if (diag_i.contains(lines_sort[key].segments[0].point) && diag_i.contains(lines_sort[key].segments[1].point))
+		if (diag_i.contains(ls_k_s0) && diag_i.contains(ls_k_s1))
 		{
 			return false;
 		}
-		if (lines_sort[key].contains(diag_i.segments[0].point) && lines_sort[key].contains(diag_i.segments[1].point))
+		if (ls_k.contains(diag_i_seg0) && ls_k.contains(diag_i_seg1))
 		{
 			return false;
 		}
-		if (point_ravny(lines_sort[key].segments[0].point, diag_i.segments[0].point) 
-			&& point_ravny(lines_sort[key].segments[1].point, diag_i.segments[1].point) 
-			|| point_ravny(lines_sort[key].segments[0].point, diag_i.segments[1].point) 
-			&& point_ravny(lines_sort[key].segments[1].point, diag_i.segments[0].point))
+		if (point_ravny(ls_k_s0, diag_i_seg0)
+			&& point_ravny(ls_k_s1, diag_i_seg1)
+			|| point_ravny(ls_k_s0, diag_i_seg1)
+			&& point_ravny(ls_k_s1, diag_i_seg0))
 		{
 			return false;
 		}
 	}
 
-	for (var key in diag)
+	for (var key = diag.length, d_k, d_k_s0, d_k_s1; key--;)
 	{
-		if (diag_i === diag[key])
+		d_k = diag[key];
+		d_k_s0 = d_k.segments[0].point;
+		d_k_s1 = d_k.segments[1].point;
+		if (diag_i === d_k)
 		{
 			continue;
 		}
-		if (isIntersect(diag_i.segments[0].point, diag_i.segments[1].point, 
-						diag[key].segments[0].point, diag[key].segments[1].point))
+		if (isIntersect(diag_i_seg0, diag_i_seg1, d_k_s0, d_k_s1))
 		{
 			return false;
 		}
-		if (diag_i.contains(diag[key].segments[0].point) && diag_i.contains(diag[key].segments[1].point))
+		if (diag_i.contains(d_k_s0) && diag_i.contains(d_k_s1))
 		{
 			return false;
 		}
-		if (diag[key].contains(diag_i.segments[0].point) && diag[key].contains(diag_i.segments[1].point))
+		if (d_k.contains(diag_i_seg0) && d_k.contains(diag_i_seg1))
 		{
 			return false;
 		}
-		if (point_ravny(diag[key].segments[0].point, diag_i.segments[0].point) 
-			&& point_ravny(diag[key].segments[1].point, diag_i.segments[1].point) 
-			|| point_ravny(diag[key].segments[0].point, diag_i.segments[1].point) 
-			&& point_ravny(diag[key].segments[1].point, diag_i.segments[0].point))
+		if (point_ravny(d_k_s0, diag_i_seg0)
+			&& point_ravny(d_k_s1, diag_i_seg1)
+			|| point_ravny(d_k_s0, diag_i_seg1)
+			&& point_ravny(d_k_s1, diag_i_seg0))
 		{
 			return false;
 		}
@@ -3395,75 +3191,15 @@ function good_diag(diag_i)
 
 function square()
 {
-	var a = 0, b = 0, c = 0, p = 0, s = 0, sq = 0, op, tr_bool;
-
-	for (var key in triangles)
+	var chertezh = new Path();
+	g_points = getPathsPointsBySort(lines_sort);
+	for(var i = g_points.length; i--;)
 	{
-		triangles[key].remove();
+		chertezh.add(g_points[i]);
 	}
-	triangles = [];
-
-	for (var i = diag_sort.length; i--;)
-	{
-		var hitResults0 = project.hitTestAll(diag_sort[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
-		var hitResults1 = project.hitTestAll(diag_sort[i].segments[1].point, {class: Path, segments: true, tolerance: 2});
-		for (var key0 = hitResults0.length; key0--;)
-		{
-			if (lines_ravny(hitResults0[key0].item, diag_sort[i]) || hitResults0[key0].item.segments.length !== 2)
-			{
-				continue;
-			}
-			for (var key1 = hitResults1.length; key1--;)
-			{
-				if (!lines_ravny(hitResults1[key1].item, diag_sort[i]) && hitResults1[key1].item.segments.length === 2)
-				{
-					op = obshaya_point(hitResults0[key0].item, hitResults1[key1].item);
-					if (op !== null)
-					{
-						var path1 = new CompoundPath({
-						    children: [
-						        diag_sort[i].clone(),
-						        hitResults0[key0].item.clone(),
-						        hitResults1[key1].item.clone()
-						    ],
-						    diag_length: text_diag[i].content
-						});
-						tr_bool = false;
-						for (var j = triangles.length; j--;)
-						{
-							if (path1.compare(triangles[j]))
-							{
-								tr_bool = true;
-								break;
-							}
-						}
-						if (!tr_bool)
-						{
-							triangles.push(path1);
-						}
-						else
-						{
-							path1.remove();
-						}
-					}
-				}
-			}
-		}
-		hitResults0.splice(0, hitResults0.length);
-		hitResults1.splice(0, hitResults1.length);
-	}
-
-	for (var key = triangles.length; key--;)
-	{
-		a = parseFloat(triangles[key].diag_length);
-		b = triangles[key].children[1].length;
-		c = triangles[key].children[2].length;
-		p = (a + b + c) / 2;
-		s = Math.sqrt(p*(p-a)*(p-b)*(p-c));
-		sq += s;
-	}
-	sq = sq / 10000;
-	elem_jform_n4.value = sq.toFixed(2);
+	chertezh.closed = true;
+	elem_jform_n4.value = Decimal.abs(new Decimal(chertezh.area).dividedBy(10000)).toNumber().toFixed(2);
+	chertezh.remove();
 }
 
 function perimetr()
@@ -3483,7 +3219,7 @@ function align_center()
 
 	chertezh.addChildren(project.activeLayer.children);
 	project.activeLayer.removeChildren();
-	
+
 	chertezh.position=view.center;
 
 	project.activeLayer.addChildren(chertezh.children);
@@ -3496,16 +3232,9 @@ function zerkalo(p_u)
 
 	chertezh.addChildren(lines_sort);
 	chertezh.addChildren(diag_sort);
-	for (var i = polotna.length; i--;)
+	for (var i = seam_lines.length; i--;)
 	{
-		if (polotna[i].up !== undefined)
-		{
-			chertezh.addChild(polotna[i].up);
-		}
-		if (polotna[i].down !== undefined)
-		{
-			chertezh.addChild(polotna[i].down);
-		}
+		chertezh.addChild(seam_lines[i]);
 	}
 	chertezh.scale(-1, 1);
 
@@ -3514,46 +3243,40 @@ function zerkalo(p_u)
 	project.activeLayer.addChildren(lines_sort);
 	project.activeLayer.addChildren(diag_sort);
 	project.activeLayer.addChildren(text_points);
-	for (var i = polotna.length; i--;)
+	for (var i = seam_lines.length; i--;)
 	{
-		if (polotna[i].up !== undefined)
-		{
-			project.activeLayer.addChild(polotna[i].up);
-		}
-		if (polotna[i].down !== undefined)
-		{
-			project.activeLayer.addChild(polotna[i].down);
-		}
+		project.activeLayer.addChild(seam_lines[i]);
 	}
 
 	chertezh.remove();
 
 	for (var i = lines_sort.length; i--;)
 	{
-		lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-		lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-		lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-		lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+		lines_sort[i].segments[0].point.x = lines_sort[i].segments[0].point.x.toFixed(2)-0;
+		lines_sort[i].segments[0].point.y = lines_sort[i].segments[0].point.y.toFixed(2)-0;
+		lines_sort[i].segments[1].point.x = lines_sort[i].segments[1].point.x.toFixed(2)-0;
+		lines_sort[i].segments[1].point.y = lines_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	for (var i = diag_sort.length; i--;)
 	{
-		diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-		diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-		diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-		diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+		diag_sort[i].segments[0].point.x = diag_sort[i].segments[0].point.x.toFixed(2)-0;
+		diag_sort[i].segments[0].point.y = diag_sort[i].segments[0].point.y.toFixed(2)-0;
+		diag_sort[i].segments[1].point.x = diag_sort[i].segments[1].point.x.toFixed(2)-0;
+		diag_sort[i].segments[1].point.y = diag_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	okruglenie_all_segments();
 
-	for (var key = 0; key < lines_sort.length; key++)
+	for (var key = 0, l_k; key < lines_sort.length; key++)
     {
-    	add_text_v_or_h(lines_sort[key]);
+    	l_k = lines_sort[key];
+    	add_text_v_or_h(l_k);
     	if (p_u === 1)
     	{
-    		text_lines[lines_sort[key].id].content = (+text_lines[lines_sort[key].id].content);
+    		text_lines[l_k.data.id].content = (+text_lines[l_k.data.id].content);
     	}
     	else
     	{
-	    	text_lines[lines_sort[key].id].content = (+text_lines[lines_sort[key].id].content * p_u).toFixed(1);
+	    	text_lines[l_k.data.id].content = (+text_lines[l_k.data.id].content * p_u).toFixed(1);
 	    }
     }
 
@@ -3569,7 +3292,7 @@ function zerkalo(p_u)
 	    	text_diag[key].content = (+text_diag[key].content * p_u).toFixed(1);
 	    }
     }
-    
+
     var j = 0;
     for (var i = 0; i < lines_sort.length; i++)
     {
@@ -3591,135 +3314,52 @@ function zerkalo(p_u)
 
 function remove_none_shvy()
 {
+	var line;
+	seam_lines = [];
 	for (var i = lines_sort.length; i--;)
 	{
-		lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-		lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-		lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-		lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+		lines_sort[i].segments[0].point.x = lines_sort[i].segments[0].point.x.toFixed(2)-0;
+		lines_sort[i].segments[0].point.y = lines_sort[i].segments[0].point.y.toFixed(2)-0;
+		lines_sort[i].segments[1].point.x = lines_sort[i].segments[1].point.x.toFixed(2)-0;
+		lines_sort[i].segments[1].point.y = lines_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	for (var i = diag_sort.length; i--;)
 	{
-		diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-		diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-		diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-		diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+		diag_sort[i].segments[0].point.x = diag_sort[i].segments[0].point.x.toFixed(2)-0;
+		diag_sort[i].segments[0].point.y = diag_sort[i].segments[0].point.y.toFixed(2)-0;
+		diag_sort[i].segments[1].point.x = diag_sort[i].segments[1].point.x.toFixed(2)-0;
+		diag_sort[i].segments[1].point.y = diag_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	okruglenie_all_segments();
 	var points_m = findMinAndMaxCordinate_g();
 
 	for (var i = polotna.length; i--;)
 	{
-		polotna[i].left.remove();
-		polotna[i].right.remove();
-		
-		delete polotna[i].left;
-		delete polotna[i].right;
-
-		if (polotna[i].down.position.y > points_m.maxY - 1)
+		if (i === 0 )
 		{
-			polotna[i].down.remove();
-			delete polotna[i].down;
+			break;
 		}
-		if (polotna[i].up.position.y < points_m.minY + 1)
-		{
-			polotna[i].up.remove();
-			delete polotna[i].up;
-		}
+		line = new Path.Line(polotna[i].polotno.bounds.bottomLeft.clone(), polotna[i].polotno.bounds.bottomRight.clone());
+		project.activeLayer.addChild(line);
+		line.strokeWidth = 2;
+		line.strokeColor = 'red';
+		polotna[i].polotno.remove();
+		polotna[i].parts.remove();
+		polotna[i].cuts.remove();
+		seam_lines.push(line);
 	}
-
-	for (var i = polotna.length; i--;)
-	{
-		for (var j = polotna.length; j--;)
-		{
-			if (polotna[i].up === undefined || polotna[j].down === undefined)
-			{
-				continue;
-			}
-			if (polotna[i].up.intersects(polotna[j].down) && polotna[i].up.length > polotna[j].down.length)
-			{
-				polotna[i].up.remove();
-				delete polotna[i].up;
-			}
-		}
-
-		for (var j = polotna.length; j--;)
-		{
-			if (polotna[i].down === undefined || polotna[j].up === undefined)
-			{
-				continue;
-			}
-			if (polotna[i].down.intersects(polotna[j].up) && polotna[i].down.length > polotna[j].up.length)
-			{
-				polotna[i].down.remove();
-				delete polotna[i].down;
-			}
-		}
-	}
-
-	var chertezh = new Path();
-	for (var key = g_points.length; key--;)
-	{
-		chertezh.add(g_points[key].clone());
-	}
-	chertezh.closed = true;
-
-	for (var i = polotna.length; i--;)
-	{
-		if (polotna[i].down !== undefined)
-		{
-			if (!polotna[i].down.intersects(chertezh) && !chertezh.contains(polotna[i].down.position))
-			{
-				polotna[i].down.remove();
-				delete polotna[i].down;
-			}
-		}
-		if (polotna[i].up !== undefined)
-		{
-			if (!polotna[i].up.intersects(chertezh) && !chertezh.contains(polotna[i].up.position))
-			{
-				polotna[i].up.remove();
-				delete polotna[i].up;
-			}
-		}
-	}
-	chertezh.remove();
 }
 
 function rotate_final()
 {
-	for (var i = lines_sort.length; i--;)
+	for (var i = project.activeLayer.children.length; i--;)
 	{
-		lines_sort[i].rotate(angle_final, view.center);
-
-		lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-		lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-		lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-		lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
-	}
-	for (var i = diag_sort.length; i--;)
-	{
-		diag_sort[i].rotate(angle_final, view.center);
-
-		diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-		diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-		diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-		diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+		if (project.activeLayer.children[i].segments !== undefined)
+		{
+			project.activeLayer.children[i].rotate(angle_final, view.center);
+		}
 	}
 	okruglenie_all_segments();
-	for (var i = polotna.length; i--;)
-	{
-		if (polotna[i].up !== undefined)
-		{
-			polotna[i].up.rotate(angle_final, view.center);
-			polotna[i].up.strokeWidth = 2;
-		}
-		if (polotna[i].down !== undefined)
-		{
-			polotna[i].down.rotate(angle_final, view.center);
-			polotna[i].down.strokeWidth = 2;
-		}
-	}
 }
 
 function remove_pt_intersects()
@@ -3742,29 +3382,30 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
 	{
 		lines_sort[i].rotate(gradus_f, view.center);
 
-		lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-		lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-		lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-		lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+		lines_sort[i].segments[0].point.x = lines_sort[i].segments[0].point.x.toFixed(2)-0;
+		lines_sort[i].segments[0].point.y = lines_sort[i].segments[0].point.y.toFixed(2)-0;
+		lines_sort[i].segments[1].point.x = lines_sort[i].segments[1].point.x.toFixed(2)-0;
+		lines_sort[i].segments[1].point.y = lines_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	for (var i = diag_sort.length; i--;)
 	{
 		diag_sort[i].rotate(gradus_f, view.center);
 
-		diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-		diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-		diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-		diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+		diag_sort[i].segments[0].point.x = diag_sort[i].segments[0].point.x.toFixed(2)-0;
+		diag_sort[i].segments[0].point.y = diag_sort[i].segments[0].point.y.toFixed(2)-0;
+		diag_sort[i].segments[1].point.x = diag_sort[i].segments[1].point.x.toFixed(2)-0;
+		diag_sort[i].segments[1].point.y = diag_sort[i].segments[1].point.y.toFixed(2)-0;
 	}
 	okruglenie_all_segments();
 	angle_final = -gradus_f;
 
 	add_polotno(width_polotna[j_f].width, p_usadki, kolvo_poloten);
 
-	for (var key = lines_sort.length; key--;)
+	for (var key = lines_sort.length, l_k; key--;)
     {
-    	add_text_v_or_h(lines_sort[key]);
-    	text_lines[lines_sort[key].id].content = (+text_lines[lines_sort[key].id].content * p_usadki).toFixed(1);
+    	l_k = lines_sort[key];
+    	add_text_v_or_h(l_k);
+    	text_lines[l_k.data.id].content = (+text_lines[l_k.data.id].content * p_usadki).toFixed(1);
     }
 
     for (var key = diag_sort.length; key--;)
@@ -3772,7 +3413,7 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
     	add_text_diag(key);
     	text_diag[key].content = (+text_diag[key].content * p_usadki).toFixed(1);
     }
-    
+
     var j = 0;
     for (var i = 0; i < lines_sort.length; i++)
     {
@@ -3790,67 +3431,69 @@ function polotno_final(gradus_f, j_f, kolvo_poloten, p_usadki)
     	}
     }
 
-
     //console.log((new Decimal(1).minus(p_usadki)).times(100).toNumber(), '%');
 
 	get_koordinats_poloten(p_usadki);
 
-	var sq_og = parseFloat(elem_jform_n4.value);
-	var sq2 = new Decimal(sq_og).times(p_usadki).times(p_usadki).toNumber();
-	var sq1 = 0;
-	var price_it, pr_dec, sq1_dec;
-
+	var sq_obr = 0, sq_polo = 0;
 	for (var key = polotna.length; key--;)
 	{
-		sq1_dec = new Decimal(polotna[key].down.length).times(polotna[key].left.length);
-		sq1_dec = sq1_dec.dividedBy(10000);
-		sq1_dec = sq1_dec.times(p_usadki).times(p_usadki);
-		sq1 = new Decimal(sq1).plus(sq1_dec).toNumber();
+		polotna[key].polotno.strokeColor = 'red';
+		polotna[key].polotno.fillColor = null;
+		polotna[key].polotno.dashArray = [10, 4];
+		polotna[key].polotno.opacity = 1;
+		polotna[key].polotno.selected = false;
+
+		polotna[key].parts.strokeColor = null;
+		polotna[key].parts.fillColor = 'green';
+		polotna[key].parts.dashArray = [];
+		polotna[key].parts.opacity = 0.4;
+		polotna[key].parts.selected = true;
+
+		polotna[key].cuts.strokeColor = null;
+		polotna[key].cuts.fillColor = 'red';
+		polotna[key].cuts.dashArray = [];
+		polotna[key].cuts.opacity = 0.3;
+		polotna[key].cuts.selected = false;
+
+
+		if (polotna[key].cuts.children !== undefined)
+		{
+			for (var key2 = polotna[key].cuts.children.length; key2--;)
+			{
+				sq_obr = new Decimal(Math.abs(polotna[key].cuts.children[key2].area)).plus(sq_obr).toNumber();
+			}
+		}
+		else
+		{
+			sq_obr = new Decimal(Math.abs(polotna[key].cuts.area)).plus(sq_obr).toNumber();
+		}
+
+		sq_polo = new Decimal(Math.abs(polotna[key].polotno.area)).plus(sq_polo).toNumber();
 	}
 
-	var sq_obr = new Decimal(sq1).minus(sq2).toNumber();
-	sq_obr = +sq_obr.toFixed(2);
-	//console.log(sq_obr, "sq_obr");
-
-	price_it = new Decimal(sq_og).times(width_polotna[j_f].price).toNumber();
-	if (sq_obr > new Decimal(sq_og).times(0.5).toNumber())
-	{
-		pr_dec = new Decimal(sq_obr).times(new Decimal(width_polotna[j_f].price).times(0.4));
-		price_it = new Decimal(price_it).plus(pr_dec).toNumber();
-		square_obrezkov = sq_obr;
-	}
-	//console.log(price_it, "price");
+	sq_obr = new Decimal(sq_obr).times(p_usadki).times(p_usadki).toNumber();
+	sq_polo = new Decimal(sq_polo).times(p_usadki).times(p_usadki).toNumber();
+	sq_obr = new Decimal(sq_obr).dividedBy(10000).toNumber();
+	sq_polo = new Decimal(sq_polo).dividedBy(10000).toNumber();
 
 	width_final = width_polotna[j_f].width;
 
     AndroidFunction.func_elem_jform_width(width_final);
 
-	sq_polotna = sq1;
+	sq_polotna = sq_polo;
 	p_usadki_final = p_usadki;
-	//console.log(width_final, "width_polotna");
-
-	for (var i = polotna.length; i--;)
-	{
-		polotna[i].up.strokeColor = 'red';
-		polotna[i].up.dashArray = [10, 4];
-		polotna[i].down.strokeColor = 'red';
-		polotna[i].down.dashArray = [10, 4];
-		polotna[i].left.strokeColor = 'red';
-		polotna[i].left.dashArray = [10, 4];
-		polotna[i].right.strokeColor = 'red';
-		polotna[i].right.dashArray = [10, 4];
-	}
-
+	square_obrezkov = sq_obr;
 }
 
 var polotno = function()
 {
 	var gradus_f, j_f, break_bool = false, points_m, kolvo_poloten = 1, height_chert, j_n, p_usadki, h, hp;
-	var sq_og = parseFloat(elem_jform_n4.value);
+	var sq_og = elem_jform_n4.value-0;
 	var price_it, sq_obr, sq_min, price_min, sq1, sq1_dec, usadka_final;
-	var time_end, time_start = performance.now();
+	//var time_end, time_start = performance.now();
+	var chertezh;
 
-console.log(width_polotna);
 	while (true)
 	{
 		sq_min = 100222;
@@ -3894,35 +3537,29 @@ console.log(width_polotna);
 					continue;
 				}
 
-console.log(angle_rotate, width_polotna[j].width, p_usadki);
-				if (kolvo_poloten === 1)
+				//console.log(kolvo_poloten, width_polotna[j].width, angle_rotate);
+				if (add_polotno(width_polotna[j].width, p_usadki, kolvo_poloten) === false)
 				{
-					if (add_polotno_fast(width_polotna[j].width, p_usadki) === false)
-					{
-						continue;
-					}
-				}
-				else
-				{
-					if (add_polotno(width_polotna[j].width, p_usadki, kolvo_poloten) === false)
-					{
-						continue;
-					}
+					continue;
 				}
 
 				if (kolvo_polos === kolvo_poloten)
 				{
-					sq1 = 0;
-
+					sq_obr = 0;
 					for (var key = polotna.length; key--;)
 					{
-						sq1_dec = new Decimal(polotna[key].down.length).times(polotna[key].left.length);
-						sq1_dec = sq1_dec.dividedBy(10000);
-						sq1 = new Decimal(sq1).plus(sq1_dec).toNumber();
+						if (polotna[key].cuts.children !== undefined)
+						{
+							for (var key2 = polotna[key].cuts.children.length; key2--;)
+							{
+								sq_obr = new Decimal(Math.abs(polotna[key].cuts.children[key2].area)).plus(sq_obr).toNumber();
+							}
+						}
+						else
+						{
+							sq_obr = new Decimal(Math.abs(polotna[key].cuts.area)).plus(sq_obr).toNumber();
+						}
 					}
-					sq1 = +sq1.toFixed(2);
-					sq_obr = new Decimal(sq1).minus(sq_og).toNumber();
-
 
 					if ((width_polotna[j].price < price_min) || (width_polotna[j].price === price_min && sq_obr < sq_min))
 					{
@@ -3932,10 +3569,10 @@ console.log(angle_rotate, width_polotna[j].width, p_usadki);
 						j_f = j;
 						usadka_final = p_usadki;
 						break_bool = true;
-						console.log(kolvo_poloten, price_min, sq_min, usadka_final, width_polotna[j].width, angle_rotate, sq1);
+						//console.log(kolvo_poloten, price_min, sq_min, usadka_final, width_polotna[j].width, angle_rotate);
 					}
 
-					if (polotna[polotna.length - 1].up.position.y <= points_m.minY)
+					if (polotna[polotna.length - 1].polotno.bounds.top <= points_m.minY)
 					{
 						break;
 					}
@@ -3945,20 +3582,18 @@ console.log(angle_rotate, width_polotna[j].width, p_usadki);
 			for (var i = lines_sort.length; i--;)
 			{
 				lines_sort[i].rotate(1, view.center);
-
-				lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-				lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-				lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-				lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+				//lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
+				//lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
+				//lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
+				//lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
 			}
 			for (var i = diag_sort.length; i--;)
 			{
 				diag_sort[i].rotate(1, view.center);
-
-				diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-				diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-				diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-				diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+				//diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
+				//diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
+				//diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
+				//diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
 			}
 			okruglenie_all_segments();
 		}
@@ -3973,442 +3608,238 @@ console.log(angle_rotate, width_polotna[j].width, p_usadki);
 	okruglenie_all_segments();
 	polotno_final(gradus_f, j_f, kolvo_poloten, usadka_final);
 
-	time_end = performance.now() - time_start;
-	//console.log(time_end, 'all_time');
+	//time_end = performance.now() - time_start;
+	//console.log(time_end, 'raskroy_time');
 };
-
-function add_polotno_fast(p_width, p_usadki)
-{
-
-
-	for (var key = polotna.length; key--;)
-	{
-		polotna[key].left.remove();
-		polotna[key].right.remove();
-		polotna[key].up.remove();
-		polotna[key].down.remove();
-	}
-	polotna = [];
-	var dotyanem = new Decimal(p_width).times(0.05).toNumber();
-	p_width = new Decimal(p_width).dividedBy(p_usadki).toNumber();
-	//p_width = +p_width.toFixed(2);
-	var points_m = findMinAndMaxCordinate_g();
-	var line_left = Path.Line(new Point(points_m.minX, points_m.maxY), new Point(points_m.minX, new Decimal(points_m.maxY).minus(p_width).toNumber()));
-	var line_right = Path.Line(new Point(points_m.maxX, points_m.maxY), new Point(points_m.maxX, new Decimal(points_m.maxY).minus(p_width).toNumber()));
-	var line_up = Path.Line(line_left.segments[1].point, line_right.segments[1].point);
-	var line_down = Path.Line(line_left.segments[0].point, line_right.segments[0].point);
-	if (line_up.position.y > new Decimal(points_m.minY).plus(new Decimal(dotyanem).dividedBy(p_usadki)).toNumber())
-	{
-		return false;
-	}
-	else
-	{
-		polotna[0] = {up: line_up, down: line_down, left: line_left, right: line_right};
-	}
-}
 
 function add_polotno(p_width, p_usadki, kolvo_poloten)
 {
 	for (var key = polotna.length; key--;)
 	{
-		polotna[key].left.remove();
-		polotna[key].right.remove();
-		polotna[key].up.remove();
-		polotna[key].down.remove();
+		polotna[key].parts.remove();
+		polotna[key].polotno.remove();
+		polotna[key].cuts.remove();
 	}
 	polotna = [];
 	kolvo_polos = 0;
-	var dotyanem = new Decimal(p_width).times(0.05).toNumber();
+	//var dotyanem = new Decimal(p_width).times(0.05).toNumber();
 	p_width = new Decimal(p_width).dividedBy(p_usadki).toNumber();
-	//p_width = +p_width.toFixed(2);
+
 	var points_m = findMinAndMaxCordinate_g();
-	var begin_point_polotna = new Point(points_m.minX, points_m.maxY);
+	var down_y = points_m.maxY;
+	var up_y = down_y;
+	var polotno, parts, rect, obj, cuts, rolik;
+	var obj_polotno, obj_parts, obj_cuts;
+
 	var chertezh = new Path();
 	for (var key = g_points.length; key--;)
 	{
-		chertezh.add(g_points[key].clone());
+		chertezh.add(g_points[key]);
 	}
+
 	chertezh.closed = true;
 
-	var left, right, up, down, num_polotna = 0;
-	while (true)
+	while (up_y > points_m.minY)
 	{
-		if (right !== undefined)
+		kolvo_polos++;
+		if (kolvo_polos > kolvo_poloten)
 		{
-			begin_point_polotna = new Point(right.segments[0].point.x + 1, right.segments[0].point.y);
-		}
-		left = find_left_polotna(begin_point_polotna, p_width, chertezh, points_m.maxX);
-		if (!left)
-		{
-			kolvo_polos++;
-			if (up.position.y <= new Decimal(points_m.minY).plus(new Decimal(dotyanem).dividedBy(p_usadki)).toNumber())
-			{
-				break;
-			}
-			begin_point_polotna = new Point(points_m.minX, up.position.y);
-			left = find_left_polotna(begin_point_polotna, p_width, chertezh, points_m.maxX);
-			if (!left)
-			{
-				break;
-			}
-		}
-		right = find_right_polotna(new Point(left.segments[0].point.x + 5, left.segments[0].point.y), p_width, chertezh, points_m.maxX);
-		up = Path.Line(left.segments[1].point, right.segments[1].point);
-
-		down = Path.Line(left.segments[0].point, right.segments[0].point);
-
-		polotna[num_polotna] = {up: up, down: down, left: left, right: right};
-		num_polotna++;
-		if (kolvo_poloten < kolvo_polos)
-		{
-			chertezh.remove();
 			return false;
+		}
+		up_y = new Decimal(down_y).minus(p_width).toNumber();
+		rolik = new Path();
+		rolik.add(new Point(points_m.minX, down_y));
+		rolik.add(new Point(points_m.minX, up_y));
+		rolik.add(new Point(points_m.maxX, up_y));
+		rolik.add(new Point(points_m.maxX, down_y));
+		rolik.closed = true;
+
+		parts = chertezh.intersect(rolik);
+
+		rolik.remove();
+
+		if (parts.children === undefined)
+		{
+			rect = parts.bounds;
+			polotno = new Path({
+				segments: [	new Point(rect.left + 1, down_y),
+							new Point(rect.left + 1, up_y),
+							new Point(rect.right - 1, up_y),
+							new Point(rect.right - 1, down_y)],
+			    closed: true
+			});
+			cuts = polotno.exclude(parts);
+			if (cuts.children !== undefined)
+			{
+				for (var j = cuts.children.length; j--;)
+				{
+					//if (Math.abs(cuts.children[j].area) < 1000)
+					if (cuts.children[j].area < 100)
+					{
+						cuts.children[j].remove();
+					}
+				}
+			}
+			obj = {parts: parts, polotno: polotno, cuts: cuts};
+			polotna.push(obj);
+		}
+		else
+		{
+			for (var i = parts.children.length; i--;)
+			{
+				rect = parts.children[i].bounds;
+				polotno = new Path({
+					segments: [	new Point(rect.left + 1, down_y),
+								new Point(rect.left + 1, up_y),
+								new Point(rect.right - 1, up_y),
+								new Point(rect.right - 1, down_y)],
+				    closed: true
+				});
+				cuts = polotno.exclude(parts.children[i]);
+				if (cuts.children !== undefined)
+				{
+					for (var j = cuts.children.length; j--;)
+					{
+						//if (Math.abs(cuts.children[j].area) < 1000)
+						if (cuts.children[j].area < 100)
+						{
+							cuts.children[j].remove();
+						}
+					}
+				}
+				obj_parts = parts.children[i];
+				obj_parts.remove();
+				project.activeLayer.addChild(obj_parts);
+				obj = {parts: obj_parts, polotno: polotno, cuts: cuts};
+				polotna.push(obj);
+			}
+		}
+
+		down_y = up_y;
+	}
+
+	for (var i = polotna.length, p_i; i--;)
+	{
+		p_i = polotna[i];
+		for (var j = polotna.length, p_j; j--;)
+		{
+			p_j = polotna[j];
+			if (p_i != polotna[j] &&
+				p_i.polotno.position.y + 1 > p_j.polotno.position.y &&
+				p_i.polotno.position.y - 1 < p_j.polotno.position.y &&
+				p_i.polotno.intersects(p_j.polotno))
+			{
+				obj_parts = p_i.parts.unite(p_j.parts);
+				obj_polotno = p_i.polotno.unite(p_j.polotno);
+				obj_cuts = obj_polotno.exclude(obj_parts);
+
+				p_i.parts.remove();
+				p_i.cuts.remove();
+				p_i.polotno.remove();
+
+				p_j.parts.remove();
+				p_j.cuts.remove();
+				p_j.polotno.remove();
+
+				p_i.parts = obj_parts;
+				p_i.cuts = obj_cuts;
+				p_i.polotno = obj_polotno;
+
+				polotna.splice(j, 1);
+				if (j < i)
+				{
+					i--;
+				}
+			}
 		}
 	}
 
 	chertezh.remove();
-}
-
-function find_left_polotna(begin_point_polotna, p_width, chertezh, maxX)
-{
-	var line_left = Path.Line(new Point(begin_point_polotna.x, new Decimal(begin_point_polotna.y).minus(0.5).toNumber()), 
-						new Point(begin_point_polotna.x, new Decimal(begin_point_polotna.y).minus(p_width).plus(0.5).toNumber()));
-
-	var sp, pos_x;
-	while (line_left.position.x < maxX + 10)
-	{
-		sp = chertezh.contains(line_left.position);
-
-		if (sp || line_left.intersects(chertezh))
-		{
-			pos_x = line_left.position.x - 2;
-			line_left.removeSegments();
-			line_left.addSegments([new Point(pos_x, begin_point_polotna.y), new Point(pos_x, new Decimal(begin_point_polotna.y).minus(p_width).toNumber())]);
-			return line_left;
-		}
-
-		line_left.position.x += 1;
-	}
-	line_left.remove();
-	return false;
-}
-
-function find_right_polotna(begin_point_polotna, p_width, chertezh, maxX)
-{
-	var line_right = Path.Line(new Point(begin_point_polotna.x, new Decimal(begin_point_polotna.y).minus(0.5).toNumber()), 
-						new Point(begin_point_polotna.x, new Decimal(begin_point_polotna.y).minus(p_width).plus(0.5).toNumber()));
-
-	var sp, pos_x;
-	while (line_right.position.x < maxX + 10)
-	{
-		sp = chertezh.contains(line_right.position);
-
-		if (!sp && !line_right.intersects(chertezh))
-		{
-			pos_x = line_right.position.x + 1;
-			line_right.removeSegments();
-			line_right.addSegments([new Point(pos_x, begin_point_polotna.y), new Point(pos_x, new Decimal(begin_point_polotna.y).minus(p_width).toNumber())]);
-			return line_right;
-		}
-
-		line_right.position.x += 1;
-	}
+	return true;
 }
 
 function get_koordinats_poloten(p_usadki)
 {
-	var op, cir, intersections, pt, pt_name, intersections_line, continue_bool = false, inarr = false;
-	for (var i = polotna.length; i--;)
-	{
-		points_poloten[i] = [];
-		for (var key = text_points.length; key--;)
-		{
-			op = obshaya_point(lines[text_points[key].data.id_line1], lines[text_points[key].data.id_line2]);
-			if (op.x >= polotna[i].left.position.x && op.x <= polotna[i].right.position.x)
-			{
-				if (op.y < polotna[i].down.position.y && op.y > polotna[i].up.position.y)
-				{
-					points_poloten[i].push({point: op.clone(), name: text_points[key].content});
-				}
-
-				if (op.y === polotna[i].up.position.y)
-				{
-					cir = new Path.Circle(op, 2.5);
-					intersections = cir.getIntersections(lines[text_points[key].data.id_line1]);
-					if (intersections[0].point.y > polotna[i].up.position.y)
-					{
-						inarr = false;
-						for (var e = points_poloten[i].length; e--;)
-						{
-							if (points_poloten[i][e].name === text_points[key].content)
-							{
-								inarr = true;
-							}
-						}
-						if (!inarr)
-						{
-					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
-					    }
-					}
-				
-					intersections = cir.getIntersections(lines[text_points[key].data.id_line2]);
-					if (intersections[0].point.y > polotna[i].up.position.y)
-					{
-				    	inarr = false;
-						for (var e = points_poloten[i].length; e--;)
-						{
-							if (points_poloten[i][e].name === text_points[key].content)
-							{
-								inarr = true;
-							}
-						}
-						if (!inarr)
-						{
-					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
-					    }
-					}
-					cir.remove();
-				}
-
-				if (op.y === polotna[i].down.position.y)
-				{
-					cir = new Path.Circle(op, 2.5);
-					intersections = cir.getIntersections(lines[text_points[key].data.id_line1]);
-					if (intersections[0].point.y < polotna[i].down.position.y)
-					{
-						inarr = false;
-						for (var e = points_poloten[i].length; e--;)
-						{
-							if (points_poloten[i][e].name === text_points[key].content)
-							{
-								inarr = true;
-							}
-						}
-						if (!inarr)
-						{
-					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
-					    }
-					}
-				
-					intersections = cir.getIntersections(lines[text_points[key].data.id_line2]);
-					if (intersections[0].point.y < polotna[i].down.position.y)
-					{
-				    	inarr = false;
-						for (var e = points_poloten[i].length; e--;)
-						{
-							if (points_poloten[i][e].name === text_points[key].content)
-							{
-								inarr = true;
-							}
-						}
-						if (!inarr)
-						{
-					    	points_poloten[i].push({point: op.clone(), name: text_points[key].content});
-					    }
-					}
-					cir.remove();
-				}
-			}
-		}
-	}
-
-	for (var i = polotna.length; i--;)
-	{
-		continue_bool = false;
-		for (var key = lines_sort.length; key--;)
-		{
-			if (lines_sort[key].segments[0].point.y < lines_sort[key].segments[1].point.y + 2 
-				&& lines_sort[key].segments[0].point.y > lines_sort[key].segments[1].point.y - 2)
-			{
-				continue;
-			}
-			intersections_line = polotna[i].up.getIntersections(lines_sort[key]);
-			if (intersections_line.length === 1)
-			{
-				intersections_line[0].point.x = +intersections_line[0].point.x.toFixed(2);
-				intersections_line[0].point.y = +intersections_line[0].point.y.toFixed(2);
-				if (intersections_line[0].point.x >= polotna[i].left.position.x
-					&& intersections_line[0].point.x <= polotna[i].right.position.x)
-				{
-					for (var j = points_poloten.length; j--;)
-					{
-						if (points_poloten[j] !== undefined)
-						{
-							for (var p = points_poloten[j].length; p--;)
-							{
-								if (intersections_line[0].point.x === points_poloten[j][p].point.x 
-									&& intersections_line[0].point.y === points_poloten[j][p].point.y)
-								{
-									continue_bool = true;
-									break;
-								}
-							}
-						}
-					}
-					if (continue_bool)
-					{
-						continue_bool = false;
-						continue;
-					}
-					if (code === 90)
-		        	{
-		        		code = 64;
-		        		alfavit++;
-		        	}
-		        	code++;
-		        	if (alfavit === 0)
-		        	{
-			            pt_name = String.fromCharCode(code);
-			        }
-			        else
-			        {
-			        	pt_name = String.fromCharCode(code) + alfavit;
-			        }
-					pt = new PointText(
-	                {
-	                    point: new Point(intersections_line[0].point.x - 5, intersections_line[0].point.y + 15),
-	                    content: pt_name,
-	                    fillColor: 'blue',
-	                    justification: 'center',
-	                    fontFamily: 'lucida console',
-	                    fontWeight: 'bold',
-	                    fontSize: text_points[0].fontSize
-	                });
-	            	text_points.push(pt);
-	            	points_poloten[i].push({point: intersections_line[0].point, name: pt_name});
-	            	if (i !== polotna.length - 1)
-	            	{
-	            		for (var j = i + 1; j < polotna.length; j++)
-	            		{
-	            			if (intersections_line[0].point.x >= polotna[j].left.position.x
-								&& intersections_line[0].point.x <= polotna[j].right.position.x)
-	            			{
-			            		points_poloten[j].push({point: intersections_line[0].point, name: pt_name});
-			            		break;
-			            	}
-		            	}
-	            	}
-				}
-			}
-		}
-
-		continue_bool = false;
-		for (var key = lines_sort.length; key--;)
-		{
-			if (lines_sort[key].segments[0].point.y < lines_sort[key].segments[1].point.y + 2 
-				&& lines_sort[key].segments[0].point.y > lines_sort[key].segments[1].point.y - 2)
-			{
-				continue;
-			}
-			intersections_line = polotna[i].down.getIntersections(lines_sort[key]);
-			if (intersections_line.length === 1)
-			{
-				intersections_line[0].point.x = +intersections_line[0].point.x.toFixed(2);
-				intersections_line[0].point.y = +intersections_line[0].point.y.toFixed(2);
-				if (intersections_line[0].point.x >= polotna[i].left.position.x
-					&& intersections_line[0].point.x <= polotna[i].right.position.x)
-				{
-					for (var j = points_poloten.length; j--;)
-					{
-						if (points_poloten[j] !== undefined)
-						{
-							for (var p = points_poloten[j].length; p--;)
-							{
-								if (intersections_line[0].point.x === points_poloten[j][p].point.x 
-									&& intersections_line[0].point.y === points_poloten[j][p].point.y)
-								{
-									continue_bool = true;
-									break;
-								}
-							}
-						}
-					}
-					if (continue_bool)
-					{
-						continue_bool = false;
-						continue;
-					}
-					if (code === 90)
-		        	{
-		        		code = 64;
-		        		alfavit++;
-		        	}
-		        	code++;
-		        	if (alfavit === 0)
-		        	{
-			            pt_name = String.fromCharCode(code);
-			        }
-			        else
-			        {
-			        	pt_name = String.fromCharCode(code) + alfavit;
-			        }
-					pt = new PointText(
-	                {
-	                    point: new Point(intersections_line[0].point.x - 5, intersections_line[0].point.y + 15),
-	                    content: pt_name,
-	                    fillColor: 'blue',
-	                    justification: 'center',
-	                    fontFamily: 'lucida console',
-	                    fontWeight: 'bold',
-	                    fontSize: text_points[0].fontSize
-	                });
-	            	text_points.push(pt);
-	            	points_poloten[i].push({point: intersections_line[0].point, name: pt_name});
-	            	if (i !== 0)
-	            	{
-	            		for (var j = i; j--;)
-	            		{
-	            			if (intersections_line[0].point.x >= polotna[j].left.position.x
-								&& intersections_line[0].point.x <= polotna[j].right.position.x)
-	            			{
-			            		points_poloten[j].push({point: intersections_line[0].point, name: pt_name});
-			            		break;
-			            	}
-		            	}
-	            	}
-				}
-			}
-		}
-	}
-
-	var chertezh = new Path();
-	for (var key = g_points.length; key--;)
-	{
-		chertezh.add(g_points[key].clone());
-	}
-	chertezh.closed = true;
-
-	for (var i = polotna.length; i--;)
-	{
-		while(!polotna[i].left.intersects(chertezh) && !chertezh.contains(polotna[i].left.position))
-		{
-			polotna[i].left.position.x = new Decimal(polotna[i].left.position.x).plus(0.5).toNumber();
-		}
-		while(!polotna[i].right.intersects(chertezh) && !chertezh.contains(polotna[i].right.position))
-		{
-			polotna[i].right.position.x = new Decimal(polotna[i].right.position.x).minus(0.5).toNumber();
-		}
-		polotna[i].up.removeSegments();
-		polotna[i].up.addSegments([polotna[i].left.segments[1].point, polotna[i].right.segments[1].point]);
-		polotna[i].down.removeSegments();
-		polotna[i].down.addSegments([polotna[i].left.segments[0].point, polotna[i].right.segments[0].point]);
-	}
-	chertezh.remove();
-
-	var kx, ky;
-	for (var i = points_poloten.length; i--;)
+	koordinats_poloten = [];
+	for (var i = 0; i < polotna.length; i++)
 	{
 		koordinats_poloten[i] = [];
-		for (var j = points_poloten[i].length; j--;)
+		if (polotna[i].parts.children !== undefined)
 		{
-			kx = Decimal.abs(new Decimal(points_poloten[i][j].point.x).minus(polotna[i].left.position.x)).times(p_usadki).toNumber(); 
-			ky = Decimal.abs(new Decimal(points_poloten[i][j].point.y).minus(polotna[i].down.position.y)).times(p_usadki).toNumber();
-			kx = +kx.toFixed(1);
-			ky = +ky.toFixed(1);
-			koordinats_poloten[i][j] = {name: points_poloten[i][j].name, koordinats: "(" + kx + "; " + ky + ")"};
+			for (var j = polotna[i].parts.children.length; j--;)
+			{
+				for (var k = polotna[i].parts.children[j].segments.length; k--;)
+				{
+					push_koordinata(polotna[i].parts.children[j].segments[k].point, i, p_usadki);
+				}
+			}
+		}
+		else
+		{
+			for (var k = polotna[i].parts.segments.length; k--;)
+			{
+				push_koordinata(polotna[i].parts.segments[k].point, i, p_usadki);
+			}
 		}
 	}
 	koordinats_poloten = sort_koordinats(koordinats_poloten);
+}
+
+function push_koordinata(point, num_polo, p_usadki)
+{
+	var name, kx, ky, pt, break_bool = false;
+	for (var l = text_points.length; l--;)
+	{
+		if (point_ravny(new Point(point.x - 10, point.y - 5), text_points[l].point))
+		{
+			name = text_points[l].content;
+			break_bool = true;
+			break;
+		}
+	}
+	if (!break_bool)
+	{
+		if (code === 90)
+    	{
+    		code = 64;
+    		alfavit++;
+    	}
+    	code++;
+    	if (alfavit === 0)
+    	{
+            name = String.fromCharCode(code);
+        }
+        else
+        {
+        	name = String.fromCharCode(code) + alfavit;
+        }
+		pt = new PointText(
+        {
+            point: new Point(point.x - 10, point.y - 5),
+            content: name,
+            fillColor: 'blue',
+            justification: 'center',
+            fontFamily: 'lucida console',
+            fontWeight: 'bold',
+            fontSize: text_points[0].fontSize
+        });
+    	text_points.push(pt);
+	}
+	kx = new Decimal(point.x).minus(polotna[num_polo].polotno.bounds.left).toNumber();
+	ky = new Decimal(polotna[num_polo].polotno.bounds.bottom).minus(point.y).toNumber();
+	kx = new Decimal(kx).times(p_usadki).toNumber();
+	ky = new Decimal(ky).times(p_usadki).toNumber();
+	if (kx < 0)
+	{
+		kx = 0;
+	}
+	if (ky < 0)
+	{
+		ky = 0;
+	}
+	kx = kx.toFixed(1)-0;
+	ky = ky.toFixed(1)-0;
+	koordinats_poloten[num_polo].push({name: name, koordinats: "(" + kx + "; " + ky + ")"});
 }
 
 function sort_koordinats(koordinats_poloten)
@@ -4455,15 +3886,19 @@ function partition(a, lo, hi)
 
 function obshaya_point(line1, line2)
 {
-	if (point_ravny(line1.segments[0].point, line2.segments[0].point)
-		|| point_ravny(line1.segments[0].point, line2.segments[1].point))
+	var l1s = line1.segments[0].point,
+		l2s0 = line2.segments[0].point,
+		l2s1 = line2.segments[1].point;
+	if (point_ravny(l1s, l2s0)
+		|| point_ravny(l1s, l2s1))
 	{
-		return line1.segments[0].point.clone();
+		return l1s.clone();
 	}
-	if (point_ravny(line1.segments[1].point, line2.segments[1].point)
-		|| point_ravny(line1.segments[1].point, line2.segments[0].point))
+	l1s = line1.segments[1].point;
+	if (point_ravny(l1s, l2s0)
+		|| point_ravny(l1s, l2s1))
 	{
-		return line1.segments[1].point.clone();
+		return l1s.clone();
 	}
 	return null;
 }
@@ -4495,7 +3930,7 @@ function change_length_diag_4angle(index, newLength)
 
 	var pd0 = diag_sort[index].segments[0].point.clone();
 	var pd1 = diag_sort[index].segments[1].point.clone();
-	var a1,b1,a2,b2,c,o,intersections,can_ver;
+	var a1,b1,a2,b2,c,o,intersections;
 	var line_arr = [];
 	var newPoint,newObshayaPoint1,newObshayaPoint2,oldObshayaPoint1,oldObshayaPoint2;
 	c = diag_sort[index];
@@ -4538,7 +3973,7 @@ function change_length_diag_4angle(index, newLength)
 		b2 = o;
 	}
 
-	var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
+	var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)),
 		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
 	coef = chis.dividedBy(znam);
 
@@ -4648,12 +4083,13 @@ function click_on_fixed(line)
 {
 	line.data.fixed = false;
 	clearInterval(timer_mig);
-	for (var key = 0; key < lines_sort.length; key++)
+	for (var key = 0, l_k; key < lines_sort.length; key++)
     {
-    	if (!lines_sort[key].data.fixed)
+    	l_k = lines_sort[key];
+    	if (!l_k.data.fixed)
     	{
-    		lines_sort[key].strokeColor = 'black';
-    		text_lines[lines_sort[key].id].fillColor = 'black';
+    		l_k.strokeColor = 'black';
+    		text_lines[l_k.data.id].fillColor = 'black';
     	}
     }
 
@@ -4674,16 +4110,17 @@ function click_on_fixed(line)
     {
 		triangulate_bool = false;
 
-	    for (var key = 0; key < lines_sort.length; key++)
+	    for (var key = 0; key < lines_sort.length, l_k; key++)
 	    {
-	    	if (!lines_sort[key].data.fixed)
+	    	l_k = lines_sort[key];
+	    	if (!l_k.data.fixed)
 	    	{
 	    		elem_preloader.style.display = 'none';
-	    		lines_sort[key].strokeColor = 'red';
-	    		text_lines[lines_sort[key].id].fillColor = 'Maroon';
-	    		timer_mig = setInterval(migalka, 500, lines_sort[key]);
+	    		l_k.strokeColor = 'red';
+	    		text_lines[l_k.data.id].fillColor = 'Maroon';
+	    		timer_mig = setInterval(migalka, 500, l_k);
 	    		elem_newLength.focus();
-	    		elem_newLength.value = Math.round(lines_sort[key].length);
+	    		elem_newLength.value = Math.round(l_k.length);
 	    		elem_newLength.select();
 	    		first_click = false;
 	    		save_cancel();
@@ -4797,7 +4234,7 @@ function ok_enter_all()
 		manual_diag = undefined;
 		elem_window.style.display = 'none';
 		resize_canvas();
-		if (triangles_count() === lines.length - 2)
+		if (diag.length === lines.length - 3)
 		{
 			elem_preloader.style.display = 'block';
 			change_length_all_diags_process = change_length_all_diags.process();
@@ -4807,7 +4244,7 @@ function ok_enter_all()
 		return;
 	}
 	var kol_fix = 0;
-	for (var key in lines_sort)
+	for (var key = lines_sort.length; key--;)
 	{
 		if (lines_sort[key].data.fixed)
 		{
@@ -4906,10 +4343,10 @@ var ok_enter = function()
 		{
 			for (var i = lines_sort.length; i--;)
 			{
-				lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-				lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-				lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-				lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+				lines_sort[i].segments[0].point.x = lines_sort[i].segments[0].point.x.toFixed(2)-0;
+				lines_sort[i].segments[0].point.y = lines_sort[i].segments[0].point.y.toFixed(2)-0;
+				lines_sort[i].segments[1].point.x = lines_sort[i].segments[1].point.x.toFixed(2)-0;
+				lines_sort[i].segments[1].point.y = lines_sort[i].segments[1].point.y.toFixed(2)-0;
 			}
 			okruglenie_all_segments();
 			for (var key = 0; key < lines_sort.length; key++)
@@ -4922,20 +4359,21 @@ var ok_enter = function()
 		    		break;
 		    	}
 		    }
-		    for (var key = 0; key < lines_sort.length; key++)
+		    for (var key = 0, l_k; key < lines_sort.length; key++)
 		    {
-		    	if (lines_sort[key].data.fixed)
+		    	l_k = lines_sort[key];
+		    	if (l_k.data.fixed)
 		    	{
-		    		lines_sort[key].strokeColor = 'green';
+		    		l_k.strokeColor = 'green';
 		    	}
 		    	else
 		    	{
 		    		elem_preloader.style.display = 'none';
-		    		lines_sort[key].strokeColor = 'red';
-		    		text_lines[lines_sort[key].id].fillColor = 'Maroon';
-		    		timer_mig = setInterval(migalka, 500, lines_sort[key]);
+		    		l_k.strokeColor = 'red';
+		    		text_lines[l_k.data.id].fillColor = 'Maroon';
+		    		timer_mig = setInterval(migalka, 500, l_k);
 		    		elem_newLength.focus();
-		    		elem_newLength.value = Math.round(lines_sort[key].length);
+		    		elem_newLength.value = Math.round(l_k.length);
 		    		elem_newLength.select();
 		    		first_click = false;
 		    		save_cancel();
@@ -4972,7 +4410,7 @@ var ok_enter = function()
 			{
 				l = 0;
 				l1 = 0;
-				for (var key in lines)
+				for (var key = lines.length; key--;)
 				{
 					l1++;
 					if (lines[key].data.fixed)
@@ -4985,30 +4423,29 @@ var ok_enter = function()
 				{
 					for (var key = lines_sort.length; key--;)
 					{
-						lines_sort[key].segments[0].point.x = +lines_sort[key].segments[0].point.x.toFixed(2);
-						lines_sort[key].segments[0].point.y = +lines_sort[key].segments[0].point.y.toFixed(2);
-						lines_sort[key].segments[1].point.x = +lines_sort[key].segments[1].point.x.toFixed(2);
-						lines_sort[key].segments[1].point.y = +lines_sort[key].segments[1].point.y.toFixed(2);
+						lines_sort[key].segments[0].point.x = lines_sort[key].segments[0].point.x.toFixed(2)-0;
+						lines_sort[key].segments[0].point.y = lines_sort[key].segments[0].point.y.toFixed(2)-0;
+						lines_sort[key].segments[1].point.x = lines_sort[key].segments[1].point.x.toFixed(2)-0;
+						lines_sort[key].segments[1].point.y = lines_sort[key].segments[1].point.y.toFixed(2)-0;
 					}
 					triangulator();
-					if (triangles_count() !== k - 2)
+					if (diag.length !== k - 3)
 					{
 						for (var key = 3; key--;)
 						{
 							pulemet();
 							//console.log('pulemet');
-							if (triangles_count() === k - 2)
+							if (diag.length === k - 3)
 							{
 								break;
 							}
 						}
 					}
-					if (triangles_count() !== k - 2)
+					if (diag.length !== k - 3)
 					{
 						alert('Ошибка в построении диагоналей!');
 						//console.log(diag);
 						//console.log(diag_sort);
-						//console.log(triangles_count());
 						elem_preloader.style.display = 'none';
 						cancel_last_action();
 						return;
@@ -5024,17 +4461,17 @@ var ok_enter = function()
 
 			    for (var i = lines_sort.length; i--;)
 				{
-					lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-					lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-					lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-					lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+					lines_sort[i].segments[0].point.x = lines_sort[i].segments[0].point.x.toFixed(2)-0;
+					lines_sort[i].segments[0].point.y = lines_sort[i].segments[0].point.y.toFixed(2)-0;
+					lines_sort[i].segments[1].point.x = lines_sort[i].segments[1].point.x.toFixed(2)-0;
+					lines_sort[i].segments[1].point.y = lines_sort[i].segments[1].point.y.toFixed(2)-0;
 				}
 				for (var i = diag_sort.length; i--;)
 				{
-					diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-					diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-					diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-					diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+					diag_sort[i].segments[0].point.x = diag_sort[i].segments[0].point.x.toFixed(2)-0;
+					diag_sort[i].segments[0].point.y = diag_sort[i].segments[0].point.y.toFixed(2)-0;
+					diag_sort[i].segments[1].point.x = diag_sort[i].segments[1].point.x.toFixed(2)-0;
+					diag_sort[i].segments[1].point.y = diag_sort[i].segments[1].point.y.toFixed(2)-0;
 				}
 				okruglenie_all_segments();
 
@@ -5076,7 +4513,7 @@ var ok_enter = function()
 		    	elem_window.style.display = 'none';
 		    	resize_canvas();
 		    }
-		}	
+		}
 	}
 	else
 	{
@@ -5089,25 +4526,33 @@ function diag_sortirovka()
 {
 	var add_bool = true;
 	var hitResults1, hitResults0;
-	for (var i in diag)
+	var d_c_w = [], d_c = [];
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 4)
+		d_c_w[i] = diag_count_walls(diag[i]);
+		d_c[i] = diag_count(diag[i]);
+		diag[i].data.d_c_w = d_c_w[i];
+		diag[i].data.d_c = d_c[i];
+	}
+	for (var i = diag.length; i--;)
+	{
+		if (d_c_w[i] === 4)
 		{
 			diag_sort.push(diag[i]);
 		}
 	}
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 3)
+		if (d_c_w[i] === 3)
 		{
 			diag_sort.push(diag[i]);
 		}
 	}
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
 		hitResults0 = project.hitTestAll(diag[i].segments[0].point, {class: Path, segments: true, tolerance: 2});
 		hitResults1 = project.hitTestAll(diag[i].segments[1].point, {class: Path, segments: true, tolerance: 2});
-		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 2 && (hitResults0.length === 3 || hitResults1.length === 3))
+		if (d_c_w[i] === 2 && d_c[i] >= 2 && (hitResults0.length === 3 || hitResults1.length === 3))
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -5124,9 +4569,9 @@ function diag_sortirovka()
 		}
 	}
 
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 2)
+		if (d_c_w[i] === 2 && d_c[i] >= 2)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -5142,9 +4587,9 @@ function diag_sortirovka()
 			}
 		}
 	}
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 1)
+		if (d_c_w[i] === 2 && d_c[i] >= 1)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -5160,9 +4605,9 @@ function diag_sortirovka()
 			}
 		}
 	}
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 2 && diag_count(diag[i]) >= 0)
+		if (d_c_w[i] === 2 && d_c[i] >= 0)
 		{
 			add_bool = true;
 			for (var j = 0; j < diag_sort.length; j++)
@@ -5179,16 +4624,16 @@ function diag_sortirovka()
 		}
 	}
 
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 1)
+		if (d_c_w[i] === 1)
 		{
 			diag_sort.push(diag[i]);
 		}
 	}
-	for (var i in diag)
+	for (var i = diag.length; i--;)
 	{
-		if (diag_count_walls(diag[i]) === 0)
+		if (d_c_w[i] === 0)
 		{
 			diag_sort.push(diag[i]);
 		}
@@ -5257,7 +4702,7 @@ function diag_count(diag)
 							count++;
 						}
 					}
-					
+
 				}
 			}
 		}
@@ -5267,47 +4712,51 @@ function diag_count(diag)
 
 function change_length_diag(index, length, rek)
 {
-	var hitResults0 = project.hitTestAll(diag_sort[index].segments[0].point, {class: Path, segments: true, tolerance: 2});
-	var hitResults1 = project.hitTestAll(diag_sort[index].segments[1].point, {class: Path, segments: true, tolerance: 2});
 	var Dx, Dy, coef;
 	var pd0, pd1, pd2;
-	var a1,b1,a2,b2,c,o,intersections,can_ver, op;
-	var line_arr = [];
+	var a1,b1,a2,b2,o,intersections, op;
+	var line_arr = [], points_m, c = diag_sort[index], c_s0 = c.segments[0].point, c_s1 = c.segments[1].point;
 	var newPoint,newObshayaPoint1,newObshayaPoint2,oldObshayaPoint1,oldObshayaPoint2;
-	var angle_new1, angle_old1, angle_rotate1, angle_new2, angle_old2, angle_rotate2, 
+	var angle_new1, angle_old1, angle_rotate1, angle_new2, angle_old2, angle_rotate2,
 	angle_new3, angle_old3, angle_rotate3, angle_new4, angle_old4, angle_rotate4, angle_new, angle_old, angle_rotate;
+	var hitResults0 = project.hitTestAll(c_s0, {class: Path, segments: true, tolerance: 2});
+	var hitResults1 = project.hitTestAll(c_s1, {class: Path, segments: true, tolerance: 2});
 
-	if (diag_count_walls(diag_sort[index]) === 3)
+	if (c.data.d_c_w === 3)
 	{
-		c = diag_sort[index];
-
-		hitResults0 = project.hitTestAll(diag_sort[index].segments[0].point, {class: Path, segments: true, tolerance: 2});
+		hitResults0 = project.hitTestAll(c_s0, {class: Path, segments: true, tolerance: 2});
 		if (hitResults0.length === 3)
 		{
-			pd0 = diag_sort[index].segments[0].point.clone();
-			pd1 = diag_sort[index].segments[1].point.clone();
+			pd0 = c_s0.clone();
+			pd1 = c_s1.clone();
 		}
 		else
 		{
-			pd0 = diag_sort[index].segments[1].point.clone();
-			pd1 = diag_sort[index].segments[0].point.clone();
+			pd0 = c_s1.clone();
+			pd1 = c_s0.clone();
 		}
 
-		for (var i in lines)
+		for (var i = lines.length, l_i, l_i_s0, l_i_s1; i--;)
 		{
-			for (var j in lines)
+			l_i = lines[i];
+			l_i_s0 = l_i.segments[0].point;
+			l_i_s1 = l_i.segments[1].point;
+			for (var j = lines.length, l_j; j--;)
 			{
-				if (obshaya_point(lines[i], lines[j]) !== null && lines[i] !== lines[j])
+				l_j = lines[j];
+				l_j_s0 = l_j.segments[0].point;
+				l_j_s1 = l_j.segments[1].point;
+				if (obshaya_point(l_i, l_j) !== null && l_i !== l_j)
 				{
-					if (!point_ravny(obshaya_point(lines[i], lines[j]), pd0) && !point_ravny(obshaya_point(lines[i], lines[j]), pd1))
+					if (!point_ravny(obshaya_point(l_i, l_j), pd0) && !point_ravny(obshaya_point(l_i, l_j), pd1))
 					{
-						if ((point_ravny(lines[i].segments[0].point, pd0) || point_ravny(lines[i].segments[1].point, pd0) 
-							|| point_ravny(lines[i].segments[0].point, pd1) || point_ravny(lines[i].segments[1].point, pd1))
-							&& (point_ravny(lines[j].segments[0].point, pd0) || point_ravny(lines[j].segments[1].point, pd0) 
-							|| point_ravny(lines[j].segments[0].point, pd1) || point_ravny(lines[j].segments[1].point, pd1)))
+						if ((point_ravny(l_i_s0, pd0) || point_ravny(l_i_s1, pd0)
+							|| point_ravny(l_i_s0, pd1) || point_ravny(l_i_s1, pd1))
+							&& (point_ravny(l_j_s0, pd0) || point_ravny(l_j_s1, pd0)
+							|| point_ravny(l_j_s0, pd1) || point_ravny(l_j_s1, pd1)))
 						{
-							a1 = lines[i];
-							b1 = lines[j];
+							a1 = l_i;
+							b1 = l_j;
 						}
 					}
 				}
@@ -5321,7 +4770,7 @@ function change_length_diag(index, length, rek)
 			b1 = o;
 		}
 
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			if (lines[key] !== a1 && lines[key] !== b1 && obshaya_point(lines[key], b1) !== null)
 			{
@@ -5338,8 +4787,8 @@ function change_length_diag(index, length, rek)
 			}
 		}
 
-		var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
-		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
+		var chis = new Decimal(new Decimal(c_s1.y).minus(c_s0.y)),
+		znam = new Decimal(new Decimal(c_s1.x).minus(c_s0.x));
 		coef = chis.dividedBy(znam);
 
 		var dec_length = new Decimal(length);
@@ -5411,7 +4860,7 @@ function change_length_diag(index, length, rek)
 	    a1.removeSegments();
 	    a1.addSegments([pd1, newObshayaPoint1]);
 	    b1.removeSegments();
-	    b1.addSegments([newObshayaPoint1, newPoint]); 
+	    b1.addSegments([newObshayaPoint1, newPoint]);
 
     	c.removeSegments();
 	    c.addSegments([newPoint, pd1]);
@@ -5428,34 +4877,32 @@ function change_length_diag(index, length, rek)
 	    add_text_v_or_h(b2);
 	    add_text_diag(index);
 
-	    can_ver = moveVertexName(b1, b2, obshaya_point(b1, b2));
+	    moveVertexName(b1, b2, obshaya_point(b1, b2));
 
-    	can_ver = moveVertexName(a1, b1, obshaya_point(a1, b1));
+    	moveVertexName(a1, b1, obshaya_point(a1, b1));
 
-		diag_sort[index].data.fixed = true;
+		c.data.fixed = true;
 	}
-	else if (diag_count_walls(diag_sort[index]) === 2 && (hitResults0.length === 3 || hitResults1.length === 3))
+	else if (c.data.d_c_w === 2 && (hitResults0.length === 3 || hitResults1.length === 3))
 	{
-		c = diag_sort[index];
-
-		line_arr = line_arr_gen(index);
+		line_arr = line_arr_gen(c);
 
 		for (var i = line_arr.length; i--;)
 		{
 			for (var j = line_arr.length; j--;)
 			{
-				if (line_arr[i] !== line_arr[j] && obshaya_point(line_arr[i], line_arr[j]) !== null 
+				if (line_arr[i] !== line_arr[j] && obshaya_point(line_arr[i], line_arr[j]) !== null
 					&& line_arr[i].strokeWidth === 3 && line_arr[j].strokeWidth === 3)
 				{
-					if (point_ravny(obshaya_point(line_arr[i], line_arr[j]), diag_sort[index].segments[0].point))
+					if (point_ravny(obshaya_point(line_arr[i], line_arr[j]), c_s0))
 					{
-						pd0 = diag_sort[index].segments[0].point.clone();
-						pd1 = diag_sort[index].segments[1].point.clone();
+						pd0 = c_s0.clone();
+						pd1 = c_s1.clone();
 					}
-					else if (point_ravny(obshaya_point(line_arr[i], line_arr[j]), diag_sort[index].segments[1].point))
+					else if (point_ravny(obshaya_point(line_arr[i], line_arr[j]), c_s1))
 					{
-						pd0 = diag_sort[index].segments[1].point.clone();
-						pd1 = diag_sort[index].segments[0].point.clone();
+						pd0 = c_s1.clone();
+						pd1 = c_s0.clone();
 					}
 				}
 			}
@@ -5466,7 +4913,7 @@ function change_length_diag(index, length, rek)
 		{
 			for (var j = line_arr.length; j--;)
 			{
-				if (line_arr[i] !== line_arr[j] && line_arr[i].strokeWidth === 3 && line_arr[j].strokeWidth === 3 
+				if (line_arr[i] !== line_arr[j] && line_arr[i].strokeWidth === 3 && line_arr[j].strokeWidth === 3
 					&& obshaya_point(line_arr[i], line_arr[j]) !== null)
 				{
 					if (point_ravny(obshaya_point(line_arr[i], line_arr[j]), pd0))
@@ -5498,8 +4945,8 @@ function change_length_diag(index, length, rek)
 			}
 		}
 
-		var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
-		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
+		var chis = new Decimal(new Decimal(c_s1.y).minus(c_s0.y)),
+		znam = new Decimal(new Decimal(c_s1.x).minus(c_s0.x));
 		coef = chis.dividedBy(znam);
 
 		var dec_length = new Decimal(length);
@@ -5537,7 +4984,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b1.length - 3;
@@ -5601,7 +5048,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b2.length - 3;
@@ -5740,7 +5187,7 @@ function change_length_diag(index, length, rek)
 	    {
 	    	add_text_diag(key);
 	    }
-	    
+
 	    var j = 0;
 	    for (var i = 0; i < lines_sort.length; i++)
 	    {
@@ -5758,28 +5205,27 @@ function change_length_diag(index, length, rek)
 	    	}
 	    }
 	}
-	else if (diag_count_walls(diag_sort[index]) === 2)
+	else if (c.data.d_c_w === 2)
 	{
-		c = diag_sort[index];
+		line_arr = line_arr_gen(c);
 
-		line_arr = line_arr_gen(index);
-
-		g_points = getPathsPoints(lines_sort);
-		var min_point = new Point(findMinAndMaxCordinate_g().minX, findMinAndMaxCordinate_g().minY);
-		var max_point = new Point(findMinAndMaxCordinate_g().maxX, findMinAndMaxCordinate_g().maxY);
+		g_points = getPathsPointsBySort(lines_sort);
+		points_m = findMinAndMaxCordinate_g();
+		var min_point = new Point(points_m.minX, points_m.minY);
+		var max_point = new Point(points_m.maxX, points_m.maxY);
 		var center_line = Path.Line(min_point, max_point);
 		var center_point = center_line.position.clone();
 		center_line.remove();
 
-		pd0 = diag_sort[index].segments[0].point.clone();
-		pd1 = diag_sort[index].segments[1].point.clone();
+		pd0 = c_s0.clone();
+		pd1 = c_s1.clone();
 
 		var rast0 = Math.sqrt(Math.pow(pd0.x - center_point.x, 2) + Math.pow(pd0.y - center_point.y, 2));
 		var rast1 = Math.sqrt(Math.pow(pd1.x - center_point.x, 2) + Math.pow(pd1.y - center_point.y, 2));
 		if (rast0 < rast1)
 		{
-			pd0 = diag_sort[index].segments[1].point.clone();
-			pd1 = diag_sort[index].segments[0].point.clone();
+			pd0 = c_s1.clone();
+			pd1 = c_s0.clone();
 		}
 
 		var break_bool = false;
@@ -5825,10 +5271,10 @@ function change_length_diag(index, length, rek)
 				a2 = line_arr[i];
 			}
 		}
-		
 
-		var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
-		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
+
+		var chis = new Decimal(new Decimal(c_s1.y).minus(c_s0.y)),
+		znam = new Decimal(new Decimal(c_s1.x).minus(c_s0.x));
 		coef = chis.dividedBy(znam);
 
 		var dec_length = new Decimal(length);
@@ -5865,7 +5311,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b1.length - 3;
@@ -5897,7 +5343,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a1.length - 3;
@@ -5962,7 +5408,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b2.length - 3;
@@ -5994,7 +5440,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a2.length - 3;
@@ -6164,7 +5610,7 @@ function change_length_diag(index, length, rek)
 	    {
 	    	add_text_diag(key);
 	    }
-	    
+
 	    var j = 0;
 	    for (var i = 0; i < lines_sort.length; i++)
 	    {
@@ -6182,25 +5628,23 @@ function change_length_diag(index, length, rek)
 	    	}
 	    }
 	}
-	else if (diag_count_walls(diag_sort[index]) === 1)
+	else if (c.data.d_c_w === 1)
 	{
-		c = diag_sort[index];
-
-		line_arr = line_arr_gen(index);
+		line_arr = line_arr_gen(c);
 
 		for (var i = line_arr.length; i--;)
 		{
 			if (line_arr[i].strokeWidth === 3)
 			{
-				if (point_ravny(obshaya_point(line_arr[i], c), c.segments[0].point))
+				if (point_ravny(obshaya_point(line_arr[i], c), c_s0))
 				{
-					pd0 = c.segments[0].point.clone();
-					pd1 = c.segments[1].point.clone();
+					pd0 = c_s0.clone();
+					pd1 = c_s1.clone();
 				}
-				else if (point_ravny(obshaya_point(line_arr[i], c), c.segments[1].point))
+				else if (point_ravny(obshaya_point(line_arr[i], c), c_s1))
 				{
-					pd0 = c.segments[1].point.clone();
-					pd1 = c.segments[0].point.clone();
+					pd0 = c_s1.clone();
+					pd1 = c_s0.clone();
 				}
 				break;
 			}
@@ -6249,10 +5693,10 @@ function change_length_diag(index, length, rek)
 				a2 = line_arr[i];
 			}
 		}
-		
 
-		var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
-		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
+
+		var chis = new Decimal(new Decimal(c_s1.y).minus(c_s0.y)),
+		znam = new Decimal(new Decimal(c_s1.x).minus(c_s0.x));
 		coef = chis.dividedBy(znam);
 
 		var dec_length = new Decimal(length);
@@ -6289,7 +5733,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b1.length - 3;
@@ -6321,7 +5765,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a1.length - 3;
@@ -6385,7 +5829,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b2.length - 3;
@@ -6417,7 +5861,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a2.length - 3;
@@ -6584,7 +6028,7 @@ function change_length_diag(index, length, rek)
 	    {
 	    	add_text_diag(key);
 	    }
-	    
+
 	    var j = 0;
 	    for (var i = 0; i < lines_sort.length; i++)
 	    {
@@ -6602,28 +6046,27 @@ function change_length_diag(index, length, rek)
 	    	}
 	    }
 	}
-	else if (diag_count_walls(diag_sort[index]) === 0)
+	else if (c.data.d_c_w === 0)
 	{
-		c = diag_sort[index];
+		line_arr = line_arr_gen(c);
 
-		line_arr = line_arr_gen(index);
-
-		g_points = getPathsPoints(lines_sort);
-		var min_point = new Point(findMinAndMaxCordinate_g().minX, findMinAndMaxCordinate_g().minY);
-		var max_point = new Point(findMinAndMaxCordinate_g().maxX, findMinAndMaxCordinate_g().maxY);
+		g_points = getPathsPointsBySort(lines_sort);
+		points_m = findMinAndMaxCordinate_g();
+		var min_point = new Point(points_m.minX, points_m.minY);
+		var max_point = new Point(points_m.maxX, points_m.maxY);
 		var center_line = Path.Line(min_point, max_point);
 		var center_point = center_line.position.clone();
 		center_line.remove();
 
-		pd0 = diag_sort[index].segments[0].point.clone();
-		pd1 = diag_sort[index].segments[1].point.clone();
+		pd0 = c_s0.clone();
+		pd1 = c_s1.clone();
 
 		var rast0 = Math.sqrt(Math.pow(pd0.x - center_point.x, 2) + Math.pow(pd0.y - center_point.y, 2));
 		var rast1 = Math.sqrt(Math.pow(pd1.x - center_point.x, 2) + Math.pow(pd1.y - center_point.y, 2));
 		if (rast0 < rast1)
 		{
-			pd0 = diag_sort[index].segments[1].point.clone();
-			pd1 = diag_sort[index].segments[0].point.clone();
+			pd0 = c_s1.clone();
+			pd1 = c_s0.clone();
 		}
 
 		var break_bool = false;
@@ -6661,10 +6104,10 @@ function change_length_diag(index, length, rek)
 				a2 = line_arr[i];
 			}
 		}
-		
 
-		var chis = new Decimal(new Decimal(c.segments[1].point.y).minus(c.segments[0].point.y)), 
-		znam = new Decimal(new Decimal(c.segments[1].point.x).minus(c.segments[0].point.x));
+
+		var chis = new Decimal(new Decimal(c_s1.y).minus(c_s0.y)),
+		znam = new Decimal(new Decimal(c_s1.x).minus(c_s0.x));
 		coef = chis.dividedBy(znam);
 
 		var dec_length = new Decimal(length);
@@ -6701,7 +6144,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b1.length - 3;
@@ -6733,7 +6176,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a1.length - 3;
@@ -6797,7 +6240,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + b2.length - 3;
@@ -6829,7 +6272,7 @@ function change_length_diag(index, length, rek)
 	   				angle_dd = new Decimal(360).minus(angle_dd).toNumber();
 	   			}
 
-	   			if (+length < diag_sort[index].length && angle_dd < 90 || +length > diag_sort[index].length && angle_dd >= 90)
+	   			if (+length < c.length && angle_dd < 90 || +length > c.length && angle_dd >= 90)
 	   			{
 	   				napr = '<';
 	   				dop_length = +length + a2.length - 3;
@@ -7025,7 +6468,7 @@ function change_length_diag(index, length, rek)
 	    {
 	    	add_text_diag(key);
 	    }
-	    
+
 	    var j = 0;
 	    for (var i = 0; i < lines_sort.length; i++)
 	    {
@@ -7046,22 +6489,26 @@ function change_length_diag(index, length, rek)
 
 	if (!rek)
 	{
-	    diag_sort[index].data.fixed = true;
+	    c.data.fixed = true;
 	}
 
-	for (var i = lines_sort.length; i--;)
+	for (var i = lines_sort.length, l_s0, l_s1; i--;)
 	{
-		lines_sort[i].segments[0].point.x = +lines_sort[i].segments[0].point.x.toFixed(2);
-		lines_sort[i].segments[0].point.y = +lines_sort[i].segments[0].point.y.toFixed(2);
-		lines_sort[i].segments[1].point.x = +lines_sort[i].segments[1].point.x.toFixed(2);
-		lines_sort[i].segments[1].point.y = +lines_sort[i].segments[1].point.y.toFixed(2);
+		l_s0 = lines_sort[i].segments[0].point;
+		l_s1 = lines_sort[i].segments[1].point;
+		l_s0.x = l_s0.x.toFixed(2)-0;
+		l_s0.y = l_s0.y.toFixed(2)-0;
+		l_s1.x = l_s1.x.toFixed(2)-0;
+		l_s1.y = l_s1.y.toFixed(2)-0;
 	}
-	for (var i = diag_sort.length; i--;)
+	for (var i = diag_sort.length, d_s0, d_s1; i--;)
 	{
-		diag_sort[i].segments[0].point.x = +diag_sort[i].segments[0].point.x.toFixed(2);
-		diag_sort[i].segments[0].point.y = +diag_sort[i].segments[0].point.y.toFixed(2);
-		diag_sort[i].segments[1].point.x = +diag_sort[i].segments[1].point.x.toFixed(2);
-		diag_sort[i].segments[1].point.y = +diag_sort[i].segments[1].point.y.toFixed(2);
+		d_s0 = diag_sort[i].segments[0].point;
+		d_s1 = diag_sort[i].segments[1].point;
+		d_s0.x = d_s0.x.toFixed(2)-0;
+		d_s0.y = d_s0.y.toFixed(2)-0;
+		d_s1.x = d_s1.x.toFixed(2)-0;
+		d_s1.y = d_s1.y.toFixed(2)-0;
 	}
 	okruglenie_all_segments();
 }
@@ -7138,29 +6585,29 @@ function circle_intersections(xp1_o, yp1_o, r1, xp2_o, yp2_o, r2)
 		var x1 = Decimal.sqrt(Decimal.pow(r1, 2).minus(Decimal.pow(c, 2).dividedBy(Decimal.pow(yp2, 2)))).toNumber();
 		var x2 = -Decimal.sqrt(Decimal.pow(r1, 2).minus(Decimal.pow(c, 2).dividedBy(Decimal.pow(yp2, 2)))).toNumber();
 	}
-	x1 = +(new Decimal(x1).plus(xp1_o).toNumber()).toFixed(2);
-	x2 = +(new Decimal(x2).plus(xp1_o).toNumber()).toFixed(2);
-	y1 = +(new Decimal(y1).plus(yp1_o).toNumber()).toFixed(2);
-	y2 = +(new Decimal(y2).plus(yp1_o).toNumber()).toFixed(2);
+	x1 = (new Decimal(x1).plus(xp1_o).toNumber()).toFixed(2)-0;
+	x2 = (new Decimal(x2).plus(xp1_o).toNumber()).toFixed(2)-0;
+	y1 = (new Decimal(y1).plus(yp1_o).toNumber()).toFixed(2)-0;
+	y2 = (new Decimal(y2).plus(yp1_o).toNumber()).toFixed(2)-0;
 
 	return [new Point(x1, y1), new Point(x2, y2)];
 }
 
-function line_arr_gen(index)
+function line_arr_gen(diag_i)
 {
 	var line_arr = [];
-	var hitResults0 = project.hitTestAll(diag_sort[index].segments[0].point, {class: Path, segments: true, tolerance: 2});
-	var hitResults1 = project.hitTestAll(diag_sort[index].segments[1].point, {class: Path, segments: true, tolerance: 2});
+	var hitResults0 = project.hitTestAll(diag_i.segments[0].point, {class: Path, segments: true, tolerance: 2});
+	var hitResults1 = project.hitTestAll(diag_i.segments[1].point, {class: Path, segments: true, tolerance: 2});
 	var op;
 	for (var key0 = hitResults0.length; key0--;)
 	{
-		if (lines_ravny(hitResults0[key0].item, diag_sort[index]) || hitResults0[key0].item.segments.length !== 2)
+		if (lines_ravny(hitResults0[key0].item, diag_i) || hitResults0[key0].item.segments.length !== 2)
 		{
 			continue;
 		}
 		for (var key1 = hitResults1.length; key1--;)
 		{
-			if (!lines_ravny(hitResults1[key1].item, diag_sort[index]) && hitResults1[key1].item.segments.length === 2)
+			if (!lines_ravny(hitResults1[key1].item, diag_i) && hitResults1[key1].item.segments.length === 2)
 			{
 				op = obshaya_point(hitResults0[key0].item, hitResults1[key1].item);
 				if (op !== null)
@@ -7176,9 +6623,10 @@ function line_arr_gen(index)
 
 function okruglenie_all_segments()
 {
-	var j = 0, min_rast, p1, p2;
-	for (var i = lines_sort.length; i--;)
+	var j = 0, p1, p2, rast;
+	for (var i = lines_sort.length, l_i, l_j, min_rast; i--;)
 	{
+		l_i = lines_sort[i];
 		if (i === 0)
 		{
 			j = lines_sort.length - 1;
@@ -7187,67 +6635,55 @@ function okruglenie_all_segments()
 		{
 			j = i - 1;
 		}
+		l_j = lines_sort[j];
 		min_rast = 40000;
-		for (var ii = lines_sort[i].segments.length; ii--;)
+		for (var ii = l_i.segments.length, ls_ii; ii--;)
 		{
-			for (var jj = lines_sort[j].segments.length; jj--;)
+			ls_ii = l_i.segments[ii].point;
+			for (var jj = l_j.segments.length, ls_jj; jj--;)
 			{
-				if (min_rast > Math.sqrt(Math.pow(lines_sort[i].segments[ii].point.x - lines_sort[j].segments[jj].point.x, 2) 
-							+ Math.pow(lines_sort[i].segments[ii].point.y - lines_sort[j].segments[jj].point.y, 2)))
+				ls_jj = l_j.segments[jj].point;
+				rast = Math.sqrt(Math.pow(ls_ii.x - ls_jj.x, 2) + Math.pow(ls_ii.y - ls_jj.y, 2));
+				if (min_rast > rast)
 				{
-					min_rast = Math.sqrt(Math.pow(lines_sort[i].segments[ii].point.x - lines_sort[j].segments[jj].point.x, 2) 
-							+ Math.pow(lines_sort[i].segments[ii].point.y - lines_sort[j].segments[jj].point.y, 2));
+					min_rast = rast;
 					p1 = ii;
 					p2 = jj;
 				}
 			}
 		}
-		lines_sort[i].segments[p1].remove();
-		lines_sort[i].add(lines_sort[j].segments[p2].point);
+		l_i.segments[p1].remove();
+		l_i.add(l_j.segments[p2].point);
 	}
-	
-	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
 
-	for (var i = diag_sort.length; i--;)
+	g_points = getPathsPointsBySort(lines_sort);
+	//g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+
+	for (var i = diag_sort.length, d_i, min_rast_s0, min_rast_s1; i--;)
 	{
-		min_rast = 40000;
-		for (var j = g_points.length; j--;)
+		d_i = diag_sort[i];
+		min_rast_s0 = 40000;
+		min_rast_s1 = 40000;
+		for (var j = g_points.length, gp_j, ds; j--;)
 		{
-			if (min_rast > Math.sqrt(Math.pow(diag_sort[i].segments[0].point.x - g_points[j].x, 2) 
-							+ Math.pow(diag_sort[i].segments[0].point.y - g_points[j].y, 2)))
+			gp_j = g_points[j];
+			ds = d_i.segments[0].point;
+			rast = Math.sqrt(Math.pow(ds.x - gp_j.x, 2) + Math.pow(ds.y - gp_j.y, 2));
+			if (min_rast_s0 > rast)
 			{
-				min_rast = Math.sqrt(Math.pow(diag_sort[i].segments[0].point.x - g_points[j].x, 2) 
-						+ Math.pow(diag_sort[i].segments[0].point.y - g_points[j].y, 2));
-				p1 = g_points[j];
+				min_rast_s0 = rast;
+				p1 = gp_j;
+			}
+			ds = d_i.segments[1].point;
+			rast = Math.sqrt(Math.pow(ds.x - gp_j.x, 2) + Math.pow(ds.y - gp_j.y, 2));
+			if (min_rast_s1 > rast)
+			{
+				min_rast_s1 = rast;
+				p2 = gp_j;
 			}
 		}
-
-		min_rast = 40000;
-		for (var j = g_points.length; j--;)
-		{
-			if (min_rast > Math.sqrt(Math.pow(diag_sort[i].segments[1].point.x - g_points[j].x, 2) 
-							+ Math.pow(diag_sort[i].segments[1].point.y - g_points[j].y, 2)))
-			{
-				min_rast = Math.sqrt(Math.pow(diag_sort[i].segments[1].point.x - g_points[j].x, 2) 
-						+ Math.pow(diag_sort[i].segments[1].point.y - g_points[j].y, 2));
-				p2 = g_points[j];
-			}
-		}
-		diag_sort[i].removeSegments();
-		diag_sort[i].addSegments([p1, p2]);
-	}
-	for (var i = text_points.length; i--;)
-	{
-		text_points[i].bringToFront();
-	}
-	for (var i = text_diag.length; i--;)
-	{
-		text_diag[i].bringToFront();
-	}
-	for (var i in text_lines)
-	{
-		text_lines[i].bringToFront();
+		d_i.removeSegments();
+		d_i.addSegments([p1, p2]);
 	}
 }
 
@@ -7258,24 +6694,24 @@ function find_part_chert_on_diag(diag_f, index)
     var obmen;
     var mass_w = [];
     var mass_d = [];
-	g_points = getPathsPoints(lines_sort);
-	g_points = changePointsOrderForNaming(g_points, 2, lines_sort);
+	g_points = getPathsPointsBySort(lines_sort);
+
 	for (var key = g_points.length; key--;)
 	{
 		if (point_ravny(diag_f.segments[0].point, g_points[key]))
 		{
-			point_n = parseFloat(key);
+			point_n = key-0;
 		}
 		if (point_ravny(diag_f.segments[1].point, g_points[key]))
 		{
-			point_k = parseFloat(key);
+			point_k = key-0;
 		}
 	}
 	if (point_n > point_k)
 	{
 		obmen = point_n;
-		point_n = parseFloat(point_k);
-		point_k = parseFloat(obmen);
+		point_n = point_k-0;
+		point_k = obmen-0;
 	}
 	var ni;
 	var i = +point_n;
@@ -7436,148 +6872,53 @@ function wheel_zoom(e)
 	if (e.wheelDelta < 0 && view.zoom > 0.2)
 	{
 		view.zoom = new Decimal(view.zoom).minus(0.05).toNumber();
-		if (view.zoom < 0.4)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize += 4;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize += 4;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize += 4;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize += 4;
-			}
-		}
-		else if (view.zoom < 1)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize += 2;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize += 2;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize += 2;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize += 2;
-			}
-		}
-		else if (view.zoom < 2)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize += 0.5;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize += 0.5;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize += 0.5;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize += 0.5;
-			}
-		}
 	}
 	else if (e.wheelDelta > 0 && view.zoom < 2.2)
 	{
 		view.zoom = new Decimal(view.zoom).plus(0.05).toNumber();
-		if (view.zoom <= 0.4)
+	}
+
+	var z = (14 / view.zoom).toFixed(2)-0;
+	for (var key = text_points.length; key--;)
+	{
+		text_points[key].fontSize = z;
+	}
+	for (var key = text_lines.length; key--;)
+	{
+		text_lines[key].fontSize = z;
+	}
+	for (var key = text_diag.length; key--;)
+	{
+		text_diag[key].fontSize = z;
+	}
+	for (var key = text_manual_diags.length; key--;)
+	{
+		text_manual_diags[key].fontSize = z;
+	}
+
+	for (var key = lines.length, l_s0, l_s1, l_k; key--;)
+	{
+		l_k = lines[key];
+		l_s0 = l_k.segments[0].point;
+		l_s1 = l_k.segments[1].point;
+		l_s0.x = l_s0.x.toFixed(2)-0;
+		l_s1.x = l_s1.x.toFixed(2)-0;
+		l_s0.y = l_s0.y.toFixed(2)-0;
+		l_s1.y = l_s1.y.toFixed(2)-0;
+		if (text_lines[l_k.data.id] !== undefined)
 		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize -= 4;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize -= 4;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize -= 4;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize -= 4;
-			}
-		}
-		else if (view.zoom <= 1)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize -= 2;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize -= 2;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize -= 2;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize -= 2;
-			}
-		}
-		else if (view.zoom <= 2)
-		{
-			for (var key = text_points.length; key--;)
-			{
-				text_points[key].fontSize -= 0.5;
-			}
-			for (var key in text_lines)
-			{
-				text_lines[key].fontSize -= 0.5;
-			}
-			for (var key = text_diag.length; key--;)
-			{
-				text_diag[key].fontSize -= 0.5;
-			}
-			for (var key = text_manual_diags.length; key--;)
-			{
-				text_manual_diags[key].fontSize -= 0.5;
-			}
+			text_lines[l_k.data.id].position = l_k.position;
 		}
 	}
 
-	for (var key in lines)
-	{
-		lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-		lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-		lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-		lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
-	}
 	if (start_point !== undefined && end_point !== undefined)
 	{
-		start_point.x = parseFloat(start_point.x.toFixed(2));
-		start_point.y = parseFloat(start_point.y.toFixed(2));
-		end_point.x = parseFloat(end_point.x.toFixed(2));
-		end_point.y = parseFloat(end_point.y.toFixed(2));
+		start_point.x = start_point.x.toFixed(2)-0;
+		start_point.y = start_point.y.toFixed(2)-0;
+		end_point.x = end_point.x.toFixed(2)-0;
+		end_point.y = end_point.y.toFixed(2)-0;
 	}
 
-	for (var key in lines)
-	{
-		if (text_lines[lines[key].id] !== undefined)
-		{
-			text_lines[lines[key].id].position = lines[key].position;
-		}
-	}
 	for (var key = diag_sort.length; key--;)
 	{
 		if (text_diag[key] !== undefined)
@@ -7585,6 +6926,7 @@ function wheel_zoom(e)
 			text_diag[key].position = diag_sort[key].position;
 		}
 	}
+	resize_canvas();
 }
 
 var rast;
@@ -7603,152 +6945,66 @@ function touch_zoom(event)
 			rast2 = Math.sqrt(Math.pow(event.touches[1].pageX - event.touches[0].pageX, 2) + Math.pow(event.touches[1].pageY - event.touches[0].pageY, 2));
 			if (rast2 < rast && view.zoom > 0.2)
 			{
-				view.zoom = new Decimal(view.zoom).minus(0.05).toNumber();
-				if (view.zoom < 0.4)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize += 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize += 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize += 4;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize += 4;
-					}
-				}
-				else if (view.zoom < 1)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize += 2;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize += 2;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize += 2;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize += 2;
-					}
-				}
-				else if (view.zoom < 2)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize += 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize += 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize += 0.5;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize += 0.5;
-					}
-				}
+				view.zoom = new Decimal(view.zoom).minus(0.025).toNumber();
 			}
 			else if (rast2 > rast && view.zoom < 2.2)
 			{
-				view.zoom = new Decimal(view.zoom).plus(0.05).toNumber();
-				if (view.zoom <= 0.4)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 4;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 4;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 4;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize -= 4;
-					}
-				}
-				if (view.zoom <= 1)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 2;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 2;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 2;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize -= 2;
-					}
-				}
-				else if (view.zoom <= 2)
-				{
-					for (var key = text_points.length; key--;)
-					{
-						text_points[key].fontSize -= 0.5;
-					}
-					for (var key in text_lines)
-					{
-						text_lines[key].fontSize -= 0.5;
-					}
-					for (var key = text_diag.length; key--;)
-					{
-						text_diag[key].fontSize -= 0.5;
-					}
-					for (var key = text_manual_diags.length; key--;)
-					{
-						text_manual_diags[key].fontSize -= 0.5;
-					}
-				}
+				view.zoom = new Decimal(view.zoom).plus(0.025).toNumber();
+			}
+
+			var z = (14 / view.zoom).toFixed(2)-0;
+			for (var key = text_points.length; key--;)
+			{
+				text_points[key].fontSize = z;
+			}
+			for (var key = text_lines.length; key--;)
+			{
+				text_lines[key].fontSize = z;
+			}
+			for (var key = text_diag.length; key--;)
+			{
+				text_diag[key].fontSize = z;
+			}
+			for (var key = text_manual_diags.length; key--;)
+			{
+				text_manual_diags[key].fontSize = z;
 			}
 
 			rast = Math.sqrt(Math.pow(event.touches[1].pageX - event.touches[0].pageX, 2) + Math.pow(event.touches[1].pageY - event.touches[0].pageY, 2));
 		}
-		for (var key in lines)
+
+		for (var key = lines.length, l_s0, l_s1, l_k; key--;)
 		{
-			lines[key].segments[0].point.x = parseFloat(lines[key].segments[0].point.x.toFixed(2));
-			lines[key].segments[1].point.x = parseFloat(lines[key].segments[1].point.x.toFixed(2));
-			lines[key].segments[0].point.y = parseFloat(lines[key].segments[0].point.y.toFixed(2));
-			lines[key].segments[1].point.y = parseFloat(lines[key].segments[1].point.y.toFixed(2));
+			l_k = lines[key];
+			l_s0 = l_k.segments[0].point;
+			l_s1 = l_k.segments[1].point;
+			l_s0.x = l_s0.x.toFixed(2)-0;
+			l_s1.x = l_s1.x.toFixed(2)-0;
+			l_s0.y = l_s0.y.toFixed(2)-0;
+			l_s1.y = l_s1.y.toFixed(2)-0;
+			if (text_lines[l_k.data.id] !== undefined)
+			{
+				text_lines[l_k.data.id].position = l_k.position;
+			}
 		}
+
 		if (start_point !== undefined && end_point !== undefined)
 		{
-			start_point.x = parseFloat(start_point.x.toFixed(2));
-			start_point.y = parseFloat(start_point.y.toFixed(2));
-			end_point.x = parseFloat(end_point.x.toFixed(2));
-			end_point.y = parseFloat(end_point.y.toFixed(2));
+			start_point.x = start_point.x.toFixed(2)-0;
+			start_point.y = start_point.y.toFixed(2)-0;
+			end_point.x = end_point.x.toFixed(2)-0;
+			end_point.y = end_point.y.toFixed(2)-0;
 		}
-		for (var key in lines)
-		{
-			text_lines[lines[key].id].position = lines[key].position;
-		}
+
 		for (var key = diag_sort.length; key--;)
 		{
-			text_diag[key].position = diag_sort[key].position;
+			if (text_diag[key] !== undefined)
+			{
+				text_diag[key].position = diag_sort[key].position;
+			}
 		}
 	}
+	resize_canvas();
 }
 
 var first_click = false;
@@ -7985,7 +7241,7 @@ function sort_sten()
 		{
 			j = i + 1;
 		}
-		for (var key in lines)
+		for (var key = lines.length; key--;)
 		{
 			if (point_ravny(lines[key].segments[0].point, g_points[i]) && point_ravny(lines[key].segments[1].point, g_points[j])
 				|| point_ravny(lines[key].segments[1].point, g_points[i]) && point_ravny(lines[key].segments[0].point, g_points[j]))
@@ -8016,10 +7272,10 @@ function drawLabels()
                     justification: 'center',
                     fontFamily: 'lucida console',
                     fontWeight: 'bold',
-                    fontSize: 6
+                    fontSize: (14 / view.zoom).toFixed(2)-0
                 });
             textPoints.push(pt);
-            for (var key in lines)
+            for (var key = lines.length; key--;)
             {
             	for (var j in lines[key].segments)
             	{
@@ -8029,7 +7285,7 @@ function drawLabels()
             		}
             	}
             }
-            for (var key in lines)
+            for (var key = lines.length; key--;)
             {
             	if (key === id1)
             	{
@@ -8047,32 +7303,6 @@ function drawLabels()
         	pt.data.id_line2 = +id2;
         }
     }
-    var f = 2;
-	while (f > view.zoom)
-	{
-		f = new Decimal(f).minus(0.05).toNumber();
-		if (f <= 0.4 && f > 0.2)
-		{
-			for (var i = textPoints.length; i--;)
-			{
-				textPoints[i].fontSize += 4;
-			}
-		}
-		else if (f < 1)
-		{
-			for (var i = textPoints.length; i--;)
-			{
-				textPoints[i].fontSize += 2;
-			}
-		}
-		else if (f < 2)
-		{
-			for (var i = textPoints.length; i--;)
-			{
-				textPoints[i].fontSize += 0.5;
-			}
-		}
-	}
     return textPoints;
 }
 
@@ -8123,7 +7353,7 @@ function findWallsByPoint(points, point, flag, lines)
 		}
 		min_y = temp_point[0].y;
 		rez_point = temp_point[0];
-		for (var key in temp_point)
+		for (var key = temp_point.length; key--;)
 		{
 			if (temp_point[key].y < min_y)
 			{
@@ -8135,7 +7365,7 @@ function findWallsByPoint(points, point, flag, lines)
 	}
 
 	if (flag === 2)
-	{	
+	{
 		for(var j in lines)
 		{
 			if (point_ravny(lines[j].getFirstSegment().point, point) || point_ravny(lines[j].getLastSegment().point, point))
@@ -8211,9 +7441,28 @@ function changePointsOrderForNaming(points, flag, lines)
     }
 }
 
+function getPathsPointsBySort(lines)
+{
+	var allpoints = [];
+	var bj;
+	for (var j = 0; j < lines.length; j++)
+	{
+		if (j === 0)
+		{
+			bj = lines.length - 1;
+		}
+		else
+		{
+			bj = j - 1;
+		}
+		allpoints.push(obshaya_point(lines[j], lines[bj]));
+	}
+	return allpoints;
+}
+
 function getPathsPoints(lines)
 {
-    var allpoints = [];
+	var allpoints = [];
     for (var j in lines)
     {
         for (var k = 0; k < lines[j].segments.length; k++)
@@ -8308,13 +7557,14 @@ var square_tkan, lines_tkan = [];
 function tkan()
 {
 	var polygonVertices = [], polygons, paddingPolygon, x1, y1, x2, y2, intersections;
+	g_points = getPathsPointsBySort(lines_sort);
 	for(var i = g_points.length; i--;)
 	{
 		polygonVertices.push({x: g_points[i].x, y: g_points[i].y});
 	}
 	polygons = init_pol(polygonVertices);
 
-	paddingPolygon = polygons.paddingPolygon;
+	paddingPolygon = polygons.marginPolygon;
 
 	var chertezh = new Path();
 	for(var i = paddingPolygon.edges.length; i--;)
@@ -8337,7 +7587,7 @@ function tkan()
 			start_line = lines_tkan[i];
 		}
 	}
-	
+
 	var last_elem;
 	while(lines_tkan[lines_tkan.length - 1] !== start_line)
 	{
@@ -8403,7 +7653,7 @@ function tkan()
 	var min_len = 1000;
 	for(var i = chertezh.segments.length; i--;)
 	{
-		m = Math.sqrt(Math.pow(chertezh.segments[i].point.x - text_points[0].point.x, 2) 
+		m = Math.sqrt(Math.pow(chertezh.segments[i].point.x - text_points[0].point.x, 2)
 				+ Math.pow(chertezh.segments[i].point.y - text_points[0].point.y, 2));
 		if (m < min_len)
 		{
@@ -8459,7 +7709,7 @@ function tkan()
             fontSize: 12
         });
     	text_points.push(pt);
-    	
+
     	for (var i = lines_tkan.length; i--;)
         {
         	for (var j = lines_tkan[i].segments.length; j--;)
@@ -8508,8 +7758,8 @@ function tkan()
 			sq_polo = new Decimal(polotna[0].down.length).times(polotna[0].left.length);
 			sq_polo = sq_polo.dividedBy(10000).toNumber();
 			sq_obr = new Decimal(sq_polo).minus(square_tkan).toNumber();
-			sq_obr = +sq_obr.toFixed(2);
-			
+			sq_obr = sq_obr.toFixed(2)-0;
+
 			if (sq_obr < sq_min)
 			{
 				sq_min = sq_obr;
@@ -8566,7 +7816,7 @@ function tkan()
     	text_contur[key].remove();
     }
     text_contur = [];
-    
+
     add_text_contur(lines_tkan);
 
     var j = 0;
@@ -8590,7 +7840,7 @@ function tkan()
 	sq_polo = new Decimal(polotna[0].down.length).times(polotna[0].left.length);
 	sq_polo = sq_polo.dividedBy(10000).toNumber();
 	sq_obr = new Decimal(sq_polo).minus(square_tkan).toNumber();
-	square_obrezkov = +sq_obr.toFixed(2);
+	square_obrezkov = sq_obr.toFixed(2)-0;
 	//console.log('sq_obr', square_obrezkov);
 
 	width_final = width_polotna[j_f].width;
@@ -8610,10 +7860,10 @@ function tkan()
 	koordinats_poloten[0] = [];
 	for (var j = text_points.length; j--;)
 	{
-		kx = Decimal.abs(new Decimal(text_points[j].point.x).minus(polotna[0].left.position.x)).toNumber(); 
+		kx = Decimal.abs(new Decimal(text_points[j].point.x).minus(polotna[0].left.position.x)).toNumber();
 		ky = Decimal.abs(new Decimal(text_points[j].point.y).minus(polotna[0].down.position.y)).toNumber();
-		kx = +kx.toFixed(1);
-		ky = +ky.toFixed(1);
+		kx = kx.toFixed(1)-0;
+		ky = ky.toFixed(1)-0;
 		koordinats_poloten[0][j] = {name: text_points[j].content, koordinats: "(" + kx + ", " + ky + ")"};
 	}
 	return true;
@@ -8647,24 +7897,7 @@ function add_text_contur(arr)
 			var tc = new PointText();
 
 			tc.fontWeight = 'bold';
-			tc.fontSize = 4;
-			var f = 2;
-			while (f > view.zoom)
-			{
-				f = new Decimal(f).minus(0.05).toNumber();
-				if (f <= 0.4 && f > 0.2)
-				{
-					tc.fontSize += 4;
-				}
-				else if (f < 1)
-				{
-					tc.fontSize += 2;
-				}
-				else if (f < 2)
-				{
-					tc.fontSize += 0.5;
-				}
-			}
+			tc.fontSize = (14 / view.zoom).toFixed(2)-0;
 			tc.content = Math.round(arr[i].length);
 			var angle = (Math.atan((arr[i].segments[1].point.y-arr[i].segments[0].point.y)/(arr[i].segments[1].point.x
 				-arr[i].segments[0].point.x))*180)/Math.PI;
@@ -8690,159 +7923,20 @@ function moveVertexNameContur(line1, line2, newPoint)
 	}
 }
 
-var cuts = [];
-
-function find_obrezki_1pol(lines)
-{
-	g_points = getPathsPoints(lines);
-	g_points = changePointsOrderForNaming(g_points, 2, lines);
-	var points_m = findMinAndMaxCordinate_g();
-	var first = 0;
-	var temp, hitResults, gr_polotna1, gr_polotna2;
-	for(var i = g_points.length; i--;)
-	{
-		if (g_points[i].y === points_m.maxY)
-		{
-			first = i;
-			break;
-		}
-	}
-	while(first < g_points.length - 1)
-	{
-		temp = g_points[g_points.length - 1].clone();
-		for(var i = g_points.length - 1; i--;)
-		{
-			g_points[i + 1] = g_points[i];
-		}
-		g_points[0] = temp.clone();
-		first++;
-	}
-
-	var bool_kray, line1, line2, op;
-	for(var i = g_points.length; i--;)
-	{
-		bool_kray = false;
-		hitResults = project.hitTestAll(g_points[i], {class: Path, segments: true, stroke: true, tolerance: 4});
-
-		for(var j = hitResults.length; j--;)
-		{
-			if (hitResults[j].item === polotna[0].up || hitResults[j].item === polotna[0].down ||
-				hitResults[j].item === polotna[0].left || hitResults[j].item === polotna[0].right)
-			{
-				bool_kray = true;
-				break;
-			}
-		}
-		if (bool_kray)
-		{
-			cuts.push(new Path);
-			cuts[cuts.length - 1].add(g_points[i].clone());
-			if (cuts.length > 1)
-			{
-				cuts[cuts.length - 2].add(g_points[i].clone());
-			}
-		}
-		else
-		{
-			cuts[cuts.length - 1].add(g_points[i].clone());
-		}
-	}
-	cuts[cuts.length - 1].add(g_points[g_points.length - 1].clone());
-
-	for(var i = cuts.length; i--;)
-	{
-		gr_polotna1 = [];
-		gr_polotna2 = [];
-		hitResults = project.hitTestAll(cuts[i].segments[0].point, {class: Path, segments: true, stroke: true, tolerance: 4});
-		for(var j = hitResults.length; j--;)
-		{
-			if (hitResults[j].item === polotna[0].up || hitResults[j].item === polotna[0].down ||
-				hitResults[j].item === polotna[0].left || hitResults[j].item === polotna[0].right)
-			{
-				gr_polotna1.push(hitResults[j].item);
-			}
-		}
-		hitResults = project.hitTestAll(cuts[i].segments[cuts[i].segments.length - 1].point, {class: Path, segments: true, stroke: true, tolerance: 4});
-		for(var j = hitResults.length; j--;)
-		{
-			if (hitResults[j].item === polotna[0].up || hitResults[j].item === polotna[0].down ||
-				hitResults[j].item === polotna[0].left || hitResults[j].item === polotna[0].right)
-			{
-				gr_polotna2.push(hitResults[j].item);
-			}
-		}
-		var bool_del = false;
-		for(var j1 = gr_polotna1.length; j1--;)
-		{
-			for(var j2 = gr_polotna2.length; j2--;)
-			{
-				if (gr_polotna1[j1] === gr_polotna2[j2] && cuts[i].segments.length === 2)
-				{
-					cuts.splice(i, 1);
-					bool_del = true;
-					break;
-				}
-			}
-		}
-		if (!bool_del)
-		{
-			op = null;
-			for(var j1 = gr_polotna1.length; j1--;)
-			{
-				for(var j2 = gr_polotna2.length; j2--;)
-				{
-					if (gr_polotna1[j1] === gr_polotna2[j2])
-					{
-						op = 1;
-						break;
-					}
-					if (obshaya_point(gr_polotna1[j1], gr_polotna2[j2]) !== null)
-					{
-						op = obshaya_point(gr_polotna1[j1], gr_polotna2[j2]);
-						break;
-					}
-				}
-			}
-			
-			if (op !== 1)
-			{
-				if (op !== null)
-				{
-					cuts[i].add(op.clone());
-				}
-				else
-				{
-					cuts[i].add(polotna[0].up.segments[0].point.clone());
-					cuts[i].add(polotna[0].up.segments[1].point.clone());
-				}
-			}
-			cuts[i].closed = true;
-			cuts[i].fillColor = 'red';
-			cuts[i].opacity = 0.1;
-		}
-	}
-}
-
 function cuts_gen()
 {
-	var arr_cuts = [], arr_points, cut_area;
-	for(var i = cuts.length; i--;)
+	cuts_json = [];
+	for (var i = polotna.length; i--;)
 	{
-		arr_points = [];
-		cut_area = new Decimal(cuts[i].area);
-		cut_area = cut_area.dividedBy(10000);
-		cut_area = cut_area.times(p_usadki_final).times(p_usadki_final).toNumber();
-		if (cut_area > 1)
+		for (var j = polotna[i].cuts.children.length; j--;)
 		{
-			for(var j = cuts[i].segments.length; j--;)
+			if (polotna[i].cuts.children[j].area > 10000)
 			{
-				arr_points.push({x: +cuts[i].segments[j].point.x.toFixed(2), y: +cuts[i].segments[j].point.y.toFixed(2)});
+				cuts_json.push(polotna[i].cuts.children[j].exportJSON({asString: false}));
 			}
-			arr_cuts.push({sq: cut_area, points: arr_points});
 		}
 	}
-	var obj = {sq_canv: sq_polotna, cuts: arr_cuts};
-	return obj;
+	cuts_json = JSON.stringify(cuts_json);
 }
 
 save_cancel();
@@ -8869,7 +7963,7 @@ var qw = fun_canv.get_pt_points();
 	var obj, pt_name;
 	for (var i = walls_points_rec.length; i--;)
 	{
-		obj = new Path.Line(new Point(walls_points_rec[i].s0_x, walls_points_rec[i].s0_y), 
+		obj = new Path.Line(new Point(walls_points_rec[i].s0_x, walls_points_rec[i].s0_y),
 			new Point(walls_points_rec[i].s1_x, walls_points_rec[i].s1_y));
 		obj.strokeColor = 'green';
 		obj.strokeWidth = 3;
@@ -8879,7 +7973,7 @@ var qw = fun_canv.get_pt_points();
 	}
 	for (var i = diags_points_rec.length; i--;)
 	{
-		obj = new Path.Line(new Point(diags_points_rec[i].s0_x, diags_points_rec[i].s0_y), 
+		obj = new Path.Line(new Point(diags_points_rec[i].s0_x, diags_points_rec[i].s0_y),
 			new Point(diags_points_rec[i].s1_x, diags_points_rec[i].s1_y));
 		obj.strokeColor = 'green';
 		obj.strokeWidth = 1;

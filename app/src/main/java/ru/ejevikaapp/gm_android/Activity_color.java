@@ -86,8 +86,8 @@ public class Activity_color extends Activity{
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-
                         String color_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        Log.d("mLog", "color = " + color_id);
                         try {
                             Integer.parseInt(color_id);
 
@@ -97,11 +97,13 @@ public class Activity_color extends Activity{
                             Cursor cc = db.rawQuery(sqlQuewy, new String[]{color_id});
                             if (cc != null) {
                                 if (cc.moveToFirst()) {
-                                    Log.d("mLog color2", color_id);
+
                                     String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                     String hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
-                                    String id = cc.getString(cc.getColumnIndex(cc.getColumnName(2)));
+                                    //String id = cc.getString(cc.getColumnIndex(cc.getColumnName(2)));
                                     btn_vs(title, hex);
+
+                                    Log.d("mLog", "hex = " + hex);
                                 }
                             }
                             cc.close();
