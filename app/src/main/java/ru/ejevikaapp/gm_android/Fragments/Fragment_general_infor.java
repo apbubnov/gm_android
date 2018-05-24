@@ -3430,15 +3430,17 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 do {
                     S = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     P = c.getString(c.getColumnIndex(c.getColumnName(1)));
-
                     tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
                     tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
                     tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
-
-                    if (c.getString(c.getColumnIndex(c.getColumnName(5))).equals("")) {
+                    try {
+                        if (c.getString(c.getColumnIndex(c.getColumnName(5))).equals("")) {
+                            dis = 0.0;
+                        } else {
+                            dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
+                        }
+                    }catch (Exception e){
                         dis = 0.0;
-                    } else {
-                        dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
                     }
                 } while (c.moveToNext());
             }

@@ -697,21 +697,5 @@ public class DBHelper extends SQLiteOpenHelper {
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
         }
 
-
-        //if (oldVersion < 21) {
-
-        //    db.execSQL("DROP TABLE IF EXISTS rgzbn_users");
-
-        //    db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_users (_id INTEGER, " +
-        //            "name TEXT, username TEXT, email TEXT, password TEXT, block INTEGER, sendEmail INTEGER, registerDate TEXT, " +
-        //            "lastvisitDate TEXT, activation TEXT, params TEXT, lastResetTime TEXT, resetCount INTEGER, otpKey TEXT, otep TEXT, " +
-        //            "requireReset INTEGER, dealer_id INTEGER, discount INTEGER, dealer_type INTEGER, wages TEXT, associated_client TEXT)");
-
-        //    ContentValues values = new ContentValues();
-        //    values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
-        //    db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
-        //}
-
     }
-
 }

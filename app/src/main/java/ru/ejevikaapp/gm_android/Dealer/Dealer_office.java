@@ -564,6 +564,11 @@ public class Dealer_office extends AppCompatActivity {
 
         if (first_entry.equals("")) {
 
+            DBHelper dbHelper = new DBHelper(Dealer_office.this);
+            final SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            db.execSQL("DROP TABLE IF EXISTS history_send_to_server");
+
             AlertDialog.Builder builder = new AlertDialog.Builder(Dealer_office.this);
             builder.setTitle("Подсказка")
                     .setMessage("В правом верхнем углу есть кнопка, если на неё нажать, то вы увидите скрытое меню")
@@ -572,10 +577,8 @@ public class Dealer_office extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialog, int id) {
 
-                                    // НИ КОГДА НЕ ЗАЙДЁТ, ЕСЛИ НЕ ИЗМЕНИТЬ
-                                    if (first_entry.equals("qweqweqweйцуйцуйцуйцу")) {
-                                        DBHelper dbHelper = new DBHelper(Dealer_office.this);
-                                        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                    /*
+                                    if (first_entry.equals("")) {
                                         final ArrayList<Select_work> sel_work = new ArrayList<>();
                                         final ArrayList<Integer> id_api_phones = new ArrayList<>();
 
@@ -749,9 +752,9 @@ public class Dealer_office extends AppCompatActivity {
                                                             db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES,
                                                                     "_id = ?", new String[]{String.valueOf(id_api_phones.get(i))});
 
-                                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                                        "id_old = ? and name_table = ? and sync = ? and status = ?",
-                                                                        new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                                                    new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
                                                         }
 
                                                         Alertdialog.dismiss();
@@ -762,9 +765,12 @@ public class Dealer_office extends AppCompatActivity {
                                         });
 
                                         Alertdialog.show();
+
                                     }
+                                    */
                                 }
                             });
+
             AlertDialog alert = builder.create();
             alert.show();
 

@@ -21,9 +21,9 @@ android {
         applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 19
+        versionCode 20
 
-        versionName '1.0.0523'
+        versionName '1.0.0524'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
     }
