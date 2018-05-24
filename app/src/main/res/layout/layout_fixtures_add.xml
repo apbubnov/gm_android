@@ -1,0 +1,44 @@
+<TableLayout android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="5dp"
+    android:stretchColumns="0,1,2"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <TableRow>
+        <EditText
+            android:id="@+id/count_fixtures"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/edit_text_style"
+            android:hint="Кол-во"
+            android:inputType="number"
+            android:paddingLeft="5dp" />
+
+        <Spinner
+            android:id="@+id/spinner_vid_fixtures"
+            style="@style/spinner_style"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="top"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
+
+        <Spinner
+            android:id="@+id/spinner_diametr_fixtures"
+            style="@style/spinner_style"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="top"
+            android:layout_marginLeft="5dp"/>
+
+        <Button
+            android:id="@+id/btn_delete_fixture"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="top"
+            android:background="@drawable/rounded_button_red"
+            android:text="-"
+            android:textColor="#ffffff" />
+    </TableRow>
+</TableLayout>

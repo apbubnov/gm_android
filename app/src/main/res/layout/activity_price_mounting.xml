@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        style="@style/backgroun"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:stretchColumns="*">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/c_number"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="4"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Наименование"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_price"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Себестоимость"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_income"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="1"
+                android:text="Цена для клиента"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+        </TableRow>
+
+    </TableLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#000000" />
+
+    <ListView
+        android:id="@+id/List_mounting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

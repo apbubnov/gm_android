@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Добавление замерщика"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:textSize="16dp"/>
+
+    <TextView
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ФИО:"
+        android:textColor="#000000"
+        android:gravity="center"/>
+
+    <EditText
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:paddingLeft="5dp"
+        android:inputType="textCapWords"
+        android:background="@drawable/edit_text_style"
+        android:id="@+id/nameGager"/>
+
+    <TextView
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Телефон(логин):"
+        android:textColor="#000000"
+        android:gravity="center"/>
+
+    <EditText
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:paddingLeft="5dp"
+        android:hint="Пример(79009090909)"
+        android:inputType="number"
+        android:background="@drawable/edit_text_style"
+        android:maxLength="11"
+        android:id="@+id/phoneGager"/>
+
+    <TextView
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Адрес электронной почты:"
+        android:textColor="#000000"
+        android:gravity="center"/>
+
+    <EditText
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:paddingLeft="5dp"
+        android:inputType="textWebEmailAddress"
+        android:background="@drawable/edit_text_style"
+        android:id="@+id/mailGager"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="#ffffff"
+        android:background="@drawable/rounded_button"
+        android:text="Добавить"
+        android:gravity="center"
+        android:id="@+id/btnAddGager"/>
+
+    </LinearLayout>
+
+</LinearLayout>
