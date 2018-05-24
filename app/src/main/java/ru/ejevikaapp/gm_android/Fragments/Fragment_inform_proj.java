@@ -224,6 +224,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
 
                     String color = c.getString(c.getColumnIndex(c.getColumnName(20)));
 
+                    Log.d("mLog", "color " + color);
+
                     sqlQuewy = "SELECT hex "
                             + "FROM rgzbn_gm_ceiling_colors" +
                             " WHERE _id = ?";

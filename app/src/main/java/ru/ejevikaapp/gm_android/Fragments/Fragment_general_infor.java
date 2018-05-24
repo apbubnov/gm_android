@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -44,7 +47,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +72,11 @@ import static android.content.Context.MODE_PRIVATE;
 import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.pixplicity.sharp.Sharp;
@@ -79,7 +90,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     Calendar dateAndTime = new GregorianCalendar();
     Calendar dateAndTime2 = Calendar.getInstance();
     TextView name_cl, contact_cl, notes_cl, notes_gm_chief, notes_gm_calc, ed_discount, edit_transport_1, edit_transport_21,
-            edit_transport_22, c_address, c_house, с_body, c_porch, c_floor, c_room, c_code;
+            edit_transport_22, c_address, advertisement;
 
     ScrollView view_general_inform;
     String id_cl;
@@ -97,18 +108,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     String time_h = "", time_brig, id_b, id_z;
 
     Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj;
-
     static DBHelper dbHelper;
     View view;
-
     TextView DateTime, S_and_P, DateTime_mount, currentDateTime;
-
     int discount = 0, count_calc = 0, bt_i = 0, ch_i = 0;
-
     ArrayList id_calcul = new ArrayList();
-
     double total = 0, sum_transport = 0.0;
-
     static RequestQueue requestQueue;
 
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -121,6 +126,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     private List<Button> BtnList_mount_zamer = new ArrayList<Button>();
     private List<CheckBox> CheckBoxList = new ArrayList<CheckBox>();
     private List<Button> BtnListEstimate = new ArrayList<Button>();
+
+    AutoCompleteTextView addressEdit;
+    List<String> addressList = new ArrayList<String>();
 
     int i = 0;
 
@@ -214,6 +222,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         c_address = (TextView) view.findViewById(R.id.c_address);
         c_address.setOnClickListener(this);
+
+        advertisement = (TextView) view.findViewById(R.id.advertisement);
+        advertisement.setOnClickListener(this);
 
         edit_transport_1 = (EditText) view.findViewById(R.id.edit_transport_1);
         edit_transport_1.setVisibility(View.GONE);
@@ -373,7 +384,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         String full_ad = "";
         discount = 0;
-        sqlQuewy = "SELECT project_info, project_calculation_date, project_note "
+        sqlQuewy = "SELECT project_info, project_calculation_date, project_note, api_phone_id "
                 + "FROM rgzbn_gm_ceiling_projects" +
                 " WHERE _id = ?";
 
@@ -383,7 +394,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             if (c.moveToFirst()) {
                 do {
                     pro_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    if (pro_info.equals("-") || pro_info.equals("null")) {
+                    if (pro_info.equals("") || pro_info.equals("null")) {
                         c_address.setText("(редактировать)");
                     } else {
                         c_address.setText(pro_info);
@@ -423,6 +434,26 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     }
 
                     notes_cl.setText(note);
+
+                    String advt = c.getString(c.getColumnIndex(c.getColumnName(3)));
+
+                    if (advt == null || advt.equals("null") || advt.equals("")) {
+                        advertisement.setText("(изменить)");
+                    } else {
+                        sqlQuewy = "SELECT name "
+                                + "FROM rgzbn_gm_ceiling_api_phones" +
+                                " WHERE _id = ?";
+                        c = db.rawQuery(sqlQuewy, new String[]{advt});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    String name = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                    advertisement.setText(name);
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
+                    }
 
                 } while (c.moveToNext());
             }
@@ -483,7 +514,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         calendar_plus = (ImageButton) view.findViewById(R.id.calendar_plus);
         calendar_plus.setOnClickListener(this);
 
-
         ImageButton edit_name = (ImageButton) view.findViewById(R.id.edit_name);
         edit_name.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -514,18 +544,26 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 promptsView = li.inflate(R.layout.layout_profile_dealer, null);
                                 AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
                                 mDialogBuilder.setView(promptsView);
-                                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+                                final EditText pass1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+                                final EditText pass2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
                                 final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
                                 final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
                                 final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
                                 final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                                final TextView ed_name_text3 = (TextView) promptsView.findViewById(R.id.ed_name_text3);
+                                final TextView ed_name_text2 = (TextView) promptsView.findViewById(R.id.ed_name_text2);
                                 final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
                                 pass.setVisibility(View.GONE);
+                                pass1.setVisibility(View.GONE);
+                                pass2.setVisibility(View.GONE);
                                 email.setVisibility(View.GONE);
                                 ava.setVisibility(View.GONE);
                                 ed_name_text.setVisibility(View.GONE);
                                 ed_password_text.setVisibility(View.GONE);
+                                ed_name_text3.setVisibility(View.GONE);
+                                ed_name_text2.setVisibility(View.GONE);
 
                                 name.setText(name_cl.getText().toString());
 
@@ -551,11 +589,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                         values.put(DBHelper.KEY_STATUS, "1");
                                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                                        getActivity().finish();
                                                         Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                         startActivity(intent);
-                                                        getActivity().finish();
 
                                                     }
                                                 })
@@ -624,7 +660,34 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 promptsView = li.inflate(R.layout.layout_edit_address, null);
                                 AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
                                 mDialogBuilder.setView(promptsView);
-                                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
+
+                                addressEdit = (AutoCompleteTextView) promptsView.findViewById(R.id.c_address);
+                                addressEdit.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                    }
+
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable s) {
+                                        String input = addressEdit.getText().toString();
+                                        try {
+                                            if (input.length() > 1)
+                                                loadAddress();
+                                        } catch (IOException ex) {
+                                            Log.d("loadAddress", "Error in!");
+                                        }
+                                    }
+                                });
+
+                                addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                                        android.R.layout.simple_dropdown_item_1line, addressList));
+
                                 final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
                                 final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
                                 final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
@@ -679,8 +742,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     }
                                     str += retval + ",";
                                 }
+
                                 str = str.substring(0, str.length() - 1);
-                                c_address.setText(str);
+                                if (str.equals("null")){
+                                    addressEdit.setText("");
+                                } else {
+                                    addressEdit.setText(str);
+                                }
 
                                 mDialogBuilder
                                         .setCancelable(false)
@@ -688,7 +756,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
 
-                                                        String address = c_address.getText().toString().trim();
+                                                        String address = addressEdit.getText().toString().trim();
                                                         String house = c_house.getText().toString().trim();
                                                         String body = с_body.getText().toString().trim();
                                                         String porch = c_porch.getText().toString().trim();
@@ -739,11 +807,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                         values.put(DBHelper.KEY_STATUS, "1");
                                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                                        getActivity().finish();
                                                         Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                         startActivity(intent);
-                                                        getActivity().finish();
 
                                                     }
                                                 })
@@ -849,11 +915,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         values.put(DBHelper.KEY_STATUS, "1");
                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                        getActivity().finish();
                                         Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                         startActivity(intent);
-                                        getActivity().finish();
 
                                     }
                                 })
@@ -930,11 +994,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                             values.put(DBHelper.KEY_STATUS, "1");
                                             db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                            getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                            getActivity().finish();
                                             Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                             startActivity(intent);
-                                            getActivity().finish();
 
                                         }
                                     }
@@ -1546,11 +1608,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                             values.put(DBHelper.KEY_STATUS, "1");
                                                             db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                                            getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                                            getActivity().finish();
                                                             Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                             startActivity(intent);
-                                                            getActivity().finish();
                                                         }
                                                     } else {
 
@@ -1605,8 +1665,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                                                     db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "_id = ?", new String[]{id_phone});
 
-                                                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                     getActivity().finish();
+                                                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                     startActivity(intent);
 
                                                     Toast toast = Toast.makeText(getActivity().getApplicationContext(),
@@ -1664,8 +1724,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                                     db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "_id = ?", new String[]{id_phone});
 
-                                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                     getActivity().finish();
+                                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                     startActivity(intent);
 
                                     Toast toast = Toast.makeText(getActivity().getApplicationContext(),
@@ -1736,13 +1796,306 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 startActivity(intent);
                 break;
 
-            case R.id.c_address:
-                View promptsView;
+            case R.id.advertisement:
+
+                DBHelper dbHelper = new DBHelper(getActivity());
+                 db = dbHelper.getWritableDatabase();
+                final ArrayList<Select_work> sel_work = new ArrayList<>();
+                final ArrayList<Integer> id_api_phones = new ArrayList<>();
+
                 LayoutInflater li = LayoutInflater.from(context);
-                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                View promptsView = li.inflate(R.layout.add_api_phones, null);
                 AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
                 mDialogBuilder.setView(promptsView);
-                final EditText c_address = (EditText) promptsView.findViewById(R.id.c_address);
+                final EditText ed_api_phones = (EditText) promptsView.findViewById(R.id.ed_api_phones);
+                Button btn_api_phones = (Button) promptsView.findViewById(R.id.btn_add_api_phones);
+                final ListView list_api_phones = (ListView) promptsView.findViewById(R.id.list_api_phones);
+
+                String sqlQuewy = "select _id, name "
+                        + "FROM rgzbn_gm_ceiling_api_phones " +
+                        "where dealer_id = ?";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+
+                            String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                            sel_work.add(new Select_work(idd, null, dealer_id, name, null));
+
+                        } while (c.moveToNext());
+                    }
+                    c.close();
+                }
+
+                BindDictionary<Select_work> dict = new BindDictionary<>();
+                dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
+                    @Override
+                    public String getStringValue(Select_work nc, int position) {
+                        return nc.getName();
+                    }
+                });
+
+                final FunDapter adapter_f = new FunDapter(getActivity(), sel_work, R.layout.list_1column, dict);
+                list_api_phones.setAdapter(adapter_f);
+
+                final SQLiteDatabase finalDb2 = db;
+                btn_api_phones.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (ed_api_phones.getText().toString().length() > 0) {
+
+                            sel_work.clear();
+
+                            int max_id = 0;
+                            try {
+                                String sqlQuewy = "select MAX(_id) "
+                                        + "FROM rgzbn_gm_ceiling_api_phones " +
+                                        "where _id>? and _id<?";
+                                Cursor c = finalDb2.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                                        String.valueOf(Integer.parseInt(dealer_id) * 100000 + 999999)});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                            max_id++;
+                                        } while (c.moveToNext());
+                                    }
+                                }
+                            } catch (Exception e) {
+                                max_id = Integer.parseInt(dealer_id) * 100000 + 1;
+                            }
+
+                            id_api_phones.add(max_id);
+                            ContentValues values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, max_id);
+                            values.put(DBHelper.KEY_NAME, ed_api_phones.getText().toString());
+                            values.put(DBHelper.KEY_NUMBER, "");
+                            values.put(DBHelper.KEY_DESCRIPTION, "");
+                            values.put(DBHelper.KEY_SITE, "");
+                            values.put(DBHelper.KEY_DEALER_ID, dealer_id);
+                            finalDb2.insert(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES, null, values);
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, max_id);
+                            values.put(DBHelper.KEY_ID_NEW, "0");
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_api_phones");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "0");
+                            finalDb2.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                            String sqlQuewy = "select _id, name "
+                                    + "FROM rgzbn_gm_ceiling_api_phones " +
+                                    "where dealer_id = ?";
+                            Cursor c = finalDb2.rawQuery(sqlQuewy, new String[]{dealer_id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+
+                                        String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                        String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                        sel_work.add(new Select_work(idd, null, dealer_id, name, null));
+
+                                    } while (c.moveToNext());
+                                }
+                                c.close();
+                            }
+
+                            BindDictionary<Select_work> dict = new BindDictionary<>();
+                            dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
+                                @Override
+                                public String getStringValue(Select_work nc, int position) {
+                                    return nc.getName();
+                                }
+                            });
+
+                            final FunDapter adapter_f = new FunDapter(getActivity(),
+                                    sel_work, R.layout.list_1column, dict);
+                            list_api_phones.setAdapter(adapter_f);
+                            ed_api_phones.setText("");
+
+                        } else {
+                            Toast.makeText(getActivity().getApplicationContext(), "Введите название рекламы",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+                final AlertDialog Alertdialog = new AlertDialog.Builder(context)
+                        .setView(promptsView)
+                        .setTitle("Добавьте или выберите рекламу")
+                        .setPositiveButton(android.R.string.ok, null)
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setNeutralButton("Убрать", null)
+                        .setCancelable(false)
+                        .create();
+
+                final SQLiteDatabase finalDb = db;
+                final SQLiteDatabase finalDb1 = db;
+                Alertdialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                    @Override
+                    public void onShow(DialogInterface dialogInterface) {
+
+                        Button button = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                        button.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                // TODO Do something
+
+                                // изменить в send_to_history колонки на status = 1
+
+                                for (int i = 0; id_api_phones.size() > i; i++) {
+                                    ContentValues values = new ContentValues();
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    finalDb.update(DBHelper.HISTORY_SEND_TO_SERVER, values,
+                                            "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                            new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                }
+                                Alertdialog.dismiss();
+                            }
+                        });
+
+                        Button button_negative = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+                        button_negative.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                // TODO Do something
+
+                                // запонимать id которые добавлял, и удалить их из всех таблиц
+
+                                for (int i = 0; id_api_phones.size() > i; i++) {
+                                    finalDb1.delete(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES,
+                                            "_id = ?", new String[]{String.valueOf(id_api_phones.get(i))});
+
+                                    finalDb1.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                            "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                            new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                }
+
+                                Alertdialog.dismiss();
+                            }
+                        });
+
+                        Button button_neutral = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_NEUTRAL);
+                        button_neutral.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View view) {
+                                // TODO Do something
+
+                                for (int i = 0; id_api_phones.size() > i; i++) {
+                                    ContentValues values = new ContentValues();
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    finalDb.update(DBHelper.HISTORY_SEND_TO_SERVER, values,
+                                            "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                            new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                }
+
+                                Integer nul = null;
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_API_PHONE_ID, nul);
+                                finalDb.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values,
+                                        "_id = ?",
+                                        new String[]{id_project});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, id_project);
+                                values.put(DBHelper.KEY_ID_NEW, "0");
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "send");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                finalDb2.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                advertisement.setText("(изменить)");
+
+                                Alertdialog.dismiss();
+                            }
+                        });
+                    }
+                });
+
+                list_api_phones.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                        Select_work selectedid = sel_work.get(position);
+                        String s_id = selectedid.getId();
+                        String s_name = selectedid.getName();
+
+                        for (int i = 0; id_api_phones.size() > i; i++) {
+                            ContentValues values = new ContentValues();
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            finalDb.update(DBHelper.HISTORY_SEND_TO_SERVER, values,
+                                    "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                    new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                        }
+
+                        ContentValues values = new ContentValues();
+                        values.put(DBHelper.KEY_API_PHONE_ID, s_id);
+                        finalDb.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values,
+                                "_id = ?",
+                                new String[]{id_project});
+
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                        values.put(DBHelper.KEY_ID_NEW, "0");
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "1");
+                        finalDb2.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                        advertisement.setText(s_name);
+
+                        Alertdialog.dismiss();
+
+                    }
+                });
+
+                Alertdialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                Alertdialog.show();
+                break;
+
+            case R.id.c_address:
+                li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+
+                addressEdit = (AutoCompleteTextView) promptsView.findViewById(R.id.c_address);
+                addressEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String input = addressEdit.getText().toString();
+                        try {
+                            if (input.length() > 1)
+                                loadAddress();
+                        } catch (IOException ex) {
+                            Log.d("loadAddress", "Error in!");
+                        }
+                    }
+                });
+
+                addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                        android.R.layout.simple_dropdown_item_1line, addressList));
+
                 final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
                 final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
                 final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
@@ -1798,7 +2151,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     str += retval + ",";
                 }
                 str = str.substring(0, str.length() - 1);
-                c_address.setText(str);
+                if (str.equals("null")){
+                    addressEdit.setText("");
+                } else {
+                    addressEdit.setText(str);
+                }
 
                 mDialogBuilder
                         .setCancelable(false)
@@ -1807,7 +2164,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     public void onClick(DialogInterface dialog, int id) {
 
 
-                                        String address = c_address.getText().toString().trim();
+                                        String address = addressEdit.getText().toString().trim();
                                         String house = c_house.getText().toString().trim();
                                         String body = с_body.getText().toString().trim();
                                         String porch = c_porch.getText().toString().trim();
@@ -1858,12 +2215,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         values.put(DBHelper.KEY_STATUS, "1");
                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
-                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                                        startActivity(intent);
-                                        getActivity().finish();
-
+                                        c_address.setText(full_address);
                                     }
                                 })
                         .setNegativeButton("Отмена",
@@ -1917,18 +2269,26 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 promptsView = li.inflate(R.layout.layout_profile_dealer, null);
                 mDialogBuilder = new AlertDialog.Builder(context);
                 mDialogBuilder.setView(promptsView);
-                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+                final EditText pass1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+                final EditText pass2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
                 final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
                 final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
                 final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
                 final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                final TextView ed_name_text3 = (TextView) promptsView.findViewById(R.id.ed_name_text3);
+                final TextView ed_name_text2 = (TextView) promptsView.findViewById(R.id.ed_name_text2);
                 final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
                 pass.setVisibility(View.GONE);
+                pass1.setVisibility(View.GONE);
+                pass2.setVisibility(View.GONE);
                 email.setVisibility(View.GONE);
                 ava.setVisibility(View.GONE);
                 ed_name_text.setVisibility(View.GONE);
                 ed_password_text.setVisibility(View.GONE);
+                ed_name_text3.setVisibility(View.GONE);
+                ed_name_text2.setVisibility(View.GONE);
 
                 name.setText(name_cl.getText().toString());
 
@@ -1954,11 +2314,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         values.put(DBHelper.KEY_STATUS, "1");
                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                        getActivity().finish();
                                         Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                         startActivity(intent);
-                                        getActivity().finish();
 
                                     }
                                 })
@@ -2027,7 +2385,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         DBHelper dbHelper = new DBHelper(getActivity());
                                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                                         ContentValues values = new ContentValues();
-                                        Log.d("mLog", "vybor = " + id_z);
                                         values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
                                         values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
                                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
@@ -2042,11 +2399,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         values.put(DBHelper.KEY_STATUS, "1");
                                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
+                                        getActivity().finish();
                                         Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                         startActivity(intent);
-                                        getActivity().finish();
 
                                     }
                                 })
@@ -2104,6 +2459,53 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 }
                 break;
         }
+    }
+
+    private void loadAddress() throws IOException {
+        String input = addressEdit.getText().toString();
+        Log.i("loadAddress", input);
+
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        url += "?input=" + input;
+        url += "&location=51.661535,39.200287";
+        url += "&radius=200&address&types=geocode&language=ru&key=AIzaSyBXhCzmFicI1Xs3pOmfnpr0wlK6hV125_4";
+        Log.d("loadAddress", url);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                addressList.clear();
+                JSONObject dataJsonObj = null;
+                try {
+                    dataJsonObj = new JSONObject(response);
+                    JSONArray predictions = dataJsonObj.getJSONArray("predictions");
+
+                    for (int i = 0; i < predictions.length(); i++) {
+                        JSONObject prediction = predictions.getJSONObject(i);
+                        JSONObject structured_formatting = prediction.getJSONObject("structured_formatting");
+                        String address = structured_formatting.getString("main_text");
+                        addressList.add(address);
+                        Log.d("loadAddress", address);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                updateAdapterAddress();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("loadAddress", error.toString());
+            }
+        });
+
+        requestQueue.add(request);
+    }
+
+    private void updateAdapterAddress() {
+        addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_dropdown_item_1line, addressList));
     }
 
     void cal_preview(int btn_id) {
@@ -2630,6 +3032,45 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         values.put(DBHelper.KEY_ID_OLD, id_project);
         values.put(DBHelper.KEY_ID_NEW, 0);
         values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+        values.put(DBHelper.KEY_SYNC, "0");
+        values.put(DBHelper.KEY_TYPE, "send");
+        values.put(DBHelper.KEY_STATUS, "1");
+        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+        int max_id_proj_history = 0;
+        try {
+            String sqlQuewy = "select MAX(_id) "
+                    + "FROM rgzbn_gm_ceiling_projects_history " +
+                    "where _id>? and _id<?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                    String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        max_id_proj_history = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        max_id_proj_history++;
+                    } while (c.moveToNext());
+                }
+            }
+        } catch (Exception e) {
+            max_id_proj_history = Integer.parseInt(dealer_id) * 100000 + 1;
+        }
+
+        Calendar date_cr = new GregorianCalendar();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String date = df.format(date_cr.getTime());
+
+        values = new ContentValues();
+        values.put(DBHelper.KEY_ID, max_id_proj_history);
+        values.put(DBHelper.KEY_PROJECT_ID, id_project);
+        values.put(DBHelper.KEY_NEW_STATUS, "5");
+        values.put(DBHelper.KEY_DATE_OF_CHANGE, date);
+        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, null, values);
+
+        values = new ContentValues();
+        values.put(DBHelper.KEY_ID_OLD, max_id_proj_history);
+        values.put(DBHelper.KEY_ID_NEW, 0);
+        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_history");
         values.put(DBHelper.KEY_SYNC, "0");
         values.put(DBHelper.KEY_TYPE, "send");
         values.put(DBHelper.KEY_STATUS, "1");

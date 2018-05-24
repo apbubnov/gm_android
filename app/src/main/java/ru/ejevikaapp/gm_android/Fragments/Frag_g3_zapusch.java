@@ -39,14 +39,14 @@ import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     DBHelper dbHelper;
     ListView list_clients;
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID="", user_id="";
+    String SAVED_ID = "", user_id = "";
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -60,7 +60,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
         View View = inflater.inflate(R.layout.frag_g3_zapusch, container, false);
 
-        list_clients = (ListView)View.findViewById(R.id.list_client);
+        list_clients = (ListView) View.findViewById(R.id.list_client);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) View.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -119,7 +119,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                 clients_gager();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
         }
 
         mSwipeRefreshLayout.setRefreshing(false);
@@ -131,7 +131,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    void clients_gager (){
+    void clients_gager() {
 
         client_mas.clear();
 
@@ -151,8 +151,8 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
 
                     int clin = c.getInt(c.getColumnIndex(c.getColumnName(0)));
 
-                    for(int g = 0; client.size()>g; g++) {
-                        if (clin == client.get(g)){
+                    for (int g = 0; client.size() > g; g++) {
+                        if (clin == client.get(g)) {
                             bool = true;
                         }
                     }
@@ -166,7 +166,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         }
         c.close();
 
-        for (int g = 0; g<client.size(); g++) {
+        for (int g = 0; g < client.size(); g++) {
 
             sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
@@ -210,6 +210,10 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                     }
                                 }
 
+                                if (p_info.equals("null")) {
+                                    p_info = "";
+                                }
+
                                 sqlQuewy = "SELECT title "
                                         + "FROM rgzbn_gm_ceiling_status " +
                                         "where _id = ?";
@@ -232,7 +236,6 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                             } while (k.moveToNext());
                         }
                         k.close();
-
 
                     } while (c.moveToNext());
                 }
@@ -271,7 +274,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item3, dict);
         list_clients.setAdapter(adapter);
 
-        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
@@ -305,13 +308,14 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                 ed.putString("", String.valueOf(c_id));
                 ed.commit();
 
+
                 Intent intent = new Intent(getActivity(), Activity_inform_zapysch.class);
                 startActivity(intent);
             }
         });
     }
 
-    void clients_dealer (){
+    void clients_dealer() {
 
         client_mas.clear();
 
@@ -341,7 +345,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         }
         c.close();
 
-        for (int g = 0; g<client.size(); g++) {
+        for (int g = 0; g < client.size(); g++) {
             sqlQuewy = "SELECT _id "
                     + "FROM rgzbn_gm_ceiling_projects" +
                     " WHERE client_id = ? and (project_status = 10 or  project_status = 5 or project_status = 4)" +
@@ -418,6 +422,10 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                 } catch (Exception e) {
                                 }
 
+                                if (p_info.equals("null")) {
+                                    p_info = "";
+                                }
+
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
                                         p_info,
                                         String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
@@ -467,7 +475,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
         FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.clients_item3, dict);
         list_clients.setAdapter(adapter);
 
-        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        list_clients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
@@ -544,9 +552,11 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(cId)});
                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "_id = ?", new String[]{String.valueOf(cId)});
 
-                        Intent intent = new Intent(getActivity(), Activity_empty_mounting.class);
-                        startActivity(intent);
-                        getActivity().finish();
+                        onResume();
+
+                        //Intent intent = new Intent(getActivity(), Activity_empty_mounting.class);
+                        //startActivity(intent);
+                        //getActivity().finish();
                     }
                 });
                 ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {

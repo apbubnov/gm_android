@@ -68,24 +68,13 @@
         <activity
             android:name=".Activity_inform_zapysch"
             android:label="Просмотр проекта"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Manager.Activity_started_projects"
             android:screenOrientation="portrait" />
 
-        <receiver
-            android:name=".Service_Sync$Alarm"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="net.multipi.ALARM" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".Service_Sync"
-            android:enabled="true"
-            android:exported="true" />
+        <service android:name=".Service_Sync" />
 
         <activity android:name=".Activity_zamer" />
 
@@ -101,7 +90,6 @@
             android:name=".Service_Sync_Import"
             android:enabled="true"
             android:exported="true" />
-
         <service
             android:name=".Send_All"
             android:enabled="true"
@@ -110,7 +98,7 @@
         <activity
             android:name=".Crew.Activity_crew"
             android:label="Кабинет монтажника"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Crew.Activity_calendar"
             android:label="Календарь работ"
@@ -122,31 +110,52 @@
         <activity
             android:name=".Crew.Activity_mounting_info"
             android:screenOrientation="portrait" />
-        <activity android:name=".Dealer.Activity_client"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Dealer.Activity_empty"
+        <activity
+            android:name=".Dealer.Activity_client"
             android:screenOrientation="portrait" />
-        <activity android:name=".Dealer.Activity_spisok_brigade"
-            android:screenOrientation="portrait"
-            android:label="Бригады"/>
-        <activity android:name=".Dealer.Activity_add_brigade"
-            android:screenOrientation="portrait"
-            android:label="Новая бригады"/>
-        <activity android:name=".Dealer.Activity_for_spisok"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Dealer.Activity_margin"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Dealer.Activity_mounting"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Dealer.Activity_empty_mounting"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".RegistrationActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ActivityEstimate"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ActivityPrice"
-            android:screenOrientation="portrait"/>
-
+        <activity
+            android:name=".Dealer.Activity_empty"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_spisok_brigade"
+            android:label="Бригады"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_add_brigade"
+            android:label="Новая бригады"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_for_spisok"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_margin"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_mounting"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_empty_mounting"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegistrationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ActivityEstimate"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ActivityPrice"
+            android:label="Прайсы"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dealer.Activity_analytics"
+            android:label="Аналитика"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Dealer.Activity_price_canvases"
+            android:label="Прайс полотен"/>
+        <activity android:name=".Dealer.Activity_price_components"
+            android:label="Прайс компонентов"/>
+        <activity android:name=".Dealer.Activity_price_mounting"
+            android:label="Прайс монтажных работ"></activity>
     </application>
 
 </manifest>

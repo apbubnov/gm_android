@@ -21,8 +21,9 @@ android {
         applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 14
-        versionName '1.0.0510'
+        versionCode 19
+
+        versionName '1.0.0523'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
     }
@@ -39,7 +40,7 @@ android {
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:23.0.1'
     }
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
     productFlavors {
     }
 }
@@ -51,25 +52,23 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.android.support:design:25.4.0'
-    compile 'com.android.support:support-v4:25.4.0'
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.github.amigold.fundapter:library:1.0'
-    // list с выбором
-    compile 'it.neokree:MaterialTabs:0.11'
-    testCompile 'junit:junit:4.12'
-    compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
-    compile files('libs/GenAsync.jar')
-    compile 'com.android.volley:volley:1.0.0'
-    //передача данных
-    compile 'io.nlopez.smartlocation:library:3.3.3'
-    compile 'cn.zhaiyifan:rememberedittext:0.9.0'
-    compile 'com.android.support:support-v4:25.0.0'
-    compile 'net.danlew:android.joda:2.9.9.1'
-    compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
+    implementation 'com.android.support:design:25.4.0'
+    implementation 'com.android.support:support-v4:25.4.0'
+    implementation 'org.jsoup:jsoup:1.8.3'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.github.amigold.fundapter:library:1.0' // list с выбором
+    implementation 'it.neokree:MaterialTabs:0.11'
+    testImplementation 'junit:junit:4.12'
+    implementation 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
+    implementation files('libs/GenAsync.jar')
+    implementation 'com.android.volley:volley:1.0.0' //передача данных
+    implementation 'io.nlopez.smartlocation:library:3.3.3'
+    implementation 'cn.zhaiyifan:rememberedittext:0.9.0'
+    implementation 'com.android.support:support-v4:25.0.0'
+    implementation 'net.danlew:android.joda:2.9.9.1'
+    implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     implementation files('libs/svg-android.jar')
     implementation files('libs/androidsvg-1.2.1.jar')
-    compile 'com.pixplicity.sharp:library:1.1.0'
-    // svg чертеж
+    implementation 'com.pixplicity.sharp:library:1.1.0' // svg чертеж
+
 }

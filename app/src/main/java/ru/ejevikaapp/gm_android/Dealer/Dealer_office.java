@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -18,15 +19,36 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.amigold.fundapter.BindDictionary;
+import com.amigold.fundapter.FunDapter;
+import com.amigold.fundapter.extractors.StringExtractor;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import ru.ejevikaapp.gm_android.Class.HelperClass;
+import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Fragments.FragmentAllProjects;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
@@ -38,6 +60,10 @@ import ru.ejevikaapp.gm_android.Service_Sync_Import;
 public class Dealer_office extends AppCompatActivity {
 
     View promptsView;
+    String domen, jsonPassword, answerRequest, user_id;
+    RequestQueue requestQueue;
+    EditText email, name;
+    AlertDialog dialog;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -46,27 +72,14 @@ public class Dealer_office extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.start_home:
-
-                    SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
-                    ed.putString("", "false");
-                    ed.commit();
                     loadFragment(Fragment_Home.newInstance());
                     return true;
-                case R.id.start_calculation:
 
-                    SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                    ed = SP.edit();
-                    ed.putString("", "true");
-                    ed.commit();
+                case R.id.start_calculation:
                     loadFragment(Fragment_calculation.newInstance());
                     return true;
-                case R.id.start_projects:
 
-                    SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                    ed = SP.edit();
-                    ed.putString("", "false");
-                    ed.commit();
+                case R.id.start_projects:
                     loadFragment(FragmentAllProjects.newInstance());
                     return true;
             }
@@ -94,6 +107,7 @@ public class Dealer_office extends AppCompatActivity {
         if (id == R.id.exit) {
             stopService(new Intent(Dealer_office.this, Service_Sync.class));
             stopService(new Intent(Dealer_office.this, Service_Sync_Import.class));
+
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
             ed.putString("", "");
@@ -107,11 +121,6 @@ public class Dealer_office extends AppCompatActivity {
             SP = getSharedPreferences("first_entry", MODE_PRIVATE);
             ed = SP.edit();
             ed.putString("", "");
-            ed.commit();
-
-            SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-            ed = SP.edit();
-            ed.putString("", "false");
             ed.commit();
 
             Intent intent = new Intent(Dealer_office.this, MainActivity.class);
@@ -155,7 +164,7 @@ public class Dealer_office extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
-                                    if (userInput.getText().toString().equals("")){
+                                    if (userInput.getText().toString().equals("")) {
                                         userInput.setText("0");
                                     }
 
@@ -175,7 +184,7 @@ public class Dealer_office extends AppCompatActivity {
                                     values.put(DBHelper.KEY_STATUS, "1");
                                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
+                                    //startService(new Intent(Dealer_office.this, Service_Sync.class));
 
 
                                 }
@@ -196,109 +205,7 @@ public class Dealer_office extends AppCompatActivity {
             Intent intent = new Intent(Dealer_office.this, Activity_margin.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.profile) {
-
-            final Context context = this;
-            LayoutInflater li = LayoutInflater.from(context);
-            promptsView = li.inflate(R.layout.layout_profile_dealer, null);
-            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-            mDialogBuilder.setView(promptsView);
-            //final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
-            final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
-            final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
-            final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
-
-            String avatar_user = "";
-            try {
-                SharedPreferences SP_end = getSharedPreferences("avatar_user", MODE_PRIVATE);
-                avatar_user = SP_end.getString("", "");
-            } catch (Exception e) {
-            }
-
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(avatar_user));
-                ava.setImageBitmap(bitmap);
-            } catch (IOException e) {
-               // ava.setBackgroundResource(R.drawable.it_c);
-            }
-
-            ava.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                    photoPickerIntent.setType("image/*");
-                    startActivityForResult(photoPickerIntent, 1);
-                }
-            });
-
-            SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
-            final String user_id = SP.getString("", "");
-
-            String str_email = "";
-            String str_name = "";
-            DBHelper dbHelper = new DBHelper(this);
-            SQLiteDatabase db;
-            db = dbHelper.getWritableDatabase();
-
-            String sqlQuewy = "SELECT email, name "
-                    + "FROM rgzbn_users" +
-                    " WHERE _id = ?";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        str_email = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        str_name = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    } while (c.moveToNext());
-                }
-            }
-            c.close();
-
-            email.setText(str_email);
-            name.setText(str_name);
-
-            mDialogBuilder
-                    .setCancelable(false)
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-
-                                    DBHelper dbHelper = new DBHelper(Dealer_office.this);
-                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                    ContentValues values = new ContentValues();
-                                    //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
-                                    values.put(DBHelper.KEY_EMAIL, email.getText().toString());
-                                    values.put(DBHelper.KEY_NAME, name.getText().toString());
-                                    db.update(DBHelper.TABLE_USERS, values, "_id = ?",
-                                            new String[]{user_id});
-
-                                    values = new ContentValues();
-                                    values.put(DBHelper.KEY_ID_OLD, user_id);
-                                    values.put(DBHelper.KEY_ID_NEW, "0");
-                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
-                                    values.put(DBHelper.KEY_SYNC, "0");
-                                    values.put(DBHelper.KEY_TYPE, "send");
-                                    values.put(DBHelper.KEY_STATUS, "1");
-                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
-
-                                    loadFragment(Fragment_Home.newInstance());
-
-                                }
-                            })
-                    .setNegativeButton("Отмена",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-
-            AlertDialog alertDialog = mDialogBuilder.create();
-            alertDialog.show();
-
-            return true;
-        }  else if (id == R.id.margin) {
+        } else if (id == R.id.margin) {
 
             final Context context = this;
             LayoutInflater li = LayoutInflater.from(context);
@@ -348,13 +255,13 @@ public class Dealer_office extends AppCompatActivity {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
 
-                                    if (canvases_margin.getText().toString().equals("")){
+                                    if (canvases_margin.getText().toString().equals("")) {
                                         canvases_margin.setText("0");
                                     }
-                                    if (components_margin.getText().toString().equals("")){
+                                    if (components_margin.getText().toString().equals("")) {
                                         components_margin.setText("0");
                                     }
-                                    if (mounting_margin.getText().toString().equals("")){
+                                    if (mounting_margin.getText().toString().equals("")) {
                                         mounting_margin.setText("0");
                                     }
                                     DBHelper dbHelper = new DBHelper(Dealer_office.this);
@@ -374,33 +281,258 @@ public class Dealer_office extends AppCompatActivity {
                                     values.put(DBHelper.KEY_STATUS, "1");
                                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                    startService(new Intent(Dealer_office.this, Service_Sync.class));
+                                    //startService(new Intent(Dealer_office.this, Service_Sync.class));
 
                                 }
                             })
                     .setNegativeButton("Отмена",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
 
             AlertDialog alertDialog = mDialogBuilder.create();
             alertDialog.show();
+
+            return true;
+        } else if (id == R.id.profile) {
+
+            requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+            final Context context = this;
+            LayoutInflater li = LayoutInflater.from(context);
+            promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+            mDialogBuilder.setView(promptsView);
+            //final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+            email = (EditText) promptsView.findViewById(R.id.ed_email);
+            name = (EditText) promptsView.findViewById(R.id.ed_name);
+            final EditText ed_oldPassword = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+            final EditText ed_newPassword1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+            final EditText ed_newPassword2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
+            final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+
+            String avatar_user = "";
+            try {
+                SharedPreferences SP_end = getSharedPreferences("avatar_user", MODE_PRIVATE);
+                avatar_user = SP_end.getString("", "");
+            } catch (Exception e) {
+            }
+
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(avatar_user));
+                ava.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                // ava.setBackgroundResource(R.drawable.it_c);
+            }
+
+            ava.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, 1);
+                }
+            });
+
+            String str_email = "";
+            String str_name = "";
+            DBHelper dbHelper = new DBHelper(this);
+            SQLiteDatabase db;
+            db = dbHelper.getWritableDatabase();
+
+            String sqlQuewy = "SELECT email, name "
+                    + "FROM rgzbn_users" +
+                    " WHERE _id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        str_email = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        str_name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+            email.setText(str_email);
+            name.setText(str_name);
+
+            dialog = new AlertDialog.Builder(context)
+                    .setView(promptsView)
+                    .setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create();
+
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+
+                    Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                    button.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            // TODO Do something
+
+                            if (ed_oldPassword.getText().toString().length() < 1 &&
+                                    ed_newPassword1.getText().toString().length() < 1 &&
+                                    ed_newPassword2.getText().toString().length() < 1) {
+
+                                DBHelper dbHelper = new DBHelper(Dealer_office.this);
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                ContentValues values = new ContentValues();
+                                //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
+                                values.put(DBHelper.KEY_EMAIL, email.getText().toString());
+                                values.put(DBHelper.KEY_NAME, name.getText().toString());
+                                db.update(DBHelper.TABLE_USERS, values, "_id = ?",
+                                        new String[]{user_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, user_id);
+                                values.put(DBHelper.KEY_ID_NEW, "0");
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "send");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                //startService(new Intent(Dealer_office.this, Service_Sync.class));
+
+                                dialog.dismiss();
+
+                            } else {
+                                if (HelperClass.isOnline(Dealer_office.this)) {
+                                    if (ed_oldPassword.getText().toString().length() > 0 &&
+                                            ed_newPassword1.getText().toString().length() > 0 &&
+                                            ed_newPassword2.getText().toString().length() > 0) {
+
+                                        if (ed_newPassword1.getText().toString().length() > 5 &&
+                                                ed_newPassword2.getText().toString().length() > 5) {
+                                            if (ed_newPassword1.getText().toString().equals(ed_newPassword2.getText().toString())) {
+
+                                                JSONObject jsonObject = new JSONObject();
+                                                try {
+                                                    jsonObject.put("old_password", jsonPassword);
+                                                    jsonObject.put("password", ed_newPassword1);
+                                                    jsonObject.put("user_id", user_id);
+                                                } catch (JSONException e) {
+                                                }
+
+                                                jsonPassword = String.valueOf(jsonObject);
+                                                new ChangePwd().execute();
+
+                                            } else {
+                                                Toast.makeText(getApplicationContext(), "Новые пароли не совпадают",
+                                                        Toast.LENGTH_LONG).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Длина пароля должна быть больше 5 символов",
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Введите старый пароль",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Не удалось проверить старый пароль(нет интернета)",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            dialog.show();
 
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    class ChangePwd extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.changePwd";
+        java.util.Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new com.android.volley.Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+                    try {
+
+                        if (res.equals("true")) {
+                            DBHelper dbHelper = new DBHelper(Dealer_office.this);
+                            SQLiteDatabase db = dbHelper.getWritableDatabase();
+                            ContentValues values = new ContentValues();
+                            values.put(DBHelper.KEY_EMAIL, email.getText().toString());
+                            values.put(DBHelper.KEY_NAME, name.getText().toString());
+                            db.update(DBHelper.TABLE_USERS, values, "_id = ?",
+                                    new String[]{user_id});
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, user_id);
+                            values.put(DBHelper.KEY_ID_NEW, "0");
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                            //startService(new Intent(Dealer_office.this, Service_Sync.class));
+
+                            dialog.dismiss();
+
+                            Toast.makeText(getApplicationContext(), "Пароль изменён",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Неверный старый пароль",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                    } catch (Exception e) {
+                    }
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+
+                @Override
+                protected java.util.Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("u_data", jsonPassword);
+                    Log.d("response", "send " + parameters);
+                    return parameters;
+                }
+            };
+
+            requestQueue.add(request);
+
+            return null;
+        }
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
 
+        startService(new Intent(this, Service_Sync.class));
         SharedPreferences SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
         String entryCalcDealer = SP.getString("", "");
 
-        if (entryCalcDealer.equals("1")){
+        if (entryCalcDealer.equals("1")) {
             BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
             navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
             navigation.setSelectedItemId(R.id.start_projects);
@@ -418,16 +550,17 @@ public class Dealer_office extends AppCompatActivity {
         setContentView(R.layout.activity_dealer_office);
         loadFragment(Fragment_calculation.newInstance());
 
-        SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-        SharedPreferences.Editor ed = SP.edit();
-        ed.putString("", "true");
-        ed.commit();
+        SharedPreferences SP = getSharedPreferences("link", MODE_PRIVATE);
+        domen = SP.getString("", "");
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         SP = getSharedPreferences("first_entry", MODE_PRIVATE);
         final String first_entry = SP.getString("", "");
+
+        SP = getSharedPreferences("user_id", MODE_PRIVATE);
+        user_id = SP.getString("", "");
 
         if (first_entry.equals("")) {
 
@@ -437,23 +570,213 @@ public class Dealer_office extends AppCompatActivity {
                     .setCancelable(false)
                     .setNegativeButton("Спасибо",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    loadFragment(Fragment_calculation.newInstance());
-                                    dialog.cancel();
+                                public void onClick(final DialogInterface dialog, int id) {
+
+                                    // НИ КОГДА НЕ ЗАЙДЁТ, ЕСЛИ НЕ ИЗМЕНИТЬ
+                                    if (first_entry.equals("qweqweqweйцуйцуйцуйцу")) {
+                                        DBHelper dbHelper = new DBHelper(Dealer_office.this);
+                                        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        final ArrayList<Select_work> sel_work = new ArrayList<>();
+                                        final ArrayList<Integer> id_api_phones = new ArrayList<>();
+
+                                        final Context context = Dealer_office.this;
+                                        LayoutInflater li = LayoutInflater.from(context);
+                                        promptsView = li.inflate(R.layout.add_api_phones, null);
+                                        AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                                        mDialogBuilder.setView(promptsView);
+                                        final EditText ed_api_phones = (EditText) promptsView.findViewById(R.id.ed_api_phones);
+                                        Button btn_api_phones = (Button) promptsView.findViewById(R.id.btn_add_api_phones);
+                                        final ListView list_api_phones = (ListView) promptsView.findViewById(R.id.list_api_phones);
+
+                                        String sqlQuewy = "select _id, name "
+                                                + "FROM rgzbn_gm_ceiling_api_phones " +
+                                                "where dealer_id = ?";
+                                        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                                        if (c != null) {
+                                            if (c.moveToFirst()) {
+                                                do {
+
+                                                    String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                                    String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                                                    sel_work.add(new Select_work(idd, null, user_id, name, null));
+
+                                                } while (c.moveToNext());
+                                            }
+                                            c.close();
+                                        }
+
+                                        BindDictionary<Select_work> dict = new BindDictionary<>();
+                                        dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
+                                            @Override
+                                            public String getStringValue(Select_work nc, int position) {
+                                                return nc.getName();
+                                            }
+                                        });
+
+                                        final FunDapter adapter_f = new FunDapter(Dealer_office.this, sel_work, R.layout.list_1column, dict);
+                                        list_api_phones.setAdapter(adapter_f);
+
+                                        btn_api_phones.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+
+                                                if (ed_api_phones.getText().toString().length() > 0) {
+
+                                                    sel_work.clear();
+
+                                                    int max_id = 0;
+                                                    try {
+                                                        String sqlQuewy = "select MAX(_id) "
+                                                                + "FROM rgzbn_gm_ceiling_api_phones " +
+                                                                "where _id>? and _id<?";
+                                                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(user_id) * 100000),
+                                                                String.valueOf(Integer.parseInt(user_id) * 100000 + 999999)});
+                                                        if (c != null) {
+                                                            if (c.moveToFirst()) {
+                                                                do {
+                                                                    max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                                                    max_id++;
+                                                                } while (c.moveToNext());
+                                                            }
+                                                        }
+                                                    } catch (Exception e) {
+                                                        max_id = Integer.parseInt(user_id) * 100000 + 1;
+                                                    }
+
+                                                    id_api_phones.add(max_id);
+                                                    ContentValues values = new ContentValues();
+                                                    values.put(DBHelper.KEY_ID, max_id);
+                                                    values.put(DBHelper.KEY_NAME, ed_api_phones.getText().toString());
+                                                    values.put(DBHelper.KEY_NUMBER, "");
+                                                    values.put(DBHelper.KEY_DESCRIPTION, "");
+                                                    values.put(DBHelper.KEY_SITE, "");
+                                                    values.put(DBHelper.KEY_DEALER_ID, user_id);
+                                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES, null, values);
+
+                                                    values = new ContentValues();
+                                                    values.put(DBHelper.KEY_ID_OLD, max_id);
+                                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_api_phones");
+                                                    values.put(DBHelper.KEY_SYNC, "0");
+                                                    values.put(DBHelper.KEY_TYPE, "send");
+                                                    values.put(DBHelper.KEY_STATUS, "0");
+                                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                    String sqlQuewy = "select _id, name "
+                                                            + "FROM rgzbn_gm_ceiling_api_phones " +
+                                                            "where dealer_id = ?";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+
+                                                                String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                                                String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                                                sel_work.add(new Select_work(idd, null, user_id, name, null));
+
+                                                            } while (c.moveToNext());
+                                                        }
+                                                        c.close();
+                                                    }
+
+                                                    BindDictionary<Select_work> dict = new BindDictionary<>();
+                                                    dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
+                                                        @Override
+                                                        public String getStringValue(Select_work nc, int position) {
+                                                            return nc.getName();
+                                                        }
+                                                    });
+
+                                                    final FunDapter adapter_f = new FunDapter(Dealer_office.this,
+                                                            sel_work, R.layout.list_1column, dict);
+                                                    list_api_phones.setAdapter(adapter_f);
+                                                    ed_api_phones.setText("");
+
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Введите название рекламы",
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+
+                                        final AlertDialog Alertdialog = new AlertDialog.Builder(context)
+                                                .setView(promptsView)
+                                                .setTitle("Добавить рекламу")
+                                                .setMessage("По рекламе вы сможете следить за своей аналитикой")
+                                                .setPositiveButton(android.R.string.ok, null)
+                                                .setNegativeButton("Не сейчас", null)
+                                                .setCancelable(false)
+                                                .create();
+
+                                        Alertdialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                                            @Override
+                                            public void onShow(DialogInterface dialogInterface) {
+
+                                                Button button = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                                                button.setOnClickListener(new View.OnClickListener() {
+
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        // TODO Do something
+
+                                                        // изменить в send_to_history колонки на status = 1
+
+                                                        for (int i = 0; id_api_phones.size() > i; i++) {
+                                                            ContentValues values = new ContentValues();
+                                                            values.put(DBHelper.KEY_STATUS, "1");
+                                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values,
+                                                                    "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                                                    new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                                        }
+                                                        Alertdialog.dismiss();
+                                                        loadFragment(Fragment_calculation.newInstance());
+                                                        startService(new Intent(Dealer_office.this, Service_Sync.class));
+                                                    }
+                                                });
+
+                                                Button button_negative = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+                                                button_negative.setOnClickListener(new View.OnClickListener() {
+
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        // TODO Do something
+
+                                                        // запонимать id которые добавлял, и удалить их из всех таблиц
+
+                                                        for (int i = 0; id_api_phones.size() > i; i++) {
+                                                            db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES,
+                                                                    "_id = ?", new String[]{String.valueOf(id_api_phones.get(i))});
+
+                                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                        "id_old = ? and name_table = ? and sync = ? and status = ?",
+                                                                        new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
+                                                        }
+
+                                                        Alertdialog.dismiss();
+                                                        loadFragment(Fragment_calculation.newInstance());
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                        Alertdialog.show();
+                                    }
                                 }
                             });
             AlertDialog alert = builder.create();
             alert.show();
 
             SP = getSharedPreferences("first_entry", MODE_PRIVATE);
-            ed = SP.edit();
+            SharedPreferences.Editor ed = SP.edit();
             ed.putString("", "1");
             ed.commit();
 
         }
 
         SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
-        ed = SP.edit();
+        SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "0");
         ed.commit();
 

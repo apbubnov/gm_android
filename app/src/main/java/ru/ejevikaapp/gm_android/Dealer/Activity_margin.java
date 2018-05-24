@@ -20,8 +20,7 @@ import ru.ejevikaapp.gm_android.R;
 public class Activity_margin extends AppCompatActivity implements View.OnClickListener {
 
     EditText distance, transport, mp43, mp22, mp23, mp24, mp25, mp26, mp27, mp33, mp30, mp34, mp36, mp37, mp38, mp40, mp41, mp42,
-            mp1, mp31, mp32, mp2, mp4, mp5, mp6, mp7, mp3, mp8, mp9, mp10, mp11,
-            mp12, mp13, mp14, mp15, mp16, mp17, mp18, mp19;
+            mp1, mp31, mp32, mp2, mp4, mp5, mp6, mp7, mp3, mp8, mp9, mp10, mp11, mp12, mp13, mp14, mp15, mp16, mp17, mp18, mp19;
 
     String str_distance, str_transport, str_mp43, str_mp22, str_mp23, str_mp24, str_mp25, str_mp26, str_mp27, str_mp33, str_mp30, str_mp34,
             str_mp36, str_mp37, str_mp38, str_mp40, str_mp41, str_mp42, str_canvases_margin, str_components_margin, str_mounting_margin,

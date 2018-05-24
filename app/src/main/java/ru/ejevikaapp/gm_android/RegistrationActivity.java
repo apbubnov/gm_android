@@ -1,5 +1,6 @@
 package ru.ejevikaapp.gm_android;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,6 +46,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     static String data = "";
     static String domen = "calc";
     static JSONObject jsonData = new JSONObject();
+    ProgressDialog pd;
 
     private static final String TAG = "responceUsers";
 
@@ -94,7 +96,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                 //ed.commit();
 
                 if (number.length()>9 && number.length()<13 && validateMail(email)) {
-                    String id_user = number.substring(1, number.length() - 3);
+                    String id_user = number.substring(0, number.length() - 4);
                     if (HelperClass.isOnline(this)) {
                         try {
                             jsonData.put("android_id", id_user);
@@ -107,7 +109,9 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                         }
                         data = String.valueOf(jsonData);
 
-                        Log.d(TAG, "послал " + data);
+                        pd = new ProgressDialog(this);
+                        pd.setMessage("Регистрируем... ");
+                        pd.show();
 
                         new SendUsers().execute();
                     } else
@@ -137,15 +141,20 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
                     Log.d(TAG, "пришло "  + res);
 
-                    if (res.length() == 130){
-                        res = "Такой номер занят";
-                    } else if (res.length() == 168){
-                        res = "Такая почта занята";
+                    String new_id = "";
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        new_id = dat.getString("new_id");
+                    }catch (Exception e){
+                    }
+
+                    if (new_id.equals("")) {
                     } else {
                         res = "спасибо за регистрацию";
                         finish();
                     }
 
+                    pd.dismiss();
                     final Toast toast = Toast.makeText(getApplicationContext(),
                             res, Toast.LENGTH_LONG);
                     toast.show();
@@ -164,9 +173,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                     return parameters;
                 }
             };
-
             requestQueue.add(request);
-
             return null;
         }
     }

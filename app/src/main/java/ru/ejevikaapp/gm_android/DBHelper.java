@@ -10,7 +10,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 20;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     private Context mContext;
@@ -81,10 +81,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_OFFCUT_SQUARE = "offcut_square";   //
     public static final String KEY_ORIGINAL_SKETCH = "original_sketch";   //
 
-    public static final String TABLE_RGZBN_GM_CEILING_CALC_GUILD = "rgzbn_gm_ceiling_calc_guild";
-    public static final String KEY_CALC_ID = "calc_id";
-    public static final String KEY_GUILD_ID = "guild_id";
-
     public static final String TABLE_RGZBN_GM_CEILING_CANVASES = "rgzbn_gm_ceiling_canvases";
     public static final String KEY_TEXTURE_ID = "texture_id";
     public static final String KEY_COLOR_ID = "color_id";
@@ -94,6 +90,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_RGZBN_GM_CEILING_CANVASES_MANUFACTURERS = "rgzbn_gm_ceiling_canvases_manufacturers";
     public static final String KEY_NAME = "name";
     public static final String KEY_COUNTRY = "country";
+
+    public static final String TABLE_RGZBN_GM_CEILING_API_PHONES = "rgzbn_gm_ceiling_api_phones";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_SITE = "site";
+    public static final String KEY_NUMBER = "number";
 
     public static final String TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE = "rgzbn_gm_ceiling_canvases_dealer_price";
     public static final String KEY_CANVAS_ID = "canvas_id";
@@ -284,8 +285,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_DISTANCE_COL = "distance_col";
 
     public static final String TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY = "rgzbn_gm_ceiling_projects_history";
-    public static final String KEY_CHANGE_VIEW = "change_view";
-    public static final String KEY_CHANGE_TEXT = "change_text";
+    public static final String KEY_NEW_STATUS = "new_status";
     public static final String KEY_DATE_OF_CHANGE = "date_of_change";
 
     public static final String TABLE_RGZBN_GM_CEILING_SPENDS = "rgzbn_gm_ceiling_spends";
@@ -343,6 +343,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_OTEP = "otep";
     public static final String KEY_REQUIRERESET = "requireReset";
     public static final String KEY_WAGES = "wages";
+    public static final String KEY_ASSOCIATED_CLIENT = "associated_client";
 
     public static final String TABLE_RGZBN_USER_USERGROUP_MAP = "rgzbn_user_usergroup_map";
 
@@ -506,11 +507,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 "mounting_check TEXT, new_project_sum TEXT, new_project_spend TEXT, new_project_mounting TEXT, new_extra_spend TEXT, " +
                 "gm_canvases_margin INTEGER, gm_components_margin INTEGER, gm_mounting_margin INTEGER, dealer_canvases_margin INTEGER, " +
                 "dealer_components_margin INTEGER, dealer_mounting_margin INTEGER, project_sum TEXT, salary_sum TEXT, extra_spend TEXT, " +
-                "penalty TEXT, bonus TEXT, calculated_by INTEGER, approved_by INTEGER, checked_by INTEGER, read_by_manager INTEGER, api_phone_id TEXT, read_by_mounter TEXT, " +
-                " change_time TEXT, new_mount_sum TEXT, new_material_sum TEXT, transport TEXT, distance TEXT, distance_col TEXT)");
+                "penalty TEXT, bonus TEXT, calculated_by INTEGER, approved_by INTEGER, checked_by INTEGER, read_by_manager INTEGER, api_phone_id TEXT DEFAULT NULL, " +
+                "read_by_mounter TEXT, change_time TEXT, new_mount_sum TEXT, new_material_sum TEXT, transport TEXT, distance TEXT, distance_col TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects_history (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "project_id INTEGER, change_view TEXT, change_text TEXT, date_of_change TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects_history (_id INTEGER ," +
+                "project_id INTEGER, new_status TEXT, date_of_change TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_spends (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
@@ -546,7 +547,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_users (_id INTEGER, " +
                 "name TEXT, username TEXT, email TEXT, password TEXT, block INTEGER, sendEmail INTEGER, registerDate TEXT, " +
                 "lastvisitDate TEXT, activation TEXT, params TEXT, lastResetTime TEXT, resetCount INTEGER, otpKey TEXT, otep TEXT, " +
-                "requireReset INTEGER, dealer_id INTEGER, discount INTEGER, dealer_type INTEGER, wages TEXT)");
+                "requireReset INTEGER, dealer_id INTEGER, discount INTEGER, dealer_type INTEGER, wages TEXT, associated_client TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_usergroups (_id INTEGER, parent_id INTEGER, lft INTEGER, rgt INTEGER, title TEXT)");
 
@@ -554,6 +555,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS history_send_to_server (_id INTEGER PRIMARY KEY AUTOINCREMENT, id_new INTEGER, id_old INTEGER, " +
                 "name_table TEXT, sync INTEGER, type TEXT, date TEXT, date_sync TEXT, status TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_api_phones (_id INTEGER, number INTEGER, name TEXT, " +
+                "description TEXT, site TEXT, dealer_id INTEGER)");
     }
 
     @Override
@@ -674,6 +678,40 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
         }
+
+        if (oldVersion < 19) {
+            //1
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_projects_history");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects_history (_id INTEGER, " +
+                    "project_id INTEGER, new_status TEXT, date_of_change TEXT)");
+        }
+
+        if (oldVersion < 20) {
+            //1
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_api_phones (_id INTEGER, number INTEGER DEFAULT NULL, name TEXT, " +
+                    "description TEXT DEFAULT NULL, site TEXT DEFAULT NULL, dealer_id INTEGER)");
+
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
+        }
+
+
+        //if (oldVersion < 21) {
+
+        //    db.execSQL("DROP TABLE IF EXISTS rgzbn_users");
+
+        //    db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_users (_id INTEGER, " +
+        //            "name TEXT, username TEXT, email TEXT, password TEXT, block INTEGER, sendEmail INTEGER, registerDate TEXT, " +
+        //            "lastvisitDate TEXT, activation TEXT, params TEXT, lastResetTime TEXT, resetCount INTEGER, otpKey TEXT, otep TEXT, " +
+        //            "requireReset INTEGER, dealer_id INTEGER, discount INTEGER, dealer_type INTEGER, wages TEXT, associated_client TEXT)");
+
+        //    ContentValues values = new ContentValues();
+        //    values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+        //    db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"dealer"});
+        //}
+
     }
 
 }

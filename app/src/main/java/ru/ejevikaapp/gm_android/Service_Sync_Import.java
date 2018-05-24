@@ -139,7 +139,7 @@ public class Service_Sync_Import extends Service {
                 } else {
                     new ImportDate().execute();
                 }
-            } else if (usergroup.equals("22") || usergroup.equals("21")){
+            } else if (usergroup.equals("22") || usergroup.equals("21")) {
                 jsonSync_Import.put("change_time", change_time_global);
                 jsonSync_Import.put("project_calculator", user_id);
                 sync_import = String.valueOf(jsonSync_Import);
@@ -181,8 +181,6 @@ public class Service_Sync_Import extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "Alarm received: " + intent.getAction());
 
-            ctx = context;
-
             SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
             domen = SP.getString("", "");
 
@@ -205,13 +203,12 @@ public class Service_Sync_Import extends Service {
                     }
                 }
                 c.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 count = 0;
             }
 
             if (!isRunning(context)) {
-                //context.startService(new Intent(context, Service_Sync_Import.class));
-            } else if (count == 0){
+            } else if (count == 0) {
                 Log.v(TAG, "don't start service: already running...");
 
                 SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
@@ -243,7 +240,6 @@ public class Service_Sync_Import extends Service {
                     if (c.moveToFirst()) {
                         do {
                             usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
                         } while (c.moveToNext());
                     }
                 }
@@ -258,7 +254,7 @@ public class Service_Sync_Import extends Service {
                     } else {
                         new ImportDate().execute();
                     }
-                } else if (usergroup.equals("22") || usergroup.equals("21")){
+                } else if (usergroup.equals("22") || usergroup.equals("21")) {
                     jsonSync_Import.put("change_time", change_time_global);
                     jsonSync_Import.put("project_calculator", user_id);
                     sync_import = String.valueOf(jsonSync_Import);
@@ -268,7 +264,6 @@ public class Service_Sync_Import extends Service {
                         new ImportDate().execute();
                     }
                 }
-
             }
         }
 
@@ -287,7 +282,7 @@ public class Service_Sync_Import extends Service {
 
     static class ImportDate extends AsyncTask<Void, Void, Void> {
 
-        String insertUrl = "http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendDataToAndroid";
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendDataToAndroid";
         Map<String, String> parameters = new HashMap<String, String>();
 
         @Override
@@ -357,7 +352,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -372,7 +367,7 @@ public class Service_Sync_Import extends Service {
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
                                         Date change = ft.parse(change_time);
-                                        if (change_max.getTime()<change.getTime()){
+                                        if (change_max.getTime() < change.getTime()) {
                                             change_max = change;
                                         }
                                     } catch (Exception e) {
@@ -408,7 +403,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -421,7 +416,7 @@ public class Service_Sync_Import extends Service {
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
                                         Date change = ft.parse(change_time);
-                                        if (change_max.getTime()<change.getTime()){
+                                        if (change_max.getTime() < change.getTime()) {
                                             change_max = change;
                                         }
                                     } catch (Exception e) {
@@ -572,7 +567,7 @@ public class Service_Sync_Import extends Service {
                                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id});
                                                 count++;
                                                 Date change = ft.parse(change_time);
-                                                if (change_max.getTime()<change.getTime()){
+                                                if (change_max.getTime() < change.getTime()) {
                                                     change_max = change;
                                                 }
                                             } while (c.moveToNext());
@@ -582,10 +577,10 @@ public class Service_Sync_Import extends Service {
 
                                     if (count == 0) {
 
-                                        if (project_status.equals("0")){
-                                        } else if (project_status.equals("1")){
+                                        if (project_status.equals("0")) {
+                                        } else if (project_status.equals("1")) {
 
-                                            count_project1 ++;
+                                            count_project1++;
 
                                             Intent resultIntent = new Intent(ctx, Activity_empty.class);
                                             ArrayList group_id = new ArrayList();
@@ -616,13 +611,11 @@ public class Service_Sync_Import extends Service {
                                                     } else if (group_id.get(g).equals("21") || group_id.get(g).equals("22")) {
                                                         resultIntent = new Intent(ctx, MainActivity.class);
                                                         break;
-                                                    }
-                                                    else if (group_id.get(g).equals("14")) {
+                                                    } else if (group_id.get(g).equals("14")) {
                                                         resultIntent = new Intent(ctx, Activity_empty.class);
                                                         break;
                                                     }
                                                 }
-
 
                                             PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
                                                     PendingIntent.FLAG_UPDATE_CURRENT);
@@ -645,7 +638,7 @@ public class Service_Sync_Import extends Service {
                                             values.put(DBHelper.KEY_ID, id);
                                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
 
@@ -653,23 +646,17 @@ public class Service_Sync_Import extends Service {
                                             values.put(DBHelper.KEY_ID, id);
                                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         }
-
                                     }
-                                }catch (Exception e ){
+                                } catch (Exception e) {
                                 }
-
                             }
 
                             JSONArray rgzbn_gm_ceiling_calculations = jsonObject.getJSONArray("rgzbn_gm_ceiling_calculations");
-
-                            Log.d(TAG, String.valueOf(rgzbn_gm_ceiling_calculations));
-
                             for (int i = 0; i < rgzbn_gm_ceiling_calculations.length(); i++) {
-
                                 values = new ContentValues();
                                 org.json.JSONObject porject_tmp = rgzbn_gm_ceiling_calculations.getJSONObject(i);
 
@@ -781,7 +768,7 @@ public class Service_Sync_Import extends Service {
                                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id});
                                                 count++;
                                                 Date change = ft.parse(change_time);
-                                                if (change_max.getTime()<change.getTime()){
+                                                if (change_max.getTime() < change.getTime()) {
                                                     change_max = change;
                                                 }
                                             } while (c.moveToNext());
@@ -793,11 +780,11 @@ public class Service_Sync_Import extends Service {
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
                                         Date change = ft.parse(change_time);
-                                        if (change_max.getTime()<change.getTime()){
+                                        if (change_max.getTime() < change.getTime()) {
                                             change_max = change;
                                         }
                                     }
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                 }
                             }
 
@@ -831,7 +818,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -848,7 +835,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_N15_SIZE, n15_size);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -882,7 +869,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -894,7 +881,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -931,7 +918,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -943,7 +930,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -979,7 +966,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -991,7 +978,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -1027,7 +1014,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -1039,7 +1026,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -1073,7 +1060,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -1085,7 +1072,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }
@@ -1123,7 +1110,7 @@ public class Service_Sync_Import extends Service {
                                             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, values, "_id = ?", new String[]{id});
                                             count++;
                                             Date change = ft.parse(change_time);
-                                            if (change_max.getTime()<change.getTime()){
+                                            if (change_max.getTime() < change.getTime()) {
                                                 change_max = change;
                                             }
                                         } while (c.moveToNext());
@@ -1136,7 +1123,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, null, values);
                                     Date change = ft.parse(change_time);
-                                    if (change_max.getTime()<change.getTime()){
+                                    if (change_max.getTime() < change.getTime()) {
                                         change_max = change;
                                     }
                                 }

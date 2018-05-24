@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_root"
     android:layout_width="fill_parent"
@@ -7,55 +7,132 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <com.github.siyamed.shapeimageview.CircularImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:id="@+id/ed_ava"
-        android:src="@drawable/it_c"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="20dp"
-        android:text="  Имя: "
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <EditText
-        android:id="@+id/ed_name"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </EditText>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textSize="20dp"
-        android:text="  Пароль(я пока не работаю): "
-        android:id="@+id/ed_name_text"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/ed_ava"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:src="@drawable/it_c" />
 
-    <EditText
-        android:id="@+id/ed_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </EditText>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="  Имя: "
+            style="@style/text_style_spisok"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="18dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="  Почта: "
-        android:layout_marginTop="5dp"
-        android:id="@+id/ed_password_text"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <EditText
+            android:id="@+id/ed_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edit_text_style"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c">
+        </EditText>
 
-    <EditText
-        android:id="@+id/ed_email"
-        android:textSize="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-        <requestFocus />
-    </EditText>
+        <TextView
+            android:id="@+id/ed_name_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="  Старый пароль: "
+            style="@style/text_style_spisok"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="18dp" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/ed_oldPassword"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edit_text_style"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c"></EditText>
+
+        <TextView
+            android:id="@+id/ed_name_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="  Новый пароль: "
+            style="@style/text_style_spisok"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="18dp" />
+
+        <EditText
+            android:id="@+id/ed_newPassword1"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edit_text_style"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c"></EditText>
+
+        <TextView
+            android:id="@+id/ed_name_text3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            style="@style/text_style_spisok"
+            android:text="  Подтвердите новый пароль: "
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="18dp" />
+
+        <EditText
+            android:id="@+id/ed_newPassword2"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edit_text_style"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c">
+        </EditText>
+
+        <TextView
+            android:id="@+id/ed_password_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="  Почта: "
+            style="@style/text_style_spisok"
+            android:textSize="18dp"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/ed_email"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingLeft="5dp"
+            android:background="@drawable/edit_text_style"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c">
+        </EditText>
+    </LinearLayout>
+</ScrollView>

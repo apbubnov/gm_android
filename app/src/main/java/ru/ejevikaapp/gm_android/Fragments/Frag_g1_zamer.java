@@ -183,7 +183,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_clients " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 999999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 999999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -193,7 +193,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                                 }
                             }
                         } catch (Exception e) {
-                            max_id = user_id_int * 1000000 + 1;
+                            max_id = user_id_int * 100000 + 1;
                         }
 
                         values.put(DBHelper.KEY_ID, max_id);
@@ -227,8 +227,8 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_clients_contacts " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000),
-                                    String.valueOf(user_id_int * 1000000 + 999999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000),
+                                    String.valueOf(user_id_int * 100000 + 999999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -238,7 +238,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                                 }
                             }
                         } catch (Exception e) {
-                            max_id_contac = user_id_int * 1000000 + 1;
+                            max_id_contac = user_id_int * 100000 + 1;
                         }
 
                         Log.d("responce", "max_id_contac " + max_id);
@@ -286,7 +286,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                             sqlQuewy = "select MAX(_id) "
                                     + "FROM rgzbn_gm_ceiling_projects " +
                                     "where _id>? and _id<?";
-                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 1000000), String.valueOf(user_id_int * 1000000 + 99999)});
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int * 100000), String.valueOf(user_id_int * 100000 + 99999)});
                             if (c != null) {
                                 if (c.moveToFirst()) {
                                     do {
@@ -297,7 +297,7 @@ public class Frag_g1_zamer extends Fragment implements View.OnClickListener {
                                 }
                             }
                         } catch (Exception e) {
-                            max_id_proj = user_id_int * 1000000 + 1;
+                            max_id_proj = user_id_int * 100000 + 1;
                         }
 
                         Log.d("mLog", "max_id_proj1 = " + max_id_proj);

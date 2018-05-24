@@ -1,26 +1,25 @@
 package ru.ejevikaapp.gm_android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.ejevikaapp.gm_android.Fragments.Fragment_inform_proj;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_general_infor;
+import ru.ejevikaapp.gm_android.Fragments.Fragment_inform_proj;
 
 public class Activity_inform_proj extends AppCompatActivity {
 
@@ -44,6 +43,8 @@ public class Activity_inform_proj extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inform_proj);
 
+        stopService(new Intent(Activity_inform_proj.this, Service_Sync.class));
+
         mViewPager = (ViewPager) findViewById(R.id.container);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -61,6 +62,11 @@ public class Activity_inform_proj extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -143,7 +149,7 @@ public class Activity_inform_proj extends AppCompatActivity {
         super.onStop();
         SharedPreferences SP = getSharedPreferences("end_activity_inform_proj", MODE_PRIVATE);
         String end = SP.getString("", "");
-        Log.d("mLog onStop ac" , end);
+        Log.d("mLog" , end);
 
     }
 

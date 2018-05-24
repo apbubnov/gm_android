@@ -56,7 +56,6 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
     View view;
 
     public FragmentClient() {
-        // Required empty public constructor
     }
 
 
@@ -299,6 +298,8 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
                 Frag_client_schedule_class selectedid = client_mas.get(position);
                 String p_id = selectedid.getId_client();
 
+                Log.d("mLog","client " + p_id);
+
                 SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
                 SharedPreferences.Editor ed = SP.edit();
                 ed.putString("", String.valueOf(p_id));
@@ -367,9 +368,7 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
 
                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "client_id = ?", new String[]{String.valueOf(cId)});
 
-                        Intent intent = new Intent(getActivity(), Activity_client.class);
-                        startActivity(intent);
-                        getActivity().finish();
+                        onResume();
                     }
                 });
                 ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {

@@ -1,107 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
+    android:descendantFocusability="beforeDescendants"
     android:fitsSystemWindows="true"
     android:focusableInTouchMode="true"
-    android:descendantFocusability="beforeDescendants"
-    tools:context="ru.ejevikaapp.gm_android.RegistrationActivity"
-    android:orientation="vertical">
+    tools:context="ru.ejevikaapp.gm_android.RegistrationActivity">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Номер телефона*"
-        android:layout_marginTop="10dp"
-        style="@style/text_style_spisok"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
-    <EditText
-        android:id="@+id/phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:maxLength="11"
-        android:inputType="phone"
-        android:textColor="#43358c"
-        android:maxLines="1"
-        android:hint="(Пример:79009009090)"
-        android:textColorHint="#d1d1d1" />
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Номер телефона*" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Почта*"
-        android:layout_marginTop="10dp"
-        style="@style/text_style_spisok"/>
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:text="(будет использоваться как логин)" />
 
-    <EditText
-        android:id="@+id/mail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:inputType="textWebEmailAddress"
-        android:textColor="#43358c"
-        android:maxLines="1"
-        android:hint="(Пример:example@mail.com)"
-        android:textColorHint="#d1d1d1" />
+        <EditText
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="(Пример:79009009090)"
+            android:inputType="phone"
+            android:maxLength="12"
+            android:maxLines="1"
+            android:textColor="#43358c"
+            android:textColorHint="#d1d1d1" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Имя"
-        android:layout_marginTop="10dp"
-        style="@style/text_style_spisok"/>
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Почта*" />
 
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textColor="#43358c"
-        android:maxLines="2"
-        android:textColorHint="#43358c" />
+        <EditText
+            android:id="@+id/mail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="(Пример:example@mail.com)"
+            android:inputType="textWebEmailAddress"
+            android:maxLines="1"
+            android:textColor="#43358c"
+            android:textColorHint="#d1d1d1" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Город*"
-        android:layout_marginTop="10dp"
-        style="@style/text_style_spisok"/>
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Имя" />
 
-    <EditText
-        android:id="@+id/city"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textColor="#43358c"
-        android:maxLines="2"
-        android:textColorHint="#43358c" />
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:maxLines="2"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c" />
 
-    <Button
-        android:id="@+id/register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:elevation="0dp"
-        android:text="Зарегистрироваться"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#edeaea"
-        android:textSize="18dp"
-        android:background="@drawable/rounded_button"
-        />
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Город*" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="После нажатия на кнопку Зарегистрироваться, вам на почту придёт логин, пароль и инструкция по пользованию. В ближайшее время с вами свяжутся наши специалисты"
-        android:layout_marginTop="10dp"
-        android:textSize="12dp"
-        style="@style/text_style_spisok"/>
+        <EditText
+            android:id="@+id/city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:maxLines="2"
+            android:textColor="#43358c"
+            android:textColorHint="#43358c" />
 
+        <Button
+            android:id="@+id/register"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_button"
+            android:elevation="0dp"
+            android:text="Зарегистрироваться"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#edeaea"
+            android:textSize="18dp" />
 
-</LinearLayout>
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:text="После нажатия на кнопку Зарегистрироваться, вам на почту придёт логин, пароль и инструкция по пользованию. В ближайшее время с вами свяжутся наши специалисты"
+            android:textSize="12dp" />
+    </LinearLayout>
+</ScrollView>

@@ -2,6 +2,7 @@ package ru.ejevikaapp.gm_android.Fragments;
 
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -67,7 +68,6 @@ import ru.ejevikaapp.gm_android.Class.Ventil_class;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_margin;
 import ru.ejevikaapp.gm_android.R;
-import ru.ejevikaapp.gm_android.Service_Sync;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -121,7 +121,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     SharedPreferences SPSO;
     SharedPreferences SP;
     SharedPreferences SPW;
-    String dealer_calc;
+    String dealer_calc = "false";
 
     final String SAVED_TEXT = "saved_text";
     String n1 = "28";
@@ -170,6 +170,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     }
 
     public static Fragment_calculation newInstance() {
+
         return new Fragment_calculation();
     }
 
@@ -178,15 +179,16 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_calculation, container, false);
 
+        if (String.valueOf(getActivity().getIntent().toString()).contains("Dealer_office")){
+            dealer_calc = "true";
+        }
+
         SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
         user_id_int = Integer.parseInt(user_id) * 100000;
 
         SP = getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id_str = SP.getString("", "");
-
-        SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
-        dealer_calc = SP.getString("", "");
 
         scroll_calc = (ScrollView) view.findViewById(R.id.scroll_calc);
         linear_image = (LinearLayout) view.findViewById(R.id.linear_image);
@@ -805,32 +807,37 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 id_calculation = String.valueOf(max_id_contac);
                 new_id_calculation = true;
             }
-        }
 
-        if (dealer_calc.equals("true")) {
-            btn_save.setVisibility(View.VISIBLE);
-            name_project.setVisibility(View.VISIBLE);
+            if (dealer_calc.equals("true")) {
+                btn_save.setVisibility(View.VISIBLE);
+                name_project.setVisibility(View.VISIBLE);
 
-            int max_id_proj = 0;
-            try {
-                String sqlQuewy = "select MAX(_id) "
-                        + "FROM rgzbn_gm_ceiling_projects " +
-                        "where _id>? and _id<?";
-                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 99999)});
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                            max_id_proj++;
-                        } while (c.moveToNext());
+                Log.d("mLog", "proj");
+
+                int max_id_proj = 0;
+                try {
+                    String sqlQuewy = "select MAX(_id) "
+                            + "FROM rgzbn_gm_ceiling_projects " +
+                            "where _id>? and _id<?";
+                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 99999)});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                max_id_proj++;
+                                id_project = String.valueOf(max_id_proj);
+                            } while (c.moveToNext());
+                        }
                     }
+                } catch (Exception e) {
+                    max_id_proj = user_id_int + 1;
+                    id_project = String.valueOf(max_id_proj);
                 }
-            } catch (Exception e) {
-                max_id_proj = user_id_int + 1;
             }
-
-            id_project = String.valueOf(max_id_proj);
         }
+
+        Log.d("mLog", " ___ id_calculation ___ " + id_calculation);
+        Log.d("mLog", " ___ id_project ___ " + id_project);
 
         fixtures();
         ecola();
@@ -839,8 +846,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         profile();
         hoods();
         diffuzor();
-
-        Log.d("mLog", "countComponents = " + countComponents);
 
         if (countComponents) {
             general_layout.setVisibility(View.VISIBLE);
@@ -1069,7 +1074,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             String color = SPSO.getString("", "");
             int id = 0;
             sqlQuewy = "select * " +
-             " FROM rgzbn_gm_ceiling_canvases_manufacturers";
+                    " FROM rgzbn_gm_ceiling_canvases_manufacturers";
             c = db.rawQuery(sqlQuewy, new String[]{});
             if (c.moveToFirst()) {
                 do {
@@ -1196,11 +1201,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             cursor.close();
         }
 
-        if (id_calculation == null) {
-        } else {
-            Log.d("mLog", "destroy _ sync");
+        if (dealer_calc.equals("false")){
+            Log.d("mLog", "______________________DEEEEEEEEEEEEEEEEEEESTROY_____________________");
             sync(Integer.valueOf(id_calculation));
         }
+
         SP = getActivity().getSharedPreferences("SAVED_SO", MODE_PRIVATE);
         SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "");
@@ -1309,11 +1314,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         SP = getActivity().getSharedPreferences("end_draft", MODE_PRIVATE);
         ed = SP.edit();
         ed.putString("", "");
-        ed.commit();
-
-        SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
-        ed = SP.edit();
-        ed.putString("", "false");
         ed.commit();
     }
 
@@ -4139,7 +4139,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 color = Integer.parseInt(SPSO.getString("", ""));
 
                 if (btn_color_canvases_visible) {
-                    if (color == 0){
+                    if (color == 0) {
                         Toast toast = Toast.makeText(getActivity().getApplicationContext(),
                                 "Выберите цвет ", Toast.LENGTH_SHORT);
                         toast.show();
@@ -4970,52 +4970,27 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         String sqlQuewy;
         Cursor c;
         try {
-            int count_space = 0;
-            char[] chars = canvases.toCharArray();
-            for (int s = 0; s < canvases.length(); s++) {
-                if (chars[s] == ' ') {
-                    count_space++;
-                }
-            }
-            StringBuffer sb = new StringBuffer();
-            chars = canvases.toCharArray();
-            int count = 0;
-            for (int s = 0; s < canvases.length(); s++) {
 
-                if (chars[s] == ' ') {
-                    sb.append(chars[s]);
-                    count++;
-                } else {
-                    sb.append(chars[s]);
-                }
-                if (chars[s] == ' ' && count_space == count) {
-                    break;
-                }
-            }
-
-            String str_sb = String.valueOf(sb);
-            try {
-                str_sb = str_sb.substring(0, str_sb.length() - 1);
-            } catch (Exception e) {
-            }
             int id = 0;
-            sqlQuewy = "select _id "
+            sqlQuewy = "select _id, name "
                     + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                    "where name LIKE('%" + str_sb + "%')";
+                    "where name = '" + canvases + "'";
             c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
                         id = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                        Log.d("mLog", c.getString(c.getColumnIndex(c.getColumnName(1))));
                     } while (c.moveToNext());
                 }
             }
             c.close();
 
             double wf = Double.valueOf(width_final) / 100;
+
             sqlQuewy = "select _id, price "
                     + "FROM rgzbn_gm_ceiling_canvases " +
-                    "where texture_id = ? and manufacturer_id = ? and width =?";
+                    "where texture_id = ? and manufacturer_id = ? and width = ?";
             c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(n2), String.valueOf(id), String.valueOf(wf)});         // заполняем массивы из таблицы
             if (c != null) {
                 if (c.moveToFirst()) {
@@ -5131,7 +5106,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         if (calculat) {
             try {
-                SPSO = getActivity().getSharedPreferences("color_title", MODE_PRIVATE);
+                SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
                 color = Integer.valueOf(SPSO.getString("", ""));
             } catch (Exception e) {
 
@@ -5354,7 +5329,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 } else if (double_chertezh_bool) {
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                     getActivity().finish();
-                    sync(Integer.valueOf(id_calculation));
                 } else if (!double_chertezh_bool) {
                     values.put(DBHelper.KEY_ID, id_calculation);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
@@ -5366,16 +5340,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             if (dealer_calc.equals("false") && !new_id_calculation) {
                 Log.d("mLog", " upd");
                 if (chertezh_bool && !double_chertezh_bool) {
-                    Log.d("mLog", " then ");
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                     chertezh_bool = false;
                     double_chertezh_bool = true;
                 } else if (double_chertezh_bool) {
-                    Log.d("mLog", " false ");
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                     getActivity().finish();
                 } else if (!double_chertezh_bool) {
-                    Log.d("mLog", " false false ");
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                     getActivity().finish();
                 }
@@ -5408,13 +5379,33 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         max_id = user_id_int + 1;
                     }
 
+                    int max_name = 0;
+                    try {
+                        sqlQuewy = "select MAX(client_name) "
+                                + "FROM rgzbn_gm_ceiling_clients " +
+                                "where client_name>? and client_name<?";
+                        c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 999999)});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    max_name = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                    max_name++;
+                                } while (c.moveToNext());
+                            }
+                        }
+                    } catch (Exception e) {
+                        max_name = user_id_int + 1;
+                    }
+
+                    Log.d("mLog","max_name " + max_name);
+
                     Calendar date_cr = new GregorianCalendar();
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
                     String date = df.format(date_cr.getTime());
 
                     values = new ContentValues();
                     values.put(DBHelper.KEY_ID, max_id);
-                    values.put(DBHelper.KEY_CLIENT_NAME, max_id);
+                    values.put(DBHelper.KEY_CLIENT_NAME, max_name);
                     values.put(DBHelper.KEY_CLIENT_DATA_ID, "");
                     values.put(DBHelper.KEY_TYPE_ID, "1");
                     values.put(DBHelper.KEY_DEALER_ID, user_id);
@@ -5460,7 +5451,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_ID, id_project);
                     values.put(DBHelper.KEY_STATE, "1");
                     values.put(DBHelper.KEY_CLIENT_ID, max_id);
-                    values.put(DBHelper.KEY_PROJECT_INFO, "-");
+                    values.put(DBHelper.KEY_PROJECT_INFO, "");
                     values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date);
                     values.put(DBHelper.KEY_PROJECT_CALCULATOR, user_id);
                     values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, "0000-00-00 00:00:00");
@@ -5496,8 +5487,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_STATUS, "1");
                     db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                    getActivity().startService(new Intent(getActivity(), Service_Sync.class));
-
                     SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
                     SharedPreferences.Editor ed = SP.edit();
                     ed.putString("", String.valueOf(id_project));
@@ -5506,15 +5495,50 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                     startActivity(intent);
 
-                    SP = getActivity().getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                    ed = SP.edit();
-                    ed.putString("", "");
-                    ed.commit();
-
                     SP = getActivity().getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
                     ed = SP.edit();
                     ed.putString("", "1");
                     ed.commit();
+
+                    try {
+                        int max_id_proj_history = 0;
+                        try {
+                            sqlQuewy = "select MAX(_id) "
+                                    + "FROM rgzbn_gm_ceiling_projects_history " +
+                                    "where _id>? and _id<?";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 99999)});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        max_id_proj_history = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                        max_id_proj_history++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                        } catch (Exception e) {
+                            max_id_proj_history = user_id_int + 1;
+                        }
+
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID, max_id_proj_history);
+                        values.put(DBHelper.KEY_PROJECT_ID, id_project);
+                        values.put(DBHelper.KEY_NEW_STATUS, "1");
+                        values.put(DBHelper.KEY_DATE_OF_CHANGE, date);
+                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, null, values);
+
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, max_id_proj_history);
+                        values.put(DBHelper.KEY_ID_NEW, 0);
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_history");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "1");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                        sync(Integer.valueOf(id_calculation));
+                    }catch (Exception e){
+                        Log.d("mLog", String.valueOf(e));
+                    }
                 }
             }
         }
@@ -5688,8 +5712,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 } while (c.moveToNext());
             }
         }
-
-        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
     }
 
     void fun_builder() {
@@ -6018,7 +6040,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                         if (SPSO.getString("", "").equals("") || SPSO.getString("", "").equals("0")) {
 
-                            Log.d("mLog", "1 _ n2 = " + n2 + " id = " +id );
+                            Log.d("mLog", "1 _ n2 = " + n2 + " id = " + id);
 
                             String str = "[";
                             sqlQuewy = "select price, width, _id " +

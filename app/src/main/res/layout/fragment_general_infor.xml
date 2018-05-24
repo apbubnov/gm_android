@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="center|left"
                 android:layout_weight="2"
                 android:text="Клиент"
                 android:textColor="#000000"
@@ -136,9 +136,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_weight="2"
-                android:gravity="center|left"
+                android:layout_gravity="center|left"
                 android:text="Адрес"
                 android:textColor="#000000"
                 android:textSize="15dp" />
@@ -177,9 +176,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_weight="2"
                 android:text="Дата и время замера"
+                android:layout_gravity="center|left"
                 android:textColor="#000000"
                 android:textSize="15dp" />
 
@@ -211,25 +210,72 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:text="Примечание менеджера"
+                android:layout_gravity="center|left"
                 android:textColor="#000000"
                 android:textSize="15dp" />
 
             <TextView
                 android:id="@+id/notes_cl"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="center"
+                style="@style/text_style_spisok"
+                android:textSize="15dp" />
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@drawable/white_btn_blue_text"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="#000000" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Реклама"
+                android:layout_gravity="center|left"
                 android:textColor="#000000"
                 android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/advertisement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                style="@style/text_style_spisok"
+                android:textSize="15dp" />
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@drawable/white_btn_blue_text"
+                android:scaleType="fitCenter" />
         </LinearLayout>
 
         <View

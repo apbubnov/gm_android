@@ -36,6 +36,7 @@ import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
+import ru.ejevikaapp.gm_android.Service_Sync;
 import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -83,7 +84,6 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorBlue);
 
         return view;
-
     }
 
     @Override
@@ -105,8 +105,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     @Override
     public void onResume() {
         super.onResume();
-
         try {
+            getActivity().startService(new Intent(getActivity(), Service_Sync.class));
             client_mas.clear();
             list_clients = (ListView) view.findViewById(R.id.list_client);
             clients();
@@ -240,9 +240,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 sqlQuewy = "SELECT project_info, client_id, project_calculation_date, gm_manager_note "
                                         + "FROM rgzbn_gm_ceiling_projects " +
                                         "where _id = ? ";
-
                                 Cursor cursor_1 = db.rawQuery(sqlQuewy, new String[]{k.getString(kdIndex)});
-
                                 if (cursor_1 != null) {
                                     if (cursor_1.moveToFirst()) {
                                         do {
@@ -287,11 +285,12 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 /* Обработка адреса */
                                 p_info = p_info.replace("Воронеж, ", "");
 
-                                try {
-                                    if (project_note.equals("null")) {
-                                        project_note = "-";
-                                    }
-                                } catch (Exception e) {
+                                if (project_note.equals("null")) {
+                                    project_note = "-";
+                                }
+
+                                if (p_info.equals("null")) {
+                                    p_info = "-";
                                 }
 
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(
@@ -417,9 +416,11 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(cId)});
                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "_id = ?", new String[]{String.valueOf(cId)});
 
-                        Intent intent = new Intent(getActivity(), Activity_for_spisok.class);
-                        startActivity(intent);
-                        getActivity().finish();
+                        onResume();
+
+                        //Intent intent = new Intent(getActivity(), Activity_for_spisok.class);
+                        //startActivity(intent);
+                        //getActivity().finish();
                     }
                 });
                 ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {

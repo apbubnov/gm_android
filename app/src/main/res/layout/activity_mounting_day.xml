@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:stretchColumns="*"
     style="@style/backgroun"
-    android:layout_margin="10dp">
+    android:padding="10dp">
 
     <TableRow>
         <TextView
             android:id="@+id/c_number"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="13dp"
             android:textStyle="bold"
@@ -20,7 +20,7 @@
             android:layout_span="2" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/c_address"
             android:gravity="center"
@@ -33,7 +33,7 @@
             android:layout_marginRight="2dp"
             android:minLines="2" />
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/c_price"
             android:gravity="center"
@@ -44,7 +44,7 @@
             android:layout_span="3"
             android:minLines="2" />
 
-        <TextView android:layout_width="wrap_content"
+        <TextView android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/c_income"
             android:gravity="center"
@@ -59,14 +59,13 @@
 
     <View
         android:layout_width="wrap_content"
-        android:background="#000000"
-        android:layout_height="2dp" />
+        android:layout_height="2dp"
+        android:background="#000000" />
 
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/List_mounting">
-        </ListView>
+    <ListView
+        android:id="@+id/List_mounting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></ListView>
 
 
 </TableLayout>

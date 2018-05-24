@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Send_All extends Service {
-    private static final String TAG = "send_all__";
+    private static final String TAG = "responce_send_all";
     static DBHelper dbHelper;
 
     static String material = "", mounters = "", dealer = "";
@@ -243,7 +243,6 @@ public class Send_All extends Service {
         }
     }
 
-
     static class Send_Material extends AsyncTask<Integer, String, String> {
 
         String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&task=api.sendMaterialToAndroid";
@@ -262,7 +261,7 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__", "Send_Material " + res);
+                    Log.d(TAG, "Send_Material " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -274,6 +273,7 @@ public class Send_All extends Service {
                         org.json.JSONObject dat = new org.json.JSONObject(res);
 
                         JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases");
+                        Log.d(TAG, "rgzbn_gm_ceiling_canvases " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -323,6 +323,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_manufacturers");
+                        Log.d(TAG, "rgzbn_gm_ceiling_canvases_manufacturers " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -364,7 +365,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_colors");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_colors " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_colors " + id_array);
 
                         for (int i = 0; i < id_array.length(); i++) {
 
@@ -408,7 +409,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_components " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_components " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -454,7 +455,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components_option");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_components_option " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_components_option " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -505,7 +506,7 @@ public class Send_All extends Service {
 
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_type");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_type " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_type " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -548,7 +549,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_type_option");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_type_option " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_type_option " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -595,7 +596,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_textures");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_textures " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_textures " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -639,7 +640,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_status");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_status " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_status " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -691,7 +692,7 @@ public class Send_All extends Service {
                         db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"material"});
 
                     } catch (Exception e) {
-                        Log.d("send_all__", "send error " + String.valueOf(e));
+                        Log.d(TAG, "send error " + String.valueOf(e));
                     }
 
                 }
@@ -699,14 +700,14 @@ public class Send_All extends Service {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d("send_all__", "send error 2 " + String.valueOf(error));
+                    Log.d(TAG, "send error 2 " + String.valueOf(error));
                 }
             }) {
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("sync_data", material);
-                    Log.d("send_all__", "mat = " + String.valueOf(parameters));
+                    Log.d(TAG, "mat = " + String.valueOf(parameters));
                     return parameters;
                 }
             };
@@ -736,7 +737,7 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__", "Send_Mounters " + res);
+                    Log.d(TAG, "Send_Mounters " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -829,7 +830,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_mounters");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_mounters " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_mounters " + id_array);
 
                         for (int i = 0; i < id_array.length(); i++) {
 
@@ -871,7 +872,7 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_mounters_map");
-                        Log.d("send_all__", "rgzbn_gm_ceiling_mounters_map " + id_array);
+                        Log.d(TAG, "rgzbn_gm_ceiling_mounters_map " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -919,7 +920,7 @@ public class Send_All extends Service {
                         db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"mount"});
 
                     } catch (Exception e) {
-                        Log.d("send_all__", "send error " + String.valueOf(e));
+                        Log.d(TAG, "send error " + String.valueOf(e));
                     }
 
                 }
@@ -934,7 +935,7 @@ public class Send_All extends Service {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("sync_data", mounters);
-                    Log.d("send_all__", "mou = " + String.valueOf(parameters));
+                    Log.d(TAG, "mou = " + String.valueOf(parameters));
                     return parameters;
                 }
             };
@@ -963,7 +964,7 @@ public class Send_All extends Service {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d("send_all__", "Send_Dealer " + res);
+                    Log.d(TAG, "Send_Dealer " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -1151,123 +1152,186 @@ public class Send_All extends Service {
                                     try {
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNT, null, values);
                                     } catch (Exception e) {
-                                        Log.d("send_all__", "error " + String.valueOf(e));
+                                        Log.d(TAG, "error " + String.valueOf(e));
                                     }
                                 }
                             }
                         }
 
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_api_phones");
+                        for (int i = 0; i < id_array.length(); i++) {
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
+
+                            String id = user.getString("id");
+                            String name = user.getString("name");
+                            String dealer_id = user.getString("dealer_id");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_NAME, name);
+                            values.put(DBHelper.KEY_DEALER_ID, dealer_id);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_api_phones" +
+                                    " WHERE _id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    values.put(DBHelper.KEY_ID, id);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES, null, values);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_dealer_price");
+                        String user_id = "";
+                        Log.d(TAG, "rgzbn_gm_ceiling_canvases_dealer_price = " + id_array);
+                        for (int i = 0; i < id_array.length(); i++) {
 
-                        if (id_array.length()<5) {
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
 
-                            jsonDealer.put("dealer_id", "1");
-                            jsonDealer.put("change_time", "0000-00-00 00:00:00");
-                            dealer = String.valueOf(jsonDealer);
-                            new Send_Dealer().execute();
+                            user_id = user.getString("user_id");
+                            String canvas_id = user.getString("canvas_id");
+                            String price = user.getString("price");
+                            String value = user.getString("value");
+                            String type = user.getString("type");
 
-                        } else {
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_USER_ID, user_id);
+                            values.put(DBHelper.KEY_CANVAS_ID, canvas_id);
+                            values.put(DBHelper.KEY_PRICE, price);
+                            values.put(DBHelper.KEY_VALUE, value);
+                            values.put(DBHelper.KEY_TYPE, type);
 
-                            for (int i = 0; i < id_array.length(); i++) {
-
-                                count_m = 0;
-                                org.json.JSONObject user = id_array.getJSONObject(i);
-
-                                String user_id = user.getString("user_id");
-                                String canvas_id = user.getString("canvas_id");
-                                String price = user.getString("price");
-                                String value = user.getString("value");
-                                String type = user.getString("type");
-
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_USER_ID, user_id);
-                                values.put(DBHelper.KEY_CANVAS_ID, canvas_id);
-                                values.put(DBHelper.KEY_PRICE, price);
-                                values.put(DBHelper.KEY_VALUE, value);
-                                values.put(DBHelper.KEY_TYPE, type);
-
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_canvases_dealer_price" +
-                                        " WHERE user_id = ? and canvas_id = ?";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, canvas_id});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE,
-                                                    values,
-                                                    "user_id = ? and canvas_id = ?",
-                                                    new String[]{user_id, canvas_id});
-                                            count_m++;
-                                        } while (c.moveToNext());
-                                    }
-                                }
-                                c.close();
-
-                                if (count_m == 0) {
-                                    try {
-                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE, null, values);
-                                    } catch (Exception e) {
-                                        Log.d("responce", String.valueOf(e));
-                                    }
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_canvases_dealer_price" +
+                                    " WHERE user_id = ? and canvas_id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, canvas_id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE,
+                                                values,
+                                                "user_id = ? and canvas_id = ?",
+                                                new String[]{user_id, canvas_id});
+                                        count_m++;
+                                    } while (c.moveToNext());
                                 }
                             }
+                            c.close();
 
-                            id_array = dat.getJSONArray("rgzbn_gm_ceiling_components_dealer_price");
-
-                            for (int i = 0; i < id_array.length(); i++) {
-
-                                count_m = 0;
-                                org.json.JSONObject user = id_array.getJSONObject(i);
-
-                                String user_id = user.getString("user_id");
-                                String component_id = user.getString("component_id");
-                                String price = user.getString("price");
-                                String value = user.getString("value");
-                                String type = user.getString("type");
-
-                                values = new ContentValues();
-                                values.put(DBHelper.KEY_USER_ID, user_id);
-                                values.put(DBHelper.KEY_COMPONENT_ID, component_id);
-                                values.put(DBHelper.KEY_PRICE, price);
-                                values.put(DBHelper.KEY_VALUE, value);
-                                values.put(DBHelper.KEY_TYPE, type);
-
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_components_dealer_price" +
-                                        " WHERE user_id = ? and component_id = ?";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, component_id});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_COMPONENTS_DEALER_PRICE,
-                                                    values,
-                                                    "user_id = ? and component_id = ?",
-                                                    new String[]{user_id, component_id});
-                                            count_m++;
-                                        } while (c.moveToNext());
-                                    }
-                                }
-                                c.close();
-
-                                if (count_m == 0) {
-                                    try {
-                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_COMPONENTS_DEALER_PRICE,
-                                                null,
-                                                values);
-                                    } catch (Exception e) {
-                                        Log.d("responce", String.valueOf(e));
-                                    }
+                            if (count_m == 0) {
+                                try {
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES_DEALER_PRICE, null, values);
+                                } catch (Exception e) {
+                                    Log.d("responce", String.valueOf(e));
                                 }
                             }
+                        }
 
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_components_dealer_price");
+
+                        Log.d(TAG, "rgzbn_gm_ceiling_components_dealer_price = " + id_array);
+                        for (int i = 0; i < id_array.length(); i++) {
+
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
+
+                            user_id = user.getString("user_id");
+                            String component_id = user.getString("component_id");
+                            String price = user.getString("price");
+                            String value = user.getString("value");
+                            String type = user.getString("type");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_USER_ID, user_id);
+                            values.put(DBHelper.KEY_COMPONENT_ID, component_id);
+                            values.put(DBHelper.KEY_PRICE, price);
+                            values.put(DBHelper.KEY_VALUE, value);
+                            values.put(DBHelper.KEY_TYPE, type);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_components_dealer_price" +
+                                    " WHERE user_id = ? and component_id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, component_id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_COMPONENTS_DEALER_PRICE,
+                                                values,
+                                                "user_id = ? and component_id = ?",
+                                                new String[]{user_id, component_id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_COMPONENTS_DEALER_PRICE,
+                                            null,
+                                            values);
+                                } catch (Exception e) {
+                                    Log.d("responce", String.valueOf(e));
+                                }
+                            }
+                        }
+
+                        int count_c = 0;
+                        String sqlQuewy = "SELECT * "
+                                + "FROM rgzbn_gm_ceiling_canvases_dealer_price" +
+                                " WHERE user_id = ?";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    count_c++;
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
+
+                        int count_p = 0;
+                        sqlQuewy = "SELECT * "
+                                + "FROM rgzbn_gm_ceiling_canvases_dealer_price" +
+                                " WHERE user_id = ?";
+                        c = db.rawQuery(sqlQuewy, new String[]{dealer_id});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    count_p++;
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
+
+                        if ((count_c > 0 && count_p > 0) || (user_id.equals("1"))){
                             values = new ContentValues();
                             Time time = new Time(Time.getCurrentTimezone());
                             time.setToNow();
                             String t = time.format("%Y-%m-%d %H:%M:00");
                             values.put(DBHelper.KEY_CHANGE_TIME, t);
                             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
-
+                        } else {
+                            jsonDealer.put("dealer_id", "1");
+                            jsonDealer.put("change_time", "0000-00-00 00:00:00");
+                            dealer = String.valueOf(jsonDealer);
+                            new Send_Dealer().execute();
                         }
+
 
                     } catch (Exception e) {
                         Log.d(TAG, String.valueOf(e));
@@ -1284,7 +1348,7 @@ public class Send_All extends Service {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("sync_data", dealer);
-                    Log.d("send_all__", "dealer = " + String.valueOf(parameters));
+                    Log.d(TAG, "dealer = " + String.valueOf(parameters));
                     return parameters;
                 }
             };

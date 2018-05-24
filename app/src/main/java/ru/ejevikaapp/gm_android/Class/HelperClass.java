@@ -1285,39 +1285,6 @@ public class HelperClass {
             db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
         }
 
-        Log.d("mLog", "canvases = " + canvases + n3);
-
-        int count_space = 0;
-        char[] chars = canvases.toCharArray();
-        for (int s = 0; s < canvases.length(); s++) {
-            if (chars[s] == ' ') {
-                count_space++;
-            }
-        }
-
-        StringBuffer sb = new StringBuffer();
-        chars = canvases.toCharArray();
-        int count = 0;
-        for (int s = 0; s < canvases.length(); s++) {
-
-            if (chars[s] == ' ') {
-                sb.append(chars[s]);
-                count++;
-            } else {
-                sb.append(chars[s]);
-            }
-
-            if (chars[s] == ' ' && count_space == count) {
-                break;
-            }
-        }
-
-        String str_sb = String.valueOf(sb);
-        try {
-            str_sb = str_sb.substring(0, str_sb.length());
-        } catch (Exception e) {
-        }
-
         boolean canvases_price = false;
         boolean boolean_canvases = false;
 
@@ -1358,9 +1325,9 @@ public class HelperClass {
 
                     if (boolean_canvases) {
                         if (canvases_price) {
-                            price = new_price("canvases", dealer_id_str, id_n3, price);
+                            price = new_price("canvases", dealer_id_str, id_n3, price, context);
                         } else {
-                            price = new_price("canvases", "1", id_n3, price);
+                            price = new_price("canvases", "1", id_n3, price, context);
                         }
                     }
 
@@ -1386,6 +1353,10 @@ public class HelperClass {
                     values.put(DBHelper.KEY_DEALER_PRICE, String.valueOf(canvases_data.get(6)));
                     values.put(DBHelper.KEY_DEALER_TOTAL, String.valueOf(canvases_data.get(7)));
                     db.insert(DBHelper.TABLE_COMPONENT_ITEM, null, values);
+
+                    if ((S/2)>Double.parseDouble(offcut_square)){
+                        price = 0;
+                    }
 
                     try {
                         //Сюда считаем итоговую сумму обрезков
@@ -1418,13 +1389,10 @@ public class HelperClass {
             } else {    //если изменён чертёж, то сюда
 
                 double wf = Double.valueOf(width_final) / 100;
-
-                Log.d("mLog", "_________ " + str_sb + " " + width_final);
-
                 int id = 0;
                 sqlQuewy = "select _id "
                         + "FROM rgzbn_gm_ceiling_canvases_manufacturers " +
-                        "where name LIKE('%" + str_sb + "%')";
+                        "where name = '" + canvases + "'";
                 c = db.rawQuery(sqlQuewy, null);         // заполняем массивы из таблицы
                 if (c != null) {
                     if (c.moveToFirst()) {
@@ -1450,9 +1418,9 @@ public class HelperClass {
                 c.close();
 
                 if (canvases_price) {
-                    price = new_price("canvases", dealer_id_str, id_n3, price);
+                    price = new_price("canvases", dealer_id_str, id_n3, price, context);
                 } else {
-                    price = new_price("canvases", "1", id_n3, price);
+                    price = new_price("canvases", "1", id_n3, price, context);
                 }
 
                 canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
@@ -1485,6 +1453,11 @@ public class HelperClass {
                 } else {
                     double wf = Double.valueOf(width_final) / 100;
                     try {
+
+                        if ((S/2)>Double.parseDouble(offcut_square)){
+                            price = 0;
+                        }
+
                         canvases_data.set(0, "Количесво обрезков");                 // название
                         canvases_data.set(1, Double.valueOf(offcut_square));           // кол-во
                         canvases_data.set(2, Math.rint(100 * (price / 2)) / 100.0);                                // цена
@@ -1547,9 +1520,9 @@ public class HelperClass {
 
                         if (boolean_components) {
                             if (components_price) {
-                                self_price = new_price("components", dealer_id_str, id, self_price);
+                                self_price = new_price("components", dealer_id_str, id, self_price, context);
                             } else {
-                                self_price = new_price("components", "1", id, self_price);
+                                self_price = new_price("components", "1", id, self_price, context);
                             }
                         }
 
@@ -2535,8 +2508,9 @@ public class HelperClass {
         return result;
     }
 
-    static Double new_price(String table, String user_id, Integer id, Double old_price) {
+    public static Double new_price(String table, String user_id, Integer id, Double old_price, Context context) {
 
+        DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         Integer type = 0;

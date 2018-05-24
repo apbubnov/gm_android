@@ -32,7 +32,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
 
@@ -52,6 +52,15 @@
                     android:clickable="true"
                     style="@style/text_style_spisok"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:id="@+id/edit_name"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/edit" />
             </LinearLayout>
 
             <View
@@ -62,7 +71,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
@@ -82,14 +91,14 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/phone_lay2"
                         android:orientation="vertical">
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/phone_lay1"
                         android:layout_marginLeft="10dp"
@@ -97,6 +106,13 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
 
             </LinearLayout>
 
@@ -108,7 +124,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
 
@@ -122,12 +138,22 @@
                     android:layout_weight="2"/>
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:id="@+id/address_cl"
                     style="@style/text_style_spisok"
-                    android:clickable="true"
-                    android:id="@+id/address_cl"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:clickable="true" />
+
+                <ImageButton
+                    android:id="@+id/edit_address"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/edit" />
 
             </LinearLayout>
 
@@ -139,12 +165,49 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Реклама"
+                    android:layout_gravity="center|left"
+                    android:textColor="#000000"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/advertisement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:textSize="15dp" />
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:background="#000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="15dp"
                     android:text="Дата и время замера"
@@ -152,11 +215,19 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
                     android:gravity="left|center"
+                    android:layout_gravity="center"
                     android:id="@+id/data_cl"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
             <View
@@ -175,15 +246,24 @@
                     android:layout_height="match_parent"
                     android:textColor="#000000"
                     android:textSize="15dp"
+                    android:gravity="left|center"
                     android:text="Замерщик"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
+                    android:layout_gravity="center"
                     android:id="@+id/project_calculator"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
             <View
@@ -199,19 +279,28 @@
                 android:layout_marginTop="10dp">
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="15dp"
+                    android:gravity="center|left"
                     android:text="Дата и время монтажа"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
                     android:gravity="left|center"
+                    android:layout_gravity="center"
                     android:id="@+id/data_mounting"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
             <View
@@ -227,19 +316,27 @@
                 android:layout_marginTop="10dp">
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="15dp"
+                    android:gravity="center|left"
                     android:text="Монтажная бригада"
                     android:layout_weight="2"/>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textSize="15dp"
-                    android:gravity="left|center"
+                    android:layout_gravity="center"
                     android:id="@+id/project_mounter"
                     android:layout_weight="1"/>
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/white_btn_blue_text"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
             <View
@@ -355,6 +452,16 @@
                     android:gravity="right"/>
             </LinearLayout>
 
+            <Button
+                android:id="@+id/completedProject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="3dp"
+                android:background="@drawable/rounded_button"
+                android:text=" Выполнено "
+                android:textColor="#ffffff"
+                />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

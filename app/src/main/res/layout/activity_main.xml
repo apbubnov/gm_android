@@ -26,8 +26,8 @@
             android:layout_width="160dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
-            android:layout_marginBottom="40dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
             android:src="@drawable/it_c"/>
 
         <cn.zhaiyifan.rememberedittext.RememberEditText
@@ -39,8 +39,8 @@
             android:layout_margin="10dp"
             android:ems="10"
             android:maxLength="11"
-            android:hint="Логин"
-            android:inputType="textPersonName"
+            android:hint="Логин(телефон)"
+            android:inputType="phone"
             android:textColor="#43358c"
             android:textColorHint="#43358c"
             app:autoSave="true"

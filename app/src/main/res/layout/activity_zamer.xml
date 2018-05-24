@@ -2,357 +2,415 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/backgroun"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/backgroun"
     tools:context="ru.ejevikaapp.gm_android.Activity_zamer">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_button"
+            android:text="    Выбрать существующего клиента    "
+            android:textColor="#ffffff" />
+
+        <EditText
+            android:id="@+id/c_search"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_style"
+            android:hint="ФИО клиента"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/rounded_button"
+            android:text="    Найти    "
+            android:textColor="#ffffff" />
+
+        <LinearLayout
+            android:id="@+id/linear_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            android:id="@+id/t_fio"
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="ФИО клиента *" />
+
+        <EditText
+            android:id="@+id/c_fio"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_style"
+            android:hint="ФИО клиента"
+            android:inputType="textCapWords"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/t_phone"
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="Телефон клиента *" />
+
+        <EditText
+            android:id="@+id/c_phone"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_style"
+            android:hint="7xxxxxxxxxx"
+            android:inputType="phone"
+            android:maxLength="11"
+            android:paddingLeft="5dp" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp">
-
-            <Button
-                android:id="@+id/btn_selection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="    Выбрать существующего клиента    "
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"
-                android:layout_margin="10dp"/>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:hint="ФИО клиента"
-                android:textColor="#000000"
-                android:id="@+id/c_search"/>
-            <Button
-                android:id="@+id/btn_search"
-                android:text="    Найти    "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/linear_spinner">
-            </LinearLayout>
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ФИО клиента *"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="5dp"
                 style="@style/text_style_spisok"
-                android:id="@+id/t_fio"/>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:hint="ФИО клиента"
-                android:inputType="textCapWords"
-                android:textColor="#000000"
-                android:id="@+id/c_fio"/>
-            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Телефон клиента *"
+                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
-                style="@style/text_style_spisok"
-                android:id="@+id/t_phone"/>
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:hint="7xxxxxxxxxx"
-                android:maxLength="11"
-                android:inputType="phone"
-                android:id="@+id/c_phone"/>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Адрес клиента"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:textSize="15dp"
-                    style="@style/text_style_spisok"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <AutoCompleteTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="Улица клиента"
-                        android:layout_weight="1"
-                        android:inputType="textMultiLine"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_address"/>
-
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="дом"
-                        android:maxLength="9"
-                        android:layout_weight="1"
-                        android:inputType="phone"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginRight="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_house"/>
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="корпус"
-                        android:layout_weight="1"
-                        android:maxLength="5"
-                        android:inputType="phone"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/с_body"/>
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="подъезд"
-                        android:layout_weight="1"
-                        android:maxLength="5"
-                        android:inputType="phone"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginLeft="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_porch"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="этаж"
-                        android:layout_weight="1"
-                        android:inputType="phone"
-                        android:maxLength="2"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginRight="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_floor"/>
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="квартира"
-                        android:layout_weight="1"
-                        android:inputType="phone"
-                        android:maxLength="5"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_room"/>
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/edit_text_style"
-                        android:hint="код"
-                        android:layout_weight="1"
-                        android:inputType="phone"
-                        android:maxLength="10"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginLeft="5dp"
-                        android:paddingLeft="5dp"
-                        android:id="@+id/c_code"/>
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Примечание к клиенту"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                style="@style/text_style_spisok"/>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:paddingLeft="5dp"
-                android:background="@drawable/edit_text_style"
-                android:hint="Примечание"
-                android:inputType="textMultiLine"
-                android:id="@+id/c_note"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Выберите замерщика и время замера"
-                android:gravity="center"
-                android:layout_marginTop="10dp"
-                style="@style/text_style_spisok"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="@drawable/calendar_other_month"
-                android:layout_marginTop="10dp">
-
-                <ImageButton
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_centerVertical="true"
-                    android:textColor="#ffffff"
-                    android:background="#43358c"
-                    android:id="@+id/calendar_minus"
-                    android:src="@drawable/left_arrow"
-                    android:textSize="25dp"/>
-
-                <TextView
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/calendar_month"
-                    android:text="месяц год"
-                    android:gravity="center"
-                    android:layout_centerInParent="true"
-                    style="@style/text_style_spisok"/>
-
-                <ImageButton
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_gravity="right"
-                    android:background="#43358c"
-                    android:textColor="#ffffff"
-                    android:id="@+id/calendar_plus"
-                    android:src="@drawable/right_arrow"
-                    android:textSize="25dp" />
-
-            </RelativeLayout>
+                android:text="Адрес клиента"
+                android:textSize="15dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
-                <TextView
+
+                <AutoCompleteTextView
+                    android:id="@+id/c_address"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="ПH"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="ВТ"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="СР"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="ЧТ"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="ПТ"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="СБ"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="ВС"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:background="@drawable/calendar_other_month"
-                    android:layout_weight="1"/>
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="Улица клиента"
+                    android:inputType="textMultiLine"
+                    android:paddingLeft="5dp" />
+
             </LinearLayout>
 
-            <TableLayout
-                android:id="@+id/tableLayout"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </TableLayout>
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/c_house"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="дом"
+                    android:inputType="phone"
+                    android:maxLength="9"
+                    android:paddingLeft="5dp" />
+
+                <EditText
+                    android:id="@+id/с_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="корпус"
+                    android:inputType="phone"
+                    android:maxLength="5"
+                    android:paddingLeft="5dp" />
+
+                <EditText
+                    android:id="@+id/c_porch"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="подъезд"
+                    android:inputType="phone"
+                    android:maxLength="5"
+                    android:paddingLeft="5dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/c_floor"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="этаж"
+                    android:inputType="phone"
+                    android:maxLength="2"
+                    android:paddingLeft="5dp" />
+
+                <EditText
+                    android:id="@+id/c_room"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="квартира"
+                    android:inputType="phone"
+                    android:maxLength="5"
+                    android:paddingLeft="5dp" />
+
+                <EditText
+                    android:id="@+id/c_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_style"
+                    android:hint="код"
+                    android:inputType="phone"
+                    android:maxLength="10"
+                    android:paddingLeft="5dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="Примечание к клиенту" />
+
+        <EditText
+            android:id="@+id/c_note"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_style"
+            android:hint="Примечание"
+            android:inputType="textMultiLine"
+            android:paddingLeft="5dp" />
+
+
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="2"
+            android:text="Реклама"
+            android:textSize="15dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/advertisement"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:layout_weight="3"
+                android:textSize="15dp" />
 
             <Button
-                android:id="@+id/btn_add_zamer"
-                android:layout_width="match_parent"
+                android:id="@+id/btn_advertisement"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Записать"
-                android:layout_marginTop="10dp"
-                android:paddingBottom="2dp"
-                android:layout_marginRight="5dp"
+                android:layout_gravity="center"
                 android:layout_marginLeft="5dp"
+                android:layout_weight="1"
                 android:background="@drawable/rounded_button"
-                android:textColor="#ffffff"
-                android:layout_marginBottom="20dp"/>
-
+                android:text="Указать"
+                android:textColor="#fff"
+                android:textSize="15dp" />
         </LinearLayout>
+
+        <TextView
+            style="@style/text_style_spisok"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Выберите замерщика и время замера" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/calendar_other_month"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/calendar_minus"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:background="#43358c"
+                android:src="@drawable/left_arrow"
+                android:textColor="#ffffff"
+                android:textSize="25dp" />
+
+            <TextView
+                android:id="@+id/calendar_month"
+                style="@style/text_style_spisok"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="месяц год" />
+
+            <ImageButton
+                android:id="@+id/calendar_plus"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="right"
+                android:background="#43358c"
+                android:src="@drawable/right_arrow"
+                android:textColor="#ffffff"
+                android:textSize="25dp" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="ПH" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="ВТ" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="СР" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="ЧТ" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="ПТ" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="СБ" />
+
+            <TextView
+                style="@style/text_style_spisok"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/calendar_other_month"
+                android:gravity="center"
+                android:text="ВС" />
+        </LinearLayout>
+
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></TableLayout>
+
+        <Button
+            android:id="@+id/btn_add_zamer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_button"
+            android:paddingBottom="2dp"
+            android:text="Записать"
+            android:textColor="#ffffff" />
+
+    </LinearLayout>
 
 </ScrollView>

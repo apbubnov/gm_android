@@ -18,11 +18,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 
 import ru.ejevikaapp.gm_android.ActivityPrice;
 import ru.ejevikaapp.gm_android.Activity_zamer;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 
@@ -94,7 +96,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                     if (cc != null) {
                         if (cc.moveToFirst()) {
                             do {
-                                count_zamer ++;
+                                count_zamer++;
                             } while (cc.moveToNext());
                         }
                     }
@@ -104,7 +106,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         }
         c.close();
 
-        if (count_zamer>0){
+        if (count_zamer > 0) {
             txt_count_zamer.setVisibility(View.VISIBLE);
             txt_count_zamer.setText(String.valueOf(count_zamer));
         }
@@ -125,7 +127,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                     if (cc != null) {
                         if (cc.moveToFirst()) {
                             do {
-                                count_mount ++;
+                                count_mount++;
                             } while (cc.moveToNext());
                         }
                     }
@@ -135,7 +137,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         }
         c.close();
 
-        if (count_mount>0){
+        if (count_mount > 0) {
             txt_count_mount.setVisibility(View.VISIBLE);
             txt_count_mount.setText(String.valueOf(count_mount));
         }
@@ -147,7 +149,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(avatar_user));
             ava.setImageBitmap(bitmap);
         } catch (IOException e) {
-           // ava.setBackgroundResource(R.drawable.it_c);
+            // ava.setBackgroundResource(R.drawable.it_c);
         }
 
         Button btn_client = (Button) view.findViewById(R.id.btn_client);
@@ -155,6 +157,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         Button btn_install = (Button) view.findViewById(R.id.btn_install);
         Button btn_add_zamer = (Button) view.findViewById(R.id.btn_add_zamer);
         Button price = (Button) view.findViewById(R.id.price);
+        Button analytics = (Button) view.findViewById(R.id.analytics);
 
         String user_name = "";
 
@@ -178,6 +181,9 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         btn_zamer.setOnClickListener(this);
         btn_install.setOnClickListener(this);
         btn_add_zamer.setOnClickListener(this);
+        price.setOnClickListener(this);
+        analytics.setOnClickListener(this);
+
     }
 
     @Override
@@ -202,6 +208,16 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             case R.id.price:
                 intent = new Intent(getActivity(), ActivityPrice.class);
                 startActivity(intent);
+                break;
+            case R.id.analytics:
+                if (HelperClass.isOnline(getActivity())) {
+                    intent = new Intent(getActivity(), Activity_analytics.class);
+                    startActivity(intent);
+                } else {
+                    Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                            "Проверьте подключение к интернету, или возможны работы на сервере", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 break;
         }
     }

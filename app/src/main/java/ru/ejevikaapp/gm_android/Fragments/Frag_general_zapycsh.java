@@ -16,15 +16,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -33,15 +38,29 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.DBHelper;
+import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync;
 
@@ -51,7 +70,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     TextView id_proj, dealer_cl, components_sum_total, mounting_sum, total_sum, final_amount, final_amount_disc, final_transport, final_transport_sum, data_mounting;
     Calendar dateAndTime = Calendar.getInstance();
-    TextView name_cl, contact_cl, address_cl, notes_cl, ed_discount, data_cl, project_calculator, project_mounter;
+    TextView name_cl, contact_cl, address_cl, notes_cl, ed_discount, data_cl, project_calculator, project_mounter, advertisement;
 
     String id_cl, id_project, phone, fio, pro_info, mount_date = "", dealer_id, item, S, P, transport = "", distance_col = "", distance = "", calc_date = "";
 
@@ -61,6 +80,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     DBHelper dbHelper;
     View view;
+
+    AutoCompleteTextView addressEdit;
+    List<String> addressList = new ArrayList<String>();
 
     TextView DateTime, S_and_P;
 
@@ -81,7 +103,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     String date_zam = df.format(dateAndTime.getTime());
     LinearLayout.LayoutParams titleViewParams, titleViewParams2;
 
-    Button btn, done;
+    Button btn, completedProject;
     private List<Button> BtnList = new ArrayList<Button>();
     private List<TextView> CheckBoxList = new ArrayList<TextView>();
     int i = 0;
@@ -134,6 +156,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         data_mounting = (TextView) view.findViewById(R.id.data_mounting);
         project_mounter = (TextView) view.findViewById(R.id.project_mounter);
         project_calculator = (TextView) view.findViewById(R.id.project_calculator);
+        advertisement = (TextView) view.findViewById(R.id.advertisement);
 
         name_cl = (TextView) view.findViewById(R.id.name_cl);
         name_cl.setOnClickListener(this);
@@ -143,10 +166,13 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         ed_discount = (TextView) view.findViewById(R.id.ed_discount);
         notes_cl = (TextView) view.findViewById(R.id.notes_cl);
 
+        completedProject = (Button) view.findViewById(R.id.completedProject);
+        completedProject.setOnClickListener(this);
+
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sqlQuewy = "select transport, distance, distance_col "
+        String sqlQuewy = "select transport, distance, distance_col, api_phone_id "
                 + "FROM rgzbn_gm_ceiling_projects " +
                 "where _id=?";
         Cursor c = db.rawQuery(sqlQuewy, new String[]{id_project});
@@ -156,6 +182,25 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     transport = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     distance = c.getString(c.getColumnIndex(c.getColumnName(1)));
                     distance_col = c.getString(c.getColumnIndex(c.getColumnName(2)));
+
+                    String advt = c.getString(c.getColumnIndex(c.getColumnName(3)));
+
+                    if (advt == null || advt.equals("null") || advt.equals("")) {
+                    } else {
+                        sqlQuewy = "SELECT name "
+                                + "FROM rgzbn_gm_ceiling_api_phones" +
+                                " WHERE _id = ?";
+                        c = db.rawQuery(sqlQuewy, new String[]{advt});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    String name = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                    advertisement.setText(name);
+                                } while (c.moveToNext());
+                            }
+                        }
+                        c.close();
+                    }
                 } while (c.moveToNext());
             }
         }
@@ -300,12 +345,383 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         id_calcul.clear();
         i = 0;
 
+        ImageButton edit_name = (ImageButton) view.findViewById(R.id.edit_name);
+        edit_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String[] array = new String[]{"Изменить", "Открыть"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Выберите действие")
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                builder.setItems(array, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        // TODO Auto-generated method stub
+
+                        switch (item) {
+                            case 0:
+
+                                final Context context = getActivity();
+                                View promptsView;
+                                LayoutInflater li = LayoutInflater.from(context);
+                                promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                                mDialogBuilder.setView(promptsView);
+                                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+                                final EditText pass1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+                                final EditText pass2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
+                                final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
+                                final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
+                                final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
+                                final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                                final TextView ed_name_text3 = (TextView) promptsView.findViewById(R.id.ed_name_text3);
+                                final TextView ed_name_text2 = (TextView) promptsView.findViewById(R.id.ed_name_text2);
+                                final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+
+                                pass.setVisibility(View.GONE);
+                                pass1.setVisibility(View.GONE);
+                                pass2.setVisibility(View.GONE);
+                                email.setVisibility(View.GONE);
+                                ava.setVisibility(View.GONE);
+                                ed_name_text.setVisibility(View.GONE);
+                                ed_password_text.setVisibility(View.GONE);
+                                ed_name_text3.setVisibility(View.GONE);
+                                ed_name_text2.setVisibility(View.GONE);
+
+                                name.setText(name_cl.getText().toString());
+
+                                mDialogBuilder
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_CLIENT_NAME, name.getText().toString());
+                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                                                new String[]{id_cl});
+
+                                                        values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, id_cl);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "send");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                        getActivity().finish();
+                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                        startActivity(intent);
+
+                                                    }
+                                                })
+                                        .setNegativeButton("Отмена",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                                alertDialog.show();
+
+                                break;
+                            case 1:
+
+                                SharedPreferences SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+                                SharedPreferences.Editor ed = SP.edit();
+                                ed.putString("", String.valueOf(id_cl));
+                                ed.commit();
+
+                                Intent intent = new Intent(getActivity(), Activity_for_spisok.class);
+                                startActivity(intent);
+
+                                break;
+                        }
+
+
+                    }
+                });
+                builder.setCancelable(false);
+                builder.create();
+                builder.show();
+
+            }
+        });
+
+        ImageButton edit_address = (ImageButton) view.findViewById(R.id.edit_address);
+        edit_address.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                String[] array = {"Изменить", "Построить маршрут"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Выберите действие")
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                builder.setItems(array, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        // TODO Auto-generated method stub
+
+                        switch (item) {
+                            case 0:
+
+                                View promptsView;
+                                LayoutInflater li = LayoutInflater.from(getActivity());
+                                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+                                mDialogBuilder.setView(promptsView);
+
+                                addressEdit = (AutoCompleteTextView) promptsView.findViewById(R.id.c_address);
+                                addressEdit.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                    }
+
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable s) {
+                                        String input = addressEdit.getText().toString();
+                                        try {
+                                            if (input.length() > 1)
+                                                loadAddress();
+                                        } catch (IOException ex) {
+                                            Log.d("loadAddress", "Error in!");
+                                        }
+                                    }
+                                });
+
+                                addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                                        android.R.layout.simple_dropdown_item_1line, addressList));
+
+                                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
+                                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
+                                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
+                                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
+                                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
+                                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
+
+                                String str = "";
+
+                                for (String retval : pro_info.split(",")) {
+
+                                    int indexJava = retval.indexOf("дом:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_house.setText(retval.substring(6));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("корпус:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        с_body.setText(retval.substring(9));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("квартира:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_room.setText(retval.substring(11));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("подъезд:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_porch.setText(retval.substring(10));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("этаж:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_floor.setText(retval.substring(7));
+                                        continue;
+                                    }
+
+                                    indexJava = retval.indexOf("код:");
+                                    if (indexJava == -1) {
+                                    } else {
+                                        c_code.setText(retval.substring(6));
+                                        continue;
+                                    }
+                                    str += retval + ",";
+                                }
+                                str = str.substring(0, str.length() - 1);
+                                addressEdit.setText(str);
+
+                                mDialogBuilder
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+
+                                                        String address = addressEdit.getText().toString().trim();
+                                                        String house = c_house.getText().toString().trim();
+                                                        String body = с_body.getText().toString().trim();
+                                                        String porch = c_porch.getText().toString().trim();
+                                                        String floor = c_floor.getText().toString().trim();
+                                                        String room = c_room.getText().toString().trim();
+                                                        String code = c_code.getText().toString().trim();
+
+                                                        String full_address = address + ", дом: " + house;
+
+                                                        if (body.equals("")) {
+                                                        } else {
+                                                            full_address += ", корпус: " + body;
+                                                        }
+
+                                                        if (porch.equals("")) {
+                                                        } else {
+                                                            full_address += ", подъезд: " + porch;
+                                                        }
+
+                                                        if (floor.equals("")) {
+                                                        } else {
+                                                            full_address += ", этаж: " + floor;
+                                                        }
+
+                                                        if (room.equals("")) {
+                                                        } else {
+                                                            full_address += ", квартира: " + room;
+                                                        }
+
+                                                        if (code.equals("")) {
+                                                        } else {
+                                                            full_address += ", код: " + code;
+                                                        }
+
+                                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                                new String[]{id_project});
+
+                                                        values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                                        values.put(DBHelper.KEY_ID_NEW, 0);
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "send");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                        getActivity().finish();
+                                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                                        startActivity(intent);
+
+                                                    }
+                                                })
+                                        .setNegativeButton("Отмена",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.cancel();
+                                                    }
+                                                });
+
+                                AlertDialog alertDialog = mDialogBuilder.create();
+                                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                                alertDialog.show();
+
+                                break;
+                            case 1:
+                                String uri = "geo:0,0?q=" + pro_info;
+                                Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                                startActivity(mapIntent);
+                                break;
+                        }
+
+
+                    }
+                });
+
+                builder.setCancelable(false);
+                builder.create();
+                builder.show();
+
+            }
+        });
+
         id_calc();
 
         transport();
         calc(id_calcul);
 
         return view;
+    }
+
+    private void loadAddress() throws IOException {
+        String input = addressEdit.getText().toString();
+        Log.i("loadAddress", input);
+
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        url += "?input=" + input;
+        url += "&location=51.661535,39.200287";
+        url += "&radius=200&address&types=geocode&language=ru&key=AIzaSyBXhCzmFicI1Xs3pOmfnpr0wlK6hV125_4";
+        Log.d("loadAddress", url);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                addressList.clear();
+                JSONObject dataJsonObj = null;
+                try {
+                    dataJsonObj = new JSONObject(response);
+                    JSONArray predictions = dataJsonObj.getJSONArray("predictions");
+
+                    for (int i = 0; i < predictions.length(); i++) {
+                        JSONObject prediction = predictions.getJSONObject(i);
+                        JSONObject structured_formatting = prediction.getJSONObject("structured_formatting");
+                        String address = structured_formatting.getString("main_text");
+                        addressList.add(address);
+                        Log.d("loadAddress", address);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                updateAdapterAddress();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("loadAddress", error.toString());
+            }
+        });
+
+        requestQueue.add(request);
+    }
+
+    private void updateAdapterAddress() {
+        addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_dropdown_item_1line, addressList));
     }
 
     void calc(ArrayList id_calcul) {
@@ -687,7 +1103,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         btn.setTextColor(Color.argb(0, 0, 0, 0));
         btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
-        btn.setBackgroundResource(R.raw.phone2);
+        btn.setBackgroundResource(R.drawable.edit);
         mainL.addView(btn);
 
         TextView txt = new TextView(getActivity());
@@ -814,33 +1230,200 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         switch (v.getId()) {
             case R.id.address_cl:
+                View promptsView;
+                LayoutInflater li = LayoutInflater.from(getActivity());
+                promptsView = li.inflate(R.layout.layout_edit_address, null);
+                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+                mDialogBuilder.setView(promptsView);
 
-                String uri = "geo:0,0?q=" + pro_info;
-                Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
-                startActivity(mapIntent);
+                addressEdit = (AutoCompleteTextView) promptsView.findViewById(R.id.c_address);
+                addressEdit.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        String input = addressEdit.getText().toString();
+                        try {
+                            if (input.length() > 1)
+                                loadAddress();
+                        } catch (IOException ex) {
+                            Log.d("loadAddress", "Error in!");
+                        }
+                    }
+                });
+
+                addressEdit.setAdapter(new ArrayAdapter<>(getActivity(),
+                        android.R.layout.simple_dropdown_item_1line, addressList));
+
+                final EditText c_house = (EditText) promptsView.findViewById(R.id.c_house);
+                final EditText с_body = (EditText) promptsView.findViewById(R.id.с_body);
+                final EditText c_porch = (EditText) promptsView.findViewById(R.id.c_porch);
+                final EditText c_floor = (EditText) promptsView.findViewById(R.id.c_floor);
+                final EditText c_room = (EditText) promptsView.findViewById(R.id.c_room);
+                final EditText c_code = (EditText) promptsView.findViewById(R.id.c_code);
+
+                String str = "";
+
+                for (String retval : pro_info.split(",")) {
+
+                    int indexJava = retval.indexOf("дом:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_house.setText(retval.substring(6));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("корпус:");
+                    if (indexJava == -1) {
+                    } else {
+                        с_body.setText(retval.substring(9));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("квартира:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_room.setText(retval.substring(11));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("подъезд:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_porch.setText(retval.substring(10));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("этаж:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_floor.setText(retval.substring(7));
+                        continue;
+                    }
+
+                    indexJava = retval.indexOf("код:");
+                    if (indexJava == -1) {
+                    } else {
+                        c_code.setText(retval.substring(6));
+                        continue;
+                    }
+                    str += retval + ",";
+                }
+                str = str.substring(0, str.length() - 1);
+                addressEdit.setText(str);
+
+                mDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+
+                                        String address = addressEdit.getText().toString().trim();
+                                        String house = c_house.getText().toString().trim();
+                                        String body = с_body.getText().toString().trim();
+                                        String porch = c_porch.getText().toString().trim();
+                                        String floor = c_floor.getText().toString().trim();
+                                        String room = c_room.getText().toString().trim();
+                                        String code = c_code.getText().toString().trim();
+
+                                        String full_address = address + ", дом: " + house;
+
+                                        if (body.equals("")) {
+                                        } else {
+                                            full_address += ", корпус: " + body;
+                                        }
+
+                                        if (porch.equals("")) {
+                                        } else {
+                                            full_address += ", подъезд: " + porch;
+                                        }
+
+                                        if (floor.equals("")) {
+                                        } else {
+                                            full_address += ", этаж: " + floor;
+                                        }
+
+                                        if (room.equals("")) {
+                                        } else {
+                                            full_address += ", квартира: " + room;
+                                        }
+
+                                        if (code.equals("")) {
+                                        } else {
+                                            full_address += ", код: " + code;
+                                        }
+
+                                        DBHelper dbHelper = new DBHelper(getActivity());
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_PROJECT_INFO, full_address);
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                                new String[]{id_project});
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, id_project);
+                                        values.put(DBHelper.KEY_ID_NEW, 0);
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "send");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        getActivity().finish();
+                                        Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                                        startActivity(intent);
+
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
 
                 break;
 
             case R.id.name_cl:
 
                 final Context context = getActivity();
-                View promptsView;
-                LayoutInflater li = LayoutInflater.from(context);
+                li = LayoutInflater.from(context);
                 promptsView = li.inflate(R.layout.layout_profile_dealer, null);
-                AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder = new AlertDialog.Builder(context);
                 mDialogBuilder.setView(promptsView);
-                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+                final EditText pass = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+                final EditText pass1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+                final EditText pass2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
                 final EditText email = (EditText) promptsView.findViewById(R.id.ed_email);
                 final EditText name = (EditText) promptsView.findViewById(R.id.ed_name);
                 final TextView ed_name_text = (TextView) promptsView.findViewById(R.id.ed_name_text);
                 final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+                final TextView ed_name_text3 = (TextView) promptsView.findViewById(R.id.ed_name_text3);
+                final TextView ed_name_text2 = (TextView) promptsView.findViewById(R.id.ed_name_text2);
                 final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
 
                 pass.setVisibility(View.GONE);
+                pass1.setVisibility(View.GONE);
+                pass2.setVisibility(View.GONE);
                 email.setVisibility(View.GONE);
                 ava.setVisibility(View.GONE);
                 ed_name_text.setVisibility(View.GONE);
                 ed_password_text.setVisibility(View.GONE);
+                ed_name_text3.setVisibility(View.GONE);
+                ed_name_text2.setVisibility(View.GONE);
 
                 name.setText(name_cl.getText().toString());
 
@@ -881,8 +1464,71 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                                     }
                                 });
 
-                AlertDialog alertDialog = mDialogBuilder.create();
+                alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
                 alertDialog.show();
+
+                break;
+
+            case R.id.completedProject:
+
+                DBHelper dbHelper = new DBHelper(getActivity());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put(DBHelper.KEY_PROJECT_STATUS, "12");
+                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                        new String[]{id_project});
+
+                values = new ContentValues();
+                values.put(DBHelper.KEY_ID_OLD, id_project);
+                values.put(DBHelper.KEY_ID_NEW, "0");
+                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                values.put(DBHelper.KEY_SYNC, "0");
+                values.put(DBHelper.KEY_TYPE, "send");
+                values.put(DBHelper.KEY_STATUS, "1");
+                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                int max_id_proj_history = 0;
+                try {
+                    String sqlQuewy = "select MAX(_id) "
+                            + "FROM rgzbn_gm_ceiling_projects_history " +
+                            "where _id>? and _id<?";
+                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                            String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                max_id_proj_history = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                max_id_proj_history++;
+                            } while (c.moveToNext());
+                        }
+                    }
+                } catch (Exception e) {
+                    max_id_proj_history = Integer.parseInt(dealer_id) * 100000 + 1;
+                }
+
+                Calendar date_cr = new GregorianCalendar();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String date = df.format(date_cr.getTime());
+
+                values = new ContentValues();
+                values.put(DBHelper.KEY_ID, max_id_proj_history);
+                values.put(DBHelper.KEY_PROJECT_ID, id_project);
+                values.put(DBHelper.KEY_NEW_STATUS, "12");
+                values.put(DBHelper.KEY_DATE_OF_CHANGE, date);
+                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, null, values);
+
+                values = new ContentValues();
+                values.put(DBHelper.KEY_ID_OLD, max_id_proj_history);
+                values.put(DBHelper.KEY_ID_NEW, 0);
+                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_history");
+                values.put(DBHelper.KEY_SYNC, "0");
+                values.put(DBHelper.KEY_TYPE, "send");
+                values.put(DBHelper.KEY_STATUS, "1");
+                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                getActivity().finish();
+                getActivity().startService(new Intent(getActivity(), Service_Sync.class));
 
                 break;
         }

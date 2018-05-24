@@ -1,47 +1,51 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:stretchColumns="*"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-        <TableRow>
-                <TextView
-                    android:id="@+id/c_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textSize="12dp"
-                    android:gravity="center"
-                    style="@style/text_style_spisok"
-                    android:minLines="3"
-                    android:layout_span="2" />
+    android:layout_height="fill_parent"
+    android:stretchColumns="*">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/c_address"
-                    android:gravity="center"
-                    android:layout_span="3"
-                    android:textSize="12dp"
-                    style="@style/text_style_spisok"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="2dp"
-                    android:minLines="3" />
+    <TableRow>
 
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/c_price"
-                    android:gravity="center"
-                    android:textSize="12dp"
-                    style="@style/text_style_spisok"
-                    android:layout_span="3"
-                    android:minLines="3" />
+        <TextView
+            android:id="@+id/c_number"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_span="2"
+            android:gravity="center"
+            android:minLines="3"
+            android:textSize="12dp" />
 
-                <TextView android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/c_income"
-                    android:gravity="center"
-                    android:textSize="12dp"
-                    android:layout_span="3"
-                    style="@style/text_style_spisok"
-                    android:layout_marginLeft="2dp"
-                    android:minLines="3" />
-        </TableRow>
+        <TextView
+            android:id="@+id/c_address"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_span="3"
+            android:gravity="center"
+            android:minLines="3"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/c_price"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_span="3"
+            android:gravity="center"
+            android:minLines="3"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/c_income"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_span="3"
+            android:gravity="center"
+            android:minLines="3"
+            android:textSize="12dp" />
+    </TableRow>
 </TableLayout>
