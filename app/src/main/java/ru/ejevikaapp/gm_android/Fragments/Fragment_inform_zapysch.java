@@ -498,7 +498,7 @@ public class Fragment_inform_zapysch extends Fragment {
                                 str = k.getString(k.getColumnIndex(k.getColumnName(1)));
 
                                 sqlQuewy = "SELECT title "
-                                        + "FROM rgzbn_gm_ceiling_components_option" +
+                                        + "FROM rgzbn_gm_ceiling_type" +
                                         " WHERE _id = ?";
                                 Cursor k1 = db.rawQuery(sqlQuewy, new String[]{str});
                                 if (k1 != null) {
@@ -513,7 +513,7 @@ public class Fragment_inform_zapysch extends Fragment {
                                 str = k.getString(c.getColumnIndex(c.getColumnName(2)));
 
                                 sqlQuewy = "SELECT title "
-                                        + "FROM rgzbn_gm_ceiling_type" +
+                                        + "FROM rgzbn_gm_ceiling_components_option" +
                                         " WHERE _id = ?";
                                 k1 = db.rawQuery(sqlQuewy, new String[]{str});
                                 if (k1 != null) {
@@ -523,9 +523,7 @@ public class Fragment_inform_zapysch extends Fragment {
                                         } while (k1.moveToNext());
                                     }
                                 }
-
                                 k1.close();
-
                                 textv(title);
 
                             } while (k.moveToNext());
@@ -568,54 +566,159 @@ public class Fragment_inform_zapysch extends Fragment {
                     }
                     k.close();
 
-                    if ((Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(4)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(5)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(6)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(7)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(9)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(13)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(14)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) ||(Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(21)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(22)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(24)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0))
-                    {
+                    sqlQuewy = "SELECT n29_count, n29_type "
+                            + "FROM rgzbn_gm_ceiling_profil" +
+                            " WHERE calculation_id = ?";
+                    k = db.rawQuery(sqlQuewy, new String[]{String.valueOf(pageNumber)});
+                    if (k != null) {
+
+                        if (k.moveToFirst()) {
+                            textt("Переход уровня");
+                            do {
+
+                                String str = k.getString(k.getColumnIndex(k.getColumnName(0)));
+                                String title = "Количество: " + str + " шт.  - ";
+
+                                str = k.getString(k.getColumnIndex(k.getColumnName(1)));
+                                Log.d("mLog ventil", str);
+
+                                sqlQuewy = "SELECT title "
+                                        + "FROM rgzbn_gm_ceiling_type" +
+                                        " WHERE _id = ?";
+                                Cursor k1 = db.rawQuery(sqlQuewy, new String[]{str});
+                                if (k1 != null) {
+                                    if (k1.moveToFirst()) {
+                                        do {
+                                            title += " Тип: " + k1.getString(k1.getColumnIndex(k1.getColumnName(0)));
+                                        } while (k1.moveToNext());
+                                    }
+                                }
+                                k1.close();
+                                textv(title);
+                            } while (k.moveToNext());
+                        }
+                    }
+                    k.close();
+
+                    int angle = 0;
+                    if (c.getString(c.getColumnIndex(c.getColumnName(6))).equals("")) {
+                    } else {
+                        angle = c.getInt(c.getColumnIndex(c.getColumnName(6)));
+                    }
+                    String n7 = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                    if (n7.equals("null") || n7.equals("")) {
+                        n7 = "0";
+                    }
+                    String n8 = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                    if (n8.equals("null") || n8.equals("")) {
+                        n8 = "0";
+                    }
+                    String n17 = c.getString(c.getColumnIndex(c.getColumnName(11)));
+                    if (n17.equals("null") || n17.equals("")) {
+                        n17 = "0";
+                    }
+                    String n9 = c.getString(c.getColumnIndex(c.getColumnName(6)));
+                    if (n9.equals("null") || n9.equals("")) {
+                        n9 = "0";
+                    }
+                    String n10 = c.getString(c.getColumnIndex(c.getColumnName(7)));
+                    if (n10.equals("null") || n10.equals("")) {
+                        n10 = "0";
+                    }
+                    String n11 = c.getString(c.getColumnIndex(c.getColumnName(8)));
+                    if (n11.equals("null") || n11.equals("")) {
+                        n11 = "0";
+                    }
+                    String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(23)));
+                    if (cut_in_shop.equals("null") || cut_in_shop.equals("")) {
+                        cut_in_shop = "0";
+                    }
+                    String n18 = c.getString(c.getColumnIndex(c.getColumnName(12)));
+                    if (n18.equals("null") || n18.equals("")) {
+                        n18 = "0";
+                    }
+                    String n19 = c.getString(c.getColumnIndex(c.getColumnName(13)));
+                    if (n19.equals("null") || n19.equals("")) {
+                        n19 = "0";
+                    }
+                    String n30 = c.getString(c.getColumnIndex(c.getColumnName(22)));
+                    Log.d("mLog", pageNumber + " n30 = " + n30);
+                    if (n30.equals("null") || n30.equals("")) {
+                        n30 = "0";
+                    }
+                    Log.d("mLog", "n30 = " + n30);
+                    String n20 = c.getString(c.getColumnIndex(c.getColumnName(14)));
+                    if (n20.equals("null") || n20.equals("")) {
+                        n20 = "0";
+                    }
+                    String n21 = c.getString(c.getColumnIndex(c.getColumnName(15)));
+                    if (n21.equals("null") || n21.equals("")) {
+                        n21 = "0";
+                    }
+                    String n24 = c.getString(c.getColumnIndex(c.getColumnName(16)));
+                    if (n24.equals("null") || n24.equals("")) {
+                        n24 = "0";
+                    }
+                    String dop_krep = c.getString(c.getColumnIndex(c.getColumnName(18)));
+                    if (dop_krep.equals("null") || dop_krep.equals("")) {
+                        dop_krep = "0";
+                    }
+                    String drain = c.getString(c.getColumnIndex(c.getColumnName(24)));
+                    if (drain.equals("null") || drain.equals("")) {
+                        drain = "0";
+                    }
+                    String height = c.getString(c.getColumnIndex(c.getColumnName(25)));
+                    if (height.equals("null") || height.equals("")) {
+                        height = "0";
+                    }
+
+                    if ((Double.valueOf(n7) > 0) || (Double.valueOf(n8) > 0) ||
+                            (angle > 0) || (Double.valueOf(n10) > 0) ||
+                            (Double.valueOf(n11) > 0) || (Double.valueOf(n19) > 0) ||
+                            (Double.valueOf(n20) > 0) || (Double.valueOf(n21) > 0) ||
+                            (Double.valueOf(n24) > 0) || (Double.valueOf(dop_krep) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(21)))) > 0) || (Double.valueOf(n30) > 0) ||
+                            (Double.valueOf(cut_in_shop) > 0) || (Double.valueOf(drain) > 0) ||
+                            (Double.valueOf(height) > 0)) {
                         textt("Прочее");
 
-                        String n7 = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                        n7 = c.getString(c.getColumnIndex(c.getColumnName(4)));
                         if (Double.valueOf(n7) > 0){
                             n7 = "Крепление в плитку, м: " + n7;
                             textv(n7);
                         }
-                        String n8 = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                        n8 = c.getString(c.getColumnIndex(c.getColumnName(5)));
                         if (Double.valueOf(n8) > 0){
                             n8 = "Крепление в керамогранит, м: " + n8;
                             textv(n8);
                         }
-                        String n9 = c.getString(c.getColumnIndex(c.getColumnName(6)));
+                        n9 = c.getString(c.getColumnIndex(c.getColumnName(6)));
                         if (Double.valueOf(n9) > 0){
                             n9 = "Углы, м: " + n9;
                             textv(n9);
                         }
-                        String n10 = c.getString(c.getColumnIndex(c.getColumnName(7)));
+                        n10 = c.getString(c.getColumnIndex(c.getColumnName(7)));
                         if (Double.valueOf(n10) > 0){
                             n10 = "Криволинейный вырез, м: " + n10;
                             textv(n10);
                         }
-                        String n11 = c.getString(c.getColumnIndex(c.getColumnName(8)));
+                        n11 = c.getString(c.getColumnIndex(c.getColumnName(8)));
                         if (Double.valueOf(n11) > 0){
                             n11 = "Внутренний вырез, м: " + n11;
                             textv(n11);
                         }
-                        String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(23)));
+                        cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(23)));
                         if (Double.valueOf(cut_in_shop ) > 0){
                             cut_in_shop  = "Внутренний вырез(в цеху): " + cut_in_shop ;
                             textv(cut_in_shop );
                         }
-                        String n19 = c.getString(c.getColumnIndex(c.getColumnName(13)));
+                        n19 = c.getString(c.getColumnIndex(c.getColumnName(13)));
                         if (Double.valueOf(n19) > 0){
                             n19 = "Провод, м: " + n19;
                             textv(n19);
                         }
 
-                        String n30 = c.getString(c.getColumnIndex(c.getColumnName(22)));
+                        n30 = c.getString(c.getColumnIndex(c.getColumnName(22)));
                         if (n30 == null ){
                             n30 = "0";
                         }
@@ -625,27 +728,27 @@ public class Fragment_inform_zapysch extends Fragment {
                             textv(n30 );
                         }
 
-                        String n20 = c.getString(c.getColumnIndex(c.getColumnName(14)));
+                        n20 = c.getString(c.getColumnIndex(c.getColumnName(14)));
                         if (Double.valueOf(n20 ) > 0){
                             n20  = "Разделитель, м: " + n20 ;
                             textv(n20 );
                         }
-                        String n21 = c.getString(c.getColumnIndex(c.getColumnName(15)));
+                        n21 = c.getString(c.getColumnIndex(c.getColumnName(15)));
                         if (Double.valueOf(n21 ) > 0){
                             n21  = "Пожарная сигнализация, м: " + n21 ;
                             textv(n21 );
                         }
-                        String n24 = c.getString(c.getColumnIndex(c.getColumnName(16)));
+                        n24 = c.getString(c.getColumnIndex(c.getColumnName(16)));
                         if (Double.valueOf(n24) > 0){
                             n24 = "Сложность доступа к месту монтажа, м: " + n24;
                             textv(n24);
                         }
-                        String dop_krep = c.getString(c.getColumnIndex(c.getColumnName(18)));
+                        dop_krep = c.getString(c.getColumnIndex(c.getColumnName(18)));
                         if (Double.valueOf(dop_krep) > 0){
                             dop_krep = "Дополнительный крепеж: " + dop_krep;
                             textv(dop_krep);
                         }
-                        String drain = c.getString(c.getColumnIndex(c.getColumnName(24)));
+                        drain = c.getString(c.getColumnIndex(c.getColumnName(24)));
                         if (drain.equals("null")){
                         }   else {
                             if (Double.valueOf(drain) > 0) {
@@ -653,7 +756,7 @@ public class Fragment_inform_zapysch extends Fragment {
                                 textv(drain);
                             }
                         }
-                        String height = c.getString(c.getColumnIndex(c.getColumnName(25)));
+                        height = c.getString(c.getColumnIndex(c.getColumnName(25)));
                         if (Double.valueOf(height) > 0){
                             height = "Комната выше 3-ех метров";
                             textv(height);

@@ -1,10 +1,13 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +35,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     SharedPreferences SP;
-    String SAVED_ID="", user_id;
+    String SAVED_ID = "", user_id;
     View view;
 
     Button btn_add_brigade;
@@ -55,11 +58,11 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
         super.onResume();
 
         client_mas.clear();
-        list_brigade = (ListView)findViewById(R.id.list_brigade);
+        list_brigade = (ListView) findViewById(R.id.list_brigade);
         clients();
     }
 
-    void clients (){
+    void clients() {
 
         SP = getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
@@ -69,7 +72,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
 
         dbHelper = new DBHelper(this);
 
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         ArrayList brigade = new ArrayList();
         ArrayList mounters = new ArrayList();
@@ -102,13 +105,15 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
         }
         c.close();
 
-        if (count == 0){
+        if (count == 0) {
             brigade.add(user_id);
         }
 
-        for (int g = 0; g<brigade.size(); g++) {
+        for (int g = 0; g < brigade.size(); g++) {
 
-            String name_br = "";
+            Log.d("mLog", String.valueOf(brigade.get(g)));
+            String name_brigade = "";
+            String name_brigade_full = "";
 
             sqlQuewy = "SELECT name "
                     + "FROM rgzbn_users " +
@@ -117,7 +122,8 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
-                        name_br = c.getString(c.getColumnIndex(c.getColumnName(0))) + " :";
+                        name_brigade_full = c.getString(c.getColumnIndex(c.getColumnName(0))) + " :";
+                        name_brigade = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     } while (c.moveToNext());
                 }
             }
@@ -140,7 +146,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
-                                    name_br +="\n     " + cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    name_brigade_full += "\n     " + cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                 } while (cc.moveToNext());
                             }
                         }
@@ -149,12 +155,12 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
                     } while (c.moveToNext());
                 }
                 c.close();
-            }   else {
+            } else {
                 Log.d("mLog", "2");
             }
 
             Frag_client_schedule_class fc = new Frag_client_schedule_class(String.valueOf(brigade.get(g)),
-                    name_br, null, null, null, null);
+                    name_brigade_full, name_brigade, null, null, null);
             client_mas.add(fc);
         }
 
@@ -170,7 +176,7 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
         FunDapter adapter = new FunDapter(this, client_mas, R.layout.brigade_list, dict);
         list_brigade.setAdapter(adapter);
 
-        list_brigade.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        list_brigade.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
@@ -207,6 +213,78 @@ public class Activity_spisok_brigade extends AppCompatActivity implements View.O
                 Intent intent = new Intent(Activity_spisok_brigade.this, Activity_calendar.class);
                 intent.putExtra("id_brigade", p_id);
                 startActivity(intent);
+            }
+        });
+
+        list_brigade.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {        // УДАЛЕНИЕ
+
+                final SQLiteDatabase db = dbHelper.getReadableDatabase();
+                Frag_client_schedule_class selectedid = client_mas.get(position);
+                final String p_id = selectedid.getId();
+                final String p_name = selectedid.getAddress();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(Activity_spisok_brigade.this);
+                builder.setTitle("Удалить бригаду " + p_name + " ?")
+                        .setMessage(null)
+                        .setIcon(null)
+                        .setCancelable(false)
+                        .setPositiveButton("Да",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        String sqlQuewy = "SELECT id_mounter "
+                                                + "FROM rgzbn_gm_ceiling_mounters_map" +
+                                                " WHERE id_brigade = ?";
+                                        Cursor cursor = db.rawQuery(sqlQuewy, new String[]{p_id});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+
+                                                    String id_mounter = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                    ContentValues values = new ContentValues();
+                                                    values.put(DBHelper.KEY_ID_OLD, id_mounter);
+                                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_mounters");
+                                                    values.put(DBHelper.KEY_SYNC, "0");
+                                                    values.put(DBHelper.KEY_TYPE, "delete");
+                                                    values.put(DBHelper.KEY_STATUS, "1");
+                                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS, "_id = ?", new String[]{String.valueOf(id_mounter)});
+
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        ContentValues values = new ContentValues();
+                                        values.put(DBHelper.KEY_ID_OLD, p_id);
+                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                                        values.put(DBHelper.KEY_SYNC, "0");
+                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                        values.put(DBHelper.KEY_STATUS, "1");
+                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                        db.delete(DBHelper.TABLE_USERS, "_id = ?", new String[]{String.valueOf(p_id)});
+                                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, "id_brigade = ?", new String[]{String.valueOf(p_id)});
+
+                                        onResume();
+                                    }
+                                })
+                        .setNegativeButton("Отмена",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                return false;
             }
         });
     }

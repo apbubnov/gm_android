@@ -37,14 +37,16 @@ public class Service_Sync extends Service {
     private static final String TAG = "responce_send";
     static DBHelper dbHelper;
 
-    static String SAVED_ID = "", id_cl, id_project, phone, fio, pro_info, calc_date, dealer_id, item, S, P, table_name, table_name_title, components_diffusers = "",
-            components_fixtures = "", components_corn = "", components_ecola = "", components_hoods = "", components_pipes = "", check_project = "", check_calculation = "",
-            components_profil = "", check_components_diffusers = "", check_components_fixtures = "", check_components_corn = "", check_components_ecola = "",
-            check_components_hoods = "", check_components_pipes = "", check_components_profil = "", check_History = "", check_ApiPhones = "";
+    static String SAVED_ID = "[", id_cl, id_project, phone, fio, pro_info, calc_date, dealer_id, item, S, P, table_name, table_name_title, components_diffusers = "[",
+            components_fixtures = "[", components_corn = "[", components_ecola = "[", components_hoods = "[", components_pipes = "[", check_project = "[", check_calculation = "[",
+            components_profil = "[", check_components_diffusers = "[", check_components_fixtures = "[", check_components_corn = "[", check_components_ecola = "[",
+            check_components_hoods = "[", check_components_pipes = "[", check_components_profil = "[", check_History = "[", check_ApiPhones = "[", checkClientHistory = "[",
+            checkCallback = "[", checkRecoil = "[";
 
-    static String jsonProjects = "", jsonCalc = "", jsonImage = "", jsonClient = "", jsonClient_Contacts = "", jsonFixtures = "", jsonEcola = "", jsonCornice = "",
-            jsonPipes = "", jsonHoods = "", jsonDiffusers = "", global_results = "", check_client = "", check_clients_contacts = "", check_users = "", jsonUsers = "",
-            jsonUserGroup = "", jsonMounters = "", check_mounters = "", check_mounters_map = "", jsonDealer_info = "", jsonMount = "", jsonHistory = "", jsonApiPhones = "";
+    static String jsonProjects = "[", jsonCalc = "[", jsonImage = "[", jsonClient = "[", jsonClient_Contacts = "[", jsonFixtures = "[", jsonEcola = "[", jsonCornice = "[",
+            jsonPipes = "[", jsonHoods = "[", jsonDiffusers = "[", global_results = "[", check_client = "[", check_clients_contacts = "[", check_users = "[", jsonUsers = "[",
+            jsonUserGroup = "[", jsonMounters = "[", check_mounters = "[", mounters_map = "[", jsonDealer_info = "[", jsonMount = "[", jsonHistory = "[", jsonApiPhones = "[",
+            jsonClientHistory = "[", jsonCallback = "[", jsonDelete = "[", jsonDeleteTable = "[", jsonRecoil = "[";
 
     static org.json.simple.JSONObject jsonObjectClient = new org.json.simple.JSONObject();
     static org.json.simple.JSONObject jsonObjectClient_Contacts = new org.json.simple.JSONObject();
@@ -57,12 +59,16 @@ public class Service_Sync extends Service {
     static JSONObject jsonObjectMounters_map = new JSONObject();
     static JSONObject jsonObjectDealer_info = new JSONObject();
     static JSONObject jsonObjectMount = new JSONObject();
+    static JSONObject jsonObjectClientHistory = new JSONObject();
+    static JSONObject jsonObjectCallback = new JSONObject();
 
     static RequestQueue requestQueue;
 
     static String domen;
 
     static Context ctx;
+
+    static int gager_id_int = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -104,10 +110,7 @@ public class Service_Sync extends Service {
 
         if (!isRunning(this)) {
         } else if (count_line > 0) {
-
             delete();
-
-            int gager_id_int = 0;
             SP = getSharedPreferences("gager_id", MODE_PRIVATE);
             String gager_id = SP.getString("", "");
             if (gager_id.length() < 5) {
@@ -115,9 +118,6 @@ public class Service_Sync extends Service {
             } else {
                 gager_id_int = Integer.parseInt(gager_id);
             }
-
-            final int finalGager_id_int = gager_id_int;
-
             try {
                 requestQueue = Volley.newRequestQueue(getApplicationContext());
             } catch (Exception e) {
@@ -130,13 +130,12 @@ public class Service_Sync extends Service {
                     + "FROM history_send_to_server " +
                     "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
             Cursor cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
+                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
                             "send", "0", "rgzbn_gm_ceiling_clients", "1"});
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
                         String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
                         try {
                             sqlQuewy = "SELECT * "
                                     + "FROM rgzbn_gm_ceiling_clients " +
@@ -146,7 +145,7 @@ public class Service_Sync extends Service {
                                 if (cursor.moveToFirst()) {
                                     do {
                                         JSONObject jsonObjectClient = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_clients"); j++) {
+                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_clients"); j++) {
                                             String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                             String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
@@ -169,897 +168,1199 @@ public class Service_Sync extends Service {
                             cursor.close();
                         } catch (Exception e) {
                         }
-
                     } while (cursor.moveToNext());
-                }
-            }
-
-            jsonClient = jsonClient.substring(0, jsonClient.length() - 1) + "]";
-            if (jsonClient.equals("]")) {
-            } else {
-                Log.d(TAG, "jsonClient = " + jsonClient);
-                new SendClientData().execute();
-            }
-            cursor.close();
-
-            //клиент check
-            check_client = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_clients"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectClient = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectClient.put("id", id_new);
-                        check_client += String.valueOf(jsonObjectClient) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_client = check_client.substring(0, check_client.length() - 1) + "]";
-            if (check_client.equals("]")) {
-            } else {
-                new CheckClientsData().execute();
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------контакты------------------------");
-            //контакты send
-            jsonClient_Contacts = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_clients_contacts", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        sqlQuewy = "SELECT * "
-                                + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                "where _id = ?";
-                        cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                        if (cursor != null) {
-                            if (cursor.moveToFirst()) {
-                                do {
-                                    jsonObjectClient_Contacts = new org.json.simple.JSONObject();
-                                    String status = "android_id";
-                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                    jsonObjectClient_Contacts.put(status, status1);
-                                    status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                    status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                    jsonObjectClient_Contacts.put(status, status1);
-                                    status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                    status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                    jsonObjectClient_Contacts.put(status, status1);
-
-                                    jsonClient_Contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
-
-                                } while (cursor.moveToNext());
-                            } else {
-                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients_contacts"});
-                            }
+                } else {
+                    //клиент check
+                    check_client = "[";
+                    sqlQuewy = "SELECT id_new "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "check", "0", "rgzbn_gm_ceiling_clients"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                jsonObjectClient = new org.json.simple.JSONObject();
+                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                jsonObjectClient.put("id", id_new);
+                                check_client += String.valueOf(jsonObjectClient) + ",";
+                            } while (cursor.moveToNext());
                         }
-                        cursor.close();
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonClient_Contacts = jsonClient_Contacts.substring(0, jsonClient_Contacts.length() - 1) + "]";
-            if (jsonClient_Contacts.equals("]")) {
-            } else {
-                new SendClientsContactsData().execute();
-            }
-            cursor.close();
+                    }
+                    check_client = check_client.substring(0, check_client.length() - 1) + "]";
+                    if (check_client.equals("]")) {
+                    } else {
+                        new CheckClientsData().execute();
+                    }
+                    cursor.close();
 
-            //контакты check
-            check_clients_contacts = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_clients_contacts"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectClient_Contacts = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectClient_Contacts.put("id", id_new);
-                        check_clients_contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_clients_contacts = check_clients_contacts.substring(0, check_clients_contacts.length() - 1) + "]";
-            if (check_clients_contacts.equals("]")) {
-            } else {
-                new CheckClientsContactsData().execute();
-            }
-            cursor.close();
+                    Log.d(TAG, "--------------------------контакты------------------------");
+                    //контакты send
+                    jsonClient_Contacts = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_clients_contacts", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_clients_contacts " +
+                                        "where _id = ?";
+                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            jsonObjectClient_Contacts = new org.json.simple.JSONObject();
+                                            String status = "android_id";
+                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectClient_Contacts.put(status, status1);
+                                            status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(1)));
+                                            status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
+                                            jsonObjectClient_Contacts.put(status, status1);
+                                            status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(2)));
+                                            status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
+                                            jsonObjectClient_Contacts.put(status, status1);
 
-            Log.d(TAG, "--------------------------проект------------------------");
-            //проект send
-            jsonProjects = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>? and id_old<?) or id_old<?)  and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_projects", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonClient_Contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
 
-                        //try {
-                        sqlQuewy = "SELECT * "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where _id = ?";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    JSONObject jsonObjectClient = new JSONObject();
-                                    for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_projects"); j++) {
-                                        String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
-                                        String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                        if (j == 0) {
-                                            status = "android_id";
-                                        }
-                                        if (status.equals("change_time")) {
-                                        } else {
-                                            if (status1 == null) {
-                                                try {
-                                                    jsonObjectClient.put(status, status1);
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
+                                        } while (cursor.moveToNext());
+                                    } else {
+                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients_contacts"});
+                                        check_clients_contacts = "[";
+                                    }
+                                }
+                                cursor.close();
+                            } while (cursor.moveToNext());
+                        } else {
+                            sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_clients_contacts"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        jsonObjectClient_Contacts = new org.json.simple.JSONObject();
+                                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                        jsonObjectClient_Contacts.put("id", id_new);
+                                        check_clients_contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_clients_contacts = check_clients_contacts.substring(0, check_clients_contacts.length() - 1) + "]";
+                            if (check_clients_contacts.equals("]")) {
+                            } else {
+                                new CheckClientsContactsData().execute();
+                            }
+                            cursor.close();
+                        }
+                    }
+                    jsonClient_Contacts = jsonClient_Contacts.substring(0, jsonClient_Contacts.length() - 1) + "]";
+                    if (jsonClient_Contacts.equals("]")) {
+                    } else {
+                        new SendClientsContactsData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------проект------------------------");
+                    //проект send
+                    jsonProjects = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>? and id_old<?) or id_old<?)  and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_projects", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                //try {
+                                sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_projects " +
+                                        "where _id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            JSONObject jsonObjectClient = new JSONObject();
+                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_projects"); j++) {
+                                                String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
+                                                String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                if (j == 0) {
+                                                    status = "android_id";
                                                 }
-                                            } else {
-                                                if (status1.equals("") || status1.equals("null")) {
+                                                if (status.equals("change_time")) {
                                                 } else {
-                                                    try {
-                                                        jsonObjectClient.put(status, status1);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
+                                                    if (status1 == null) {
+                                                        try {
+                                                            jsonObjectClient.put(status, status1);
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    } else {
+                                                        if (status1.equals("") || status1.equals("null")) {
+                                                        } else {
+                                                            try {
+                                                                jsonObjectClient.put(status, status1);
+                                                            } catch (JSONException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
+                                            jsonProjects += String.valueOf(jsonObjectClient) + ",";
+                                        } while (c.moveToNext());
+                                    } else {
+                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER, "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects"});
+                                    }
+                                }
+                                c.close();
+                            } while (cursor.moveToNext());
+                        } else {
+                            //проект check
+                            check_project = "[";
+                            sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_projects"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        jsonObjectClient = new org.json.simple.JSONObject();
+                                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                        jsonObjectClient.put("id", id_new);
+                                        check_project += String.valueOf(jsonObjectClient) + ",";
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_project = check_project.substring(0, check_project.length() - 1) + "]";
+                            if (check_project.equals("]")) {
+                            } else {
+                                new CheckProjectsData().execute();
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------калькулятор------------------------");
+                            //калькулятор send
+                            jsonCalc = "[";
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_calculations", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        sqlQuewy = "SELECT * "
+                                                + "FROM rgzbn_gm_ceiling_calculations " +
+                                                "where _id = ?";
+                                        Cursor c = db.rawQuery(sqlQuewy, new String[]{id_old});
+                                        if (c != null) {
+                                            if (c.moveToFirst()) {
+                                                do {
+                                                    jsonObjectCalculation = new org.json.simple.JSONObject();
+                                                    for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_calculations"); j++) {
+                                                        try {
+                                                            String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
+                                                            String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                            if (status.equals("_id")) {
+                                                                status = "android_id";
+                                                                jsonObjectCalculation.put(status, status1);
+                                                            } else if (status.equals("calc_image")) {
+                                                                status = "image";
+                                                                status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                                jsonObjectCalculation.put(status, status1);
+                                                            } else if (status.equals("cut_image")) {
+                                                                status = "cut_image";
+                                                                status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                                jsonObjectCalculation.put(status, status1);
+                                                            } else if (status1.equals("")) {
+                                                            } else if (status1.equals("null") || status1.equals(null) || status1 == null) {
+                                                            } else {
+                                                                jsonObjectCalculation.put(status, status1);
+                                                            }
+                                                        } catch (Exception e) {
+                                                        }
+                                                    }
+                                                    jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
+                                                } while (c.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_calculations"});
+                                            }
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                } else {
+                                    //калькулятор check
+                                    check_calculation = "[";
+                                    sqlQuewy = "SELECT id_new "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "check", "0", "rgzbn_gm_ceiling_calculations"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+
+                                                jsonObjectClient = new org.json.simple.JSONObject();
+                                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                jsonObjectClient.put("id", id_new);
+                                                check_calculation += String.valueOf(jsonObjectClient) + ",";
+                                            } while (cursor.moveToNext());
                                         }
                                     }
-                                    jsonProjects += String.valueOf(jsonObjectClient) + ",";
-                                } while (c.moveToNext());
-                            } else {
-                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects"});
+                                    check_calculation = check_calculation.substring(0, check_calculation.length() - 1) + "]";
+                                    if (check_calculation.equals("]")) {
+                                    } else {
+                                        new CheckCalculationData().execute();
+                                    }
+                                    cursor.close();
 
-                            }
-                        }
-                        c.close();
-                        //} catch (Exception e) {
-                        //}
+                                    components_diffusers = "[";
+                                    components_ecola = "[";
+                                    components_fixtures = "[";
+                                    components_hoods = "[";
+                                    components_pipes = "[";
+                                    components_corn = "[";
+                                    components_profil = "[";
 
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonProjects = jsonProjects.substring(0, jsonProjects.length() - 1) + "]";
-            if (jsonProjects.equals("]")) {
-            } else {
-                new SendProjectsData().execute();
-            }
-            cursor.close();
+                                    Log.d(TAG, "--------------------------компоненты_fix------------------------");
+                                    //компоненты_fix send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_fixtures", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
 
-            //проект check
-            check_project = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_projects"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectClient = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectClient.put("id", id_new);
-                        check_project += String.valueOf(jsonObjectClient) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_project = check_project.substring(0, check_project.length() - 1) + "]";
-            if (check_project.equals("]")) {
-            } else {
-                new CheckProjectsData().execute();
-            }
-            cursor.close();
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_fixtures " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_fixtures += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_fixtures"});
 
-            Log.d(TAG, "--------------------------калькулятор------------------------");
-            //калькулятор send
-            jsonCalc = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_calculations", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
 
-                        sqlQuewy = "SELECT * "
-                                + "FROM rgzbn_gm_ceiling_calculations " +
-                                "where _id = ?";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{id_old});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_calculations"); j++) {
-                                        try {
-                                            String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
-                                            String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                            if (status.equals("_id")) {
-                                                status = "android_id";
-                                                jsonObjectCalculation.put(status, status1);
-                                            } else if (status.equals("calc_image")) {
-                                                status = "image";
-                                                status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                jsonObjectCalculation.put(status, status1);
-                                            } else if (status.equals("cut_image")) {
-                                                status = "cut_image";
-                                                status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                jsonObjectCalculation.put(status, status1);
-                                            } else if (status1.equals("")) {
-                                            } else if (status1 == null) {
-                                                status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                jsonObjectClient.put(status, status1);
-                                            } else {
-                                                jsonObjectCalculation.put(status, status1);
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_ecola------------------------");
+                                    //компоненты_ecola send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_ecola", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_ecola " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_ecola += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_ecola"});
+
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_diff------------------------");
+                                    //компоненты_diff send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_diffusers", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_diffusers " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_diffusers += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_diffusers"});
+
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_hoods------------------------");
+                                    //компоненты_hoods send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_hoods", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_hoods " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_hoods += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_hoods"});
+
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_pipes------------------------");
+                                    //компоненты_pipes send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_pipes", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_pipes " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_pipes += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_pipes"});
+
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_cornice------------------------");
+                                    //компоненты_cornice send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_cornice", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_cornice " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_corn += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_cornice"});
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    Log.d(TAG, "--------------------------компоненты_profil------------------------");
+                                    //компоненты_cornice send
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_profil", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                jsonObjectComponents = new org.json.simple.JSONObject();
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_profil " +
+                                                            "where _id = ? ";
+                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (c != null) {
+                                                        if (c.moveToFirst()) {
+                                                            do {
+                                                                String status = "android_id";
+                                                                String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                                status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                                jsonObjectComponents.put(status, status1);
+                                                                components_profil += String.valueOf(jsonObjectComponents) + ",";
+                                                            } while (c.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_profil"});
+
+                                                        }
+                                                    }
+                                                    c.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
+                                    if (components_diffusers.length() < 3) {
+                                        components_diffusers += "]";
+                                    } else {
+                                        components_diffusers = components_diffusers.substring(0, components_diffusers.length() - 1) + "]";
+                                    }
+                                    if (components_ecola.length() < 3) {
+                                        components_ecola += "]";
+                                    } else {
+                                        components_ecola = components_ecola.substring(0, components_ecola.length() - 1) + "]";
+                                    }
+                                    if (components_fixtures.length() < 3) {
+                                        components_fixtures += "]";
+                                    } else {
+                                        components_fixtures = components_fixtures.substring(0, components_fixtures.length() - 1) + "]";
+                                    }
+                                    if (components_hoods.length() < 3) {
+                                        components_hoods += "]";
+                                    } else {
+                                        components_hoods = components_hoods.substring(0, components_hoods.length() - 1) + "]";
+                                    }
+                                    if (components_pipes.length() < 3) {
+                                        components_pipes += "]";
+                                    } else {
+                                        components_pipes = components_pipes.substring(0, components_pipes.length() - 1) + "]";
+                                    }
+                                    if (components_corn.length() < 3) {
+                                        components_corn += "]";
+                                    } else {
+                                        components_corn = components_corn.substring(0, components_corn.length() - 1) + "]";
+                                    }
+                                    if (components_profil.length() < 3) {
+                                        components_profil += "]";
+                                    } else {
+                                        components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
+                                    }
+
+                                    if ((components_diffusers.equals("]") && components_ecola.equals("]") && components_fixtures.equals("]") && components_hoods.equals("]") &&
+                                            components_pipes.equals("]") && components_corn.equals("]") && components_profil.equals("]")) ||
+                                            (components_diffusers.equals("[]") && components_ecola.equals("[]") && components_fixtures.equals("[]") && components_hoods.equals("[]") &&
+                                                    components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))) {
+                                        //компоненты_fix check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_fixtures"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_fixtures += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
                                             }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_diff check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_diffusers"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_diffusers += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_pipes check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_pipes"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_pipes += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_hoods check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_hoods"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_hoods += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_ecola check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_ecola"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_ecola += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_cornice check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_cornice"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_corn += String.valueOf(jsonObjectComponents) + ",";
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        //компоненты_cornice check
+                                        sqlQuewy = "SELECT id_new "
+                                                + "FROM history_send_to_server " +
+                                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                        cursor = db.rawQuery(sqlQuewy,
+                                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                        "check", "0", "rgzbn_gm_ceiling_profil"});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectComponents.put("id", id_new);
+                                                    check_components_profil += String.valueOf(jsonObjectComponents) + ",";
+                                                    new CheckCalculationData().execute();
+                                                } while (cursor.moveToNext());
+                                            }
+                                        }
+                                        cursor.close();
+
+                                        check_components_diffusers = check_components_diffusers.substring(0, check_components_diffusers.length() - 1) + "]";
+                                        check_components_ecola = check_components_ecola.substring(0, check_components_ecola.length() - 1) + "]";
+                                        check_components_fixtures = check_components_fixtures.substring(0, check_components_fixtures.length() - 1) + "]";
+                                        check_components_hoods = check_components_hoods.substring(0, check_components_hoods.length() - 1) + "]";
+                                        check_components_pipes = check_components_pipes.substring(0, check_components_pipes.length() - 1) + "]";
+                                        check_components_corn = check_components_corn.substring(0, check_components_corn.length() - 1) + "]";
+                                        check_components_profil = check_components_profil.substring(0, check_components_profil.length() - 1) + "]";
+
+                                        if ((check_components_diffusers.equals("]") && check_components_ecola.equals("]") && check_components_fixtures.equals("]")
+                                                && check_components_hoods.equals("]") && check_components_pipes.equals("]") && check_components_corn.equals("]")
+                                                && check_components_profil.equals("]"))
+                                                || (check_components_diffusers.equals("[]") && check_components_ecola.equals("[]") && check_components_fixtures.equals("[]")
+                                                && check_components_hoods.equals("[]") && check_components_pipes.equals("[]") && check_components_corn.equals("[]")
+                                                && check_components_profil.equals("[]"))) {
+                                        } else {
+                                            new CheckComponents().execute();
+                                        }
+
+                                    } else {
+                                        new SendComponents().execute();
+                                    }
+
+                                    check_components_diffusers = "[";
+                                    check_components_ecola = "[";
+                                    check_components_fixtures = "[";
+                                    check_components_hoods = "[";
+                                    check_components_pipes = "[";
+                                    check_components_corn = "[";
+                                    check_components_profil = "[";
+                                }
+                            }
+                            jsonCalc = jsonCalc.substring(0, jsonCalc.length() - 1) + "]";
+                            if (jsonCalc.equals("]")) {
+                            } else {
+                                new SendCalculationsData().execute();
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------ИСТОРИЯ------------------------");
+                            //клиент send
+                            jsonHistory = "[";
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_projects_history", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_projects_history " +
+                                                    "where _id = ?";
+                                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (cursor != null) {
+                                                if (cursor.moveToFirst()) {
+                                                    do {
+                                                        JSONObject jsonObjectClient = new JSONObject();
+                                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_projects_history"); j++) {
+                                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                            if (j == 0) {
+                                                                status = "android_id";
+                                                            }
+                                                            if (status1 == null || status1.equals("") || (status1.equals("null"))) {
+                                                            } else {
+                                                                jsonObjectClient.put(status, status1);
+                                                            }
+                                                        }
+                                                        jsonHistory += String.valueOf(jsonObjectClient) + ",";
+                                                    } while (cursor.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects_history"});
+                                                }
+                                            }
+                                            cursor.close();
 
                                         } catch (Exception e) {
+                                            Log.d(TAG, String.valueOf(e));
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+                            jsonHistory = jsonHistory.substring(0, jsonHistory.length() - 1) + "]";
+                            Log.d(TAG, "jsonHistory = " + jsonHistory);
+                            if (jsonHistory.equals("]")) {
+                            } else {
+                                new SendProjectsHistory().execute();
+                            }
+
+                            Log.d(TAG, "--------------------------RECOIL_MAP_PROJECT------------------------");
+                            //клиент send
+                            jsonRecoil = "[";
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_recoil_map_project", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_recoil_map_project " +
+                                                    "where _id = ?";
+                                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (cursor != null) {
+                                                if (cursor.moveToFirst()) {
+                                                    do {
+                                                        JSONObject jsonObjectClient = new JSONObject();
+                                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_recoil_map_project"); j++) {
+                                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                            if (j == 0) {
+                                                                status = "android_id";
+                                                            }
+                                                            if (status1 == null || (status1.equals("null"))) {
+                                                            } else {
+                                                                jsonObjectClient.put(status, status1);
+                                                            }
+                                                        }
+                                                        jsonRecoil += String.valueOf(jsonObjectClient) + ",";
+                                                    } while (cursor.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_recoil_map_project"});
+                                                }
+                                            }
+                                            cursor.close();
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                } else {
+
+                                    checkRecoil = "[";
+                                    sqlQuewy = "SELECT id_new "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "check", "0", "rgzbn_gm_ceiling_recoil_map_project"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                try {
+                                                    JSONObject jsonObjectClient = new JSONObject();
+                                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                    jsonObjectClient.put("id", id_new);
+                                                    checkRecoil += String.valueOf(jsonObjectClient) + ",";
+                                                } catch (Exception e) {
+                                                }
+                                            } while (cursor.moveToNext());
                                         }
                                     }
-                                    jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
-                                } while (c.moveToNext());
+
+                                    checkRecoil = checkRecoil.substring(0, checkRecoil.length() - 1) + "]";
+                                    if (checkRecoil.equals("]")) {
+                                    } else {
+                                        new CheckRecoilMapProject().execute();
+                                    }
+                                    cursor.close();
+                                }
+                            }
+                            cursor.close();
+                            jsonRecoil = jsonRecoil.substring(0, jsonRecoil.length() - 1) + "]";
+                            if (jsonRecoil.equals("]")) {
                             } else {
-                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_calculations"});
+                                new SendRecoilMapProject().execute();
                             }
                         }
+                    }
+                    jsonProjects = jsonProjects.substring(0, jsonProjects.length() - 1) + "]";
+                    if (jsonProjects.equals("]")) {
+                    } else {
+                        new SendProjectsData().execute();
+                    }
+                    cursor.close();
 
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonCalc = jsonCalc.substring(0, jsonCalc.length() - 1) + "]";
-            if (jsonCalc.equals("]")) {
-            } else {
-                new SendCalculationsData().execute();
-            }
-            cursor.close();
+                    Log.d(TAG, "--------------------------ИСТОРИЯ КЛИЕНТА------------------------");
+                    //клиент send
+                    jsonClientHistory = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_client_history", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
 
-            //калькулятор check
-            check_calculation = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_calculations"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_client_history " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                JSONObject jsonObjectClient = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_client_history"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
-                        jsonObjectClient = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectClient.put("id", id_new);
-                        check_calculation += String.valueOf(jsonObjectClient) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_calculation = check_calculation.substring(0, check_calculation.length() - 1) + "]";
-            if (check_calculation.equals("]")) {
-            } else {
-                new CheckCalculationData().execute();
-            }
-            cursor.close();
-
-            components_diffusers = "[";
-            components_ecola = "[";
-            components_fixtures = "[";
-            components_hoods = "[";
-            components_pipes = "[";
-            components_corn = "[";
-            components_profil = "[";
-
-
-            Log.d(TAG, "--------------------------компоненты_fix------------------------");
-            //компоненты_fix send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_fixtures", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_fixtures " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+                                                    if (status1 == null || (status1.equals("null"))) {
+                                                    } else {
+                                                        jsonObjectClient.put(status, status1);
+                                                    }
+                                                }
+                                                jsonClientHistory += String.valueOf(jsonObjectClient) + ",";
+                                            } while (cursor.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send'",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_client_history"});
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                }
+                            } while (cursor.moveToNext());
+                        } else {
+                            checkClientHistory = "[";
+                            sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_client_history"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
                                     do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_fixtures += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_fixtures"});
-
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            checkClientHistory += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
                                 }
                             }
-                            c.close();
-                        } catch (Exception e) {
+                            checkClientHistory = checkClientHistory.substring(0, checkClientHistory.length() - 1) + "]";
+                            if (checkClientHistory.equals("]")) {
+                            } else {
+                                new CheckClientHistory().execute();
+                            }
+                            cursor.close();
                         }
+                    }
+                    cursor.close();
+                    jsonClientHistory = jsonClientHistory.substring(0, jsonClientHistory.length() - 1) + "]";
+                    Log.d(TAG, "jsonClientHistory " + jsonClientHistory);
+                    if (jsonClientHistory.equals("]")) {
+                    } else {
+                        new SendClientHistory().execute();
+                    }
 
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
+                    Log.d(TAG, "--------------------------CALLBACK------------------------");
+                    //клиент send
+                    jsonCallback = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_callback", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
 
-            Log.d(TAG, "--------------------------компоненты_ecola------------------------");
-            //компоненты_ecola send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_ecola", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_callback " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                JSONObject jsonObjectClient = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_callback"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_ecola " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+                                                    if (status1 == null || (status1.equals("null"))) {
+                                                    } else {
+                                                        jsonObjectClient.put(status, status1);
+                                                    }
+                                                }
+                                                jsonCallback += String.valueOf(jsonObjectClient) + ",";
+                                            } while (cursor.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_callback"});
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                }
+
+                            } while (cursor.moveToNext());
+                        } else {
+                            checkCallback = "[";
+                            sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_callback"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
                                     do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_ecola += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_ecola"});
-
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            checkCallback += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
                                 }
                             }
-                            c.close();
-                        } catch (Exception e) {
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------компоненты_diff------------------------");
-            //компоненты_diff send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999),
-                            "send", "0", "rgzbn_gm_ceiling_diffusers", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_diffusers " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_diffusers += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_diffusers"});
-
-                                }
+                            checkCallback = checkCallback.substring(0, checkCallback.length() - 1) + "]";
+                            Log.d(TAG, "checkCallback " + checkCallback);
+                            if (checkCallback.equals("]")) {
+                            } else {
+                                new CheckCallback().execute();
                             }
-                            c.close();
-                        } catch (Exception e) {
+                            cursor.close();
                         }
+                    }
+                    cursor.close();
+                    jsonCallback = jsonCallback.substring(0, jsonCallback.length() - 1) + "]";
+                    Log.d(TAG, "jsonCallback " + jsonCallback);
+                    if (jsonCallback.equals("]")) {
+                    } else {
+                        new SendCallback().execute();
+                    }
 
-                    } while (cursor.moveToNext());
                 }
             }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------компоненты_hoods------------------------");
-            //компоненты_hoods send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999),
-                            "send", "0", "rgzbn_gm_ceiling_hoods", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_hoods " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_hoods += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_hoods"});
-
-                                }
-                            }
-                            c.close();
-                        } catch (Exception e) {
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------компоненты_pipes------------------------");
-            //компоненты_pipes send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_pipes", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_pipes " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_pipes += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_pipes"});
-
-                                }
-                            }
-                            c.close();
-                        } catch (Exception e) {
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------компоненты_cornice------------------------");
-            //компоненты_cornice send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_cornice", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_cornice " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_corn += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_cornice"});
-                                }
-                            }
-                            c.close();
-                        } catch (Exception e) {
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------компоненты_profil------------------------");
-            //компоненты_cornice send
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_profil", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_profil " +
-                                    "where _id = ? ";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        String status = "android_id";
-                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                        jsonObjectComponents.put(status, status1);
-                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                        jsonObjectComponents.put(status, status1);
-                                        components_profil += String.valueOf(jsonObjectComponents) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_profil"});
-
-                                }
-                            }
-                            c.close();
-                        } catch (Exception e) {
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            if (components_diffusers.length() < 3) {
-                components_diffusers += "]";
+            jsonClient = jsonClient.substring(0, jsonClient.length() - 1) + "]";
+            if (jsonClient.equals("]")) {
             } else {
-                components_diffusers = components_diffusers.substring(0, components_diffusers.length() - 1) + "]";
-            }
-            if (components_ecola.length() < 3) {
-                components_ecola += "]";
-            } else {
-                components_ecola = components_ecola.substring(0, components_ecola.length() - 1) + "]";
-            }
-            if (components_fixtures.length() < 3) {
-                components_fixtures += "]";
-            } else {
-                components_fixtures = components_fixtures.substring(0, components_fixtures.length() - 1) + "]";
-            }
-            if (components_hoods.length() < 3) {
-                components_hoods += "]";
-            } else {
-                components_hoods = components_hoods.substring(0, components_hoods.length() - 1) + "]";
-            }
-            if (components_pipes.length() < 3) {
-                components_pipes += "]";
-            } else {
-                components_pipes = components_pipes.substring(0, components_pipes.length() - 1) + "]";
-            }
-            if (components_corn.length() < 3) {
-                components_corn += "]";
-            } else {
-                components_corn = components_corn.substring(0, components_corn.length() - 1) + "]";
-            }
-            if (components_profil.length() < 3) {
-                components_profil += "]";
-            } else {
-                components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
-            }
-
-            if ((components_diffusers.equals("]") && components_ecola.equals("]") && components_fixtures.equals("]") && components_hoods.equals("]") &&
-                    components_pipes.equals("]") && components_corn.equals("]") && components_profil.equals("]")) ||
-                    (components_diffusers.equals("[]") && components_ecola.equals("[]") && components_fixtures.equals("[]") && components_hoods.equals("[]") &&
-                            components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))) {
-            } else {
-                new SendComponents().execute();
-            }
-
-            check_components_diffusers = "[";
-            check_components_ecola = "[";
-            check_components_fixtures = "[";
-            check_components_hoods = "[";
-            check_components_pipes = "[";
-            check_components_corn = "[";
-            check_components_profil = "[";
-
-            //компоненты_fix check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_fixtures"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_fixtures += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
+                new SendClientData().execute();
             }
             cursor.close();
-
-            //компоненты_diff check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_diffusers"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_diffusers += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            //компоненты_pipes check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_pipes"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_pipes += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            //компоненты_hoods check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_hoods"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_hoods += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            //компоненты_ecola check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_ecola"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_ecola += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            //компоненты_cornice check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_cornice"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_corn += String.valueOf(jsonObjectComponents) + ",";
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            //компоненты_cornice check
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_profil"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        jsonObjectComponents = new org.json.simple.JSONObject();
-                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        jsonObjectComponents.put("id", id_new);
-                        check_components_profil += String.valueOf(jsonObjectComponents) + ",";
-                        new CheckCalculationData().execute();
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            check_components_diffusers = check_components_diffusers.substring(0, check_components_diffusers.length() - 1) + "]";
-            check_components_ecola = check_components_ecola.substring(0, check_components_ecola.length() - 1) + "]";
-            check_components_fixtures = check_components_fixtures.substring(0, check_components_fixtures.length() - 1) + "]";
-            check_components_hoods = check_components_hoods.substring(0, check_components_hoods.length() - 1) + "]";
-            check_components_pipes = check_components_pipes.substring(0, check_components_pipes.length() - 1) + "]";
-            check_components_corn = check_components_corn.substring(0, check_components_corn.length() - 1) + "]";
-            check_components_profil = check_components_profil.substring(0, check_components_profil.length() - 1) + "]";
-
-            if ((check_components_diffusers.equals("]") && check_components_ecola.equals("]") && check_components_fixtures.equals("]")
-                    && check_components_hoods.equals("]") && check_components_pipes.equals("]") && check_components_corn.equals("]")
-                    && check_components_profil.equals("]"))
-                    || (check_components_diffusers.equals("[]") && check_components_ecola.equals("[]") && check_components_fixtures.equals("[]")
-                    && check_components_hoods.equals("[]") && check_components_pipes.equals("[]") && check_components_corn.equals("[]")
-                    && check_components_profil.equals("[]"))) {
-            } else {
-                new CheckComponents().execute();
-            }
-
 
             Log.d(TAG, "--------------------------ЮЗЕРЫ------------------------");
             //клиент send
@@ -1068,13 +1369,11 @@ public class Service_Sync extends Service {
                     + "FROM history_send_to_server " +
                     "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
             cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
+                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
                             "send", "0", "rgzbn_users", "1"});
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
-
-
                         String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
                         try {
                             sqlQuewy = "SELECT * "
@@ -1085,7 +1384,7 @@ public class Service_Sync extends Service {
                                 if (cursor.moveToFirst()) {
                                     do {
                                         jsonObjectUsers = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_users"); j++) {
+                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_users"); j++) {
                                             String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                             String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
                                             if (j == 0) {
@@ -1111,466 +1410,363 @@ public class Service_Sync extends Service {
                         } catch (Exception e) {
                             Log.d(TAG, String.valueOf(e));
                         }
-
-
                     } while (cursor.moveToNext());
+                } else {
+                    //клиент check
+                    check_users = "[";
+                    sqlQuewy = "SELECT id_new "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "check", "0", "rgzbn_users"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                try {
+                                    jsonObjectUsers = new JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectUsers.put("id", id_new);
+                                    check_users += String.valueOf(jsonObjectUsers) + ",";
+                                } catch (Exception e) {
+                                }
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    check_users = check_users.substring(0, check_users.length() - 1) + "]";
+                    if (check_users.equals("]")) {
+                    } else {
+                        new CheckUsersData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------UserGroup------------------------");
+                    //клиент send
+                    jsonUserGroup = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_user_usergroup_map", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_user_usergroup_map " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                jsonObjectUserGroup = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_user_usergroup_map"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+                                                    try {
+                                                        if (status1.equals("") || (status1 == null)) {
+                                                        } else {
+                                                            jsonObjectUserGroup.put(status, status1);
+                                                        }
+                                                    } catch (Exception e) {
+                                                    }
+
+                                                    Log.d(TAG, j + " " + String.valueOf(jsonObjectUserGroup));
+                                                }
+                                                Log.d(TAG, " end " + String.valueOf(jsonObjectUserGroup));
+                                                jsonUserGroup += String.valueOf(jsonObjectUserGroup) + ",";
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                    Log.d(TAG, String.valueOf(e));
+                                }
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    jsonUserGroup = jsonUserGroup.substring(0, jsonUserGroup.length() - 1) + "]";
+
+                    if (jsonUserGroup.equals("]") || jsonUserGroup.equals("[]") || jsonUserGroup.equals("[")) {
+                    } else {
+                        new CheckUserGroupData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------МОНТАЖНИКИ------------------------");
+                    //монтажники send
+                    jsonMounters = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_mounters", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_mounters " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                jsonObjectMounters = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_mounters"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+
+                                                    try {
+                                                        if (status1.equals("") || (status1 == null)) {
+                                                        } else {
+                                                            jsonObjectMounters.put(status, status1);
+                                                        }
+                                                    } catch (Exception e) {
+                                                    }
+
+                                                    Log.d(TAG, j + " " + String.valueOf(jsonObjectMounters));
+                                                }
+                                                Log.d(TAG, " end " + String.valueOf(jsonObjectMounters));
+                                                jsonMounters += String.valueOf(jsonObjectMounters) + ",";
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                    Log.d(TAG, String.valueOf(e));
+                                }
+
+                            } while (cursor.moveToNext());
+                        } else {
+                            //монтажники check
+                            check_mounters = "[";
+                            sqlQuewy = "SELECT id_new "
+                             + "FROM history_send_to_server " +
+                             "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_mounters"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectMounters = new org.json.JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectMounters.put("id", id_new);
+                                            check_mounters += String.valueOf(jsonObjectMounters) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_mounters = check_mounters.substring(0, check_mounters.length() - 1) + "]";
+                            if (check_mounters.equals("]")) {
+                            } else {
+                                new CheckMountersData().execute();
+                            }
+                            cursor.close();
+
+                            //
+                            mounters_map = "[";
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_mounters_map", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                            sqlQuewy = "SELECT _id, id_mounter, id_brigade "
+                                                    + "FROM rgzbn_gm_ceiling_mounters_map " +
+                                                    "where id_mounter = ?";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        jsonObjectMounters_map = new JSONObject();
+
+                                                        String status = "";
+                                                        String status1 = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                                        jsonObjectMounters_map.put("android_id", status1);
+
+                                                        status = c.getColumnName(c.getColumnIndex(c.getColumnName(1)));
+                                                        status1 = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                                        jsonObjectMounters_map.put(status, status1);
+
+                                                        status = c.getColumnName(c.getColumnIndex(c.getColumnName(2)));
+                                                        status1 = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                                        jsonObjectMounters_map.put(status, status1);
+
+                                                        mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
+                                                    } while (c.moveToNext());
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            mounters_map = mounters_map.substring(0, mounters_map.length() - 1) + "]";
+                            if (mounters_map.equals("]")) {
+                            } else {
+                                new SendMounters_mapData().execute();
+                            }
+                            cursor.close();
+                        }
+                    }
+                    jsonMounters = jsonMounters.substring(0, jsonMounters.length() - 1) + "]";
+                    if (jsonMounters.equals("]")) {
+                    } else {
+                        new SendMountersData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------DEALER_INFO------------------------");
+                    //клиент send
+                    jsonDealer_info = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_dealer_info", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_dealer_info " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                jsonObjectDealer_info = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_dealer_info"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+
+                                                    try {
+                                                        if (status1.equals("") || (status1 == null)) {
+                                                        } else {
+                                                            jsonObjectDealer_info.put(status, status1);
+                                                        }
+                                                    } catch (Exception e) {
+                                                    }
+
+                                                    Log.d(TAG, j + " " + String.valueOf(jsonObjectDealer_info));
+                                                }
+                                                Log.d(TAG, " end " + String.valueOf(jsonObjectDealer_info));
+                                                jsonDealer_info += String.valueOf(jsonObjectDealer_info) + ",";
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                    Log.d(TAG, String.valueOf(e));
+                                }
+
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    jsonDealer_info = jsonDealer_info.substring(0, jsonDealer_info.length() - 1) + "]";
+
+                    if (jsonDealer_info.equals("]")) {
+                    } else {
+                        new SendDealerData().execute();
+                    }
+
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------MOUNT------------------------");
+                    //клиент send
+                    jsonMount = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_mount", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_mount " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                jsonObjectMount = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_mount"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+
+                                                    try {
+                                                        if (status1.equals("") || (status1 == null)) {
+                                                        } else {
+                                                            jsonObjectMount.put(status, status1);
+                                                        }
+                                                    } catch (Exception e) {
+                                                    }
+                                                }
+                                                jsonMount += String.valueOf(jsonObjectMount) + ",";
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+                                } catch (Exception e) {
+                                    Log.d(TAG, String.valueOf(e));
+                                }
+
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    jsonMount = jsonMount.substring(0, jsonMount.length() - 1) + "]";
+
+                    if (jsonMount.equals("]")) {
+                    } else {
+                        new SendMountData().execute();
+                    }
+
+                    cursor.close();
                 }
             }
+            cursor.close();
             jsonUsers = jsonUsers.substring(0, jsonUsers.length() - 1) + "]";
-
             if (jsonUsers.equals("]") || jsonUsers.equals("[]") || jsonUsers.equals("[")) {
             } else {
                 new SendUsersData().execute();
             }
-
-            cursor.close();
-
-            //клиент check
-
-            check_users = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_users"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            jsonObjectUsers = new JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectUsers.put("id", id_new);
-                            check_users += String.valueOf(jsonObjectUsers) + ",";
-                        } catch (Exception e) {
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_users = check_users.substring(0, check_users.length() - 1) + "]";
-            if (check_users.equals("]")) {
-            } else {
-                new CheckUsersData().execute();
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------UserGroup------------------------");
-            //клиент send
-            jsonUserGroup = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_user_usergroup_map", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_user_usergroup_map " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        jsonObjectUserGroup = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_user_usergroup_map"); j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-                                            try {
-                                                if (status1.equals("") || (status1 == null)) {
-                                                } else {
-                                                    jsonObjectUserGroup.put(status, status1);
-                                                }
-                                            } catch (Exception e) {
-                                            }
-
-                                            Log.d(TAG, j + " " + String.valueOf(jsonObjectUserGroup));
-                                        }
-                                        Log.d(TAG, " end " + String.valueOf(jsonObjectUserGroup));
-                                        jsonUserGroup += String.valueOf(jsonObjectUserGroup) + ",";
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-                        } catch (Exception e) {
-                            Log.d(TAG, String.valueOf(e));
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonUserGroup = jsonUserGroup.substring(0, jsonUserGroup.length() - 1) + "]";
-
-            if (jsonUserGroup.equals("]") || jsonUserGroup.equals("[]") || jsonUserGroup.equals("[")) {
-            } else {
-                new CheckUserGroupData().execute();
-            }
-
-            cursor.close();
-
-            Log.d(TAG, "--------------------------МОНТАЖНИКИ------------------------");
-            //монтажники send
-            jsonMounters = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_mounters", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_mounters " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        jsonObjectMounters = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_mounters"); j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-
-                                            try {
-                                                if (status1.equals("") || (status1 == null)) {
-                                                } else {
-                                                    jsonObjectMounters.put(status, status1);
-                                                }
-                                            } catch (Exception e) {
-                                            }
-
-                                            Log.d(TAG, j + " " + String.valueOf(jsonObjectMounters));
-                                        }
-                                        Log.d(TAG, " end " + String.valueOf(jsonObjectMounters));
-                                        jsonMounters += String.valueOf(jsonObjectMounters) + ",";
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-                        } catch (Exception e) {
-                            Log.d(TAG, String.valueOf(e));
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonMounters = jsonMounters.substring(0, jsonMounters.length() - 1) + "]";
-
-            if (jsonMounters.equals("]")) {
-            } else {
-                new SendMountersData().execute();
-            }
-
-            cursor.close();
-
-            //монтажники check
-
-            check_mounters = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_mounters"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            jsonObjectMounters = new org.json.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectMounters.put("id", id_new);
-                            check_mounters += String.valueOf(jsonObjectMounters) + ",";
-                        } catch (Exception e) {
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_mounters = check_mounters.substring(0, check_mounters.length() - 1) + "]";
-            if (check_mounters.equals("]")) {
-            } else {
-                new CheckMountersData().execute();
-            }
-            cursor.close();
-
-            //
-            check_mounters_map = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_mounters_map", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            sqlQuewy = "SELECT id_mounter, id_brigade "
-                                    + "FROM rgzbn_gm_ceiling_mounters_map " +
-                                    "where id_mounter = ?";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        jsonObjectMounters_map = new JSONObject();
-
-                                        String status = c.getColumnName(c.getColumnIndex(c.getColumnName(0)));
-                                        String status1 = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                        jsonObjectMounters_map.put(status, status1);
-
-                                        status = c.getColumnName(c.getColumnIndex(c.getColumnName(1)));
-                                        status1 = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                                        jsonObjectMounters_map.put(status, status1);
-
-                                        status = "android_id";
-                                        status1 = "101010101";
-                                        jsonObjectMounters_map.put(status, status1);
-
-                                        check_mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
-                                    } while (c.moveToNext());
-                                }
-                            }
-                            c.close();
-                            //jsonObjectMounters_map = new org.json.JSONObject();
-                            //String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            //jsonObjectMounters_map.put("id", id_new);
-                            //check_mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
-                        } catch (Exception e) {
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_mounters_map = check_mounters_map.substring(0, check_mounters_map.length() - 1) + "]";
-            if (check_mounters_map.equals("]")) {
-            } else {
-                new SendMounters_mapData().execute();
-            }
-            cursor.close();
-
-            Log.d(TAG, "--------------------------DEALER_INFO------------------------");
-            //клиент send
-            jsonDealer_info = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_dealer_info", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_dealer_info " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        jsonObjectDealer_info = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_dealer_info"); j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-
-                                            try {
-                                                if (status1.equals("") || (status1 == null)) {
-                                                } else {
-                                                    jsonObjectDealer_info.put(status, status1);
-                                                }
-                                            } catch (Exception e) {
-                                            }
-
-                                            Log.d(TAG, j + " " + String.valueOf(jsonObjectDealer_info));
-                                        }
-                                        Log.d(TAG, " end " + String.valueOf(jsonObjectDealer_info));
-                                        jsonDealer_info += String.valueOf(jsonObjectDealer_info) + ",";
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-                        } catch (Exception e) {
-                            Log.d(TAG, String.valueOf(e));
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonDealer_info = jsonDealer_info.substring(0, jsonDealer_info.length() - 1) + "]";
-
-            if (jsonDealer_info.equals("]")) {
-            } else {
-                new SendDealerData().execute();
-            }
-
-            cursor.close();
-
-            Log.d(TAG, "--------------------------MOUNT------------------------");
-            //клиент send
-            jsonMount = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_mount", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_mount " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        jsonObjectMount = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_mount"); j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-
-                                            try {
-                                                if (status1.equals("") || (status1 == null)) {
-                                                } else {
-                                                    jsonObjectMount.put(status, status1);
-                                                }
-                                            } catch (Exception e) {
-                                            }
-                                        }
-                                        jsonMount += String.valueOf(jsonObjectMount) + ",";
-                                    } while (cursor.moveToNext());
-                                }
-                            }
-                            cursor.close();
-                        } catch (Exception e) {
-                            Log.d(TAG, String.valueOf(e));
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            jsonMount = jsonMount.substring(0, jsonMount.length() - 1) + "]";
-
-            if (jsonMount.equals("]")) {
-            } else {
-                new SendMountData().execute();
-            }
-
-            cursor.close();
-
-            Log.d(TAG, "--------------------------ИСТОРИЯ------------------------");
-            //клиент send
-            jsonHistory = "[";
-            sqlQuewy = "SELECT id_old "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "send", "0", "rgzbn_gm_ceiling_projects_history", "1"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                        try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_projects_history " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        JSONObject jsonObjectClient = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_projects_history"); j++) {
-                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-
-                                            Log.d(TAG, status + " " + status1);
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-                                            if (status1 == null || status1.equals("") || (status1.equals("null"))) {
-                                            } else {
-                                                jsonObjectClient.put(status, status1);
-                                            }
-                                            Log.d(TAG, status + " " + status1);
-                                        }
-                                        jsonHistory += String.valueOf(jsonObjectClient) + ",";
-                                    } while (cursor.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects_history"});
-                                }
-                            }
-                            cursor.close();
-                        } catch (Exception e) {
-                            Log.d(TAG, String.valueOf(e));
-                        }
-
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-            jsonHistory = jsonHistory.substring(0, jsonHistory.length() - 1) + "]";
-            Log.d(TAG, "jsonHistory = " + jsonHistory);
-
-            if (jsonHistory.equals("]")) {
-            } else {
-                new SendProjectsHistory().execute();
-            }
-
-            check_History = "[";
-            sqlQuewy = "SELECT id_new "
-                    + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_projects_history"});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            jsonObjectUsers = new JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectUsers.put("id", id_new);
-                            check_History += String.valueOf(jsonObjectUsers) + ",";
-                        } catch (Exception e) {
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            check_History = check_History.substring(0, check_History.length() - 1) + "]";
-            if (check_History.equals("]")) {
-            } else {
-                new CheckProjectsHistory().execute();
-            }
-            cursor.close();
 
             Log.d(TAG, "--------------------------РЕКЛАМА------------------------");
             //клиент send
@@ -1579,13 +1775,12 @@ public class Service_Sync extends Service {
                     + "FROM history_send_to_server " +
                     "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
             cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
+                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
                             "send", "0", "rgzbn_gm_ceiling_api_phones", "1"});
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
                         String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
                         try {
                             sqlQuewy = "SELECT * "
                                     + "FROM rgzbn_gm_ceiling_api_phones " +
@@ -1595,7 +1790,7 @@ public class Service_Sync extends Service {
                                 if (cursor.moveToFirst()) {
                                     do {
                                         JSONObject jsonObjectClient = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(Service_Sync.this, "rgzbn_gm_ceiling_api_phones"); j++) {
+                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_api_phones"); j++) {
                                             String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
                                             String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
@@ -1619,46 +1814,74 @@ public class Service_Sync extends Service {
                         } catch (Exception e) {
                             Log.d(TAG, String.valueOf(e));
                         }
-
                     } while (cursor.moveToNext());
+                } else {
+                    check_ApiPhones = "[";
+                    sqlQuewy = "SELECT id_new "
+                     + "FROM history_send_to_server " +
+                     "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "check", "0", "rgzbn_gm_ceiling_api_phones"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                try {
+                                    jsonObjectUsers = new JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectUsers.put("id", id_new);
+                                    check_ApiPhones += String.valueOf(jsonObjectUsers) + ",";
+                                } catch (Exception e) {
+                                }
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    check_ApiPhones = check_ApiPhones.substring(0, check_ApiPhones.length() - 1) + "]";
+                    if (check_ApiPhones.equals("]")) {
+                    } else {
+                        new CheckApiPhones().execute();
+                    }
+                    cursor.close();
                 }
             }
+
             cursor.close();
-
             jsonApiPhones = jsonApiPhones.substring(0, jsonApiPhones.length() - 1) + "]";
-
             if (jsonApiPhones.equals("]")) {
             } else {
                 new SendApiPhones().execute();
             }
 
-            check_ApiPhones = "[";
-            sqlQuewy = "SELECT id_new "
+            Log.d(TAG, "--------------------------DELETE------------------------");
+            //клиент send
+            jsonDelete = "[";
+            sqlQuewy = "SELECT id_old, name_table "
                     + "FROM history_send_to_server " +
-                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-            cursor = db.rawQuery(sqlQuewy,
-                    new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                            "check", "0", "rgzbn_gm_ceiling_api_phones"});
+                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and status=?";
+            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(gager_id_int),
+                    String.valueOf(gager_id_int + 999999), String.valueOf(999999), "delete", "0", "1"});
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            jsonObjectUsers = new JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectUsers.put("id", id_new);
-                            check_ApiPhones += String.valueOf(jsonObjectUsers) + ",";
-                        } catch (Exception e) {
-                        }
-                    } while (cursor.moveToNext());
+                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                    String name_table = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
+                    jsonDeleteTable = name_table;
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("id", id_old);
+                        jsonDelete += String.valueOf(jsonObject);
+                    } catch (Exception e) {
+                    }
                 }
-            }
-            check_ApiPhones = check_ApiPhones.substring(0, check_ApiPhones.length() - 1) + "]";
-            if (check_ApiPhones.equals("]")) {
-            } else {
-                new CheckApiPhones().execute();
             }
             cursor.close();
 
+            jsonDelete = jsonDelete.substring(0, jsonDelete.length()) + "]";
+            if (jsonDelete.equals("[]")) {
+            } else {
+                new SendDeleteTable().execute();
+            }
+
+        } else {
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -1678,1447 +1901,6 @@ public class Service_Sync extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.v(TAG, "Service stopped!");
-    }
-
-
-    public static class Alarm extends BroadcastReceiver {
-
-        public static final String ALARM_EVENT = "net.multipi.ALARM";
-        public static final int ALARM_INTERVAL_SEC = 1;
-
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            Log.v(TAG, "Alarm received: " + intent.getAction());
-
-            ctx = context;
-            SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
-            domen = SP.getString("", "");
-
-            SP = context.getSharedPreferences("sync", MODE_PRIVATE);
-            SharedPreferences.Editor ed = SP.edit();
-            ed.putString("", "0");
-            ed.commit();
-
-            int count_line = 0;
-            Log.d(TAG, "count_line " + count_line);
-            dbHelper = new DBHelper(context);
-            final SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-            try {
-                String sqlQuewy = "SELECT _id "
-                        + "FROM history_send_to_server ";
-                Cursor cursor = db.rawQuery(sqlQuewy,
-                        new String[]{});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            count_line++;
-                            Log.d("TAG", cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0))));
-                        } while (cursor.moveToNext());
-                    }
-                }
-            } catch (Exception e) {
-            }
-
-            if (!isRunning(context)) {
-                context.startService(new Intent(context, Service_Sync.class));
-            } else if (count_line > 0) {
-
-                delete();
-
-                int gager_id_int = 0;
-                SP = context.getSharedPreferences("gager_id", MODE_PRIVATE);
-                String gager_id = SP.getString("", "");
-                if (gager_id.length() < 5) {
-                    gager_id_int = Integer.parseInt(gager_id) * 100000;
-                } else {
-                    gager_id_int = Integer.parseInt(gager_id);
-                }
-
-                final int finalGager_id_int = gager_id_int;
-
-                try {
-                    requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                } catch (Exception e) {
-                }
-
-                Log.v(TAG, "don't start service: already running... " + finalGager_id_int);
-
-                Log.d(TAG, "--------------------------КЛИЕНТ------------------------");
-                //клиент send
-                jsonClient = "[";
-                String sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                Cursor cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_clients", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_clients " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            JSONObject jsonObjectClient = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_clients"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-
-                                                Log.d(TAG, status + " " + status1);
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-                                                if (status1 == null || status1.equals("") || (status1.equals("null"))) {
-                                                } else {
-                                                    jsonObjectClient.put(status, status1);
-                                                }
-                                                Log.d(TAG, status + " " + status1);
-                                            }
-                                            jsonClient += String.valueOf(jsonObjectClient) + ",";
-                                        } while (cursor.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients"});
-
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-
-                Log.d(TAG, "jsonClient = " + jsonClient);
-
-                jsonClient = jsonClient.substring(0, jsonClient.length() - 1) + "]";
-                if (jsonClient.equals("]")) {
-                } else {
-
-                    new SendClientData().execute();
-                }
-                cursor.close();
-
-                //клиент check
-
-                check_client = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_clients"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectClient = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectClient.put("id", id_new);
-                            check_client += String.valueOf(jsonObjectClient) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_client = check_client.substring(0, check_client.length() - 1) + "]";
-                if (check_client.equals("]")) {
-                } else {
-                    new CheckClientsData().execute();
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------контакты------------------------");
-                //контакты send
-                jsonClient_Contacts = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_clients_contacts", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            Log.d(TAG, "jsonClient_Contacts " + id_old);
-
-                            //try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                    "where _id = ?";
-                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (cursor != null) {
-                                if (cursor.moveToFirst()) {
-                                    do {
-                                        jsonObjectClient_Contacts = new org.json.simple.JSONObject();
-                                        String status = "android_id";
-                                        String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                        jsonObjectClient_Contacts.put(status, status1);
-                                        status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                        status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
-                                        jsonObjectClient_Contacts.put(status, status1);
-                                        status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                        status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
-                                        jsonObjectClient_Contacts.put(status, status1);
-
-                                        jsonClient_Contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
-
-                                    } while (cursor.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients_contacts"});
-
-                                }
-                            }
-                            cursor.close();
-                            //} catch (Exception e) {
-                            //}
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonClient_Contacts = jsonClient_Contacts.substring(0, jsonClient_Contacts.length() - 1) + "]";
-                if (jsonClient_Contacts.equals("]")) {
-                } else {
-                    new SendClientsContactsData().execute();
-                }
-                cursor.close();
-
-                //контакты check
-                check_clients_contacts = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_clients_contacts"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectClient_Contacts = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectClient_Contacts.put("id", id_new);
-                            check_clients_contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_clients_contacts = check_clients_contacts.substring(0, check_clients_contacts.length() - 1) + "]";
-                if (check_clients_contacts.equals("]")) {
-                } else {
-                    new CheckClientsContactsData().execute();
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------проект------------------------");
-                //проект send
-                jsonProjects = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>? and id_old<?) or id_old<?)  and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_projects", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            //try {
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_projects " +
-                                    "where _id = ?";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        JSONObject jsonObjectClient = new JSONObject();
-                                        for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_projects"); j++) {
-                                            String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
-                                            String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                            if (j == 0) {
-                                                status = "android_id";
-                                            }
-                                            if (status1 == null || status1.equals("") || status1.equals("null")) {
-                                            } else {
-                                                try {
-                                                    jsonObjectClient.put(status, status1);
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-                                        jsonProjects += String.valueOf(jsonObjectClient) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects"});
-
-                                }
-                            }
-                            c.close();
-                            //} catch (Exception e) {
-                            //}
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonProjects = jsonProjects.substring(0, jsonProjects.length() - 1) + "]";
-                if (jsonProjects.equals("]")) {
-                } else {
-                    new SendProjectsData().execute();
-                }
-                cursor.close();
-
-                //проект check
-                check_project = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_projects"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectClient = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectClient.put("id", id_new);
-                            check_project += String.valueOf(jsonObjectClient) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_project = check_project.substring(0, check_project.length() - 1) + "]";
-                if (check_project.equals("]")) {
-                } else {
-                    new CheckProjectsData().execute();
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------калькулятор------------------------");
-                //калькулятор send
-                jsonCalc = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_calculations", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_calculations " +
-                                    "where _id = ?";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id_old});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_calculations"); j++) {
-                                            try {
-                                                String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
-                                                String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                if (status.equals("_id")) {
-                                                    status = "android_id";
-                                                    jsonObjectCalculation.put(status, status1);
-                                                } else if (status.equals("calc_image")) {
-                                                    status = "image";
-                                                    status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                    jsonObjectCalculation.put(status, status1);
-                                                } else if (status.equals("cut_image")) {
-                                                    status = "cut_image";
-                                                    status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
-                                                    jsonObjectCalculation.put(status, status1);
-                                                } else if (status1.equals("")) {
-                                                } else {
-                                                    jsonObjectCalculation.put(status, status1);
-                                                }
-                                            } catch (Exception e) {
-                                            }
-                                        }
-                                        jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
-                                    } while (c.moveToNext());
-                                } else {
-                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_calculations"});
-                                }
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonCalc = jsonCalc.substring(0, jsonCalc.length() - 1) + "]";
-                if (jsonCalc.equals("]")) {
-                } else {
-                    new SendCalculationsData().execute();
-                }
-                cursor.close();
-
-                //калькулятор check
-                check_calculation = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_calculations"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-
-                            jsonObjectClient = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectClient.put("id", id_new);
-                            check_calculation += String.valueOf(jsonObjectClient) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_calculation = check_calculation.substring(0, check_calculation.length() - 1) + "]";
-                if (check_calculation.equals("]")) {
-                } else {
-                    new CheckCalculationData().execute();
-                }
-                cursor.close();
-
-                components_diffusers = "[";
-                components_ecola = "[";
-                components_fixtures = "[";
-                components_hoods = "[";
-                components_pipes = "[";
-                components_corn = "[";
-                components_profil = "[";
-
-
-                Log.d(TAG, "--------------------------компоненты_fix------------------------");
-                //компоненты_fix send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_fixtures", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_fixtures " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_fixtures += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_fixtures"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_ecola------------------------");
-                //компоненты_ecola send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_ecola", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_ecola " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_ecola += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_ecola"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_diff------------------------");
-                //компоненты_diff send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999),
-                                "send", "0", "rgzbn_gm_ceiling_diffusers", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_diffusers " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_diffusers += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_diffusers"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_hoods------------------------");
-                //компоненты_hoods send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999),
-                                "send", "0", "rgzbn_gm_ceiling_hoods", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_hoods " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_hoods += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_hoods"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_pipes------------------------");
-                //компоненты_pipes send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_pipes", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_pipes " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_pipes += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_pipes"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_cornice------------------------");
-                //компоненты_cornice send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_cornice", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_cornice " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_corn += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_cornice"});
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------компоненты_profil------------------------");
-                //компоненты_cornice send
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_profil", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_profil " +
-                                        "where _id = ? ";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            String status = "android_id";
-                                            String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                            jsonObjectComponents.put(status, status1);
-                                            status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                            status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                            jsonObjectComponents.put(status, status1);
-                                            components_profil += String.valueOf(jsonObjectComponents) + ",";
-                                        } while (c.moveToNext());
-                                    } else {
-                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
-                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_profil"});
-
-                                    }
-                                }
-                                c.close();
-                            } catch (Exception e) {
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                if (components_diffusers.length() < 3) {
-                    components_diffusers += "]";
-                } else {
-                    components_diffusers = components_diffusers.substring(0, components_diffusers.length() - 1) + "]";
-                }
-                if (components_ecola.length() < 3) {
-                    components_ecola += "]";
-                } else {
-                    components_ecola = components_ecola.substring(0, components_ecola.length() - 1) + "]";
-                }
-                if (components_fixtures.length() < 3) {
-                    components_fixtures += "]";
-                } else {
-                    components_fixtures = components_fixtures.substring(0, components_fixtures.length() - 1) + "]";
-                }
-                if (components_hoods.length() < 3) {
-                    components_hoods += "]";
-                } else {
-                    components_hoods = components_hoods.substring(0, components_hoods.length() - 1) + "]";
-                }
-                if (components_pipes.length() < 3) {
-                    components_pipes += "]";
-                } else {
-                    components_pipes = components_pipes.substring(0, components_pipes.length() - 1) + "]";
-                }
-                if (components_corn.length() < 3) {
-                    components_corn += "]";
-                } else {
-                    components_corn = components_corn.substring(0, components_corn.length() - 1) + "]";
-                }
-                if (components_profil.length() < 3) {
-                    components_profil += "]";
-                } else {
-                    components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
-                }
-
-                if ((components_diffusers.equals("]") && components_ecola.equals("]") && components_fixtures.equals("]") && components_hoods.equals("]") &&
-                        components_pipes.equals("]") && components_corn.equals("]") && components_profil.equals("]")) ||
-                        (components_diffusers.equals("[]") && components_ecola.equals("[]") && components_fixtures.equals("[]") && components_hoods.equals("[]") &&
-                                components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))) {
-                } else {
-                    new SendComponents().execute();
-                }
-
-                check_components_diffusers = "[";
-                check_components_ecola = "[";
-                check_components_fixtures = "[";
-                check_components_hoods = "[";
-                check_components_pipes = "[";
-                check_components_corn = "[";
-                check_components_profil = "[";
-
-                //компоненты_fix check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_fixtures"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_fixtures += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_diff check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_diffusers"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_diffusers += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_pipes check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_pipes"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_pipes += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_hoods check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_hoods"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_hoods += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_ecola check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_ecola"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_ecola += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_cornice check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_cornice"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_corn += String.valueOf(jsonObjectComponents) + ",";
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                //компоненты_cornice check
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_profil"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            jsonObjectComponents = new org.json.simple.JSONObject();
-                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            jsonObjectComponents.put("id", id_new);
-                            check_components_profil += String.valueOf(jsonObjectComponents) + ",";
-                            new CheckCalculationData().execute();
-                        } while (cursor.moveToNext());
-                    }
-                }
-                cursor.close();
-
-                check_components_diffusers = check_components_diffusers.substring(0, check_components_diffusers.length() - 1) + "]";
-                check_components_ecola = check_components_ecola.substring(0, check_components_ecola.length() - 1) + "]";
-                check_components_fixtures = check_components_fixtures.substring(0, check_components_fixtures.length() - 1) + "]";
-                check_components_hoods = check_components_hoods.substring(0, check_components_hoods.length() - 1) + "]";
-                check_components_pipes = check_components_pipes.substring(0, check_components_pipes.length() - 1) + "]";
-                check_components_corn = check_components_corn.substring(0, check_components_corn.length() - 1) + "]";
-                check_components_profil = check_components_profil.substring(0, check_components_profil.length() - 1) + "]";
-
-                if ((check_components_diffusers.equals("]") && check_components_ecola.equals("]") && check_components_fixtures.equals("]")
-                        && check_components_hoods.equals("]") && check_components_pipes.equals("]") && check_components_corn.equals("]")
-                        && check_components_profil.equals("]"))
-                        || (check_components_diffusers.equals("[]") && check_components_ecola.equals("[]") && check_components_fixtures.equals("[]")
-                        && check_components_hoods.equals("[]") && check_components_pipes.equals("[]") && check_components_corn.equals("[]")
-                        && check_components_profil.equals("[]"))) {
-                } else {
-                    new CheckComponents().execute();
-                }
-
-                Log.d(TAG, "--------------------------ЮЗЕРЫ------------------------");
-                //клиент send
-                jsonUsers = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_users", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-
-
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_users " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            jsonObjectUsers = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_users"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-
-                                                try {
-                                                    if (status1.equals("") || (status1 == null)) {
-                                                    } else {
-                                                        jsonObjectUsers.put(status, status1);
-                                                    }
-                                                } catch (Exception e) {
-                                                }
-
-                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectUsers));
-                                            }
-                                            Log.d(TAG, " end " + String.valueOf(jsonObjectUsers));
-                                            jsonUsers += String.valueOf(jsonObjectUsers) + ",";
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonUsers = jsonUsers.substring(0, jsonUsers.length() - 1) + "]";
-
-                if (jsonUsers.equals("]") || jsonUsers.equals("[]") || jsonUsers.equals("[")) {
-                } else {
-                    new SendUsersData().execute();
-                }
-
-                cursor.close();
-
-                //клиент check
-
-                check_users = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_users"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            try {
-                                jsonObjectUsers = new JSONObject();
-                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                jsonObjectUsers.put("id", id_new);
-                                check_users += String.valueOf(jsonObjectUsers) + ",";
-                            } catch (Exception e) {
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_users = check_users.substring(0, check_users.length() - 1) + "]";
-                if (check_users.equals("]")) {
-                } else {
-                    new CheckUsersData().execute();
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------UserGroup------------------------");
-                //клиент send
-                jsonUserGroup = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_user_usergroup_map", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_user_usergroup_map " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            jsonObjectUserGroup = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_user_usergroup_map"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-                                                try {
-                                                    if (status1.equals("") || (status1 == null)) {
-                                                    } else {
-                                                        jsonObjectUserGroup.put(status, status1);
-                                                    }
-                                                } catch (Exception e) {
-                                                }
-
-                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectUserGroup));
-                                            }
-                                            Log.d(TAG, " end " + String.valueOf(jsonObjectUserGroup));
-                                            jsonUserGroup += String.valueOf(jsonObjectUserGroup) + ",";
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonUserGroup = jsonUserGroup.substring(0, jsonUserGroup.length() - 1) + "]";
-
-                if (jsonUserGroup.equals("]") || jsonUserGroup.equals("[]") || jsonUserGroup.equals("[")) {
-                } else {
-                    new CheckUserGroupData().execute();
-                }
-
-                cursor.close();
-
-                Log.d(TAG, "--------------------------МОНТАЖНИКИ------------------------");
-                //монтажники send
-                jsonMounters = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_mounters", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_mounters " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            jsonObjectMounters = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_mounters"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-
-                                                try {
-                                                    if (status1.equals("") || (status1 == null)) {
-                                                    } else {
-                                                        jsonObjectMounters.put(status, status1);
-                                                    }
-                                                } catch (Exception e) {
-                                                }
-
-                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectMounters));
-                                            }
-                                            Log.d(TAG, " end " + String.valueOf(jsonObjectMounters));
-                                            jsonMounters += String.valueOf(jsonObjectMounters) + ",";
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonMounters = jsonMounters.substring(0, jsonMounters.length() - 1) + "]";
-
-                if (jsonMounters.equals("]")) {
-                } else {
-                    new SendMountersData().execute();
-                }
-
-                cursor.close();
-
-                //монтажники check
-
-                check_mounters = "[";
-                sqlQuewy = "SELECT id_new "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "check", "0", "rgzbn_gm_ceiling_mounters"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            try {
-                                jsonObjectMounters = new org.json.JSONObject();
-                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                jsonObjectMounters.put("id", id_new);
-                                check_mounters += String.valueOf(jsonObjectMounters) + ",";
-                            } catch (Exception e) {
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_mounters = check_mounters.substring(0, check_mounters.length() - 1) + "]";
-                if (check_mounters.equals("]")) {
-                } else {
-                    new CheckMountersData().execute();
-                }
-                cursor.close();
-
-                //
-                check_mounters_map = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_mounters_map", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            try {
-                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                                sqlQuewy = "SELECT id_mounter, id_brigade "
-                                        + "FROM rgzbn_gm_ceiling_mounters_map " +
-                                        "where id_mounter = ?";
-                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (c != null) {
-                                    if (c.moveToFirst()) {
-                                        do {
-                                            jsonObjectMounters_map = new JSONObject();
-
-                                            String status = c.getColumnName(c.getColumnIndex(c.getColumnName(0)));
-                                            String status1 = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                            jsonObjectMounters_map.put(status, status1);
-
-                                            status = c.getColumnName(c.getColumnIndex(c.getColumnName(1)));
-                                            status1 = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                                            jsonObjectMounters_map.put(status, status1);
-
-                                            status = "android_id";
-                                            status1 = "101010101";
-                                            jsonObjectMounters_map.put(status, status1);
-
-                                            check_mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
-                                        } while (c.moveToNext());
-                                    }
-                                }
-                                c.close();
-                                //jsonObjectMounters_map = new org.json.JSONObject();
-                                //String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                //jsonObjectMounters_map.put("id", id_new);
-                                //check_mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
-                            } catch (Exception e) {
-                            }
-                        } while (cursor.moveToNext());
-                    }
-                }
-                check_mounters_map = check_mounters_map.substring(0, check_mounters_map.length() - 1) + "]";
-                if (check_mounters_map.equals("]")) {
-                } else {
-                    new SendMounters_mapData().execute();
-                }
-                cursor.close();
-
-                Log.d(TAG, "--------------------------DEALER_INFO------------------------");
-                //клиент send
-                jsonDealer_info = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_dealer_info", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_dealer_info " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            jsonObjectDealer_info = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_dealer_info"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-
-                                                try {
-                                                    if (status1.equals("") || (status1 == null)) {
-                                                    } else {
-                                                        jsonObjectDealer_info.put(status, status1);
-                                                    }
-                                                } catch (Exception e) {
-                                                }
-
-                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectDealer_info));
-                                            }
-                                            Log.d(TAG, " end " + String.valueOf(jsonObjectDealer_info));
-                                            jsonDealer_info += String.valueOf(jsonObjectDealer_info) + ",";
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonDealer_info = jsonDealer_info.substring(0, jsonDealer_info.length() - 1) + "]";
-
-                if (jsonDealer_info.equals("]")) {
-                } else {
-                    new SendDealerData().execute();
-                }
-
-                cursor.close();
-
-                Log.d(TAG, "--------------------------MOUNT------------------------");
-                //клиент send
-                jsonMount = "[";
-                sqlQuewy = "SELECT id_old "
-                        + "FROM history_send_to_server " +
-                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
-                cursor = db.rawQuery(sqlQuewy,
-                        new String[]{String.valueOf(finalGager_id_int), String.valueOf(finalGager_id_int + 999999), String.valueOf(999999),
-                                "send", "0", "rgzbn_gm_ceiling_mount", "1"});
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        do {
-                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-
-                            try {
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_mount " +
-                                        "where _id = ?";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            jsonObjectMount = new JSONObject();
-                                            for (int j = 0; j < HelperClass.countColumns(context, "rgzbn_gm_ceiling_mount"); j++) {
-                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                                if (j == 0) {
-                                                    status = "android_id";
-                                                }
-
-                                                try {
-                                                    if (status1.equals("") || (status1 == null)) {
-                                                    } else {
-                                                        jsonObjectMount.put(status, status1);
-                                                    }
-                                                } catch (Exception e) {
-                                                }
-                                            }
-                                            jsonMount += String.valueOf(jsonObjectMount) + ",";
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
-                            } catch (Exception e) {
-                                Log.d(TAG, String.valueOf(e));
-                            }
-
-                        } while (cursor.moveToNext());
-                    }
-                }
-                jsonMount = jsonMount.substring(0, jsonMount.length() - 1) + "]";
-
-                if (jsonMount.equals("]")) {
-                } else {
-                    new SendMountData().execute();
-                }
-
-                cursor.close();
-            }
-        }
-
-        //public static void setAlarm(Context context) {
-        //    //if () {
-        //    //    AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        //    //    PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent(ALARM_EVENT), 0);
-        //    //    am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000 * ALARM_INTERVAL_SEC, pi);
-        //    //}
-        //}
-
-        public static void cancelAlarm(Context context) {
-
-            Service_Sync.delete();
-            PendingIntent sender = PendingIntent.getBroadcast(context, 0, new Intent(ALARM_EVENT), 0);
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(sender);
-        }
-
     }
 
     static void delete() {
@@ -3173,8 +1955,6 @@ public class Service_Sync extends Service {
 
         @Override
         protected Void doInBackground(final Void... params) {
-            // try {
-
             StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String res) {
@@ -3184,7 +1964,7 @@ public class Service_Sync extends Service {
                     } else {
                         SQLiteDatabase db;
                         db = dbHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
+                        ContentValues values;
                         String new_id = "";
                         try {
                             org.json.JSONObject dat = new org.json.JSONObject(res);
@@ -3194,89 +1974,309 @@ public class Service_Sync extends Service {
                                 String old_id = client_contact.getString("old_id");
                                 new_id = client_contact.getString("new_id");
 
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM history_send_to_server " +
-                                        "where id_old = ? and type=? and sync=? and name_table=?";
-                                Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id),
-                                        "send", "0", "rgzbn_gm_ceiling_clients"});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{old_id});
 
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID, new_id);
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?", new String[]{old_id});
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_CLIENT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, values, "client_id = ?", new String[]{old_id});
 
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_SYNC, "1");
-                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ?",
-                                                    new String[]{old_id, "rgzbn_gm_ceiling_clients", "0"});
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_CLIENT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENT_HISTORY, values, "client_id = ?", new String[]{old_id});
 
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_OLD, old_id);
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
-                                            values.put(DBHelper.KEY_SYNC, "0");
-                                            values.put(DBHelper.KEY_TYPE, "check");
-                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ?",
+                                        new String[]{old_id, "rgzbn_gm_ceiling_clients", "0"});
 
-                                            jsonObjectClient.put("id", new_id);
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_CLIENT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "client_id = ?", new String[]{old_id});
 
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_clients_contacts " +
-                                        "where client_id = ? ";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
-                                if (cursor != null) {
-                                    cursor.moveToFirst();
-                                    do {
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_CLIENT_ID, new_id);
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, values, "client_id = ?", new String[]{old_id});
-
-                                    } while (cursor.moveToNext());
-                                }
-                                cursor.close();
-
-                                sqlQuewy = "SELECT * "
-                                        + "FROM rgzbn_gm_ceiling_projects " +
-                                        "where client_id = ? ";
-                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
-                                if (cursor != null) {
-                                    cursor.moveToFirst();
-                                    do {
-
-                                        values = new ContentValues();
-                                        values.put(DBHelper.KEY_CLIENT_ID, new_id);
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "client_id = ?", new String[]{old_id});
-
-                                    } while (cursor.moveToNext());
-                                }
-                                cursor.close();
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_CLIENT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "client_id = ?", new String[]{old_id});
                             }
 
                         } catch (Exception e) {
                         }
 
-                        check_client = "[" + String.valueOf(jsonObjectClient) + "]";
+                        //клиент check
+                        check_client = "[";
+                        String sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        Cursor cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_clients"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectClient = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectClient.put("id", id_new);
+                                    check_client += String.valueOf(jsonObjectClient) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        check_client = check_client.substring(0, check_client.length() - 1) + "]";
+                        if (check_client.equals("]")) {
+                        } else {
+                            new CheckClientsData().execute();
+                        }
+                        cursor.close();
+
+                        Log.d(TAG, "--------------------------контакты------------------------");
+                        //контакты send
+                        jsonClient_Contacts = "[";
+                        sqlQuewy = "SELECT id_old "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "send", "0", "rgzbn_gm_ceiling_clients_contacts", "1"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_clients_contacts " +
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                jsonObjectClient_Contacts = new org.json.simple.JSONObject();
+                                                String status = "android_id";
+                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                jsonObjectClient_Contacts.put(status, status1);
+                                                status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(1)));
+                                                status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1)));
+                                                jsonObjectClient_Contacts.put(status, status1);
+                                                status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(2)));
+                                                status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2)));
+                                                jsonObjectClient_Contacts.put(status, status1);
+
+                                                jsonClient_Contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
+
+                                            } while (cursor.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_clients_contacts"});
+                                        }
+                                    }
+                                    cursor.close();
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        jsonClient_Contacts = jsonClient_Contacts.substring(0, jsonClient_Contacts.length() - 1) + "]";
+                        if (jsonClient_Contacts.equals("]")) {
+                        } else {
+                            new SendClientsContactsData().execute();
+                        }
+                        cursor.close();
+
+                        Log.d(TAG, "--------------------------проект------------------------");
+                        //проект send
+                        jsonProjects = "[";
+                        sqlQuewy = "SELECT id_old "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>? and id_old<?) or id_old<?)  and type=? and sync=? and name_table=? and status=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "send", "0", "rgzbn_gm_ceiling_projects", "1"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                    //try {
+                                    sqlQuewy = "SELECT * "
+                                            + "FROM rgzbn_gm_ceiling_projects " +
+                                            "where _id = ?";
+                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                    if (c != null) {
+                                        if (c.moveToFirst()) {
+                                            do {
+                                                JSONObject jsonObjectClient = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_projects"); j++) {
+                                                    String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
+                                                    String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+                                                    if (status.equals("change_time")) {
+                                                    } else {
+                                                        if (status1 == null) {
+                                                            try {
+                                                                jsonObjectClient.put(status, status1);
+                                                            } catch (JSONException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        } else {
+                                                            if (status1.equals("") || status1.equals("null")) {
+                                                            } else {
+                                                                try {
+                                                                    jsonObjectClient.put(status, status1);
+                                                                } catch (JSONException e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                jsonProjects += String.valueOf(jsonObjectClient) + ",";
+                                            } while (c.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER, "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects"});
+                                        }
+                                    }
+                                    c.close();
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        jsonProjects = jsonProjects.substring(0, jsonProjects.length() - 1) + "]";
+                        if (jsonProjects.equals("]")) {
+                        } else {
+                            new SendProjectsData().execute();
+                        }
+                        cursor.close();
+                        Log.d(TAG, "--------------------------ИСТОРИЯ КЛИЕНТА------------------------");
+                        //клиент send
+                        jsonClientHistory = "[";
+                        sqlQuewy = "SELECT id_old "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "send", "0", "rgzbn_gm_ceiling_client_history", "1"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                    try {
+                                        sqlQuewy = "SELECT * "
+                                                + "FROM rgzbn_gm_ceiling_client_history " +
+                                                "where _id = ?";
+                                        cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    JSONObject jsonObjectClient = new JSONObject();
+                                                    for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_client_history"); j++) {
+                                                        String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                        String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                        if (j == 0) {
+                                                            status = "android_id";
+                                                        }
+                                                        if (status1 == null || (status1.equals("null"))) {
+                                                        } else {
+                                                            jsonObjectClient.put(status, status1);
+                                                        }
+                                                    }
+                                                    jsonClientHistory += String.valueOf(jsonObjectClient) + ",";
+                                                } while (cursor.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send'",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_client_history"});
+                                            }
+                                        }
+                                        cursor.close();
+                                    } catch (Exception e) {
+                                    }
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+                        jsonClientHistory = jsonClientHistory.substring(0, jsonClientHistory.length() - 1) + "]";
+                        Log.d(TAG, "jsonClientHistory " + jsonClientHistory);
+                        if (jsonClientHistory.equals("]")) {
+                        } else {
+                            new SendClientHistory().execute();
+                        }
+
+                        Log.d(TAG, "--------------------------CALLBACK------------------------");
+                        //клиент send
+                        jsonCallback = "[";
+                        sqlQuewy = "SELECT id_old "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "send", "0", "rgzbn_gm_ceiling_callback", "1"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                    try {
+                                        sqlQuewy = "SELECT * "
+                                                + "FROM rgzbn_gm_ceiling_callback " +
+                                                "where _id = ?";
+                                        cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                        if (cursor != null) {
+                                            if (cursor.moveToFirst()) {
+                                                do {
+                                                    JSONObject jsonObjectClient = new JSONObject();
+                                                    for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_callback"); j++) {
+                                                        String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                        String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                        if (j == 0) {
+                                                            status = "android_id";
+                                                        }
+                                                        if (status1 == null || (status1.equals("null"))) {
+                                                        } else {
+                                                            jsonObjectClient.put(status, status1);
+                                                        }
+                                                    }
+                                                    jsonCallback += String.valueOf(jsonObjectClient) + ",";
+                                                } while (cursor.moveToNext());
+                                            } else {
+                                                db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                        "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                        new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_callback"});
+                                            }
+                                        }
+                                        cursor.close();
+                                    } catch (Exception e) {
+                                    }
+
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+                        jsonCallback = jsonCallback.substring(0, jsonCallback.length() - 1) + "]";
+                        Log.d(TAG, "jsonCallback " + jsonCallback);
+                        if (jsonCallback.equals("]")) {
+                        } else {
+                            new SendCallback().execute();
+                        }
+
                     }
-                    ctx.startService(new Intent(ctx, Service_Sync.class));
-                    new CheckClientsData().execute();
                 }
 
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-
                 }
             }) {
-
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("rgzbn_gm_ceiling_clients", jsonClient);
@@ -3285,7 +2285,6 @@ public class Service_Sync extends Service {
             };
 
             requestQueue.add(request);
-
             return null;
         }
     }
@@ -3371,6 +2370,366 @@ public class Service_Sync extends Service {
     }
 
 
+    static class SendClientHistory extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "SendClientHistory " + res);
+
+                    if (res.equals("")) {
+                    } else {
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_client_history");
+                            for (int i = 0; i < id_array.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                String new_id = client_contact.getString("new_id");
+
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENT_HISTORY, values, "_id = ?", new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=?",
+                                        new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_client_history"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_client_history");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                            }
+
+
+                            checkClientHistory = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_client_history"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            checkClientHistory += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            checkClientHistory = checkClientHistory.substring(0, checkClientHistory.length() - 1) + "]";
+                            if (checkClientHistory.equals("]")) {
+                            } else {
+                                new CheckClientHistory().execute();
+                            }
+                            cursor.close();
+
+
+                        } catch (Exception e) {
+                        }
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
+                    }
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_client_history", jsonClientHistory);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+    static class CheckClientHistory extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "rgzbn_gm_ceiling_client_history = " + res);
+
+                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
+                    }
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_client_history");
+                        for (int i = 0; i < dat.length(); i++) {
+
+                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                            String new_id = client_contact.getString("new_android_id");
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM history_send_to_server " +
+                                    "where id_new = ? and type=? and name_table=? and sync=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check", "rgzbn_gm_ceiling_client_history", "0"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_SYNC, "1");
+                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=? and sync=?",
+                                                new String[]{new_id, "rgzbn_gm_ceiling_client_history", "0"});
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+                        }
+                    } catch (Exception e) {
+                    }
+
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+                @Override
+
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_client_history", checkClientHistory);
+                    Log.d(TAG, "rgzbn_gm_ceiling_client_history " + parameters);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+
+    static class SendCallback extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    if (res.equals("")) {
+
+                    } else {
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_callback");
+                            for (int i = 0; i < id_array.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                String new_id = client_contact.getString("new_id");
+
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, values, "_id = ?", new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=? and id_new=?",
+                                        new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_callback", "0"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, values, "_id = ?",
+                                        new String[]{String.valueOf(old_id)});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_callback");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                            }
+
+                            checkCallback = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_callback"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            checkCallback += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            checkCallback = checkCallback.substring(0, checkCallback.length() - 1) + "]";
+                            Log.d(TAG, "checkCallback " + checkCallback);
+                            if (checkCallback.equals("]")) {
+                            } else {
+                                new CheckCallback().execute();
+                            }
+                            cursor.close();
+
+                        } catch (Exception e) {
+                        }
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
+                    }
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_callback", jsonCallback);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+    static class CheckCallback extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
+                    }
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_callback");
+                        for (int i = 0; i < dat.length(); i++) {
+
+                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                            String new_id = client_contact.getString("new_android_id");
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM history_send_to_server " +
+                                    "where id_new = ? and type=? and name_table=? and sync=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check", "rgzbn_gm_ceiling_callback", "0"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_SYNC, "1");
+                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=? and sync=?",
+                                                new String[]{new_id, "rgzbn_gm_ceiling_callback", "0"});
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+                        }
+                    } catch (Exception e) {
+                    }
+
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_callback", checkCallback);
+                    Log.d(TAG, "checkCallback " + parameters);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+
     static class SendUsersData extends AsyncTask<Void, Void, Void> {
 
         String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
@@ -3426,11 +2785,6 @@ public class Service_Sync extends Service {
                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, values, "id_brigade = ?",
                                         new String[]{old_id});
 
-                                //values = new ContentValues();
-                                //values.put(DBHelper.KEY_ID_NEW, new_id);
-                                //db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and name_table=? and sync = ? ",
-                                //        new String[]{old_id, "rgzbn_user_usergroup_map", "0"});
-
                                 values = new ContentValues();
                                 values.put(DBHelper.KEY_USER_ID, new_id);
                                 db.update(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, values, "user_id = ?", new String[]{old_id});
@@ -3445,10 +2799,279 @@ public class Service_Sync extends Service {
                                 db.update("rgzbn_gm_ceiling_dealer_info", values, "dealer_id = ?",
                                         new String[]{old_id});
 
+                                //клиент check
+                                check_users = "[";
+                                String sqlQuewy = "SELECT id_new "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                Cursor cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "check", "0", "rgzbn_users"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            try {
+                                                jsonObjectUsers = new JSONObject();
+                                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                jsonObjectUsers.put("id", id_new);
+                                                check_users += String.valueOf(jsonObjectUsers) + ",";
+                                            } catch (Exception e) {
+                                            }
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                check_users = check_users.substring(0, check_users.length() - 1) + "]";
+                                if (check_users.equals("]")) {
+                                } else {
+                                    new CheckUsersData().execute();
+                                }
+                                cursor.close();
+
+                                Log.d(TAG, "--------------------------UserGroup------------------------");
+                                //клиент send
+                                jsonUserGroup = "[";
+                                sqlQuewy = "SELECT id_old "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "send", "0", "rgzbn_user_usergroup_map", "1"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            try {
+                                                sqlQuewy = "SELECT * "
+                                                        + "FROM rgzbn_user_usergroup_map " +
+                                                        "where _id = ?";
+                                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                if (cursor != null) {
+                                                    if (cursor.moveToFirst()) {
+                                                        do {
+                                                            jsonObjectUserGroup = new JSONObject();
+                                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_user_usergroup_map"); j++) {
+                                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                if (j == 0) {
+                                                                    status = "android_id";
+                                                                }
+                                                                try {
+                                                                    if (status1.equals("") || (status1 == null)) {
+                                                                    } else {
+                                                                        jsonObjectUserGroup.put(status, status1);
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                }
+
+                                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectUserGroup));
+                                                            }
+                                                            Log.d(TAG, " end " + String.valueOf(jsonObjectUserGroup));
+                                                            jsonUserGroup += String.valueOf(jsonObjectUserGroup) + ",";
+                                                        } while (cursor.moveToNext());
+                                                    }
+                                                }
+                                                cursor.close();
+                                            } catch (Exception e) {
+                                                Log.d(TAG, String.valueOf(e));
+                                            }
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                jsonUserGroup = jsonUserGroup.substring(0, jsonUserGroup.length() - 1) + "]";
+
+                                if (jsonUserGroup.equals("]") || jsonUserGroup.equals("[]") || jsonUserGroup.equals("[")) {
+                                } else {
+                                    new CheckUserGroupData().execute();
+                                }
+
+                                cursor.close();
+
+                                Log.d(TAG, "--------------------------МОНТАЖНИКИ------------------------");
+                                //монтажники send
+                                jsonMounters = "[";
+                                sqlQuewy = "SELECT id_old "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "send", "0", "rgzbn_gm_ceiling_mounters", "1"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                            try {
+                                                sqlQuewy = "SELECT * "
+                                                        + "FROM rgzbn_gm_ceiling_mounters " +
+                                                        "where _id = ?";
+                                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                if (cursor != null) {
+                                                    if (cursor.moveToFirst()) {
+                                                        do {
+                                                            jsonObjectMounters = new JSONObject();
+                                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_mounters"); j++) {
+                                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                                if (j == 0) {
+                                                                    status = "android_id";
+                                                                }
+
+                                                                try {
+                                                                    if (status1.equals("") || (status1 == null)) {
+                                                                    } else {
+                                                                        jsonObjectMounters.put(status, status1);
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                }
+
+                                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectMounters));
+                                                            }
+                                                            Log.d(TAG, " end " + String.valueOf(jsonObjectMounters));
+                                                            jsonMounters += String.valueOf(jsonObjectMounters) + ",";
+                                                        } while (cursor.moveToNext());
+                                                    }
+                                                }
+                                                cursor.close();
+                                            } catch (Exception e) {
+                                                Log.d(TAG, String.valueOf(e));
+                                            }
+
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                jsonMounters = jsonMounters.substring(0, jsonMounters.length() - 1) + "]";
+                                if (jsonMounters.equals("]")) {
+                                } else {
+                                    new SendMountersData().execute();
+                                }
+                                cursor.close();
+
+                                Log.d(TAG, "--------------------------DEALER_INFO------------------------");
+                                //клиент send
+                                jsonDealer_info = "[";
+                                sqlQuewy = "SELECT id_old "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "send", "0", "rgzbn_gm_ceiling_dealer_info", "1"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                            try {
+                                                sqlQuewy = "SELECT * "
+                                                        + "FROM rgzbn_gm_ceiling_dealer_info " +
+                                                        "where _id = ?";
+                                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                if (cursor != null) {
+                                                    if (cursor.moveToFirst()) {
+                                                        do {
+                                                            jsonObjectDealer_info = new JSONObject();
+                                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_dealer_info"); j++) {
+                                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                if (j == 0) {
+                                                                    status = "android_id";
+                                                                }
+
+                                                                try {
+                                                                    if (status1.equals("") || (status1 == null)) {
+                                                                    } else {
+                                                                        jsonObjectDealer_info.put(status, status1);
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                }
+
+                                                                Log.d(TAG, j + " " + String.valueOf(jsonObjectDealer_info));
+                                                            }
+                                                            Log.d(TAG, " end " + String.valueOf(jsonObjectDealer_info));
+                                                            jsonDealer_info += String.valueOf(jsonObjectDealer_info) + ",";
+                                                        } while (cursor.moveToNext());
+                                                    }
+                                                }
+                                                cursor.close();
+                                            } catch (Exception e) {
+                                                Log.d(TAG, String.valueOf(e));
+                                            }
+
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                jsonDealer_info = jsonDealer_info.substring(0, jsonDealer_info.length() - 1) + "]";
+
+                                if (jsonDealer_info.equals("]")) {
+                                } else {
+                                    new SendDealerData().execute();
+                                }
+
+                                cursor.close();
+
+                                Log.d(TAG, "--------------------------MOUNT------------------------");
+                                //клиент send
+                                jsonMount = "[";
+                                sqlQuewy = "SELECT id_old "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "send", "0", "rgzbn_gm_ceiling_mount", "1"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                            try {
+                                                sqlQuewy = "SELECT * "
+                                                        + "FROM rgzbn_gm_ceiling_mount " +
+                                                        "where _id = ?";
+                                                cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                if (cursor != null) {
+                                                    if (cursor.moveToFirst()) {
+                                                        do {
+                                                            jsonObjectMount = new JSONObject();
+                                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_mount"); j++) {
+                                                                String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                if (j == 0) {
+                                                                    status = "android_id";
+                                                                }
+
+                                                                try {
+                                                                    if (status1.equals("") || (status1 == null)) {
+                                                                    } else {
+                                                                        jsonObjectMount.put(status, status1);
+                                                                    }
+                                                                } catch (Exception e) {
+                                                                }
+                                                            }
+                                                            jsonMount += String.valueOf(jsonObjectMount) + ",";
+                                                        } while (cursor.moveToNext());
+                                                    }
+                                                }
+                                                cursor.close();
+                                            } catch (Exception e) {
+                                                Log.d(TAG, String.valueOf(e));
+                                            }
+
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                jsonMount = jsonMount.substring(0, jsonMount.length() - 1) + "]";
+
+                                if (jsonMount.equals("]")) {
+                                } else {
+                                    new SendMountData().execute();
+                                }
+
+                                cursor.close();
+
                             }
                         } catch (Exception e) {
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
                 }
             }, new Response.ErrorListener() {
@@ -3528,8 +3151,6 @@ public class Service_Sync extends Service {
                     } catch (Exception e) {
                     }
 
-                    ctx.startService(new Intent(ctx, Service_Sync.class));
-
                     delete();
                 }
             }, new Response.ErrorListener() {
@@ -3552,6 +3173,7 @@ public class Service_Sync extends Service {
             return null;
         }
     }
+
 
     static class CheckUserGroupData extends AsyncTask<Void, Void, Void> {
 
@@ -3601,8 +3223,6 @@ public class Service_Sync extends Service {
                         } catch (Exception e) {
                             Log.d(TAG, "error " + e);
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
-
                     }
 
                 }
@@ -3627,6 +3247,7 @@ public class Service_Sync extends Service {
             return null;
         }
     }
+
 
     static class SendMountersData extends AsyncTask<Void, Void, Void> {
 
@@ -3687,6 +3308,86 @@ public class Service_Sync extends Service {
                                 values.put(DBHelper.KEY_ID_MOUNTER, new_id);
                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, values, "id_mounter = ?",
                                         new String[]{old_id});
+
+                                //монтажники check
+                                check_mounters = "[";
+                                String sqlQuewy = "SELECT id_new "
+                                        + "FROM history_send_to_server " +
+                                        "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                                Cursor cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "check", "0", "rgzbn_gm_ceiling_mounters"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            try {
+                                                jsonObjectMounters = new org.json.JSONObject();
+                                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                                jsonObjectMounters.put("id", id_new);
+                                                check_mounters += String.valueOf(jsonObjectMounters) + ",";
+                                            } catch (Exception e) {
+                                            }
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                check_mounters = check_mounters.substring(0, check_mounters.length() - 1) + "]";
+                                if (check_mounters.equals("]")) {
+                                } else {
+                                    new CheckMountersData().execute();
+                                }
+                                cursor.close();
+
+                                //
+                                mounters_map = "[";
+                                sqlQuewy = "SELECT id_old "
+                                        + "FROM history_send_to_server " +
+                                        "where id_old = ? and type=? and sync=? and name_table=? and status=?";
+                                cursor = db.rawQuery(sqlQuewy,
+                                        new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                "send", "0", "rgzbn_gm_ceiling_mounters_map", "1"});
+                                if (cursor != null) {
+                                    if (cursor.moveToFirst()) {
+                                        do {
+                                            try {
+                                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                sqlQuewy = "SELECT _id, id_mounter, id_brigade "
+                                                        + "FROM rgzbn_gm_ceiling_mounters_map " +
+                                                        "where id_mounter = ?";
+                                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                if (c != null) {
+                                                    if (c.moveToFirst()) {
+                                                        do {
+                                                            jsonObjectMounters_map = new JSONObject();
+
+                                                            String status = "";
+                                                            String status1 = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                                            jsonObjectMounters_map.put("android_id", status1);
+
+                                                            status = c.getColumnName(c.getColumnIndex(c.getColumnName(1)));
+                                                            status1 = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                                            jsonObjectMounters_map.put(status, status1);
+
+                                                            status = c.getColumnName(c.getColumnIndex(c.getColumnName(2)));
+                                                            status1 = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                                            jsonObjectMounters_map.put(status, status1);
+
+                                                            mounters_map += String.valueOf(jsonObjectMounters_map) + ",";
+                                                        } while (c.moveToNext());
+                                                    }
+                                                }
+                                                c.close();
+                                            } catch (Exception e) {
+                                            }
+                                        } while (cursor.moveToNext());
+                                    }
+                                }
+                                mounters_map = mounters_map.substring(0, mounters_map.length() - 1) + "]";
+                                if (mounters_map.equals("]")) {
+                                } else {
+                                    new SendMounters_mapData().execute();
+                                }
+                                cursor.close();
 
                             }
                         } catch (Exception e) {
@@ -3831,7 +3532,7 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_mounters_map"});
 
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
 
                     }
 
@@ -3844,7 +3545,7 @@ public class Service_Sync extends Service {
             }) {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
-                    parameters.put("rgzbn_gm_ceiling_mounters_map", check_mounters_map);
+                    parameters.put("rgzbn_gm_ceiling_mounters_map", mounters_map);
                     Log.d(TAG, String.valueOf(parameters));
                     return parameters;
                 }
@@ -3887,7 +3588,7 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_mount"});
 
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
 
                     delete();
@@ -3941,7 +3642,7 @@ public class Service_Sync extends Service {
                         db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "sync=? and name_table = ?",
                                 new String[]{"0", "rgzbn_gm_ceiling_dealer_info"});
 
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
 
                     delete();
@@ -3963,6 +3664,7 @@ public class Service_Sync extends Service {
             return null;
         }
     }
+
 
     static class SendClientsContactsData extends AsyncTask<Void, Void, Void> {
 
@@ -4031,12 +3733,35 @@ public class Service_Sync extends Service {
                                 }
                                 cursor.close();
                             }
-                            global_results = String.valueOf(jsonObjectClient_Contacts);
 
-                            new CheckClientsContactsData().execute();
+                            //контакты check
+                            check_clients_contacts = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_clients_contacts"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        jsonObjectClient_Contacts = new org.json.simple.JSONObject();
+                                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                        jsonObjectClient_Contacts.put("id", id_new);
+                                        check_clients_contacts += String.valueOf(jsonObjectClient_Contacts) + ",";
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_clients_contacts = check_clients_contacts.substring(0, check_clients_contacts.length() - 1) + "]";
+                            if (check_clients_contacts.equals("]")) {
+                            } else {
+                                new CheckClientsContactsData().execute();
+                            }
+                            cursor.close();
+
                         } catch (Exception e) {
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
                 }
 
@@ -4154,11 +3879,13 @@ public class Service_Sync extends Service {
                 @Override
                 public void onResponse(String res) {
 
+                    Log.d(TAG, "SendProjectsData " + res);
+
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+
                     if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
-                        Log.d("responce", "SendProjectData пусто");
                     } else {
-                        SQLiteDatabase db;
-                        db = dbHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();
                         String new_id = "";
                         try {
@@ -4175,112 +3902,250 @@ public class Service_Sync extends Service {
                                 values.put(DBHelper.KEY_ID, new_id);
                                 db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{old_id});
 
-                                String sqlQuewy = "SELECT * "
-                                        + "FROM history_send_to_server " +
-                                        "where id_old = ? and type=? and sync=? and name_table=? and id_new=?";
-                                Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_projects", "0"});
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_SYNC, "1");
-                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=? and id_new=?",
-                                                    new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_projects", "0"});
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_PROJECT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, values, "project_id = ?", new String[]{old_id});
 
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_ID_OLD, old_id);
-                                            values.put(DBHelper.KEY_ID_NEW, new_id);
-                                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                                            values.put(DBHelper.KEY_SYNC, "0");
-                                            values.put(DBHelper.KEY_TYPE, "check");
-                                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_PROJECT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, values, "project_id = ?", new String[]{old_id});
 
-                                            // global_results = String.valueOf(jsonObjectProject);
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=? ",
+                                        new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_projects"});
 
-                                        } while (cursor.moveToNext());
-                                    }
-                                }
-                                cursor.close();
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                                 global_results = String.valueOf(jsonObjectProject);
 
-                                try {
-                                    sqlQuewy = "SELECT * "
-                                            + "FROM rgzbn_gm_ceiling_calculations " +
-                                            "where project_id = ? ";
-                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
-                                    if (cursor != null) {
-                                        cursor.moveToFirst();
-                                        do {
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_PROJECT_ID, new_id);
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "project_id = ?", new String[]{old_id});
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_PROJECT_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "project_id = ?", new String[]{old_id});
 
-                                        } while (cursor.moveToNext());
+                            }
+
+                            //ctx.startService(new Intent(ctx, Service_Sync.class));
+                        } catch (Exception e) {
+                            //ctx.startService(new Intent(ctx, Service_Sync.class));
+                        }
+                    }
+
+                    //проект check
+                    check_project = "[";
+                    String sqlQuewy = "SELECT id_new "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                    Cursor cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "check", "0", "rgzbn_gm_ceiling_projects"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                jsonObjectClient = new org.json.simple.JSONObject();
+                                String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                jsonObjectClient.put("id", id_new);
+                                check_project += String.valueOf(jsonObjectClient) + ",";
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    check_project = check_project.substring(0, check_project.length() - 1) + "]";
+                    if (check_project.equals("]")) {
+                    } else {
+                        new CheckProjectsData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------калькулятор------------------------");
+                    //калькулятор send
+                    jsonCalc = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_calculations", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_calculations " +
+                                        "where _id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{id_old});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            jsonObjectCalculation = new org.json.simple.JSONObject();
+                                            for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_calculations"); j++) {
+                                                try {
+                                                    String status = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
+                                                    String status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                    if (status.equals("_id")) {
+                                                        status = "android_id";
+                                                        jsonObjectCalculation.put(status, status1);
+                                                    } else if (status.equals("calc_image")) {
+                                                        status = "image";
+                                                        status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                        jsonObjectCalculation.put(status, status1);
+                                                    } else if (status.equals("cut_image")) {
+                                                        status = "cut_image";
+                                                        status1 = c.getString(c.getColumnIndex(c.getColumnName(j)));
+                                                        jsonObjectCalculation.put(status, status1);
+                                                    } else if (status1.equals("")) {
+                                                    } else if (status1.equals("null") || status1.equals(null) || status1 == null) {
+                                                    } else {
+                                                        jsonObjectCalculation.put(status, status1);
+                                                    }
+                                                } catch (Exception e) {
+                                                }
+                                            }
+                                            jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
+                                        } while (c.moveToNext());
+                                    } else {
+                                        db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_calculations"});
                                     }
-                                    cursor.close();
-                                } catch (Exception e) {
                                 }
+
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    jsonCalc = jsonCalc.substring(0, jsonCalc.length() - 1) + "]";
+                    if (jsonCalc.equals("]")) {
+                    } else {
+                        new SendCalculationsData().execute();
+                    }
+                    cursor.close();
+
+                    Log.d(TAG, "--------------------------ИСТОРИЯ------------------------");
+                    //клиент send
+                    jsonHistory = "[";
+                    sqlQuewy = "SELECT id_old "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "send", "0", "rgzbn_gm_ceiling_projects_history", "1"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
 
                                 try {
                                     sqlQuewy = "SELECT * "
                                             + "FROM rgzbn_gm_ceiling_projects_history " +
-                                            "where project_id = ? ";
-                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(old_id)});
+                                            "where _id = ?";
+                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
                                     if (cursor != null) {
-                                        cursor.moveToFirst();
-                                        do {
-                                            values = new ContentValues();
-                                            values.put(DBHelper.KEY_PROJECT_ID, new_id);
-                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, values, "project_id = ?", new String[]{old_id});
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                JSONObject jsonObjectClient = new JSONObject();
+                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_projects_history"); j++) {
+                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
 
-                                        } while (cursor.moveToNext());
+                                                    Log.d(TAG, status + " " + status1);
+                                                    if (j == 0) {
+                                                        status = "android_id";
+                                                    }
+                                                    if (status1 == null || status1.equals("") || (status1.equals("null"))) {
+                                                    } else {
+                                                        jsonObjectClient.put(status, status1);
+                                                    }
+                                                    Log.d(TAG, status + " " + status1);
+                                                }
+                                                jsonHistory += String.valueOf(jsonObjectClient) + ",";
+                                            } while (cursor.moveToNext());
+                                        } else {
+                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects_history"});
+                                        }
                                     }
                                     cursor.close();
+                                    jsonRecoil = jsonRecoil.substring(0, jsonRecoil.length() - 1) + "]";
+                                    if (jsonRecoil.equals("]")) {
+                                    } else {
+                                        new SendRecoilMapProject().execute();
+                                    }
+
+                                    Log.d(TAG, "--------------------------RECOIL_MAP_PROJECT------------------------");
+                                    //клиент send
+                                    jsonRecoil = "[";
+                                    sqlQuewy = "SELECT id_old "
+                                            + "FROM history_send_to_server " +
+                                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                                    cursor = db.rawQuery(sqlQuewy,
+                                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                                    "send", "0", "rgzbn_gm_ceiling_recoil_map_project", "1"});
+                                    if (cursor != null) {
+                                        if (cursor.moveToFirst()) {
+                                            do {
+                                                id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                                try {
+                                                    sqlQuewy = "SELECT * "
+                                                            + "FROM rgzbn_gm_ceiling_recoil_map_project " +
+                                                            "where _id = ?";
+                                                    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                                    if (cursor != null) {
+                                                        if (cursor.moveToFirst()) {
+                                                            do {
+                                                                JSONObject jsonObjectClient = new JSONObject();
+                                                                for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_recoil_map_project"); j++) {
+                                                                    String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                                                    String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                                                    if (j == 0) {
+                                                                        status = "android_id";
+                                                                    }
+                                                                    if (status1 == null || (status1.equals("null"))) {
+                                                                    } else {
+                                                                        jsonObjectClient.put(status, status1);
+                                                                    }
+                                                                }
+                                                                jsonRecoil += String.valueOf(jsonObjectClient) + ",";
+                                                            } while (cursor.moveToNext());
+                                                        } else {
+                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                                    "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                                    new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_recoil_map_project"});
+                                                        }
+                                                    }
+                                                    cursor.close();
+                                                } catch (Exception e) {
+                                                }
+
+                                            } while (cursor.moveToNext());
+                                        }
+                                    }
+                                    cursor.close();
+
                                 } catch (Exception e) {
+                                    Log.d(TAG, String.valueOf(e));
                                 }
 
-                                //org.json.simple.JSONObject jsonObjectCalc = new org.json.simple.JSONObject();
-                                //jsonCalc = "[";
-                                //sqlQuewy = "SELECT * "
-                                //        + "FROM rgzbn_gm_ceiling_calculations " +
-                                //        "where project_id = ?";
-                                //cursor = db.rawQuery(sqlQuewy, new String[]{new_id});
-                                //if (cursor != null) {
-                                //    if (cursor.moveToFirst()) {
-                                //        do {
-                                //            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                //            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
-                                //            //jsonObjectCalculation_id.put(status, status1);
-                                //            //calculation_id.add(status1);
-                                //            for (int j = 0; j < 50; j++) {
-                                //                status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                //                status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
-                                //                //Log.d("responce", "status " + status + " " + status1);
-                                //                if (status.equals("_id")) {
-                                //                    status = "android_id";
-                                //                    jsonObjectCalculation.put(status, status1);
-                                //                } else if (status.equals("calc_image")) {
-                                //                } else if (status.equals("cut_image")) {
-                                //                } else if (status1.equals("")) {
-                                //                } else {
-                                //                    jsonObjectCalculation.put(status, status1);
-                                //                }
-                                //            }
-                                //            jsonCalc += String.valueOf(jsonObjectCalculation) + ",";
-                                //        } while (cursor.moveToNext());
-                                //    }
-                                //}
-                                //jsonCalc = jsonCalc.substring(0, jsonCalc.length() - 1) + "]";
-                                //Log.d("responce", "jsonCalc " + jsonCalc);
-                            }
-
-                        } catch (Exception e) {
+                            } while (cursor.moveToNext());
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
-                    new CheckProjectsData().execute();
+                    cursor.close();
+                    jsonHistory = jsonHistory.substring(0, jsonHistory.length() - 1) + "]";
+                    Log.d(TAG, "jsonHistory = " + jsonHistory);
+                    if (jsonHistory.equals("]")) {
+                    } else {
+                        new SendProjectsHistory().execute();
+                    }
+
                 }
 
             }, new Response.ErrorListener() {
@@ -4294,7 +4159,6 @@ public class Service_Sync extends Service {
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("rgzbn_gm_ceiling_projects", jsonProjects);
                     Log.d(TAG, String.valueOf(parameters));
-
                     return parameters;
                 }
             };
@@ -4402,6 +4266,8 @@ public class Service_Sync extends Service {
                 @Override
                 public void onResponse(String res) {
 
+                    Log.d(TAG, "SendProjectsHistory " + res);
+
                     if (res.equals("")) {
 
                     } else {
@@ -4435,9 +4301,37 @@ public class Service_Sync extends Service {
                                 db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                             }
 
+                            check_History = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_projects_history"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            check_History += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_History = check_History.substring(0, check_History.length() - 1) + "]";
+                            Log.d(TAG, "check_History = " + check_History);
+                            if (check_History.equals("]")) {
+                            } else {
+                                new CheckProjectsHistory().execute();
+                            }
+                            cursor.close();
+
                         } catch (Exception e) {
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
 
                     }
 
@@ -4477,6 +4371,8 @@ public class Service_Sync extends Service {
             StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String res) {
+
+                    Log.d(TAG, "CheckProjectsHistory " + res);
 
                     if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
                     }
@@ -4594,9 +4490,36 @@ public class Service_Sync extends Service {
                                 db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                             }
 
+                            check_ApiPhones = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_api_phones"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            check_ApiPhones += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_ApiPhones = check_ApiPhones.substring(0, check_ApiPhones.length() - 1) + "]";
+                            if (check_ApiPhones.equals("]")) {
+                            } else {
+                                new CheckApiPhones().execute();
+                            }
+                            cursor.close();
+
                         } catch (Exception e) {
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
                     delete();
                 }
@@ -4686,6 +4609,184 @@ public class Service_Sync extends Service {
 
                     Log.d(TAG, "rgzbn_gm_ceiling_api_phones " + parameters);
 
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+
+    static class SendRecoilMapProject extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    if (res.equals("")) {
+
+                    } else {
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_recoil_map_project");
+                            for (int i = 0; i < id_array.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                String new_id = client_contact.getString("new_id");
+
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, values, "_id = ?", new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=?",
+                                        new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_recoil_map_project"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_recoil_map_project");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                            }
+
+                            checkRecoil = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_recoil_map_project"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            JSONObject jsonObjectClient = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectClient.put("id", id_new);
+                                            checkRecoil += String.valueOf(jsonObjectClient) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+
+                            checkRecoil = checkRecoil.substring(0, checkRecoil.length() - 1) + "]";
+                            if (checkRecoil.equals("]")) {
+                            } else {
+                                new CheckRecoilMapProject().execute();
+                            }
+                            cursor.close();
+
+
+                        } catch (Exception e) {
+                        }
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
+                    }
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_recoil_map_project", jsonRecoil);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+    static class CheckRecoilMapProject extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "rgzbn_gm_ceiling_recoil_map_project = " + res);
+
+                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
+                    }
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_recoil_map_project");
+                        for (int i = 0; i < dat.length(); i++) {
+
+                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                            String new_id = client_contact.getString("new_android_id");
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM history_send_to_server " +
+                                    "where id_new = ? and type=? and name_table=? and sync=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check", "rgzbn_gm_ceiling_recoil_map_project", "0"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_SYNC, "1");
+                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=? and sync=?",
+                                                new String[]{new_id, "rgzbn_gm_ceiling_recoil_map_project", "0"});
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+                        }
+                    } catch (Exception e) {
+                    }
+
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+                @Override
+
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_recoil_map_project", checkRecoil);
                     return parameters;
                 }
             };
@@ -4877,38 +4978,6 @@ public class Service_Sync extends Service {
                                 } catch (Exception e) {
                                 }
 
-                                //jsonObjectComponents = new org.json.simple.JSONObject();
-                                //try {
-                                //    sqlQuewy = "SELECT * "
-                                //            + "FROM rgzbn_gm_ceiling_cornice " +
-                                //            "where calculation_id = ? ";
-                                //    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id)});
-                                //    if (cursor != null) {
-                                //        cursor.moveToFirst();
-                                //        do {
-
-                                //            String status = "android_id";
-                                //            String status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_ID));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_N15_COUNT));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_N15_TYPE));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_N15_SIZE));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            components_corn += String.valueOf(jsonObjectComponents) + ",";
-                                //        } while (cursor.moveToNext());
-                                //    }
-                                //    cursor.close();
-                                //} catch (Exception e) {
-                                //}
-
                                 try {
                                     sqlQuewy = "SELECT * "
                                             + "FROM rgzbn_gm_ceiling_profil " +
@@ -4926,61 +4995,472 @@ public class Service_Sync extends Service {
                                 } catch (Exception e) {
                                 }
 
-                                //jsonObjectComponents = new org.json.simple.JSONObject();
-                                //try {
-                                //    sqlQuewy = "SELECT * "
-                                //            + "FROM rgzbn_gm_ceiling_profil " +
-                                //            "where calculation_id = ? ";
-                                //    cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id)});
-                                //    if (cursor != null) {
-                                //        cursor.moveToFirst();
-                                //        do {
-
-                                //            String status = "android_id";
-                                //            String status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_ID));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_N29_COUNT));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            status = cursor.getColumnName(cursor.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                //            status1 = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_N29_TYPE));
-                                //            jsonObjectComponents.put(status, status1);
-                                //            components_profil += String.valueOf(jsonObjectComponents) + ",";
-                                //        } while (cursor.moveToNext());
-                                //    }
-                                //    cursor.close();
-                                //} catch (Exception e) {
-                                //}
                             }
 
+                            //калькулятор check
+                            check_calculation = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_calculations"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
 
-                            //global_results = global_results.substring(0, global_results.length() - 1) + "]";
-                            //components_diffusers = components_diffusers.substring(0, components_diffusers.length() - 1) + "]";
-                            //components_ecola = components_ecola.substring(0, components_ecola.length() - 1) + "]";
-                            //components_fixtures = components_fixtures.substring(0, components_fixtures.length() - 1) + "]";
-                            //components_hoods = components_hoods.substring(0, components_hoods.length() - 1) + "]";
-                            //components_pipes = components_pipes.substring(0, components_pipes.length() - 1) + "]";
-                            //components_corn = components_corn.substring(0, components_corn.length() - 1) + "]";
-                            //components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
+                                        jsonObjectClient = new org.json.simple.JSONObject();
+                                        String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                        jsonObjectClient.put("id", id_new);
+                                        check_calculation += String.valueOf(jsonObjectClient) + ",";
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            check_calculation = check_calculation.substring(0, check_calculation.length() - 1) + "]";
+                            if (check_calculation.equals("]")) {
+                            } else {
+                                new CheckCalculationData().execute();
+                            }
+                            cursor.close();
 
-                            //Log.d("responce", global_results);
-                            //Log.d("responce", components_diffusers);
-                            //Log.d("responce", components_fixtures);
-                            //Log.d("responce", components_corn);
-                            //Log.d("responce", components_ecola);
-                            //Log.d("responce", components_hoods);
-                            //Log.d("responce", components_pipes);
-                            //Log.d("responce", "SENDCALCULATIONS GOOD");
-                            //
-                            //new SendComponents().execute();
-                            new CheckCalculationData().execute();
+                            components_diffusers = "[";
+                            components_ecola = "[";
+                            components_fixtures = "[";
+                            components_hoods = "[";
+                            components_pipes = "[";
+                            components_corn = "[";
+                            components_profil = "[";
+
+                            Log.d(TAG, "--------------------------компоненты_fix------------------------");
+                            //компоненты_fix send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_fixtures", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_fixtures " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_TYPE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N13_SIZE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_fixtures += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_fixtures"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_ecola------------------------");
+                            //компоненты_ecola send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_ecola", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_ecola " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_ILLUMINATOR));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N26_LAMP));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_ecola += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_ecola"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_diff------------------------");
+                            //компоненты_diff send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999),
+                                            "send", "0", "rgzbn_gm_ceiling_diffusers", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_diffusers " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N23_SIZE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_diffusers += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_diffusers"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_hoods------------------------");
+                            //компоненты_hoods send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where (id_old>? and id_old<?) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999),
+                                            "send", "0", "rgzbn_gm_ceiling_hoods", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_hoods " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_TYPE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N22_SIZE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_hoods += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ?  and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_hoods"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_pipes------------------------");
+                            //компоненты_pipes send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_pipes", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_pipes " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N14_SIZE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_pipes += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_pipes"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_cornice------------------------");
+                            //компоненты_cornice send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_cornice", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_cornice " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_TYPE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N15_SIZE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_corn += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_cornice"});
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            Log.d(TAG, "--------------------------компоненты_profil------------------------");
+                            //компоненты_cornice send
+                            sqlQuewy = "SELECT id_old "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+                            cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "send", "0", "rgzbn_gm_ceiling_profil", "1"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+
+                                        jsonObjectComponents = new org.json.simple.JSONObject();
+                                        try {
+                                            sqlQuewy = "SELECT * "
+                                                    + "FROM rgzbn_gm_ceiling_profil " +
+                                                    "where _id = ? ";
+                                            Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                                            if (c != null) {
+                                                if (c.moveToFirst()) {
+                                                    do {
+                                                        String status = "android_id";
+                                                        String status1 = c.getString(c.getColumnIndex(DBHelper.KEY_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_CALCULATION_ID));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_COUNT));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        status = c.getColumnName(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                        status1 = c.getString(c.getColumnIndex(DBHelper.KEY_N29_TYPE));
+                                                        jsonObjectComponents.put(status, status1);
+                                                        components_profil += String.valueOf(jsonObjectComponents) + ",";
+                                                    } while (c.moveToNext());
+                                                } else {
+                                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_profil"});
+
+                                                }
+                                            }
+                                            c.close();
+                                        } catch (Exception e) {
+                                        }
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+
+                            if (components_diffusers.length() < 3) {
+                                components_diffusers += "]";
+                            } else {
+                                components_diffusers = components_diffusers.substring(0, components_diffusers.length() - 1) + "]";
+                            }
+                            if (components_ecola.length() < 3) {
+                                components_ecola += "]";
+                            } else {
+                                components_ecola = components_ecola.substring(0, components_ecola.length() - 1) + "]";
+                            }
+                            if (components_fixtures.length() < 3) {
+                                components_fixtures += "]";
+                            } else {
+                                components_fixtures = components_fixtures.substring(0, components_fixtures.length() - 1) + "]";
+                            }
+                            if (components_hoods.length() < 3) {
+                                components_hoods += "]";
+                            } else {
+                                components_hoods = components_hoods.substring(0, components_hoods.length() - 1) + "]";
+                            }
+                            if (components_pipes.length() < 3) {
+                                components_pipes += "]";
+                            } else {
+                                components_pipes = components_pipes.substring(0, components_pipes.length() - 1) + "]";
+                            }
+                            if (components_corn.length() < 3) {
+                                components_corn += "]";
+                            } else {
+                                components_corn = components_corn.substring(0, components_corn.length() - 1) + "]";
+                            }
+                            if (components_profil.length() < 3) {
+                                components_profil += "]";
+                            } else {
+                                components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
+                            }
+
+                            if ((components_diffusers.equals("]") && components_ecola.equals("]") && components_fixtures.equals("]") && components_hoods.equals("]") &&
+                                    components_pipes.equals("]") && components_corn.equals("]") && components_profil.equals("]")) ||
+                                    (components_diffusers.equals("[]") && components_ecola.equals("[]") && components_fixtures.equals("[]") && components_hoods.equals("[]") &&
+                                            components_pipes.equals("[]") && components_corn.equals("[]") && components_profil.equals("[]"))) {
+                            } else {
+                                new SendComponents().execute();
+                            }
+
+                            check_components_diffusers = "[";
+                            check_components_ecola = "[";
+                            check_components_fixtures = "[";
+                            check_components_hoods = "[";
+                            check_components_pipes = "[";
+                            check_components_corn = "[";
+                            check_components_profil = "[";
 
                         } catch (Exception e) {
                         }
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
                     }
                 }
 
@@ -5405,9 +5885,160 @@ public class Service_Sync extends Service {
                         }
                         components_profil = components_profil.substring(0, components_profil.length() - 1) + "]";
 
-                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
 
-                        new CheckComponents().execute();
+                        //компоненты_fix check
+                        String sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        Cursor cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_fixtures"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_fixtures += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_diff check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_diffusers"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_diffusers += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_pipes check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_pipes"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_pipes += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_hoods check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_hoods"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_hoods += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_ecola check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_ecola"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_ecola += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_cornice check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_cornice"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_corn += String.valueOf(jsonObjectComponents) + ",";
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        //компоненты_cornice check
+                        sqlQuewy = "SELECT id_new "
+                                + "FROM history_send_to_server " +
+                                "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                        cursor = db.rawQuery(sqlQuewy,
+                                new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                        "check", "0", "rgzbn_gm_ceiling_profil"});
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    jsonObjectComponents = new org.json.simple.JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectComponents.put("id", id_new);
+                                    check_components_profil += String.valueOf(jsonObjectComponents) + ",";
+                                    new CheckCalculationData().execute();
+                                } while (cursor.moveToNext());
+                            }
+                        }
+                        cursor.close();
+
+                        check_components_diffusers = check_components_diffusers.substring(0, check_components_diffusers.length() - 1) + "]";
+                        check_components_ecola = check_components_ecola.substring(0, check_components_ecola.length() - 1) + "]";
+                        check_components_fixtures = check_components_fixtures.substring(0, check_components_fixtures.length() - 1) + "]";
+                        check_components_hoods = check_components_hoods.substring(0, check_components_hoods.length() - 1) + "]";
+                        check_components_pipes = check_components_pipes.substring(0, check_components_pipes.length() - 1) + "]";
+                        check_components_corn = check_components_corn.substring(0, check_components_corn.length() - 1) + "]";
+                        check_components_profil = check_components_profil.substring(0, check_components_profil.length() - 1) + "]";
+
+                        if ((check_components_diffusers.equals("]") && check_components_ecola.equals("]") && check_components_fixtures.equals("]")
+                                && check_components_hoods.equals("]") && check_components_pipes.equals("]") && check_components_corn.equals("]")
+                                && check_components_profil.equals("]"))
+                                || (check_components_diffusers.equals("[]") && check_components_ecola.equals("[]") && check_components_fixtures.equals("[]")
+                                && check_components_hoods.equals("[]") && check_components_pipes.equals("[]") && check_components_corn.equals("[]")
+                                && check_components_profil.equals("[]"))) {
+                        } else {
+                            new CheckComponents().execute();
+                        }
+
                     }
                 }
 
@@ -5701,6 +6332,70 @@ public class Service_Sync extends Service {
 
             requestQueue.add(request);
 
+            return null;
+        }
+    }
+
+
+    static class SendDeleteTable extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.deleteDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    if (res.equals("")) {
+
+                    } else {
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+
+                        res = res.substring(1, res.length() - 1);
+                        Log.d(TAG, res);
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(res);
+                            String delete_id = jsonObject.getString("ids");
+                            String table = jsonObject.getString("table");
+
+                            Log.d(TAG, delete_id + " " + table);
+
+                            ContentValues values = new ContentValues();
+                            values.put(DBHelper.KEY_SYNC, "1");
+                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=? and id_new=?",
+                                    new String[]{String.valueOf(delete_id), "delete", "0", table, "0"});
+
+                        } catch (Exception e) {
+                            Log.d(TAG, String.valueOf(e));
+                        }
+                        ctx.startService(new Intent(ctx, Service_Sync.class));
+                    }
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put(jsonDeleteTable, jsonDelete);
+                    Log.d(TAG, "delete" + parameters);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
             return null;
         }
     }

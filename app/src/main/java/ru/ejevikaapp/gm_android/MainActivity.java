@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     SharedPreferences SP_end;
 
-    ProgressDialog mProgressDialog;
+    public static ProgressDialog mProgressDialog;
 
     Map<String, String> parameters = new HashMap<String, String>();
     static RequestQueue requestQueue;
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     org.json.simple.JSONObject jsonDealer = new org.json.simple.JSONObject();
 
     String jsonAuth = "", material = "", mounters = "", dealer = "", yourDealer = "";
+
+    int usergroup = 0;
 
     String domen;
 
@@ -356,8 +358,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             send(res, user_id, ob);
                         }
 
-                        Log.d("responce",user_id);
-                    }catch (Exception e){
+                        Log.d("responce", user_id);
+                    } catch (Exception e) {
 
                         mProgressDialog.dismiss();
                         Toast toast = Toast.makeText(getApplicationContext(),
@@ -380,8 +382,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("authorizations", jsonAuth);
-                    Log.d("responce", String.valueOf(parameters));
-                    Log.d("responce", String.valueOf(domen));
                     return parameters;
                 }
             };
@@ -481,29 +481,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             if (indexJava == -1) {
             } else {
                 for (String retval1 : retval.split(":")) {
-
                     retval1 = retval1.replaceAll("[^0-9]", "");
-
-                    sqlQuewy = "SELECT * "
-                            + "FROM rgzbn_user_usergroup_map" +
-                            " WHERE user_id = ? and group_id = ? ";
-
-                    c = db.rawQuery(sqlQuewy, new String[]{user_id, retval1});
-
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                // ничего не делаем
-                            } while (c.moveToNext());
-                        } else {
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_USER_ID, user_id);
-                            values.put(DBHelper.KEY_GROUP_ID, retval1);
-                            db.insert(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, null, values);
-                        }
-                    }
-                    c.close();
-
+                    group_id.add(retval1);
                 }
                 continue;
             }
@@ -526,10 +505,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         boolean bool = true;
         for (int g = 0; group_id.size() > g; g++) {
-
-            Log.d("mLog", String.valueOf(group_id.get(g)));
             if (group_id.get(g).equals("11")) { // монтажная бригада
-
+                usergroup = 11;
                 SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
                 SharedPreferences.Editor ed = SP.edit();
                 ed.putString("", user_id);
@@ -579,14 +556,15 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
                 }
 
-                Send_All.Alarm.setAlarm(MainActivity.this);
-                startService(new Intent(MainActivity.this, Send_All.class));
 
-                //Service_Sync.Alarm.setAlarm(MainActivity.this);
-                //startService(new Intent(MainActivity.this, Service_Sync.class));
-
-                Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        new Send_Material().execute();
+                        new Send_Mounters().execute();
+                        new Send_Dealer().execute();
+                    }
+                });
+                t.start();
 
                 final Toast toast = Toast.makeText(getApplicationContext(),
                         "При первом запуске приложения возможны торможения или зависания, " +
@@ -606,8 +584,17 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 finish();
 
                 bool = false;
+                break;
             } else if (group_id.get(g).equals("22") || group_id.get(g).equals("21")) { // замерщик
                 try {
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_USER_ID, user_id);
+                    values.put(DBHelper.KEY_GROUP_ID, "21");
+                    db.insert(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, null, values);
+
+                    usergroup = 22;
+                    mProgressDialog.setMessage("Загружаем...");
                     JSONObject jsonObject = new JSONObject(res);
                     user_id = jsonObject.getString("id");
 
@@ -664,38 +651,88 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         db.insert(DBHelper.HISTORY_IMPORT_TO_SERVER, null, values);
                     }
 
-                    Log.d("responce", time);
+                    String change_time = "0000-00-00 00:00:00";
 
-                    Send_All.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Send_All.class));
+                    sqlQuewy = "SELECT change_time "
+                            + "FROM history_import_to_server" +
+                            " WHERE title = ?";
 
-                    //Service_Sync.Alarm.setAlarm(MainActivity.this);
-                    //startService(new Intent(MainActivity.this, Service_Sync.class));
+                    c = db.rawQuery(sqlQuewy, new String[]{"material"});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            } while (c.moveToNext());
+                        }
+                    }
+                    c.close();
 
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                    jsonMaterial.put("change_time", change_time);
+                    material = String.valueOf(jsonMaterial);
+
+                    sqlQuewy = "SELECT change_time "
+                            + "FROM history_import_to_server" +
+                            " WHERE title = ?";
+
+                    c = db.rawQuery(sqlQuewy, new String[]{"mount"});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            } while (c.moveToNext());
+                        }
+                    }
+                    c.close();
+
+                    jsonMounters.put("dealer_id", dealer_id);
+                    jsonMounters.put("change_time", change_time);
+                    mounters = String.valueOf(jsonMounters);
+
+                    sqlQuewy = "SELECT change_time "
+                            + "FROM history_import_to_server" +
+                            " WHERE title = ?";
+
+                    c = db.rawQuery(sqlQuewy, new String[]{"dealer"});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                change_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            } while (c.moveToNext());
+                        }
+                    }
+                    c.close();
+
+                    jsonDealer.put("dealer_id", dealer_id);
+                    jsonDealer.put("change_time", change_time);
+                    dealer = String.valueOf(jsonDealer);
+
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            new Send_Material().execute();
+                            new Send_Mounters().execute();
+                            new Send_Dealer().execute();
+                        }
+                    });
+                    t.start();
 
                     final Toast toast = Toast.makeText(getApplicationContext(),
                             "При первом запуске приложения возможны торможения или зависания, " +
                                     "это происходит из-за проектов, полотен, производителей и т.д., которые скачиваются...", Toast.LENGTH_LONG);
                     toast.show();
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            toast.cancel();
-                        }
-                    }, 10000);
-
-                    Intent intent = new Intent(MainActivity.this, Gager_office.class);
-                    startActivity(intent);
-                    finish();
                 } catch (Exception e) {
                 }
 
+                break;
             } else if (group_id.get(g).equals("14")) {    // дилер
                 try {
+
+                    values = new ContentValues();
+                    values.put(DBHelper.KEY_USER_ID, user_id);
+                    values.put(DBHelper.KEY_GROUP_ID, "14");
+                    db.insert(DBHelper.TABLE_RGZBN_USER_USERGROUP_MAP, null, values);
+
+                    usergroup = 14;
                     mProgressDialog.setMessage("Загружаем...");
                     JSONObject jsonObject = new JSONObject(res);
                     user_id = jsonObject.getString("id");
@@ -769,20 +806,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         }
                     }
                     c.close();
-
                     jsonMaterial.put("change_time", change_time);
                     material = String.valueOf(jsonMaterial);
-                    Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            new Send_Material().execute();
-                        }
-                    });
-                    t.start();
 
                     sqlQuewy = "SELECT change_time "
                             + "FROM history_import_to_server" +
                             " WHERE title = ?";
-
                     c = db.rawQuery(sqlQuewy, new String[]{"mount"});
                     if (c != null) {
                         if (c.moveToFirst()) {
@@ -792,7 +821,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         }
                     }
                     c.close();
-
                     jsonMounters.put("dealer_id", dealer_id);
                     jsonMounters.put("change_time", change_time);
                     mounters = String.valueOf(jsonMounters);
@@ -800,7 +828,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     sqlQuewy = "SELECT change_time "
                             + "FROM history_import_to_server" +
                             " WHERE title = ?";
-
                     c = db.rawQuery(sqlQuewy, new String[]{"dealer"});
                     if (c != null) {
                         if (c.moveToFirst()) {
@@ -810,19 +837,25 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         }
                     }
                     c.close();
-
                     jsonDealer.put("dealer_id", dealer_id);
                     jsonDealer.put("change_time", change_time);
                     dealer = String.valueOf(jsonDealer);
 
-                    //Service_Sync.Alarm.setAlarm(MainActivity.this);
-                    //startService(new Intent(MainActivity.this, Service_Sync.class));
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            new Send_Material().execute();
+                            new Send_Mounters().execute();
+                            new Send_Dealer().execute();
+                        }
+                    });
+                    t.start();
 
                     final Toast toast = Toast.makeText(getApplicationContext(),
                             "При первом запуске приложения возможны торможения или зависания, " +
                                     "это происходит из-за проектов, полотен, производителей и т.д., которые скачиваются...", Toast.LENGTH_LONG);
                     toast.show();
 
+                    break;
                 } catch (Exception e) {
                 }
             }
@@ -841,13 +874,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         @Override
         protected String doInBackground(final Integer... integers) {
-            // try {
 
             StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d(TAG, "Send_Material " + res);
+                    Log.d(TAG, "Send_Material MAINACTIVITY " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -857,8 +889,51 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     try {
                         org.json.JSONObject dat = new org.json.JSONObject(res);
 
-                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases");
-                        Log.d("mLog", "rgzbn_gm_ceiling_canvases "+id_array);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_textures");
+                        Log.d(TAG, "rgzbn_gm_ceiling_textures " + id_array);
+                        for (int i = 0; i < id_array.length(); i++) {
+
+                            count_m = 0;
+                            org.json.JSONObject text = id_array.getJSONObject(i);
+
+                            String id = text.getString("id");
+                            String texture_title = text.getString("texture_title");
+                            String texture_colored = text.getString("texture_colored");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, id);
+                            values.put(DBHelper.KEY_TEXTURE_TITLE, texture_title);
+                            values.put(DBHelper.KEY_TEXTURE_COLORED, texture_colored);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_textures" +
+                                    " WHERE _id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        Log.d("mLog", "upd " + String.valueOf(values));
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    Log.d("mLog", "ins " + String.valueOf(values));
+                                    values.put(DBHelper.KEY_ID, id);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, null, values);
+
+                                } catch (Exception e) {
+                                    Log.d("responce", String.valueOf(e));
+                                }
+                            }
+                        }
+
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases");
+                        Log.d("mLog", "rgzbn_gm_ceiling_canvases " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -893,7 +968,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     } while (c.moveToNext());
                                 }
                             }
-
                             c.close();
 
                             if (count_m == 0) {
@@ -901,14 +975,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     values.put(DBHelper.KEY_ID, id);
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CANVASES, null, values);
                                 } catch (Exception e) {
-                                    Log.d("responce", String.valueOf(e));
                                 }
                             }
 
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_manufacturers");
-                        Log.d("mLog", "rgzbn_gm_ceiling_canvases_manufacturers "+id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -950,7 +1022,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_colors");
-                        Log.d("mLog", "rgzbn_gm_ceiling_colors "+id_array);
+                        Log.d("mLog", "rgzbn_gm_ceiling_colors " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -990,7 +1062,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components");
-                        Log.d("mLog", "rgzbn_gm_ceiling_components "+id_array);
+                        Log.d("mLog", "rgzbn_gm_ceiling_components " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -1175,50 +1247,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             }
                         }
 
-                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_textures");
-                        Log.d(TAG, "rgzbn_gm_ceiling_textures " + id_array);
-                        for (int i = 0; i < id_array.length(); i++) {
-
-                            count_m = 0;
-                            org.json.JSONObject text = id_array.getJSONObject(i);
-
-                            String id = text.getString("id");
-                            String texture_title = text.getString("texture_title");
-                            String texture_colored = text.getString("texture_colored");
-
-                            values = new ContentValues();
-                            values.put(DBHelper.KEY_ID, id);
-                            values.put(DBHelper.KEY_TEXTURE_TITLE, texture_title);
-                            values.put(DBHelper.KEY_TEXTURE_COLORED, texture_colored);
-
-                            String sqlQuewy = "SELECT * "
-                                    + "FROM rgzbn_gm_ceiling_textures" +
-                                    " WHERE _id = ?";
-                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
-                            if (c != null) {
-                                if (c.moveToFirst()) {
-                                    do {
-                                        Log.d("mLog", "upd " + String.valueOf(values));
-                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, values, "_id = ?", new String[]{id});
-                                        count_m++;
-                                    } while (c.moveToNext());
-                                }
-                            }
-
-                            c.close();
-
-                            if (count_m == 0) {
-                                try {
-                                    Log.d("mLog", "ins " + String.valueOf(values));
-                                    values.put(DBHelper.KEY_ID, id);
-                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_TEXTURES, null, values);
-
-                                } catch (Exception e) {
-                                    Log.d("responce", String.valueOf(e));
-                                }
-                            }
-                        }
-
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_status");
                         Log.d(TAG, "rgzbn_gm_ceiling_status " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
@@ -1269,7 +1297,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         values.put(DBHelper.KEY_CHANGE_TIME, t);
                         db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"material"});
 
-                        new Send_Mounters().execute();
                     } catch (Exception e) {
                     }
 
@@ -1316,7 +1343,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d(TAG, "Send_Mounters " + res);
+                    Log.d(TAG, "Send_Mounters MAINACTIVITY " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -1328,17 +1355,21 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         org.json.JSONObject dat = new org.json.JSONObject(res);
 
                         JSONArray id_array = dat.getJSONArray("rgzbn_users");
+                        Log.d("responce", "USERS = "  + String.valueOf(id_array));
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
                             org.json.JSONObject user = id_array.getJSONObject(i);
 
-                            Log.d(TAG, "users  = " + user);
-
                             String id = user.getString("id");
                             String name = user.getString("name");
                             String username = user.getString("username");
                             String email = user.getString("email");
+                            String associated_client = "";
+                            try {
+                                associated_client = user.getString("associated_client");
+                            } catch (Exception e) {
+                            }
 
                             values = new ContentValues();
                             values.put(DBHelper.KEY_ID, id);
@@ -1346,6 +1377,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             values.put(DBHelper.KEY_NAME, name);
                             values.put(DBHelper.KEY_USERNAME, username);
                             values.put(DBHelper.KEY_EMAIL, email);
+                            values.put(DBHelper.KEY_ASSOCIATED_CLIENT, associated_client);
 
                             String sqlQuewy = "SELECT * "
                                     + "FROM rgzbn_users" +
@@ -1364,11 +1396,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                             if (count_m == 0) {
                                 try {
-
                                     db.insert(DBHelper.TABLE_USERS, null, values);
-
                                 } catch (Exception e) {
-                                    Log.d("responce", String.valueOf(e));
                                 }
                             }
 
@@ -1457,10 +1486,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             count_m = 0;
                             org.json.JSONObject comp = id_array.getJSONObject(i);
 
+                            String id = comp.getString("id");
                             String id_mounter = comp.getString("id_mounter");
                             String id_brigade = comp.getString("id_brigade");
 
                             values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, id);
                             values.put(DBHelper.KEY_ID_MOUNTER, id_mounter);
                             values.put(DBHelper.KEY_ID_BRIGADE, id_brigade);
 
@@ -1476,19 +1507,15 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     } while (c.moveToNext());
                                 }
                             }
-
                             c.close();
 
                             if (count_m == 0) {
                                 try {
-
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, null, values);
-
                                 } catch (Exception e) {
                                     Log.d("responce", String.valueOf(e));
                                 }
                             }
-
                         }
 
                         values = new ContentValues();
@@ -1498,7 +1525,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         values.put(DBHelper.KEY_CHANGE_TIME, t);
                         db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"mount"});
 
-                        new Send_Dealer().execute();
                     } catch (Exception e) {
                         Log.d(TAG, "send error " + String.valueOf(e));
                     }
@@ -1538,13 +1564,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         @Override
         protected Void doInBackground(final Void... params) {
-            // try {
 
             StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String res) {
 
-                    Log.d(TAG, "Send_Dealer " + res);
+                    Log.d(TAG, "Send_Dealer MAINACTIVITY " + res);
 
                     SQLiteDatabase db;
                     db = dbHelper.getWritableDatabase();
@@ -1775,6 +1800,48 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             }
                         }
 
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_recoil_map_project");
+                        for (int i = 0; i < id_array.length(); i++) {
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
+
+                            String id = user.getString("id");
+                            String recoil_id = user.getString("recoil_id");
+                            String project_id = user.getString("project_id");
+                            String sum = user.getString("sum");
+                            String date_time = user.getString("date_time");
+                            String comment = user.getString("comment");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_RECOIL_ID, recoil_id);
+                            values.put(DBHelper.KEY_PROJECT_ID, project_id);
+                            values.put(DBHelper.KEY_SUM, sum);
+                            values.put(DBHelper.KEY_DATE_TIME, date_time);
+                            values.put(DBHelper.KEY_COMMENT, comment);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_recoil_map_project" +
+                                    " WHERE _id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    values.put(DBHelper.KEY_ID, id);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, null, values);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_dealer_price");
                         String user_id = "";
                         for (int i = 0; i < id_array.length(); i++) {
@@ -1899,6 +1966,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                         if ((count_c > 0 && count_p > 0) || user_id.equals("1")) {
 
+                        } else {
+                            jsonDealer.put("dealer_id", "1");
+                            jsonDealer.put("change_time", "0000-00-00 00:00:00");
+                            dealer = String.valueOf(jsonDealer);
+                            new Send_Dealer().execute();
+                        }
+
+                        if (usergroup == 22) {
                             values = new ContentValues();
                             Time time = new Time(Time.getCurrentTimezone());
                             time.setToNow();
@@ -1907,9 +1982,29 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
 
                             Send_All.Alarm.setAlarm(MainActivity.this);
-                            startService(new Intent(MainActivity.this, Send_All.class));
+                            //startService(new Intent(MainActivity.this, Send_All.class));
 
-                            Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+                            //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+                            startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+
+                            Intent intent = new Intent(MainActivity.this, Gager_office.class);
+                            startActivity(intent);
+                            finish();
+
+                            mProgressDialog.dismiss();
+
+                        } else if (usergroup == 14) {
+                            values = new ContentValues();
+                            Time time = new Time(Time.getCurrentTimezone());
+                            time.setToNow();
+                            String t = time.format("%Y-%m-%d %H:%M:00");
+                            values.put(DBHelper.KEY_CHANGE_TIME, t);
+                            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
+
+                            Send_All.Alarm.setAlarm(MainActivity.this);
+                            //startService(new Intent(MainActivity.this, Send_All.class));
+
+                            //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
                             startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                             Intent intent = new Intent(MainActivity.this, Dealer_office.class);
@@ -1917,18 +2012,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             finish();
 
                             mProgressDialog.dismiss();
-
-                        } else {
-                            jsonDealer.put("dealer_id", "1");
-                            jsonDealer.put("change_time", "0000-00-00 00:00:00");
-                            dealer = String.valueOf(jsonDealer);
-                            new Send_Dealer().execute();
                         }
-
 
                     } catch (Exception e) {
                         Log.d(TAG, String.valueOf(e));
                     }
+
                 }
 
             }, new Response.ErrorListener() {
@@ -1951,5 +2040,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             return null;
         }
     }
+
 
 }

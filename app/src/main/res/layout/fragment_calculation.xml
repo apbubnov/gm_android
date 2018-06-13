@@ -180,15 +180,32 @@
 
             </LinearLayout>
 
-
-            <Button
+            <LinearLayout
                 android:id="@+id/general_hide"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_button_question"
-                android:text="Добавить монтаж и комплектующие"
-                android:textColor="#ffffff" />
+                android:clickable="true"
+                android:gravity="center"
+                android:onClick="general_hide"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:adjustViewBounds="true"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp"
+                    android:src="@drawable/screwdriver" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="ДОБАВИТЬ МОНТАЖ И КОМПЛЕКТУЮЩИЕ"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/general_layout"
@@ -209,18 +226,19 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingTop="5dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="Изменить прайс монтажа"
-                        android:layout_weight="1"
                         android:textColor="#43358c" />
 
                     <Button
+                        android:id="@+id/priceMount"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="5dp"
@@ -229,7 +247,6 @@
                         android:gravity="center"
                         android:stateListAnimator="@null"
                         android:text="Изменить"
-                        android:id="@+id/priceMount"
                         android:textColor="#ffffff" />
                 </LinearLayout>
 
@@ -241,14 +258,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/buguette_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Крепёжный профиль"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/profil" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="КРЕПЕЖНЫЙ ПРОФИЛЬ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/buguette_help"
@@ -318,14 +354,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/vstavka_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Декоративная вставка"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/insert" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДЕКОРАТИВНАЯ ВСТАВКА"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/vstavka_help"
@@ -408,14 +463,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/lustr_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Добавить люстры"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/lamp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДОБАВИТЬ ЛЮСТРЫ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/lustr_help"
@@ -464,14 +538,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/svetiln_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Добавить светильники"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/lamps" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДОБАВИТЬ СВЕТИЛЬНИКИ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/svetiln_help"
@@ -500,14 +593,16 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:layout_span="2"
                                 android:gravity="center"
-                                android:layout_marginRight="5dp"
                                 android:text="Кол-во" />
 
                             <TextView
@@ -522,8 +617,8 @@
                                 style="@style/text_style_spisok"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_span="3"
                                 android:layout_marginLeft="5dp"
+                                android:layout_span="3"
                                 android:gravity="center"
                                 android:text="Диаметр" />
 
@@ -535,32 +630,35 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <EditText
                                 android:id="@+id/count_fixtures"
                                 android:layout_width="wrap_content"
-                                android:layout_height="40dp"
+                                android:layout_height="match_parent"
                                 android:layout_marginRight="5dp"
+                                android:layout_span="2"
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
-                                android:layout_span="2"
                                 android:inputType="number"
+                                android:maxLength="3"
                                 android:paddingLeft="5dp" />
 
                             <Spinner
                                 android:id="@+id/spinner_vid_fixtures"
                                 style="@style/spinner_style"
                                 android:layout_width="wrap_content"
-                                android:layout_span="3"
-                                android:layout_height="40dp"/>
+                                android:layout_height="40dp"
+                                android:layout_span="3" />
 
                             <Spinner
                                 android:id="@+id/spinner_diametr_fixtures"
                                 style="@style/spinner_style"
                                 android:layout_width="wrap_content"
-                                android:layout_span="3"
                                 android:layout_height="40dp"
-                                android:layout_marginLeft="5dp"/>
+                                android:layout_marginLeft="5dp"
+                                android:layout_span="3" />
 
                         </TableRow>
                     </TableLayout>
@@ -595,15 +693,16 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:layout_span="2"
                                 android:gravity="center"
-                                android:layout_marginRight="5dp"
                                 android:text="Кол-во" />
 
                             <TextView
@@ -619,9 +718,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="5dp"
+                                android:layout_marginLeft="5dp"
                                 android:layout_span="3"
                                 android:gravity="center"
-                                android:layout_marginLeft="5dp"
                                 android:text="Лампа" />
                         </TableRow>
                     </TableLayout>
@@ -631,7 +730,9 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <EditText
                                 android:id="@+id/count_ecola"
                                 android:layout_width="wrap_content"
@@ -641,6 +742,7 @@
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
                                 android:inputType="number"
+                                android:maxLength="3"
                                 android:paddingLeft="5dp" />
 
                             <Spinner
@@ -648,16 +750,15 @@
                                 style="@style/spinner_style"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
-                                android:layout_gravity="center"
                                 android:layout_marginRight="5dp"
-                                android:layout_span="2"/>
+                                android:layout_span="3" />
 
                             <Spinner
                                 android:id="@+id/spinner_diametr_ecola"
                                 style="@style/spinner_style"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="40dp"
-                                android:layout_span="3"/>
+                                android:layout_span="3" />
 
                         </TableRow>
                     </TableLayout>
@@ -688,14 +789,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/cabling_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Провод"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/wire" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ПРОВОД"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/cabling_help"
@@ -741,14 +861,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/karniz_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Добавить шторный карниз"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/cornice" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДОБАВИТЬ ШТОРНЫЙ КАРНИЗ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/karniz_help"
@@ -805,7 +944,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginBottom="5dp"
                         android:layout_marginTop="5dp"
                         android:orientation="horizontal">
 
@@ -832,15 +970,16 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:layout_span="2"
                                 android:gravity="center"
-                                android:layout_marginRight="5dp"
                                 android:text="Кол-во" />
 
                             <TextView
@@ -868,17 +1007,20 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <EditText
                                 android:id="@+id/count_cornice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_marginRight="5dp"
                                 android:layout_span="2"
-                                android:paddingLeft="5dp"
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
-                                android:inputType="number" />
+                                android:inputType="number"
+                                android:maxLength="3"
+                                android:paddingLeft="5dp" />
 
                             <Spinner
                                 android:id="@+id/spinner_vid_cornice"
@@ -886,15 +1028,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_gravity="center"
-                                android:layout_span="3"/>
+                                android:layout_span="3" />
 
                             <Spinner
                                 android:id="@+id/spinner_diametr_cornice"
                                 style="@style/spinner_style"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
-                                android:layout_span="3"
-                                android:layout_marginLeft="5dp"/>
+                                android:layout_marginLeft="5dp"
+                                android:layout_span="3" />
 
                         </TableRow>
                     </TableLayout>
@@ -925,14 +1067,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/pipes_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Добавить трубы входящие в потолок "
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/pipes" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДОБАВИТЬ ВХОДЯЩИЕ В ПОТОЛОК"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/pipes_help"
@@ -960,8 +1121,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-
-
                     </LinearLayout>
 
                     <TableLayout
@@ -969,7 +1128,9 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
@@ -982,9 +1143,9 @@
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
                                 android:layout_span="2"
                                 android:gravity="center"
-                                android:layout_marginLeft="5dp"
                                 android:text="Диаметр" />
 
                         </TableRow>
@@ -995,16 +1156,19 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <EditText
                                 android:id="@+id/count_pipes"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_span="2"
-                                android:paddingLeft="5dp"
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
-                                android:inputType="number"/>
+                                android:inputType="number"
+                                android:maxLength="3"
+                                android:paddingLeft="5dp" />
 
                             <Spinner
                                 android:id="@+id/spinner_diametr_pipes"
@@ -1012,7 +1176,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
-                                android:layout_span="2"/>
+                                android:layout_span="2" />
 
                         </TableRow>
                     </TableLayout>
@@ -1020,8 +1184,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-                    </LinearLayout>
+                        android:orientation="horizontal"></LinearLayout>
 
                     <Button
                         android:id="@+id/btn_add_pipes"
@@ -1049,14 +1212,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/bond_beam_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Закладная брусом"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/bar" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ЗАКЛАДНАЯ БРУСОМ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/bond_beam_help"
@@ -1092,14 +1274,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/separator_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Разделитель"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/delimiter" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="РАЗДЕЛИТЕЛЬ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/separator_help"
@@ -1135,14 +1336,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/mount_wall_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Метраж стен с плиткой"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/tile" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="МЕТРАЖ СТЕН С ПЛИТКОЙ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/mount_wall_help"
@@ -1158,17 +1378,51 @@
                     </TableRow>
                 </TableLayout>
 
-                <EditText
-                    android:id="@+id/mount_wall"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="м."
-                    android:inputType="numberDecimal"
-                    android:paddingLeft="5dp"
-                    android:textColor="#000000"
-                    android:visibility="gone" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/layout_wall"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="left"
+                        android:text="Керамическая"
+                        android:textColor="#43358c" />
+
+                    <EditText
+                        android:id="@+id/mount_wall"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/edit_text_style"
+                        android:hint="м."
+                        android:inputType="numberDecimal"
+                        android:paddingLeft="5dp"
+                        android:textColor="#000000"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="left"
+                        android:text="Керамогранит"
+                        android:textColor="#43358c" />
+
+                    <EditText
+                        android:id="@+id/mount_granite"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/edit_text_style"
+                        android:hint="м."
+                        android:inputType="numberDecimal"
+                        android:paddingLeft="5dp"
+                        android:textColor="#000000"/>
+                </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
@@ -1178,57 +1432,33 @@
 
                     <TableRow>
 
-                        <Button
-                            android:id="@+id/mount_granite_hide"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_span="7"
-                            android:background="@drawable/rounded_button_question"
-                            android:text="Метраж стен с керамогранитом"
-                            android:textColor="#ffffff" />
-
-                        <Button
-                            android:id="@+id/mount_granite_help"
-                            android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_span="1"
-                            android:background="@drawable/rounded_button_question"
-                            android:stateListAnimator="@null"
-                            android:text="\?"
-                            android:textColor="#ffffff"
-                            android:textSize="20dp" />
-                    </TableRow>
-                </TableLayout>
-
-                <EditText
-                    android:id="@+id/mount_granite"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/edit_text_style"
-                    android:hint="м."
-                    android:inputType="numberDecimal"
-                    android:paddingLeft="5dp"
-                    android:textColor="#000000"
-                    android:visibility="gone" />
-
-                <TableLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="10dp"
-                    android:stretchColumns="0,3,5">
-
-                    <TableRow>
-
-                        <Button
+                        <LinearLayout
                             android:id="@+id/wall_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Усиление стен"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/amplifier" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="УСИЛЕНИЕ СТЕН"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/wall_help"
@@ -1264,14 +1494,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/fasteners_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Дополнительный крепеж"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/screw" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДОПОЛНИТЕЛЬНЫЙ КРЕПЕЖ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/fasteners_help"
@@ -1307,14 +1556,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/fire_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Пожарная сигнализация"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/firealarm" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ПОЖАРНАЯ СИГНАЛИЗАЦИЯ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/fire_help"
@@ -1350,14 +1618,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/add_vent_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Вентиляция "
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/hood" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ВЕНТИЛЯЦИЯ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/add_vent_help"
@@ -1386,6 +1673,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
@@ -1409,9 +1697,9 @@
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:layout_span="3"
                                 android:layout_marginLeft="5dp"
+                                android:layout_span="3"
+                                android:gravity="center"
                                 android:text="Размер" />
                         </TableRow>
                     </TableLayout>
@@ -1421,16 +1709,18 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
+
                             <EditText
                                 android:id="@+id/count_hoods"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
+                                android:layout_marginRight="5dp"
                                 android:layout_span="2"
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
                                 android:inputType="number"
-                                android:layout_marginRight="5dp"
                                 android:minWidth="100dp"
                                 android:paddingLeft="5dp" />
 
@@ -1448,7 +1738,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
-                                android:layout_span="3"/>
+                                android:layout_span="3" />
                         </TableRow>
                     </TableLayout>
 
@@ -1478,14 +1768,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/add_diff_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Диффузор "
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/diffuser" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДИФФУЗОР"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/add_diff_help"
@@ -1514,15 +1823,16 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:layout_span="2"
                                 android:gravity="center"
-                                android:layout_marginRight="5dp"
                                 android:text="Кол-во" />
 
                             <TextView
@@ -1592,14 +1902,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/soaring_ceiling_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Парящий потолок"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/paryashii" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ПАРЯЩИЙ ПОТОЛОК"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/soaring_ceiling_help"
@@ -1635,14 +1964,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/add_profile_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Переход уровня "
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/perehod" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ПЕРЕХОД УРОВНЯ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/add_profile_help"
@@ -1671,14 +2019,15 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_span="2"
                                 android:layout_marginRight="5dp"
+                                android:layout_span="2"
                                 android:gravity="center"
                                 android:text="Кол-во" />
 
@@ -1698,18 +2047,20 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <EditText
                                 android:id="@+id/count_profile"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
-                                android:layout_span="2"
                                 android:layout_marginRight="5dp"
+                                android:layout_span="2"
                                 android:background="@drawable/edit_text_style"
-                                android:hint="Кол-во"
-                                android:paddingLeft="5dp"
-                                android:inputType="number" />
+                                android:hint="м."
+                                android:inputType="number"
+                                android:maxLength="3"
+                                android:paddingLeft="5dp" />
 
                             <Spinner
                                 android:id="@+id/spinner_vid_profile"
@@ -1717,7 +2068,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_gravity="center"
-                                android:layout_span="2"/>
+                                android:layout_span="2" />
 
                         </TableRow>
                     </TableLayout>
@@ -1748,14 +2099,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/in_cut_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Внутренний вырез (на месте)"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/virez" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ВНУТРЕННИЙ ВЫРЕЗ (НА МЕСТЕ)"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/in_cut_help"
@@ -1791,14 +2161,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/in_cut_shop_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Внутренний вырез (в цеху)"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/virez" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ВНУТРЕННИЙ ВЫРЕЗ (В ЦЕХУ)"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/in_cut_shop_help"
@@ -1834,14 +2223,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/drain_the_water_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Слив воды"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/sliv" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="СЛИВ ВОДЫ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/drain_the_water_help"
@@ -1878,14 +2286,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/height_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Высота помещения"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/height" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ВЫСОТА ПОМЕЩЕНИЯ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/height_help"
@@ -1934,14 +2361,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/diff_acc_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Сложность доступа"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/slozhnost" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="СЛОЖНОСТЬ ДОСТУПА"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/diff_acc_help"
@@ -1977,14 +2423,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/add_other_comp_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Другие комплектующие"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/drcomplect" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДРУГИЕ КОМПЛЕКТУЮЩИЕ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/add_other_comp_help"
@@ -2013,6 +2478,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
@@ -2040,16 +2506,17 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <EditText
                                 android:id="@+id/count_comp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
-                                android:background="@drawable/edit_text_style"
-                                android:hint="Название"
                                 android:layout_marginRight="5dp"
                                 android:layout_span="2"
+                                android:background="@drawable/edit_text_style"
+                                android:hint="Название"
                                 android:paddingLeft="5dp" />
 
                             <EditText
@@ -2091,14 +2558,33 @@
 
                     <TableRow>
 
-                        <Button
+                        <LinearLayout
                             android:id="@+id/add_other_mount_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="40dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
-                            android:text="Другие монтажные работы"
-                            android:textColor="#ffffff" />
+                            android:clickable="true"
+                            android:gravity="center"
+                            android:onClick="general_hide"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="8dp"
+                                android:paddingTop="8dp"
+                                android:src="@drawable/hammer" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:text="ДРУГИЕ МОНТАЖНЫЕ РАБОТЫ"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
 
                         <Button
                             android:id="@+id/add_other_mount_help"
@@ -2127,6 +2613,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <TextView
@@ -2134,25 +2621,27 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="5dp"
-                                android:gravity="center"
                                 android:layout_span="2"
+                                android:gravity="center"
                                 android:text="Название " />
 
                             <TextView
                                 style="@style/text_style_spisok"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="center"
                                 android:layout_span="2"
+                                android:gravity="center"
                                 android:text="Стоимость" />
 
                         </TableRow>
                     </TableLayout>
+
                     <TableLayout
                         android:layout_width="fill_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
                         android:stretchColumns="*">
+
                         <TableRow>
 
                             <EditText

@@ -1,0 +1,408 @@
+body
+{
+	font-family: Arial, sans-serif;
+	background-color:#414390; 
+	background-image: -moz-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
+	background-image: -webkit-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
+	background-image: -o-linear-gradient(bottom, #414390 0%, #d3d3f9 100%);
+	background-image: -ms-linear-gradient(bottom, #414390 0% ,#d3d3f9 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d3d3f9', endColorstr='#d3d3f9',GradientType=0 );
+	background-image: linear-gradient(bottom, #414390 0% ,#d3d3f9 100%);
+}
+
+canvas
+{
+	display: inline-block;
+	margin-top: 10px;
+	margin-left: 10px;
+	width: calc(96% - 200px);
+	height: 96%;
+	min-height: 360px;
+	background: #EEEEEE;
+	border-radius: 4px;
+	border: 1px solid;
+}
+
+#back
+{
+	position: absolute;
+	width: 28px;
+	height: 28px;
+	margin-top: 9px;
+	margin-left: 163px;
+	text-align: center;
+	padding: 0px 0px;
+}
+
+#up
+{
+	position: absolute;
+	width: 38px;
+	height: 38px;
+	margin-top: 56px;
+	margin-left: 81px;
+}
+
+#down
+{
+	position: absolute;
+	width: 38px;
+	height: 38px;
+	margin-top: 103px;
+	margin-left: 81px;
+}
+
+#usadka
+{
+	position: absolute;
+	width: 60px;
+	height: 32px;
+	margin-top: 160px;
+	margin-left: 96px;
+}
+
+#usadka_label
+{
+	position: absolute;
+	margin-top: 162px;
+	margin-left: 20px;
+}
+
+#procent_label
+{
+	position: absolute;
+	margin-top: 162px;
+	margin-left: 160px;
+}
+
+#ugol
+{
+	position: absolute;
+	width: 56px;
+	height: 32px;
+	margin-top: 210px;
+	margin-left: 110px;
+}
+
+#ugol_label
+{
+	position: absolute;
+	margin-top: 212px;
+	margin-left: 20px;
+}
+
+#deg_label
+{
+	position: absolute;
+	margin-top: 210px;
+	margin-left: 170px;
+}
+
+#width_polotna
+{
+	position: absolute;
+	width: 60px;
+	height: 32px;
+	margin-top: 260px;
+	margin-left: 106px;
+}
+
+#plus
+{
+	position: absolute;
+	width: 38px;
+	height: 38px;
+	margin-top: 82px;
+	margin-left: 126px;
+}
+
+#minus
+{
+	position: absolute;
+	width: 38px;
+	height: 38px;
+	margin-top: 82px;
+	margin-left: 36px;
+}
+
+#width_label
+{
+	position: absolute;
+	margin-top: 262px;
+	margin-left: 20px;
+}
+
+#cut
+{
+	position: absolute;
+	width: 182px;
+	height: 38px;
+	margin-top: 360px;
+	margin-left: 9px;
+}
+
+#open_popup
+{
+	width: 182px;
+	height: 38px;
+	position: absolute;
+	bottom: 9px;
+	margin-left: 9px;
+}
+
+#btn_cut_label
+{
+	margin-top: 2px;
+	cursor: pointer;
+}
+
+#btn_ok_label
+{
+	margin-top: 2px;
+	cursor: pointer;
+}
+
+#panel_cont
+{
+	display: inline-block;
+}
+
+#panel
+{
+	position: relative;
+	margin: 0px auto;
+	width: 200px;
+	height: 96%;
+	min-height: 360px;
+	background: #d3d3f9;
+	border: 1px solid;
+	border-radius: 4px;
+	font-size: 14pt;
+}
+
+@media screen and (orientation: portrait) {
+
+	canvas
+	{
+		display: inline-block;
+		margin-top: 10px;
+		margin-left: 10px;
+		width: 96%;
+		height: calc(96% - 160px);
+		min-height: 0px;
+		background: #EEEEEE;
+		border-radius: 4px;
+		border: 1px solid;
+	}
+
+	#panel_cont
+	{
+		display: block;
+	}
+
+	#panel
+	{
+		position: relative;
+		margin: 0px auto;
+		margin-left: 10px;
+		margin-top: 10px;
+		width: 96%;
+		height: 150px;
+		min-height: 150px;
+		background: #d3d3f9;
+		border: 1px solid;
+		border-radius: 4px;
+		font-size: 14pt;
+	}
+
+	#back
+	{
+		position: absolute;
+		width: 28px;
+		height: 28px;
+		margin-top: 9px;
+		margin-left: 0px;
+		right: 9px;
+		text-align: center;
+		padding: 0px 0px;
+	}
+
+	#up
+	{
+		position: absolute;
+		width: 38px;
+		height: 38px;
+		margin-top: 34px;
+		margin-left: 50px;
+	}
+
+	#down
+	{
+		position: absolute;
+		width: 38px;
+		height: 38px;
+		margin-top: 0px;
+		bottom: 34px;
+		margin-left: 50px;
+	}
+
+	#minus
+	{
+		position: absolute;
+		width: 38px;
+		height: 38px;
+		margin-top: 54px;
+		margin-left: 9px;
+	}
+
+	#plus
+	{
+		position: absolute;
+		width: 38px;
+		height: 38px;
+		margin-top: 54px;
+		margin-left: 92px;
+	}
+
+	#usadka
+	{
+		position: absolute;
+		width: 60px;
+		height: 32px;
+		margin-top: 14px;
+		margin-left: 216px;
+	}
+
+	#usadka_label
+	{
+		position: absolute;
+		margin-top: 16px;
+		margin-left: 142px;
+	}
+
+	#procent_label
+	{
+		position: absolute;
+		margin-top: 16px;
+		margin-left: 282px;
+	}
+
+	#ugol
+	{
+		position: absolute;
+		width: 56px;
+		height: 32px;
+		margin-top: 60px;
+		margin-left: 230px;
+	}
+
+	#ugol_label
+	{
+		position: absolute;
+		margin-top: 62px;
+		margin-left: 140px;
+	}
+
+	#deg_label
+	{
+		position: absolute;
+		margin-top: 60px;
+		margin-left: 290px;
+	}
+
+	#width_polotna
+	{
+		position: absolute;
+		width: 60px;
+		height: 32px;
+		margin-top: 0px;
+		margin-left: 226px;
+		bottom: 9px;
+	}
+
+	#width_label
+	{
+		position: absolute;
+		margin-top: 0px;
+		margin-left: 140px;
+		bottom: 9px;
+	}
+
+	#cut
+	{
+		position: absolute;
+		width: 38px;
+		height: 38px;
+		margin-top: 50px;
+		margin-left: 0px;
+		right: 9px;
+	}
+
+	#open_popup
+	{
+		width: 38px;
+		height: 38px;
+		position: absolute;
+		bottom: 9px;
+		margin-left: 0px;
+		right: 9px;
+	}
+
+	#btn_cut_label
+	{
+		display: none;
+		margin-top: 2px;
+	}
+
+	#btn_ok_label
+	{
+		display: none;
+		margin-top: 2px;
+	}
+}
+/*PRELOADER*/
+.PRELOADER_GM
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: inline-block;
+	background-color: rgb(54,53,127);
+	width: 100vw;
+	height: 100vh;
+	line-height: 100vh;
+	text-align: center;
+	z-index: 1000;
+}
+.PRELOADER_GM_OPACITY
+{
+	background-color: rgba(54,53,127,.7);
+}
+.PRELOADER_GM .PRELOADER_BLOCK {
+	position: absolute;
+	top: calc(100%/2 - 110px);
+	left: calc(100%/2 - 110px);
+	width: 220px;
+	height: 220px;
+	display: inline-block;
+	transform: rotate(0deg);
+	border: 10px dashed rgb(255,255,255);
+	border-radius: 110px;
+	animation: PRELOADER 4s infinite linear;
+	z-index: 1001;
+}
+.PRELOADER_GM .PRELOADER_IMG {
+	position: absolute;
+	top: calc(100%/2 - 100px);
+	left: calc(100%/2 - 100px);
+	width: 200px;
+	height: 200px;
+	vertical-align: middle;
+	text-align: center;
+	transform: rotate(0deg);
+	z-index: 1002;
+}
+@keyframes PRELOADER {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(359deg); }
+}

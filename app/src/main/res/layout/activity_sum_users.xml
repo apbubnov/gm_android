@@ -1,0 +1,166 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/backgroun"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/sumTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="Детализация счета"
+        android:textColor="#000"
+        android:textSize="17dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="Выбрать с  "
+            android:textColor="#000" />
+
+        <TextView
+            android:id="@+id/first_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_style"
+            android:gravity="center|left"
+            android:hint="дд.мм.гггг"
+            android:onClick="firstSetDate"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="right"
+            android:text=" по  "
+            android:textColor="#000" />
+
+        <TextView
+            android:id="@+id/second_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_style"
+            android:gravity="center|left"
+            android:hint="дд.мм.гггг"
+            android:onClick="SecondSetDate"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/show"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button"
+            android:text=" Показать "
+            android:textColor="#ffffff"
+            android:textSize="12dp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/show_all"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/rounded_button"
+        android:padding="5dp"
+        android:text="  Показать все  "
+        android:textColor="#ffffff" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="7dp"
+        android:stretchColumns="*">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/c_number"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="2"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="№"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_address"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Дата"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_price"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Сумма"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_income"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Комментарий"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <ListView
+            android:id="@+id/list_client"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></ListView>
+
+    </TableLayout>
+</LinearLayout>

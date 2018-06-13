@@ -2,11 +2,13 @@ package ru.ejevikaapp.gm_android.Dealer;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -34,6 +36,12 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
 
     View view;
     public TextView name_org;
+    Button sum_users;
+
+    DBHelper dbHelper;
+    SQLiteDatabase db;
+
+    String user_id;
 
     public Fragment_Home() {
         // Required empty public constructor
@@ -57,7 +65,8 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
 
-        Log.d("Fragment 1", "onResume");
+        dbHelper = new DBHelper(getActivity());
+        db = dbHelper.getReadableDatabase();
 
         String avatar_user = "";
         try {
@@ -67,15 +76,19 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         }
 
         SharedPreferences SP_end = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-        String user_id = SP_end.getString("", "");
-
-        Log.d("mLog", user_id);
-
-        DBHelper dbHelper = new DBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        user_id = SP_end.getString("", "");
 
         TextView txt_count_zamer = (TextView) view.findViewById(R.id.count_zamer);
         TextView txt_count_mount = (TextView) view.findViewById(R.id.count_mount);
+
+        sum_users = (Button) view.findViewById(R.id.sum_users);
+        sum_users.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ActivitySumUsers.class);
+                startActivity(intent);
+            }
+        });
 
         int count_zamer = 0;
         int count_mount = 0;
@@ -88,19 +101,23 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             if (c.moveToFirst()) {
                 do {
                     String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    if (HelperClass.associated_client(getActivity(), user_id, id_client)) {
 
-                    sqlQuewy = "SELECT project_info, project_status "
-                            + "FROM rgzbn_gm_ceiling_projects " +
-                            "where client_id = ? and project_status = 1";
-                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
-                    if (cc != null) {
-                        if (cc.moveToFirst()) {
-                            do {
-                                count_zamer++;
-                            } while (cc.moveToNext());
+                    } else {
+
+                        sqlQuewy = "SELECT project_info, project_status "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where client_id = ? and project_status = 1";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    count_zamer++;
+                                } while (cc.moveToNext());
+                            }
                         }
+                        cc.close();
                     }
-                    cc.close();
                 } while (c.moveToNext());
             }
         }
@@ -119,19 +136,22 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             if (c.moveToFirst()) {
                 do {
                     String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    if (HelperClass.associated_client(getActivity(), user_id, id_client)) {
 
-                    sqlQuewy = "SELECT project_info, project_status "
-                            + "FROM rgzbn_gm_ceiling_projects " +
-                            "where client_id = ? and (project_status = 10 or project_status = 5 or project_status = 4)";
-                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
-                    if (cc != null) {
-                        if (cc.moveToFirst()) {
-                            do {
-                                count_mount++;
-                            } while (cc.moveToNext());
+                    } else {
+                        sqlQuewy = "SELECT project_info, project_status "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where client_id = ? and (project_status = 10 or project_status = 5 or project_status = 4)";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    count_mount++;
+                                } while (cc.moveToNext());
+                            }
                         }
+                        cc.close();
                     }
-                    cc.close();
                 } while (c.moveToNext());
             }
         }
@@ -152,12 +172,20 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             // ava.setBackgroundResource(R.drawable.it_c);
         }
 
+        Typeface fontAwesomeFont = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf");
+
         Button btn_client = (Button) view.findViewById(R.id.btn_client);
+        btn_client.setTypeface(fontAwesomeFont);
         Button btn_zamer = (Button) view.findViewById(R.id.btn_zamer);
+        btn_zamer.setTypeface(fontAwesomeFont);
         Button btn_install = (Button) view.findViewById(R.id.btn_install);
+        btn_install.setTypeface(fontAwesomeFont);
         Button btn_add_zamer = (Button) view.findViewById(R.id.btn_add_zamer);
+        btn_add_zamer.setTypeface(fontAwesomeFont);
         Button price = (Button) view.findViewById(R.id.price);
+        price.setTypeface(fontAwesomeFont);
         Button analytics = (Button) view.findViewById(R.id.analytics);
+        analytics.setTypeface(fontAwesomeFont);
 
         String user_name = "";
 
@@ -184,6 +212,27 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         price.setOnClickListener(this);
         analytics.setOnClickListener(this);
 
+        sum_us();
+    }
+
+    void sum_us(){
+
+        dbHelper = new DBHelper(getActivity());
+        db = dbHelper.getReadableDatabase();
+        float sum = 0;
+        String sqlQuewy = "SELECT sum "
+                + "FROM rgzbn_gm_ceiling_recoil_map_project " +
+                "where recoil_id = ?";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    sum += c.getFloat(c.getColumnIndex(c.getColumnName(0)));
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+        sum_users.setText(sum+ " руб.");
     }
 
     @Override

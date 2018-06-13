@@ -27,7 +27,6 @@ import ru.ejevikaapp.gm_android.R;
 
 public class Activity_mounting_day extends AppCompatActivity {
 
-
     DBHelper dbHelper;
     ListView list_clients;
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();

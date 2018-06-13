@@ -2,6 +2,7 @@ package ru.ejevikaapp.gm_android.Fragments;
 
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,8 +37,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class Fragment_inform_proj extends Fragment implements View.OnClickListener {
 
-
-    String SAVED_ID="", select_id_project, imag, id_calc, s_setTitle, s_setMessage;
+    String SAVED_ID = "", select_id_project, imag, id_calc, s_setTitle, s_setMessage;
     Button upd_calc, delete_ceiling;
 
     View view;
@@ -59,7 +59,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
 
     public static Fragment_inform_proj newInstance(int page) {
         Fragment_inform_proj fragment = new Fragment_inform_proj();
-        Bundle args=new Bundle();
+        Bundle args = new Bundle();
         args.putInt("num", page);
         fragment.setArguments(args);
         return fragment;
@@ -83,27 +83,27 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
 
         titleViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        titleViewParams.setMargins(0,15,0,0);
+        titleViewParams.setMargins(0, 15, 0, 0);
 
-        upd_calc = (Button)view.findViewById(R.id.upd_calc);
+        upd_calc = (Button) view.findViewById(R.id.upd_calc);
         upd_calc.setOnClickListener(this);
 
-        delete_ceiling = (Button)view.findViewById(R.id.delete_ceiling);
+        delete_ceiling = (Button) view.findViewById(R.id.delete_ceiling);
         delete_ceiling.setOnClickListener(this);
 
-        id_cl = (TextView)view.findViewById(R.id.id_cl);
+        id_cl = (TextView) view.findViewById(R.id.id_cl);
         SharedPreferences SPI = this.getActivity().getSharedPreferences("id_cl", MODE_PRIVATE); //id_client
-        id_calc = SPI.getString(SAVED_ID,"");
+        id_calc = SPI.getString(SAVED_ID, "");
         id_cl.setText(id_calc);
 
         SPI = this.getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE); //id_project
-        select_id_project = SPI.getString(SAVED_ID,"");
+        select_id_project = SPI.getString(SAVED_ID, "");
 
-        id_pagenumber = (TextView)view.findViewById(R.id.id_pagenumber);
+        id_pagenumber = (TextView) view.findViewById(R.id.id_pagenumber);
         id_pagenumber.setText(String.valueOf(pageNumber));
 
-        image = (ImageView)view.findViewById(R.id.id_image);
-        id_polotna = (ImageView)view.findViewById(R.id.id_polotna);
+        image = (ImageView) view.findViewById(R.id.id_image);
+        id_polotna = (ImageView) view.findViewById(R.id.id_polotna);
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -125,7 +125,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         try {
             Sharp.loadString(imag)
                     .into(image);
-        }catch (Exception e){
+        } catch (Exception e) {
             linear_head.setVisibility(View.GONE);
         }
 
@@ -142,30 +142,30 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     String n3 = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
                     try {
-                    String title1 = null;
-                    int n1 = 0, n2 = 0;
+                        String title1 = null;
+                        int n1 = 0, n2 = 0;
 
-                    sqlQuewy = "SELECT  texture_id, manufacturer_id "
-                            + "FROM rgzbn_gm_ceiling_canvases" +
-                            " WHERE _id = ?";
-                    Cursor k = db.rawQuery(sqlQuewy, new String[]{n3});
+                        sqlQuewy = "SELECT  texture_id, manufacturer_id "
+                                + "FROM rgzbn_gm_ceiling_canvases" +
+                                " WHERE _id = ?";
+                        Cursor k = db.rawQuery(sqlQuewy, new String[]{n3});
 
-                    if (k != null) {
-                        if (k.moveToFirst()) {
-                            do {
-                                n1 = k.getInt(k.getColumnIndex(k.getColumnName(0)));
-                                n2 = k.getInt(k.getColumnIndex(k.getColumnName(1)));
-                            } while (k.moveToNext());
+                        if (k != null) {
+                            if (k.moveToFirst()) {
+                                do {
+                                    n1 = k.getInt(k.getColumnIndex(k.getColumnName(0)));
+                                    n2 = k.getInt(k.getColumnIndex(k.getColumnName(1)));
+                                } while (k.moveToNext());
+                            }
                         }
-                    }
-                    k.close();
+                        k.close();
 
-                    if (n1 == 29){
-                        title1 = "Ткань";
-                    } else title1 = "ПВХ";
+                        if (n1 == 29) {
+                            title1 = "Ткань";
+                        } else title1 = "ПВХ";
 
-                    TextView mat_1 = (TextView) view.findViewById(R.id.mat_1);
-                    mat_1.setText(mat_1.getText() + "  " + title1);
+                        TextView mat_1 = (TextView) view.findViewById(R.id.mat_1);
+                        mat_1.setText(mat_1.getText() + "  " + title1);
 
                         sqlQuewy = "SELECT  texture_title "
                                 + "FROM rgzbn_gm_ceiling_textures" +
@@ -219,7 +219,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                             }
                         }
                         k.close();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                     }
 
                     String color = c.getString(c.getColumnIndex(c.getColumnName(20)));
@@ -253,62 +253,61 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                     raz_2.setText(raz_2.getText() + "  " + n5);
 
                     String n28 = c.getString(c.getColumnIndex(c.getColumnName(21)));
-
-                    if (n28 == null) {
+                    if (n28 == null || n28.equals("")) {
                         n28 = "0";
                     }
 
                     if (imag.equals("")) {
-                    } else if (n28.equals("3")||n28.equals("3.0")) {
+                    } else if (n28.equals("3") || n28.equals("3.0")) {
                         textt("Багет");
                         textv("Обычный багет");
-                    } else if (n28.equals("1")||n28.equals("1.0")) {
+                    } else if (n28.equals("1") || n28.equals("1.0")) {
                         textt("Багет");
                         textv("Потолочный багет");
-                    } else if (n28.equals("2")||n28.equals("2.0")) {
+                    } else if (n28.equals("2") || n28.equals("2.0")) {
                         textt("Багет");
                         textv("Аллюминиевый багет");
                     }
 
-                   String n6 = c.getString(c.getColumnIndex(c.getColumnName(3)));
-                   try {
-                       if (n6.equals("314")) {
-                           textt("Вставка");
-                           textv("Белая вставка");
-                       } else
-                           try {
-                               if (Integer.parseInt(n6) != 314 && Integer.parseInt(n6) != 0) {
-                                   textt("Вставка");
-                                   String hex = "";
-                                   sqlQuewy = "SELECT title, hex "
-                                           + "FROM rgzbn_gm_ceiling_colors" +
-                                           " WHERE title = ? ";
-                                   Cursor cc = db.rawQuery(sqlQuewy, new String[]{n6});
-                                   if (cc != null) {
-                                       if (cc.moveToFirst()) {
-                                           Log.d("mLog color2", n6);
-                                           String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                           hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
-                                           textv("Цветная " + title);
-                                       }
-                                   }
-                                   cc.close();
-                                   ImageView im = new ImageView(getActivity());
-                                   imageViewParams.height = 200;
-                                   imageViewParams.width = 300;
-                                   im.setLayoutParams(imageViewParams);
-                                   im.setBackgroundColor(Color.parseColor("#"+hex));
-                                   mainL.addView(im);
-                               }
-                           } catch (Exception e) {
+                    String n6 = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                    try {
+                        if (n6.equals("314")) {
+                            textt("Вставка");
+                            textv("Белая вставка");
+                        } else
+                            try {
+                                if (Integer.parseInt(n6) != 314 && Integer.parseInt(n6) != 0) {
+                                    textt("Вставка");
+                                    String hex = "";
+                                    sqlQuewy = "SELECT title, hex "
+                                            + "FROM rgzbn_gm_ceiling_colors" +
+                                            " WHERE title = ? ";
+                                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{n6});
+                                    if (cc != null) {
+                                        if (cc.moveToFirst()) {
+                                            Log.d("mLog color2", n6);
+                                            String title = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                            hex = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                                            textv("Цветная " + title);
+                                        }
+                                    }
+                                    cc.close();
+                                    ImageView im = new ImageView(getActivity());
+                                    imageViewParams.height = 200;
+                                    imageViewParams.width = 300;
+                                    im.setLayoutParams(imageViewParams);
+                                    im.setBackgroundColor(Color.parseColor("#" + hex));
+                                    mainL.addView(im);
+                                }
+                            } catch (Exception e) {
 
-                           }
-                   }catch (Exception e){
+                            }
+                    } catch (Exception e) {
 
-                   }
+                    }
 
                     String n12 = c.getString(c.getColumnIndex(c.getColumnName(9)));
-                    if (Integer.valueOf(n12) > 0){
+                    if (Integer.valueOf(n12) > 0) {
                         textt("Установка люстры");
                         n12 = n12 + " шт.";
                         textv(n12);
@@ -330,8 +329,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                                 str = k.getString(k.getColumnIndex(k.getColumnName(1)));
 
                                 sqlQuewy = "SELECT title "
-                                    + "FROM rgzbn_gm_ceiling_type" +
-                                    " WHERE _id = ?";
+                                        + "FROM rgzbn_gm_ceiling_type" +
+                                        " WHERE _id = ?";
                                 Cursor k1 = db.rawQuery(sqlQuewy, new String[]{str});
                                 if (k1 != null) {
                                     if (k1.moveToFirst()) {
@@ -387,7 +386,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                                 if (k1 != null) {
                                     if (k1.moveToFirst()) {
                                         do {
-                                            title += " Диаметр: " + k1.getString(k1.getColumnIndex(k1.getColumnName(0))) ;
+                                            title += " Диаметр: " + k1.getString(k1.getColumnIndex(k1.getColumnName(0)));
                                         } while (k1.moveToNext());
                                     }
                                 }
@@ -402,17 +401,17 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
 
 
                     String n27 = c.getString(c.getColumnIndex(c.getColumnName(19)));
-                    if (Double.valueOf(n27) > 0){
+                    if (!n27.equals("") && Double.valueOf(n27) > 0) {
                         textt("Шторный карниз");
                         n27 = n27 + " м.";
                     }
 
                     String n16 = c.getString(c.getColumnIndex(c.getColumnName(10)));
-                    if (Double.valueOf(n16) == 1){
+                    if (!n16.equals("") && Double.valueOf(n16) == 1) {
                         textv("Скрытый");
                     }
 
-                    if (n27.equals("0.0") || n27.equals("0")){
+                    if (n27.equals("0.0") || n27.equals("0")) {
                     } else {
                         textv(n27);
                     }
@@ -591,7 +590,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                                 if (k1 != null) {
                                     if (k1.moveToFirst()) {
                                         do {
-                                            title += " Размер: " + k1.getString(k1.getColumnIndex(k1.getColumnName(0))) ;
+                                            title += " Размер: " + k1.getString(k1.getColumnIndex(k1.getColumnName(0)));
                                         } while (k1.moveToNext());
                                     }
                                 }
@@ -632,152 +631,198 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                                     }
                                 }
                                 k1.close();
-
                                 textv(title);
-
                             } while (k.moveToNext());
                         }
                     }
                     k.close();
 
                     int angle = 0;
-                    if (c.getString(c.getColumnIndex(c.getColumnName(6))).equals("")){
-
+                    if (c.getString(c.getColumnIndex(c.getColumnName(6))).equals("")) {
                     } else {
                         angle = c.getInt(c.getColumnIndex(c.getColumnName(6)));
                     }
+                    String n7 = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                    if (n7.equals("null") || n7.equals("")) {
+                        n7 = "0";
+                    }
+                    String n8 = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                    if (n8.equals("null") || n8.equals("")) {
+                        n8 = "0";
+                    }
+                    String n17 = c.getString(c.getColumnIndex(c.getColumnName(11)));
+                    if (n17.equals("null") || n17.equals("")) {
+                        n17 = "0";
+                    }
+                    String n9 = c.getString(c.getColumnIndex(c.getColumnName(6)));
+                    if (n9.equals("null") || n9.equals("")) {
+                        n9 = "0";
+                    }
+                    String n10 = c.getString(c.getColumnIndex(c.getColumnName(7)));
+                    if (n10.equals("null") || n10.equals("")) {
+                        n10 = "0";
+                    }
+                    String n11 = c.getString(c.getColumnIndex(c.getColumnName(8)));
+                    if (n11.equals("null") || n11.equals("")) {
+                        n11 = "0";
+                    }
+                    String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(23)));
+                    if (cut_in_shop.equals("null") || cut_in_shop.equals("")) {
+                        cut_in_shop = "0";
+                    }
+                    String n18 = c.getString(c.getColumnIndex(c.getColumnName(12)));
+                    if (n18.equals("null") || n18.equals("")) {
+                        n18 = "0";
+                    }
+                    String n19 = c.getString(c.getColumnIndex(c.getColumnName(13)));
+                    if (n19.equals("null") || n19.equals("")) {
+                        n19 = "0";
+                    }
+                    String n30 = c.getString(c.getColumnIndex(c.getColumnName(22)));
+                    Log.d("mLog", pageNumber + " n30 = " + n30);
+                    if (n30.equals("null") || n30.equals("")) {
+                        n30 = "0";
+                    }
+                    Log.d("mLog", "n30 = " + n30);
+                    String n20 = c.getString(c.getColumnIndex(c.getColumnName(14)));
+                    if (n20.equals("null") || n20.equals("")) {
+                        n20 = "0";
+                    }
+                    String n21 = c.getString(c.getColumnIndex(c.getColumnName(15)));
+                    if (n21.equals("null") || n21.equals("")) {
+                        n21 = "0";
+                    }
+                    String n24 = c.getString(c.getColumnIndex(c.getColumnName(16)));
+                    if (n24.equals("null") || n24.equals("")) {
+                        n24 = "0";
+                    }
+                    String dop_krep = c.getString(c.getColumnIndex(c.getColumnName(18)));
+                    if (dop_krep.equals("null") || dop_krep.equals("")) {
+                        dop_krep = "0";
+                    }
+                    String drain = c.getString(c.getColumnIndex(c.getColumnName(24)));
+                    if (drain.equals("null") || drain.equals("")) {
+                        drain = "0";
+                    }
+                    String height = c.getString(c.getColumnIndex(c.getColumnName(25)));
+                    if (height.equals("null") || height.equals("")) {
+                        height = "0";
+                    }
 
-                    if ((Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(4)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(5)))) > 0) ||
-                            (angle > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(7)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(8)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(13)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(14)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(15)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(16)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(18)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(21)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(22)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(23)))) > 0) || (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(24)))) > 0) ||
-                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(25)))) > 0))
-                    {
+                    if ((Double.valueOf(n7) > 0) || (Double.valueOf(n8) > 0) ||
+                            (angle > 0) || (Double.valueOf(n10) > 0) ||
+                            (Double.valueOf(n11) > 0) || (Double.valueOf(n19) > 0) ||
+                            (Double.valueOf(n20) > 0) || (Double.valueOf(n21) > 0) ||
+                            (Double.valueOf(n24) > 0) || (Double.valueOf(dop_krep) > 0) ||
+                            (Double.valueOf(c.getString(c.getColumnIndex(c.getColumnName(21)))) > 0) || (Double.valueOf(n30) > 0) ||
+                            (Double.valueOf(cut_in_shop) > 0) || (Double.valueOf(drain) > 0) ||
+                            (Double.valueOf(height) > 0)) {
                         textt("Прочее");
 
-                        String n7 = c.getString(c.getColumnIndex(c.getColumnName(4)));
-                        if (Double.valueOf(n7) > 0){
+                        if (Double.valueOf(n7) > 0) {
                             n7 = "Крепление в плитку, м: " + n7;
                             textv(n7);
                         }
-                        String n8 = c.getString(c.getColumnIndex(c.getColumnName(5)));
-                        if (Double.valueOf(n8) > 0){
+                        if (Double.valueOf(n8) > 0) {
                             n8 = "Крепление в керамогранит, м: " + n8;
                             textv(n8);
                         }
-                        String n17 = c.getString(c.getColumnIndex(c.getColumnName(11)));
-                        if (Double.valueOf(n17) > 0){
+                        if (Double.valueOf(n17) > 0) {
                             n17 = "Закладная брусом, м: " + n17;
                             textv(n17);
                         }
-                        String n9 = c.getString(c.getColumnIndex(c.getColumnName(6)));
-                        if (Double.valueOf(n9) > 0){
+                        if (Double.valueOf(n9) > 0) {
                             n9 = "Углы, шт: " + n9;
                             textv(n9);
                         }
-                        String n10 = c.getString(c.getColumnIndex(c.getColumnName(7)));
-                        if (Double.valueOf(n10) > 0){
+                        if (Double.valueOf(n10) > 0) {
                             n10 = "Криволинейный вырез, м: " + n10;
                             textv(n10);
                         }
-                        String n11 = c.getString(c.getColumnIndex(c.getColumnName(8)));
-                        if (Double.valueOf(n11) > 0){
+                        if (Double.valueOf(n11) > 0) {
                             n11 = "Внутренний вырез, м: " + n11;
                             textv(n11);
                         }
-                        String cut_in_shop = c.getString(c.getColumnIndex(c.getColumnName(23)));
-                        if (Double.valueOf(cut_in_shop ) > 0){
-                            cut_in_shop  = "Внутренний вырез(в цеху): " + cut_in_shop ;
-                            textv(cut_in_shop );
+                        if (Double.valueOf(cut_in_shop) > 0) {
+                            cut_in_shop = "Внутренний вырез(в цеху): " + cut_in_shop;
+                            textv(cut_in_shop);
                         }
-                        String n18 = c.getString(c.getColumnIndex(c.getColumnName(12)));
-                        if (Double.valueOf(n18) > 0){
+                        if (Double.valueOf(n18) > 0) {
                             n18 = "Укрепление стены, м: " + n18;
                             textv(n18);
                         }
-                        String n19 = c.getString(c.getColumnIndex(c.getColumnName(13)));
-                        if (Double.valueOf(n19) > 0){
+                        if (Double.valueOf(n19) > 0) {
                             n19 = "Провод, м: " + n19;
                             textv(n19);
                         }
 
-                        String n30 = c.getString(c.getColumnIndex(c.getColumnName(22)));
-
-                        if (n30 == null){
+                        if (n30 == null) {
                             n30 = "0";
                         }
 
-                        if (Double.valueOf(n30) > 0){
-                            n30  = "Парящий потолок, м: " + n30 ;
-                            textv(n30 );
+                        if (Double.valueOf(n30) > 0) {
+                            n30 = "Парящий потолок, м: " + n30;
+                            textv(n30);
                         }
 
-                        String n20 = c.getString(c.getColumnIndex(c.getColumnName(14)));
-                        if (Double.valueOf(n20 ) > 0){
-                            n20  = "Разделитель, м: " + n20 ;
-                            textv(n20 );
+                        if (Double.valueOf(n20) > 0) {
+                            n20 = "Разделитель, м: " + n20;
+                            textv(n20);
                         }
-                        String n21 = c.getString(c.getColumnIndex(c.getColumnName(15)));
-                        if (Double.valueOf(n21 ) > 0){
-                            n21  = "Пожарная сигнализация, м: " + n21 ;
-                            textv(n21 );
+
+                        if (Double.valueOf(n21) > 0) {
+                            n21 = "Пожарная сигнализация, м: " + n21;
+                            textv(n21);
                         }
-                        String n24 = c.getString(c.getColumnIndex(c.getColumnName(16)));
-                        if (Double.valueOf(n24) > 0){
+                        if (Double.valueOf(n24) > 0) {
                             n24 = "Сложность доступа к месту монтажа, м: " + n24;
                             textv(n24);
                         }
-                        String dop_krep = c.getString(c.getColumnIndex(c.getColumnName(18)));
-                        if (Double.valueOf(dop_krep) > 0){
+                        if (Double.valueOf(dop_krep) > 0) {
                             dop_krep = "Дополнительный крепеж: " + dop_krep;
                             textv(dop_krep);
                         }
-                        String drain = c.getString(c.getColumnIndex(c.getColumnName(24)));
-                        if (Double.valueOf(drain) > 0){
+                        if (Double.valueOf(drain) > 0) {
                             drain = "Слив воды, кол-во комнат: " + drain;
                             textv(drain);
                         }
-                        String height = c.getString(c.getColumnIndex(c.getColumnName(25)));
-                        if (Double.valueOf(height) > 0){
+                        if (Double.valueOf(height) > 0) {
                             height = "Комната выше 3-ех метров";
                             textv(height);
                         }
                     }
 
                     String extra_comp = c.getString(c.getColumnIndex(c.getColumnName(26)));
-                    if (extra_comp.equals("{}") || extra_comp.equals("null") ){
+                    if (extra_comp.equals("{}") || extra_comp.equals("null")) {
                     } else {
                         textt("Дополнительные компоненты");
-                            try {
-                                org.json.JSONObject dat = new org.json.JSONObject(extra_comp);
-                                int i=0;
-                                do {
-                                    try {
-                                        JSONObject id_array = dat.getJSONObject(String.valueOf(i));
-                                        String title = id_array.getString("title");
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(extra_comp);
+                            int i = 0;
+                            do {
+                                try {
+                                    JSONObject id_array = dat.getJSONObject(String.valueOf(i));
+                                    String title = id_array.getString("title");
 
-                                        textv("Название: " + title);
+                                    textv("Название: " + title);
 
-                                    } catch (Exception e) {
-                                    }
+                                } catch (Exception e) {
+                                }
 
-                                    i++;
-                                } while (dat.length() != i);
-                            } catch (Exception e) {
-                            }
+                                i++;
+                            } while (dat.length() != i);
+                        } catch (Exception e) {
+                        }
 
                     }
 
                     String extra_mount = c.getString(c.getColumnIndex(c.getColumnName(27)));
-                    if (extra_mount.equals("{}") || extra_mount.equals("null")){
+                    if (extra_mount.equals("{}") || extra_mount.equals("null")) {
                     } else {
                         textt("Дополнительные работы");
                         try {
                             org.json.JSONObject dat = new org.json.JSONObject(extra_mount);
-                            int i=0;
+                            int i = 0;
                             do {
                                 try {
                                     JSONObject id_array = dat.getJSONObject(String.valueOf(i));
@@ -837,6 +882,15 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
                                 SQLiteDatabase db = dbHelper.getReadableDatabase();
                                 db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "_id = ?", new String[]{id_calc});
 
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, id_calc);
+                                values.put(DBHelper.KEY_ID_NEW, "0");
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "delete");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
                                 Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                 getActivity().finish();
                                 getActivity().startActivity(intent);
@@ -856,7 +910,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         alert.show();
     }
 
-    void textt(String text){
+    void textt(String text) {
 
         TextView txtV = new TextView(getActivity());
         txtV.setText(text);
@@ -866,7 +920,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         mainL.addView(txtV);
     }
 
-    void textv(String text){
+    void textv(String text) {
 
         TextView txtV = new TextView(getActivity());
         txtV.setText(text);

@@ -3,6 +3,7 @@ package ru.ejevikaapp.gm_android;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -835,9 +836,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.btn_add_zamer:
-
-                Log.d("mLog" ,"advertisement_id " + advertisement_id);
-
                 db = dbHelper.getWritableDatabase();
                 String fio = c_fio.getText().toString().trim();
                 String phone = c_phone.getText().toString().trim();
@@ -908,6 +906,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                                 values.put(DBHelper.KEY_MANAGER_ID, "");
                                 values.put(DBHelper.KEY_CREATED, date);
+                                values.put(DBHelper.KEY_DELETED_BY_USER, "0");
                                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
                                 values = new ContentValues();
@@ -988,25 +987,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                     }
                                 }
 
-                                //SharedPreferences SP = getSharedPreferences("dealer_calc", MODE_PRIVATE);
-                                //String dealer_calc = SP.getString("", "");
-                                //if (dealer_calc.equals("true")) {
-
-                                //    max_id_proj = Integer.parseInt(getIntent().getStringExtra("project"));
-                                //    int id_calculation = Integer.parseInt(getIntent().getStringExtra("calculation"));
-
-                                //    values = new ContentValues();
-                                //    values.put(DBHelper.KEY_ID_OLD, id_calculation);
-                                //    values.put(DBHelper.KEY_ID_NEW, 0);
-                                //    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
-                                //    values.put(DBHelper.KEY_SYNC, "0");
-                                //    values.put(DBHelper.KEY_TYPE, "send");
-                                //    values.put(DBHelper.KEY_STATUS, "1");
-                                //    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                //} else {
-                                //}
-
                                 int max_id_proj = 0;
                                 try {
                                     sqlQuewy = "select MAX(_id) "
@@ -1054,6 +1034,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 String change_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                                 values.put(DBHelper.KEY_CHANGE_TIME, change_time);
                                 values.put(DBHelper.KEY_API_PHONE_ID, advertisement_id);
+                                values.put(DBHelper.KEY_DELETED_BY_USER, "0");
                                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
                                 values = new ContentValues();
@@ -1273,6 +1254,12 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                             Toast toast = Toast.makeText(this,
                                     "Замер добавлен", Toast.LENGTH_SHORT);
                             toast.show();
+
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
 
                             finish();
 
@@ -1549,4 +1536,5 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                 break;
         }
     }
+
 }

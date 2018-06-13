@@ -1,6 +1,7 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,12 +41,20 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
@@ -415,8 +424,8 @@ public class Dealer_office extends AppCompatActivity {
 
                                                 JSONObject jsonObject = new JSONObject();
                                                 try {
-                                                    jsonObject.put("old_password", jsonPassword);
-                                                    jsonObject.put("password", ed_newPassword1);
+                                                    jsonObject.put("old_password", ed_oldPassword.getText().toString());
+                                                    jsonObject.put("password", ed_newPassword1.getText().toString());
                                                     jsonObject.put("user_id", user_id);
                                                 } catch (JSONException e) {
                                                 }
@@ -487,11 +496,8 @@ public class Dealer_office extends AppCompatActivity {
                             values.put(DBHelper.KEY_TYPE, "send");
                             values.put(DBHelper.KEY_STATUS, "1");
                             db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                            //startService(new Intent(Dealer_office.this, Service_Sync.class));
-
+                            startService(new Intent(Dealer_office.this, Service_Sync.class));
                             dialog.dismiss();
-
                             Toast.makeText(getApplicationContext(), "Пароль изменён",
                                     Toast.LENGTH_LONG).show();
                         } else {
@@ -512,7 +518,6 @@ public class Dealer_office extends AppCompatActivity {
                 @Override
                 protected java.util.Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("u_data", jsonPassword);
-                    Log.d("response", "send " + parameters);
                     return parameters;
                 }
             };
@@ -566,8 +571,6 @@ public class Dealer_office extends AppCompatActivity {
 
             DBHelper dbHelper = new DBHelper(Dealer_office.this);
             final SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            db.execSQL("DROP TABLE IF EXISTS history_send_to_server");
 
             AlertDialog.Builder builder = new AlertDialog.Builder(Dealer_office.this);
             builder.setTitle("Подсказка")

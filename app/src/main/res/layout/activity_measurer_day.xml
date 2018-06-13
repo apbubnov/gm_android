@@ -1,0 +1,42 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*"
+    style="@style/backgroun"
+    android:padding="10dp">
+
+    <TableRow>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/text_style_spisok"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minLines="2"
+            android:text="Время"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/text_style_spisok"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minLines="2"
+            android:text="Адрес"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"/>
+    </TableRow>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#000000" />
+
+    <ListView
+        android:id="@+id/List_mounting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></ListView>
+
+</TableLayout>

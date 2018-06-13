@@ -16,7 +16,7 @@ public class Activity_draft extends AppCompatActivity {
 
     private WebView mWebView;
 
-    static String canvases, textures, diags_points, walls_points, pt_points, auto;
+    static String canvases, textures, diags_points, walls_points, pt_points, auto, code, alfavit;
 
     SharedPreferences sPref, SP4, SP5, SP9, SPI, SPSO, SPW;
 
@@ -96,6 +96,14 @@ public class Activity_draft extends AppCompatActivity {
             SPW = getSharedPreferences("SAVED_WIDTH", MODE_PRIVATE);
             SharedPreferences.Editor ed = SPW.edit();
             ed.putString("", sw);
+            ed.commit();
+        }
+
+        @JavascriptInterface
+        public void func_elem_seam(String seam) {
+            SPW = getSharedPreferences("seam", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SPW.edit();
+            ed.putString("", seam);
             ed.commit();
         }
 
@@ -194,6 +202,18 @@ public class Activity_draft extends AppCompatActivity {
         }
 
         @android.webkit.JavascriptInterface
+        public String get_code() {
+
+            return code;
+        }
+
+        @android.webkit.JavascriptInterface
+        public String get_alfavit() {
+
+            return alfavit;
+        }
+
+        @android.webkit.JavascriptInterface
         public String get_auto() {
 
             return auto;
@@ -220,6 +240,12 @@ public class Activity_draft extends AppCompatActivity {
 
         sPref = this.getSharedPreferences("draft_pt_points", MODE_PRIVATE);
         pt_points = sPref.getString("", "");
+
+        sPref = this.getSharedPreferences("SAVED_CODE", MODE_PRIVATE);
+        code = sPref.getString("", "");
+
+        sPref = this.getSharedPreferences("SAVED_ALFAVIT", MODE_PRIVATE);
+        alfavit = sPref.getString("", "");
 
         sPref = this.getSharedPreferences("draft_auto", MODE_PRIVATE);
         auto = sPref.getString("", "");

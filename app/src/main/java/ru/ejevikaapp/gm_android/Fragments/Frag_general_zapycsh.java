@@ -44,6 +44,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.pixplicity.sharp.Sharp;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -111,7 +112,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     RadioButton rb_transport_0, rb_transport_1, rb_transport_2;
 
     LinearLayout.LayoutParams lin_calc;
-    LinearLayout mainL, mainC, mainL2;
+    LinearLayout mainL, mainC, mainC2, mainL2;
 
     public Frag_general_zapycsh() {
         // Required empty public constructor
@@ -129,15 +130,15 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         lin_calc.setMargins(0, 2, 0, 0);
 
         mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
-        titleViewParams = new LinearLayout.LayoutParams(80, 80);
-        titleViewParams.weight = 1;
+        titleViewParams = new LinearLayout.LayoutParams(80, 80, 1);
         titleViewParams.setMargins(0, 0, 0, 20);
 
         mainL2 = (LinearLayout) view.findViewById(R.id.phone_lay2);
         titleViewParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        titleViewParams2.weight = 1;
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1);
         titleViewParams2.setMargins(0, 0, 0, 20);
+
+        mainC2 = (LinearLayout) view.findViewById(R.id.linear_calc2);
 
         SharedPreferences SPI = this.getActivity().getSharedPreferences("id_client_spisok", MODE_PRIVATE);
         id_cl = SPI.getString("", "");
@@ -759,7 +760,15 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 if (c.moveToFirst()) {
                     do {
                         S = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        if (S == null || S.equals("")) {
+                            S = "0";
+                        }
+
                         P = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        if (P == null || P.equals("")) {
+                            P = "0";
+                        }
+
                         s += Double.parseDouble(S);
                         p += Double.parseDouble(P);
 
@@ -954,8 +963,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         count_calc = 0;
         mainC.removeAllViews();
         id_calcul.clear();
+        mainC2.removeAllViews();
 
-        String sqlQuewy = "SELECT n4, n5, calculation_title, _id "
+        String sqlQuewy = "SELECT n4, n5, calculation_title, _id, calc_image "
                 + "FROM rgzbn_gm_ceiling_calculations" +
                 " WHERE project_id = ?";
 
@@ -967,8 +977,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     String n5 = c.getString(c.getColumnIndex(c.getColumnName(1)));
                     String calc_title = c.getString(c.getColumnIndex(c.getColumnName(2)));
                     String id = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                    String imag = c.getString(c.getColumnIndex(c.getColumnName(4)));
 
-                    radiob(calc_title, n4, n5, id);
+                    radiob(calc_title, n4, n5, id, imag);
 
                     count_calc++;
                     id_calcul.add(id);
@@ -1092,33 +1103,42 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     @SuppressLint("ResourceType")
     void btn(String title) {
 
+        mainL = (LinearLayout) view.findViewById(R.id.phone_lay1);
+        titleViewParams = new LinearLayout.LayoutParams(80, 80, 1);
+        titleViewParams.setMargins(0, 0, 0, 20);
+
         int txt_i = bt_i;
         btn = new Button(getActivity());
         BtnList.add(bt_i, btn);
         btn.setId(bt_i++);
         btn.setLayoutParams(titleViewParams);
-        btn.setBackgroundResource(R.drawable.rounded_button_green);
+        btn.setBackgroundResource(R.drawable.white_btn_blue_text);
         btn.setTextSize(1);
         btn.setText(title);
         btn.setTextColor(Color.argb(0, 0, 0, 0));
-        btn.setOnLongClickListener(longGetPhone);
+        //btn.setOnLongClickListener(longGetPhone);
         btn.setOnClickListener(getPhone);
         btn.setBackgroundResource(R.drawable.edit);
         mainL.addView(btn);
 
+        lin_calc = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        lin_calc.weight = 1;
+        lin_calc.setMargins(0, 2, 0, 20);
+
         TextView txt = new TextView(getActivity());
-        txt.setLayoutParams(titleViewParams2);
+        txt.setLayoutParams(lin_calc);
         txt.setTextSize(14);
         txt.setText(title);
         txt.setId(txt_i);
-        txt.setOnLongClickListener(longGetPhone);
+        //txt.setOnLongClickListener(longGetPhone);
         txt.setOnClickListener(getPhone);
         txt.setGravity(Gravity.CENTER_VERTICAL);
         txt.setTextColor(Color.parseColor("#414099"));
         mainL2.addView(txt);
     }
 
-    void radiob(String calc_title, String n4, String n5, String id) {
+    void radiob(String calc_title, String n4, String n5, String id, String imag) {
         TextView rb = new TextView(getActivity());
         CheckBoxList.add(ch_i, rb);
         rb.setId(Integer.parseInt(id));
@@ -1154,14 +1174,38 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             if (c.moveToFirst()) {
                 do {
                     S = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    if (S == null || S.equals("")) {
+                        S = "0";
+                    }
+
                     P = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    if (P == null || P.equals("")) {
+                        P = "0";
+                    }
+
                     s += Double.parseDouble(S);
                     p += Double.parseDouble(P);
 
-                    tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                    tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
-                    tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
-                    dis = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                    if(c.getString(c.getColumnIndex(c.getColumnName(2))) == null){
+                    } else {
+                        tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                    }
+
+                    if(c.getString(c.getColumnIndex(c.getColumnName(3))) == null){
+                    } else {
+                        tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                    }
+
+                    if(c.getString(c.getColumnIndex(c.getColumnName(4))) == null){
+                    } else {
+                        tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
+                    }
+
+                    if(c.getString(c.getColumnIndex(c.getColumnName(5))) == null){
+                    } else {
+                        dis = c.getString(c.getColumnIndex(c.getColumnName(5)));
+                    }
+
                 } while (c.moveToNext());
             }
         }
@@ -1222,6 +1266,27 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             tx1.setTextColor(Color.parseColor("#414099"));
             mainC.addView(tx1);
         }
+
+
+        LinearLayout.LayoutParams ViewParams = new LinearLayout.LayoutParams(200, 200, 1);
+
+        ImageView image = new ImageView(getActivity());
+        image.setLayoutParams(ViewParams);
+
+        if (imag.length() > 10) {
+            try {
+                Sharp.loadString(imag)
+                        .into(image);
+                mainC2.addView(image);
+            } catch (Exception e) {
+            }
+        } else {
+            View view = new View(getActivity());
+            view.setLayoutParams(ViewParams);
+            mainC2.addView(view);
+
+        }
+
 
     }
 

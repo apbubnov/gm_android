@@ -1,80 +1,83 @@
-<TableLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="*"
-    style="@style/backgroun"
-    android:layout_margin="10dp">
+    android:orientation="vertical">
 
-    <TableRow>
-        <TextView
-            android:id="@+id/c_number"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="13dp"
-            android:text="№"
-            android:textStyle="bold"
-            android:gravity="center"
-            style="@style/text_style_spisok"
-            android:minLines="2"
-            android:layout_span="2" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/c_address"
-            android:gravity="center"
-            android:layout_span="3"
-            android:textSize="13dp"
-            android:text="Дата замера"
-            android:textStyle="bold"
-            style="@style/text_style_spisok"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:minLines="2" />
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/c_price"
-            android:gravity="center"
-            android:textSize="13dp"
-            android:text="Адрес"
-            android:textStyle="bold"
-            style="@style/text_style_spisok"
-            android:layout_span="3"
-            android:minLines="2" />
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/c_income"
-            android:gravity="center"
-            android:textSize="13dp"
-            android:text="Статус"
-            android:textStyle="bold"
-            android:layout_span="3"
-            style="@style/text_style_spisok"
-            android:layout_marginLeft="2dp"
-            android:minLines="2" />
-    </TableRow>
-
-    <View
-        android:layout_width="wrap_content"
-        android:background="#000000"
-        android:layout_height="2dp" />
-
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/swipe_container"
+    <TableLayout
+        style="@style/backgroun"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:stretchColumns="*">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_client">
-    </ListView>
+        <TableRow>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            <TextView
+                android:id="@+id/c_number"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="2"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="№"
+                android:textSize="13dp"
+                android:textStyle="bold" />
 
-</TableLayout>
+            <TextView
+                android:id="@+id/c_address"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Дата замера"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_price"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Адрес"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/c_income"
+                style="@style/text_style_spisok"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_span="3"
+                android:gravity="center"
+                android:minLines="2"
+                android:text="Статус"
+                android:textSize="13dp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="#000000" />
+
+        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipe_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/list_client"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></ListView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </TableLayout>
+</LinearLayout>

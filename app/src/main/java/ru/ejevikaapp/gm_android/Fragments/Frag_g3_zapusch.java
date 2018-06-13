@@ -2,6 +2,7 @@ package ru.ejevikaapp.gm_android.Fragments;
 
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -528,29 +529,19 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                 ad.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int arg1) {
 
-                        String sqlQuewy = "SELECT _id "
-                                + "FROM rgzbn_gm_ceiling_calculations " +
-                                "where project_id = ? ";
-                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(cId)});
-                        if (c != null) {
-                            if (c.moveToFirst()) {
-                                do {
-                                    int calcId = c.getInt(c.getColumnIndex(c.getColumnName(0)));
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, "calculation_id = ?", new String[]{String.valueOf(calcId)});
+                        ContentValues values = new ContentValues();
+                        values.put(DBHelper.KEY_DELETED_BY_USER, "1");
+                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                new String[]{cId});
 
-                                } while (c.moveToNext());
-                            }
-                        }
-                        c.close();
-
-                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(cId)});
-                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "_id = ?", new String[]{String.valueOf(cId)});
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, cId);
+                        values.put(DBHelper.KEY_ID_NEW, "0");
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "1");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                         onResume();
 

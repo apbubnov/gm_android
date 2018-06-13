@@ -155,7 +155,10 @@ public class FragmentAllProjects extends Fragment implements View.OnClickListene
                     if (c1 != null) {
                         if (c1.moveToFirst()) {
 
-                            client_project.add(id);
+                            if (HelperClass.associated_client(getActivity(), user_id, client_id)){
+                            } else {
+                                client_project.add(id);
+                            }
                         }
                     }
                     c1.close();

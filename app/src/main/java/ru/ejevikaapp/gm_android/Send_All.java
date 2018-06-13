@@ -749,17 +749,21 @@ public class Send_All extends Service {
                         org.json.JSONObject dat = new org.json.JSONObject(res);
 
                         JSONArray id_array = dat.getJSONArray("rgzbn_users");
+                        Log.d("responce", "USERS = "  + String.valueOf(id_array));
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
                             org.json.JSONObject user = id_array.getJSONObject(i);
 
-                            Log.d(TAG, "users  = " + user);
-
                             String id = user.getString("id");
                             String name = user.getString("name");
                             String username = user.getString("username");
                             String email = user.getString("email");
+                            String associated_client = "";
+                            try {
+                                associated_client = user.getString("associated_client");
+                            }catch (Exception e){
+                            }
 
                             values = new ContentValues();
                             values.put(DBHelper.KEY_ID, id);
@@ -767,6 +771,7 @@ public class Send_All extends Service {
                             values.put(DBHelper.KEY_NAME, name);
                             values.put(DBHelper.KEY_USERNAME, username);
                             values.put(DBHelper.KEY_EMAIL, email);
+                            values.put(DBHelper.KEY_ASSOCIATED_CLIENT, associated_client);
 
                             String sqlQuewy = "SELECT * "
                                     + "FROM rgzbn_users" +
@@ -878,10 +883,12 @@ public class Send_All extends Service {
                             count_m = 0;
                             org.json.JSONObject comp = id_array.getJSONObject(i);
 
+                            String id = comp.getString("id");
                             String id_mounter = comp.getString("id_mounter");
                             String id_brigade = comp.getString("id_brigade");
 
                             values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, id);
                             values.put(DBHelper.KEY_ID_MOUNTER, id_mounter);
                             values.put(DBHelper.KEY_ID_BRIGADE, id_brigade);
 
@@ -897,19 +904,15 @@ public class Send_All extends Service {
                                     } while (c.moveToNext());
                                 }
                             }
-
                             c.close();
 
                             if (count_m == 0) {
                                 try {
-
                                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTERS_MAP, null, values);
-
                                 } catch (Exception e) {
                                     Log.d("responce", String.valueOf(e));
                                 }
                             }
-
                         }
 
                         values = new ContentValues();
@@ -1026,7 +1029,6 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_mount");
-
                         for (int i = 0; i < id_array.length(); i++) {
                             count_m = 0;
                             org.json.JSONObject user = id_array.getJSONObject(i);
@@ -1194,9 +1196,52 @@ public class Send_All extends Service {
                             }
                         }
 
+
+                        id_array = dat.getJSONArray("rgzbn_gm_ceiling_recoil_map_project");
+                        for (int i = 0; i < id_array.length(); i++) {
+                            count_m = 0;
+                            org.json.JSONObject user = id_array.getJSONObject(i);
+
+                            String id = user.getString("id");
+                            String recoil_id = user.getString("recoil_id");
+                            String project_id = user.getString("project_id");
+                            String sum = user.getString("sum");
+                            String date_time = user.getString("date_time");
+                            String comment = user.getString("comment");
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_RECOIL_ID, recoil_id);
+                            values.put(DBHelper.KEY_PROJECT_ID, project_id);
+                            values.put(DBHelper.KEY_SUM, sum);
+                            values.put(DBHelper.KEY_DATE_TIME, date_time);
+                            values.put(DBHelper.KEY_COMMENT, comment);
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_recoil_map_project" +
+                                    " WHERE _id = ?";
+                            Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, values, "_id = ?", new String[]{id});
+                                        count_m++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                            c.close();
+
+                            if (count_m == 0) {
+                                try {
+                                    values.put(DBHelper.KEY_ID, id);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, null, values);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+
+
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_canvases_dealer_price");
                         String user_id = "";
-                        Log.d(TAG, "rgzbn_gm_ceiling_canvases_dealer_price = " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;
@@ -1242,8 +1287,6 @@ public class Send_All extends Service {
                         }
 
                         id_array = dat.getJSONArray("rgzbn_gm_ceiling_components_dealer_price");
-
-                        Log.d(TAG, "rgzbn_gm_ceiling_components_dealer_price = " + id_array);
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;

@@ -21,6 +21,7 @@
             android:gravity="center"
             android:textSize="13dp"
             android:layout_span="3"
+            style="@style/text_style_spisok"
             />
 
         <TextView android:layout_width="wrap_content"
@@ -29,6 +30,7 @@
             android:gravity="center"
             android:textSize="13dp"
             android:layout_span="3"
+            style="@style/text_style_spisok"
             />
 
         <TextView android:layout_width="wrap_content"
@@ -39,6 +41,7 @@
             android:layout_span="3"
             android:minLines="2"
             android:layout_marginLeft="5dp"
+            style="@style/text_style_spisok"
             />
     </TableRow>
 

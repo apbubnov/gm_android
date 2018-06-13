@@ -150,12 +150,23 @@
             android:name=".Dealer.Activity_analytics"
             android:label="Аналитика"
             android:screenOrientation="portrait" />
-        <activity android:name=".Dealer.Activity_price_canvases"
-            android:label="Прайс полотен"/>
-        <activity android:name=".Dealer.Activity_price_components"
-            android:label="Прайс компонентов"/>
-        <activity android:name=".Dealer.Activity_price_mounting"
-            android:label="Прайс монтажных работ"></activity>
+        <activity
+            android:name=".Dealer.Activity_price_canvases"
+            android:label="Прайс полотен" />
+        <activity
+            android:name=".Dealer.Activity_price_components"
+            android:label="Прайс компонентов" />
+        <activity
+            android:name=".Dealer.Activity_price_mounting"
+            android:label="Прайс монтажных работ" />
+        <activity
+            android:name=".Dealer.ActivitySumUsers"
+            android:label="Детализация счета" />
+        <activity
+            android:name=".Dealer.ListOfMeasurers"
+            android:label="Замерщики" />
+        <activity android:name=".Dealer.MeasurerDay"
+            android:label="Замеры"/>
     </application>
 
 </manifest>

@@ -14,10 +14,13 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.R;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class Activity_analytics extends AppCompatActivity {
 
@@ -47,6 +50,8 @@ public class Activity_analytics extends AppCompatActivity {
 
         webView.loadUrl("http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&view=analiticdealers&api=1&user_id=" + id);
 
+        Log.d("mLog", webView.getUrl());
+
         getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -57,10 +62,20 @@ public class Activity_analytics extends AppCompatActivity {
             }
         });
 
+        webView.setWebViewClient(new MyWebViewClient());
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+    }
+
+    private class MyWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading
+                (WebView view, String url) {
+            return(false);
+        }
     }
 
     @Override

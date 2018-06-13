@@ -2,6 +2,7 @@ package ru.ejevikaapp.gm_android.Fragments;
 
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -57,7 +58,6 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
 
     public FragmentClient() {
     }
-
 
     public static FragmentClient newInstance() {
         return new FragmentClient();
@@ -147,55 +147,60 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
         if (client_name.equals("")) {
             String sqlQuewy = "SELECT _id, client_name, created "
                     + "FROM rgzbn_gm_ceiling_clients " +
-                    "where dealer_id = ? " +
+                    "where dealer_id = ? and deleted_by_user = ?" +
                     "group by client_name";
-            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id, "0"});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
 
                         String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        sqlQuewy = "SELECT project_info, project_status "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where client_id = ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
-                        if (cc != null) {
-                            if (cc.moveToLast()) {
+                        if (HelperClass.associated_client(getActivity(), user_id, id_client)) {
 
-                                String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                        } else {
 
-                                sqlQuewy = "SELECT title "
-                                        + "FROM rgzbn_gm_ceiling_status " +
-                                        "where _id = ? ";
-                                Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
-                                if (c1 != null) {
-                                    if (c1.moveToFirst()) {
-                                        do {
-                                            status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
-                                        } while (c1.moveToNext());
+                            sqlQuewy = "SELECT project_info, project_status "
+                                    + "FROM rgzbn_gm_ceiling_projects " +
+                                    "where client_id = ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                            if (cc != null) {
+                                if (cc.moveToLast()) {
+
+                                    String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                    sqlQuewy = "SELECT title "
+                                            + "FROM rgzbn_gm_ceiling_status " +
+                                            "where _id = ? ";
+                                    Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
+                                    if (c1 != null) {
+                                        if (c1.moveToFirst()) {
+                                            do {
+                                                status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
+                                            } while (c1.moveToNext());
+                                        }
                                     }
+                                    c1.close();
+
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                            cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
+                                            c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                            status,
+                                            c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    client_mas.add(fc);
+
+                                } else {
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                            "-",
+                                            c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                            "-",
+                                            c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    client_mas.add(fc);
                                 }
-                                c1.close();
-
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                        cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
-                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
-                                        status,
-                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
-                                client_mas.add(fc);
-
-                            } else {
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                        "-",
-                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
-                                        "-",
-                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
-                                client_mas.add(fc);
+                                cc.close();
                             }
-                            cc.close();
                         }
 
                     } while (c.moveToNext());
@@ -214,46 +219,49 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
 
                         String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                        sqlQuewy = "SELECT project_info, project_status "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where client_id = ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
-                        if (cc != null) {
-                            if (cc.moveToLast()) {
+                        if (HelperClass.associated_client(getActivity(), user_id, id_client)) {
+                        } else {
+                            sqlQuewy = "SELECT project_info, project_status "
+                                    + "FROM rgzbn_gm_ceiling_projects " +
+                                    "where client_id = ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
+                            if (cc != null) {
+                                if (cc.moveToLast()) {
 
-                                String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+                                    String status = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
 
-                                sqlQuewy = "SELECT title "
-                                        + "FROM rgzbn_gm_ceiling_status " +
-                                        "where _id = ? ";
-                                Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
-                                if (c1 != null) {
-                                    if (c1.moveToFirst()) {
-                                        do {
-                                            status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
-                                        } while (c1.moveToNext());
+                                    sqlQuewy = "SELECT title "
+                                            + "FROM rgzbn_gm_ceiling_status " +
+                                            "where _id = ? ";
+                                    Cursor c1 = db.rawQuery(sqlQuewy, new String[]{status});
+                                    if (c1 != null) {
+                                        if (c1.moveToFirst()) {
+                                            do {
+                                                status = c1.getString(c1.getColumnIndex(c1.getColumnName(0)));
+                                            } while (c1.moveToNext());
+                                        }
                                     }
+                                    c1.close();
+
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                            cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
+                                            c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                            status,
+                                            c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    client_mas.add(fc);
+
+                                } else {
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
+                                            c.getString(c.getColumnIndex(c.getColumnName(1))),
+                                            "-",
+                                            c.getString(c.getColumnIndex(c.getColumnName(0))),
+                                            "-",
+                                            c.getString(c.getColumnIndex(c.getColumnName(2))));
+                                    client_mas.add(fc);
                                 }
-                                c1.close();
-
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                        cc.getString(cc.getColumnIndex(cc.getColumnName(0))),
-                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
-                                        status,
-                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
-                                client_mas.add(fc);
-
-                            } else {
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(null,
-                                        c.getString(c.getColumnIndex(c.getColumnName(1))),
-                                        "-",
-                                        c.getString(c.getColumnIndex(c.getColumnName(0))),
-                                        "-",
-                                        c.getString(c.getColumnIndex(c.getColumnName(2))));
-                                client_mas.add(fc);
+                                cc.close();
                             }
-                            cc.close();
                         }
 
                     } while (c.moveToNext());
@@ -298,8 +306,6 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
                 Frag_client_schedule_class selectedid = client_mas.get(position);
                 String p_id = selectedid.getId_client();
 
-                Log.d("mLog","client " + p_id);
-
                 SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
                 SharedPreferences.Editor ed = SP.edit();
                 ed.putString("", String.valueOf(p_id));
@@ -321,52 +327,50 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
                 String name = selectedid.getFio();
 
                 AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-                ad.setMessage("Удалить клиента "+name+"?"); // сообщение
+                ad.setMessage("Удалить клиента " + name + "?"); // сообщение
                 ad.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int arg1) {
 
-                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, "_id = ?", new String[]{String.valueOf(cId)});
-                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "client_id = ?", new String[]{String.valueOf(cId)});
+                        ContentValues values = new ContentValues();
+                        values.put(DBHelper.KEY_DELETED_BY_USER, "1");
+                        db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
+                                new String[]{cId});
 
-                        String sqlQuewy = "SELECT _id "
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, cId);
+                        values.put(DBHelper.KEY_ID_NEW, "0");
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_clients");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "1");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                        String sqlQuewy = "select _id "
                                 + "FROM rgzbn_gm_ceiling_projects " +
-                                "where client_id = ? ";
-                        Cursor c1 = db.rawQuery(sqlQuewy, new String[]{cId});
-                        if (c1 != null) {
-                            if (c1.moveToFirst()) {
+                                "where client_id = ?";
+                        Cursor c = db.rawQuery(sqlQuewy, new String[]{cId});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
                                 do {
-                                    int pId = c1.getInt(c1.getColumnIndex(c1.getColumnName(0)));
+                                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_DELETED_BY_USER, "1");
+                                    db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
+                                            new String[]{id});
 
-                                    sqlQuewy = "SELECT _id "
-                                            + "FROM rgzbn_gm_ceiling_calculations " +
-                                            "where project_id = ? ";
-                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(pId)});
-                                    if (c != null) {
-                                        if (c.moveToFirst()) {
-                                            do {
+                                    values = new ContentValues();
+                                    values.put(DBHelper.KEY_ID_OLD, id);
+                                    values.put(DBHelper.KEY_ID_NEW, "0");
+                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                                    values.put(DBHelper.KEY_SYNC, "0");
+                                    values.put(DBHelper.KEY_TYPE, "send");
+                                    values.put(DBHelper.KEY_STATUS, "1");
+                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-                                                int calcId = c.getInt(c.getColumnIndex(c.getColumnName(0)));
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-                                                db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, "calculation_id = ?", new String[]{String.valueOf(calcId)});
-
-                                            } while (c.moveToNext());
-                                        }
-                                    }
-                                    c.close();
-
-                                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, "project_id = ?", new String[]{String.valueOf(pId)});
-
-                                } while (c1.moveToNext());
+                                } while (c.moveToNext());
                             }
                         }
-                        c1.close();
-
-                        db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, "client_id = ?", new String[]{String.valueOf(cId)});
+                        c.close();
 
                         onResume();
                     }

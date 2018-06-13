@@ -7,6 +7,9 @@
     android:layout_margin="5dp"
     android:background="#ffffff"
     android:stretchColumns="*"
+    android:fitsSystemWindows="true"
+    android:focusableInTouchMode="true"
+    android:descendantFocusability="beforeDescendants"
     tools:context="ru.ejevikaapp.gm_android.Fragments.Frag_spisok">
 
     <Button
@@ -16,6 +19,135 @@
         android:background="@drawable/rounded_button"
         android:text="Добавить замер"
         android:textColor="#ffffff" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/layout_history">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="История клиента"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginTop="10dp"
+            android:layout_weight="2"
+            android:text="Последнее действие:"
+            android:textColor="#000000"
+            android:textSize="15dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/last_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|left"
+                    android:layout_marginRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/last_history_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|left"
+                    android:layout_marginRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:textColor="#000000"
+                    android:textSize="12dp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_history"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_button"
+                android:padding="6dp"
+                android:text=" Открыть историю "
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="#8b8b8b" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"
+            android:layout_marginTop="10dp"
+            android:layout_weight="2"
+            android:text="Добавить звонок:"
+            android:textColor="#000000"
+            android:textSize="15dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/add_client_call"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_style"
+                android:gravity="center|left"
+                android:hint="Добавить звонок"
+                android:onClick="add_client_call"
+                android:paddingLeft="5dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/add_client_call_note"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_style"
+                android:gravity="center|left"
+                android:hint="Введите примечание"
+                android:paddingLeft="5dp"
+                android:textSize="15dp" />
+
+            <ImageButton
+                android:id="@+id/btn_client_call"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@drawable/white_btn_blue_text"
+                android:scaleType="fitCenter"
+                android:src="@drawable/plus" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <View
         android:layout_width="wrap_content"

@@ -3348,6 +3348,8 @@ function remove_none_shvy()
 		polotna[i].cuts.remove();
 		seam_lines.push(line);
 	}
+
+    AndroidFunction.func_elem_seam(seam_lines.push(line));
 }
 
 function rotate_final()

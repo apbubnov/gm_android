@@ -225,7 +225,6 @@ public class Service_Sync_Import extends Service {
                     if (c.moveToFirst()) {
                         do {
                             change_time_global = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
                         } while (c.moveToNext());
                     }
                 }
@@ -298,11 +297,13 @@ public class Service_Sync_Import extends Service {
                 @Override
                 public void onResponse(String res) {
 
+                    Log.d(TAG, res);
+
                     SQLiteDatabase db;
                     db = dbHelper.getReadableDatabase();
 
-                    Log.d(TAG, res);
                     if (res.equals("null")) {
+
                     } else {
 
                         int count = 0;
@@ -332,6 +333,7 @@ public class Service_Sync_Import extends Service {
                                 String dealer_id = cleint.getString("dealer_id");
                                 String created = cleint.getString("created");
                                 String sex = cleint.getString("sex");
+                                String deleted_by_user = cleint.getString("deleted_by_user");
                                 String change_time = cleint.getString("change_time");
 
                                 values.put(DBHelper.KEY_CLIENT_NAME, client_name);
@@ -341,6 +343,7 @@ public class Service_Sync_Import extends Service {
                                 values.put(DBHelper.KEY_DEALER_ID, dealer_id);
                                 values.put(DBHelper.KEY_CREATED, created);
                                 values.put(DBHelper.KEY_SEX, sex);
+                                values.put(DBHelper.KEY_DELETED_BY_USER, deleted_by_user);
 
                                 String sqlQuewy = "SELECT * "
                                         + "FROM rgzbn_gm_ceiling_clients" +
@@ -376,7 +379,6 @@ public class Service_Sync_Import extends Service {
                             }
 
                             JSONArray rgzbn_gm_ceiling_clients_contacts = jsonObject.getJSONArray("rgzbn_gm_ceiling_clients_contacts");
-
                             for (int i = 0; i < rgzbn_gm_ceiling_clients_contacts.length(); i++) {
 
                                 values = new ContentValues();
@@ -415,6 +417,113 @@ public class Service_Sync_Import extends Service {
                                     try {
                                         values.put(DBHelper.KEY_ID, id);
                                         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);
+                                        Date change = ft.parse(change_time);
+                                        if (change_max.getTime() < change.getTime()) {
+                                            change_max = change;
+                                        }
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            }
+
+                            JSONArray rgzbn_gm_ceiling_callback = jsonObject.getJSONArray("rgzbn_gm_ceiling_callback");
+                            for (int i = 0; i < rgzbn_gm_ceiling_callback.length(); i++) {
+
+                                values = new ContentValues();
+                                org.json.JSONObject callback = rgzbn_gm_ceiling_callback.getJSONObject(i);
+
+                                Log.d(TAG, "callback " + String.valueOf(callback));
+
+                                count = 0;
+                                String id = callback.getString("id");
+                                String client_id = callback.getString("client_id");
+                                String date_time = callback.getString("date_time");
+                                String comment = callback.getString("comment");
+                                String manager_id = callback.getString("manager_id");
+                                String notify = callback.getString("notify");
+                                String change_time = callback.getString("change_time");
+
+                                values.put(DBHelper.KEY_CLIENT_ID, client_id);
+                                values.put(DBHelper.KEY_DATE_TIME, date_time);
+                                values.put(DBHelper.KEY_COMMENT, comment);
+                                values.put(DBHelper.KEY_MANAGER_ID, manager_id);
+                                values.put(DBHelper.KEY_NOTIFY, notify);
+
+                                String sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_callback" +
+                                        " WHERE _id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, values,
+                                                    "_id = ?", new String[]{id});
+                                            count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime() < change.getTime()) {
+                                                change_max = change;
+                                            }
+                                        } while (c.moveToNext());
+                                    }
+                                }
+                                c.close();
+
+                                if (count == 0) {
+                                    try {
+                                        values.put(DBHelper.KEY_ID, id);
+                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, null, values);
+                                        Date change = ft.parse(change_time);
+                                        if (change_max.getTime() < change.getTime()) {
+                                            change_max = change;
+                                        }
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            }
+
+                            JSONArray rgzbn_gm_ceiling_client_history = jsonObject.getJSONArray("rgzbn_gm_ceiling_client_history");
+                            for (int i = 0; i < rgzbn_gm_ceiling_client_history.length(); i++) {
+
+                                values = new ContentValues();
+                                org.json.JSONObject client_history = rgzbn_gm_ceiling_client_history.getJSONObject(i);
+
+                                Log.d(TAG, "client_history " + String.valueOf(client_history));
+
+                                count = 0;
+                                String id = client_history.getString("id");
+                                String client_id = client_history.getString("client_id");
+                                String date_time = client_history.getString("date_time");
+                                String text = client_history.getString("text");
+                                String change_time = client_history.getString("change_time");
+
+                                values.put(DBHelper.KEY_CLIENT_ID, client_id);
+                                values.put(DBHelper.KEY_DATE_TIME, date_time);
+                                values.put(DBHelper.KEY_TEXT, text);
+                                //values.put(DBHelper.KEY_CHANGE_TIME, change_time);
+
+                                String sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_client_history" +
+                                        " WHERE _id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENT_HISTORY, values,
+                                                    "_id = ?", new String[]{id});
+                                            count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime() < change.getTime()) {
+                                                change_max = change;
+                                            }
+                                        } while (c.moveToNext());
+                                    }
+                                }
+                                c.close();
+
+                                if (count == 0) {
+                                    try {
+                                        values.put(DBHelper.KEY_ID, id);
+                                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENT_HISTORY, null, values);
                                         Date change = ft.parse(change_time);
                                         if (change_max.getTime() < change.getTime()) {
                                             change_max = change;
@@ -494,6 +603,7 @@ public class Service_Sync_Import extends Service {
                                     String transport = porject_tmp.getString("transport");
                                     String distance = porject_tmp.getString("distance");
                                     String distance_col = porject_tmp.getString("distance_col");
+                                    String deleted_by_user = porject_tmp.getString("deleted_by_user");
                                     String change_time = porject_tmp.getString("change_time");
 
                                     values.put(DBHelper.KEY_ORDERING, ordering);
@@ -555,6 +665,7 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_TRANSPORT, transport);
                                     values.put(DBHelper.KEY_DISTANCE, distance);
                                     values.put(DBHelper.KEY_DISTANCE_COL, distance_col);
+                                    values.put(DBHelper.KEY_DELETED_BY_USER, deleted_by_user);
                                     values.put(DBHelper.KEY_CHANGE_TIME, change_time);
 
                                     String sqlQuewy = "SELECT * "
@@ -1135,11 +1246,10 @@ public class Service_Sync_Import extends Service {
                             values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf(out_format.format(change_max)));
                             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
 
+
                         } catch (Exception e) {
                         }
-
                         int i = 0;
-
                     }
                 }
 
@@ -1162,6 +1272,6 @@ public class Service_Sync_Import extends Service {
 
             return null;
         }
-    }
 
+    }
 }

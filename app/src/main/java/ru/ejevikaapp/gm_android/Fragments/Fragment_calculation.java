@@ -17,9 +17,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -71,18 +73,18 @@ import ru.ejevikaapp.gm_android.R;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Fragment_calculation extends Fragment implements View.OnClickListener {
+public class Fragment_calculation extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
     Button chertezh, texture_help, canvas_help, btn_rb_v;
 
     Button btn_color_canvases, btn_save, btn_add_cornice, btn_calculate, priceMount;
 
-    Button buguette_hide, vstavka_hide, lustr_hide, svetiln_hide, cabling_hide, karniz_hide, pipes_hide, bond_beam_hide, separator_hide,
-            mount_wall_hide, mount_granite_hide, wall_hide, fasteners_hide, fire_hide, add_vent_hide, diff_acc_hide, soaring_ceiling_hide,
-            add_profile_hide, in_cut_hide, in_cut_shop_hide, drain_the_water_hide, height_hide, add_other_comp_hide, add_other_mount_hide,
-            add_diff_hide, mounting_hide, general_hide;
+    LinearLayout buguette_hide, vstavka_hide, lustr_hide, svetiln_hide, cabling_hide, karniz_hide, pipes_hide, bond_beam_hide, separator_hide,
+            mount_wall_hide, mount_granite_hide, wall_hide, fasteners_hide, fire_hide, add_vent_hide, add_diff_hide, soaring_ceiling_hide,
+            add_profile_hide, in_cut_hide, in_cut_shop_hide, drain_the_water_hide, diff_acc_hide, height_hide, add_other_comp_hide, add_other_mount_hide,
+            general_hide, layout_wall;
 
-    Button buguette_help, vstavka_help, lustr_help, svetiln_help, cabling_help, karniz_help, pipes_help, bond_beam_help, separator_help,
+    Button  mounting_hide, buguette_help, vstavka_help, lustr_help, svetiln_help, cabling_help, karniz_help, pipes_help, bond_beam_help, separator_help,
             mount_wall_help, mount_granite_help, wall_help, fasteners_help, fire_help, add_vent_help, diff_acc_help, soaring_ceiling_help,
             add_profile_help, in_cut_help, in_cut_shop_help, drain_the_water_help, height_help, add_other_comp_help, add_other_mount_help,
             add_diff_help, mounting_help, name_help;
@@ -91,7 +93,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             add_other_comp_layout, add_other_mount_layout, add_profile_layout, add_diff_layout, general_layout, second_layout;
 
     EditText ed_cabling, bond_beam, ed_separator, mount_wall, mount_granite, ed_wall, ed_fasteners, ed_fire, soaring_ceiling, ed_in_cut,
-            ed_in_cut_shop, ed_drain_the_water, ed_diff_acc;
+            ed_in_cut_shop, ed_drain_the_water, ed_diff_acc, count_pipes, count_fixtures, count_cornice, count_profile, count_hoods,
+            count_diffuzor;
 
     RadioGroup radios_height, radios_mounting;
 
@@ -179,7 +182,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_calculation, container, false);
 
-        if (String.valueOf(getActivity().getIntent().toString()).contains("Dealer_office")){
+        if (String.valueOf(getActivity().getIntent().toString()).contains("Dealer_office")) {
             dealer_calc = "true";
         }
 
@@ -191,6 +194,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         dealer_id_str = SP.getString("", "");
 
         scroll_calc = (ScrollView) view.findViewById(R.id.scroll_calc);
+        scroll_calc.setOnTouchListener(this);
         linear_image = (LinearLayout) view.findViewById(R.id.linear_image);
 
         chertezh = (Button) view.findViewById(R.id.chertezh);
@@ -209,33 +213,35 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         btn_calculate.setOnClickListener(this);
         priceMount.setOnClickListener(this);
 
-        buguette_hide = (Button) view.findViewById(R.id.buguette_hide);
-        vstavka_hide = (Button) view.findViewById(R.id.vstavka_hide);
-        lustr_hide = (Button) view.findViewById(R.id.lustr_hide);
-        svetiln_hide = (Button) view.findViewById(R.id.svetiln_hide);
-        cabling_hide = (Button) view.findViewById(R.id.cabling_hide);
-        karniz_hide = (Button) view.findViewById(R.id.karniz_hide);
-        pipes_hide = (Button) view.findViewById(R.id.pipes_hide);
-        bond_beam_hide = (Button) view.findViewById(R.id.bond_beam_hide);
-        separator_hide = (Button) view.findViewById(R.id.separator_hide);
-        mount_wall_hide = (Button) view.findViewById(R.id.mount_wall_hide);
-        mount_granite_hide = (Button) view.findViewById(R.id.mount_granite_hide);
-        wall_hide = (Button) view.findViewById(R.id.wall_hide);
-        fasteners_hide = (Button) view.findViewById(R.id.fasteners_hide);
-        fire_hide = (Button) view.findViewById(R.id.fire_hide);
-        add_vent_hide = (Button) view.findViewById(R.id.add_vent_hide);
-        diff_acc_hide = (Button) view.findViewById(R.id.diff_acc_hide);
-        soaring_ceiling_hide = (Button) view.findViewById(R.id.soaring_ceiling_hide);
-        add_profile_hide = (Button) view.findViewById(R.id.add_profile_hide);
-        in_cut_hide = (Button) view.findViewById(R.id.in_cut_hide);
-        in_cut_shop_hide = (Button) view.findViewById(R.id.in_cut_shop_hide);
-        height_hide = (Button) view.findViewById(R.id.height_hide);
-        add_other_comp_hide = (Button) view.findViewById(R.id.add_other_comp_hide);
-        add_other_mount_hide = (Button) view.findViewById(R.id.add_other_mount_hide);
-        add_diff_hide = (Button) view.findViewById(R.id.add_diff_hide);
-        drain_the_water_hide = (Button) view.findViewById(R.id.drain_the_water_hide);
+        diff_acc_hide = (LinearLayout) view.findViewById(R.id.diff_acc_hide);
+        height_hide = (LinearLayout) view.findViewById(R.id.height_hide);
+        add_other_comp_hide = (LinearLayout) view.findViewById(R.id.add_other_comp_hide);
+        add_other_mount_hide = (LinearLayout) view.findViewById(R.id.add_other_mount_hide);
         mounting_hide = (Button) view.findViewById(R.id.mounting_hide);
-        general_hide = (Button) view.findViewById(R.id.general_hide);
+
+        general_hide = (LinearLayout) view.findViewById(R.id.general_hide);
+        buguette_hide = (LinearLayout) view.findViewById(R.id.buguette_hide);
+        vstavka_hide = (LinearLayout) view.findViewById(R.id.vstavka_hide);
+        lustr_hide = (LinearLayout) view.findViewById(R.id.lustr_hide);
+        svetiln_hide = (LinearLayout) view.findViewById(R.id.svetiln_hide);
+        cabling_hide = (LinearLayout) view.findViewById(R.id.cabling_hide);
+        karniz_hide = (LinearLayout) view.findViewById(R.id.karniz_hide);
+        pipes_hide = (LinearLayout) view.findViewById(R.id.pipes_hide);
+        bond_beam_hide = (LinearLayout) view.findViewById(R.id.bond_beam_hide);
+        separator_hide = (LinearLayout) view.findViewById(R.id.separator_hide);
+        mount_wall_hide = (LinearLayout) view.findViewById(R.id.mount_wall_hide);
+        wall_hide = (LinearLayout) view.findViewById(R.id.wall_hide);
+        fasteners_hide = (LinearLayout) view.findViewById(R.id.fasteners_hide);
+        fire_hide = (LinearLayout) view.findViewById(R.id.fire_hide);
+        add_vent_hide = (LinearLayout) view.findViewById(R.id.add_vent_hide);
+        add_diff_hide = (LinearLayout) view.findViewById(R.id.add_diff_hide);
+        soaring_ceiling_hide = (LinearLayout) view.findViewById(R.id.soaring_ceiling_hide);
+        add_profile_hide = (LinearLayout) view.findViewById(R.id.add_profile_hide);
+        in_cut_hide = (LinearLayout) view.findViewById(R.id.in_cut_hide);
+        in_cut_shop_hide = (LinearLayout) view.findViewById(R.id.in_cut_shop_hide);
+        drain_the_water_hide = (LinearLayout) view.findViewById(R.id.drain_the_water_hide);
+
+        layout_wall = (LinearLayout) view.findViewById(R.id.layout_wall);
 
         buguette_hide.setOnClickListener(this);
         vstavka_hide.setOnClickListener(this);
@@ -247,7 +253,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         bond_beam_hide.setOnClickListener(this);
         separator_hide.setOnClickListener(this);
         mount_wall_hide.setOnClickListener(this);
-        mount_granite_hide.setOnClickListener(this);
         wall_hide.setOnClickListener(this);
         fasteners_hide.setOnClickListener(this);
         fire_hide.setOnClickListener(this);
@@ -284,7 +289,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         separator_help = (Button) view.findViewById(R.id.separator_help);
         soaring_ceiling_help = (Button) view.findViewById(R.id.soaring_ceiling_help);
         mount_wall_help = (Button) view.findViewById(R.id.mount_wall_help);
-        mount_granite_help = (Button) view.findViewById(R.id.mount_granite_help);
         cabling_help = (Button) view.findViewById(R.id.cabling_help);
         bond_beam_help = (Button) view.findViewById(R.id.bond_beam_help);
         in_cut_shop_help = (Button) view.findViewById(R.id.in_cut_shop_help);
@@ -318,7 +322,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         separator_help.setOnClickListener(this);
         soaring_ceiling_help.setOnClickListener(this);
         mount_wall_help.setOnClickListener(this);
-        mount_granite_help.setOnClickListener(this);
+        //mount_granite_help.setOnClickListener(this);
         cabling_help.setOnClickListener(this);
         bond_beam_help.setOnClickListener(this);
         in_cut_shop_help.setOnClickListener(this);
@@ -524,7 +528,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             String sqlQuewy = "SELECT calculation_title, n3, n4, n5, n6, n7, n8, n9," +
                     " n10, n11, n12, n16, n17, n18, n19, n20, n21, n24," +
                     " n25, dop_krepezh, calc_image, n27, color, offcut_square, discount, n28, n30, original_sketch, n31, n32, height, " +
-                    " extra_components, extra_mounting "
+                    " extra_components, extra_mounting, cut_image, cut_data, calc_data "
                     + "FROM rgzbn_gm_ceiling_calculations" +
                     " WHERE _id = ?";
 
@@ -566,6 +570,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         String height_2 = k.getString(k.getColumnIndex(k.getColumnName(30)));
                         String extra_components_2 = k.getString(k.getColumnIndex(k.getColumnName(31)));
                         String extra_mounting_2 = k.getString(k.getColumnIndex(k.getColumnName(32)));
+                        cut_image = k.getString(k.getColumnIndex(k.getColumnName(33)));
+                        cut_data = k.getString(k.getColumnIndex(k.getColumnName(34)));
+                        calc_data = k.getString(k.getColumnIndex(k.getColumnName(35)));
 
                         extra_comp(extra_components_2);
                         extra_mount(extra_mounting_2);
@@ -587,10 +594,20 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
 
                         name_project.setText(calculation_title);
+
                         area.setText(" S = " + n4_2 + " м2");
-                        S = Double.valueOf(n4_2);
+                        if (n4_2.equals("")) {
+                            S = 0.0;
+                        } else {
+                            S = Double.valueOf(n4_2);
+                        }
+
                         perimetr.setText(" P = " + n5_2 + " м");
-                        P = Double.valueOf(n5_2);
+                        if (n5_2.equals("")) {
+                            P = 0.0;
+                        } else {
+                            P = Double.valueOf(n5_2);
+                        }
 
                         SPSO = getActivity().getSharedPreferences("color_title_vs", MODE_PRIVATE);
                         ed = SPSO.edit();
@@ -609,8 +626,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             mount_granite.setVisibility(View.VISIBLE);
                             countComponents = true;
                         }
+
                         corners.setText(" Количество углов =   " + n9_2);
-                        n9 = Double.valueOf(n9_2);
+                        if (n9_2.equals("")) {
+                            n9 = 0.0;
+                        } else {
+                            n9 = Double.valueOf(n9_2);
+                        }
+
                         ed_in_cut.setText(n11_2);
                         if (n11_2.equals("0") || n11_2.equals("") || n11_2.equals("0.0")) {
                         } else {
@@ -978,6 +1001,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             if (SPI.getString("", "").equals("")) {
             } else {
                 cut_image = SPI.getString("", "");
+                Log.d("mLog", cut_image);
             }
 
             SPI = getActivity().getSharedPreferences("SAVED_KP", MODE_PRIVATE);
@@ -1031,6 +1055,34 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 Sharp.loadString(calc_image).into(image);
                 linear_image.setVisibility(View.VISIBLE);
             } catch (Exception e) {
+            }
+
+            try{
+                SPI = getActivity().getSharedPreferences("seam", MODE_PRIVATE);
+                int seam = Integer.valueOf(SPI.getString("", ""));
+                Log.d("mLog", "seam = " + seam);
+                if (seam > 1){
+                    final Context context = getActivity();
+                    AlertDialog.Builder ad = new AlertDialog.Builder(context);
+                    ad.setTitle("Потолок со швом. Изменить раскрой вручную?");  // заголовок
+                    ad.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int arg1) {
+
+                            Intent intent = new Intent(getActivity(), Activity_draft.class);
+                            startActivity(intent);
+
+                        }
+                    });
+                    ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int arg1) {
+
+                        }
+                    });
+                    ad.setCancelable(false);
+                    ad.show();
+                }
+
+            }catch (Exception e){
             }
 
         } else bool_resume = true;
@@ -1133,7 +1185,14 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         Log.d("mLog", "destroy");
 
+        Log.d("mLog", "id_calculation " + id_calculation);
+        Log.d("mLog", "dealer_calc " + dealer_calc);
+        Log.d("mLog", "id_project " + id_project);
+        Log.d("mLog", "delete_comp " + delete_comp);
+
         if (id_calculation == null || dealer_calc.equals("true") || id_project == null || delete_comp) {
+
+            Log.d("mLog", "destroy comp");
 
             dbHelper = new DBHelper(getActivity());
             SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -1201,8 +1260,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             cursor.close();
         }
 
-        if (dealer_calc.equals("false")){
-            Log.d("mLog", "______________________DEEEEEEEEEEEEEEEEEEESTROY_____________________");
+        if (dealer_calc.equals("false")) {
             sync(Integer.valueOf(id_calculation));
         }
 
@@ -1661,11 +1719,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void fixtures() {
 
+        delete_comp = false;
+
         circle_count = 0;
         square_count = 0;
 
         final DBHelper[] dbHelper = new DBHelper[1];
-        final EditText count_fixtures;
 
         final String[] select_vid = new String[1];
         final String[] select_diam = new String[1];
@@ -1921,6 +1980,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_FIXTURES, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_fixtures");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -2010,6 +2078,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     }
 
     void ecola() {
+
+        delete_comp = false;
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -2273,6 +2343,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_ECOLA, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_ecola");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                                        Log.d("mLog", "ecola = " + s_id);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -2364,7 +2445,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void cornice() {
 
-        final EditText count_cornice;
+        delete_comp = false;
+
         Button btn_add_cornice;
         ListView list_cornice;
 
@@ -2628,6 +2710,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CORNICE, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_cornice");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -2721,7 +2812,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void pipes() {
 
-        final EditText count_pipes;
+        delete_comp = false;
+
         Spinner spinner_diametr_pipes;
         Button btn_add_pipes;
         ListView list_pipes;
@@ -2901,6 +2993,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PIPES, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_pipes");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -2988,8 +3089,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void profile() {
 
+        delete_comp = false;
+
         final DBHelper[] dbHelper = new DBHelper[1];
-        final EditText count_profile;
         Spinner spinner_profiles;
         ListView list_profile;
 
@@ -3161,6 +3263,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROFIL, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_profil");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -3248,8 +3359,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
     void hoods() {
 
+        delete_comp = false;
+
         final DBHelper[] dbHelper = new DBHelper[1];
-        final EditText count_hoods;
 
         Button btn_add_hoods;
         ListView list_hoods;
@@ -3510,6 +3622,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_HOODS, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_hoods");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -3600,7 +3721,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     void diffuzor() {
 
         final DBHelper[] dbHelper = new DBHelper[1];
-        final EditText count_diffuzor;
         Spinner spinner_diffuzor;
         Button btn_add_diffuzor;
         ListView list_diffuzor;
@@ -3777,6 +3897,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                                                 do {
                                                     if (s_id.equals(cursor.getString(kd_Index))) {
                                                         db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_DIFFUSERS, "_id = ?", new String[]{String.valueOf(s_id)});
+
+                                                        ContentValues values = new ContentValues();
+                                                        values.put(DBHelper.KEY_ID_OLD, s_id);
+                                                        values.put(DBHelper.KEY_ID_NEW, "0");
+                                                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_diffusers");
+                                                        values.put(DBHelper.KEY_SYNC, "0");
+                                                        values.put(DBHelper.KEY_TYPE, "delete");
+                                                        values.put(DBHelper.KEY_STATUS, "1");
+                                                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
                                                     }
                                                 }
                                                 while (cursor.moveToNext());
@@ -4472,14 +4601,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 s_setdrawable1 = "";
                 fun_builder();
                 break;
-            case R.id.mount_granite_help:
-                s_setMessage = "    В расчет считается добавочная стоимость на сложность крепления в керамогранит";
-                s_setMessage1 = "";
-                s_setMessage2 = "";
-                s_setdrawable = "";
-                s_setdrawable1 = "";
-                fun_builder();
-                break;
             case R.id.cabling_help:
                 s_setMessage = "    В расчет входит провод (ПВС 2*0,75)\n" +
                         "А также на 1м провода:\n" +
@@ -4603,6 +4724,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (lustr_layout.getVisibility() == View.GONE) {
                     lustr_layout.setVisibility(View.VISIBLE);
                     lustr_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(lustr);
                 } else {
                     lustr_layout.setVisibility(View.GONE);
                     lustr_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4621,6 +4743,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_cabling.getVisibility() == View.GONE) {
                     ed_cabling.setVisibility(View.VISIBLE);
                     cabling_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_cabling);
                 } else {
                     ed_cabling.setVisibility(View.GONE);
                     cabling_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4630,6 +4753,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (karniz_layout.getVisibility() == View.GONE) {
                     karniz_layout.setVisibility(View.VISIBLE);
                     karniz_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(karniz);
                 } else {
                     karniz_layout.setVisibility(View.GONE);
                     karniz_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4639,6 +4763,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (pipes_layout.getVisibility() == View.GONE) {
                     pipes_layout.setVisibility(View.VISIBLE);
                     pipes_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(count_pipes);
                 } else {
                     pipes_layout.setVisibility(View.GONE);
                     pipes_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4648,6 +4773,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (bond_beam.getVisibility() == View.GONE) {
                     bond_beam.setVisibility(View.VISIBLE);
                     bond_beam_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(bond_beam);
                 } else {
                     bond_beam.setVisibility(View.GONE);
                     bond_beam_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4657,33 +4783,27 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_separator.getVisibility() == View.GONE) {
                     ed_separator.setVisibility(View.VISIBLE);
                     separator_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_separator);
                 } else {
                     ed_separator.setVisibility(View.GONE);
                     separator_hide.setBackgroundResource(R.drawable.rounded_button_question);
                 }
                 break;
             case R.id.mount_wall_hide:
-                if (mount_wall.getVisibility() == View.GONE) {
-                    mount_wall.setVisibility(View.VISIBLE);
+                if (layout_wall.getVisibility() == View.GONE) {
+                    layout_wall.setVisibility(View.VISIBLE);
                     mount_wall_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(mount_wall);
                 } else {
-                    mount_wall.setVisibility(View.GONE);
+                    layout_wall.setVisibility(View.GONE);
                     mount_wall_hide.setBackgroundResource(R.drawable.rounded_button_question);
-                }
-                break;
-            case R.id.mount_granite_hide:
-                if (mount_granite.getVisibility() == View.GONE) {
-                    mount_granite.setVisibility(View.VISIBLE);
-                    mount_granite_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
-                } else {
-                    mount_granite.setVisibility(View.GONE);
-                    mount_granite_hide.setBackgroundResource(R.drawable.rounded_button_question);
                 }
                 break;
             case R.id.wall_hide:
                 if (ed_wall.getVisibility() == View.GONE) {
                     ed_wall.setVisibility(View.VISIBLE);
                     wall_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_wall);
                 } else {
                     ed_wall.setVisibility(View.GONE);
                     wall_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4693,6 +4813,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_fasteners.getVisibility() == View.GONE) {
                     ed_fasteners.setVisibility(View.VISIBLE);
                     fasteners_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_fasteners);
                 } else {
                     ed_fasteners.setVisibility(View.GONE);
                     fasteners_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4702,6 +4823,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_fire.getVisibility() == View.GONE) {
                     ed_fire.setVisibility(View.VISIBLE);
                     fire_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_fire);
                 } else {
                     ed_fire.setVisibility(View.GONE);
                     fire_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4711,6 +4833,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (add_vent_layout.getVisibility() == View.GONE) {
                     add_vent_layout.setVisibility(View.VISIBLE);
                     add_vent_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(count_hoods);
                 } else {
                     add_vent_layout.setVisibility(View.GONE);
                     add_vent_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4720,6 +4843,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_diff_acc.getVisibility() == View.GONE) {
                     ed_diff_acc.setVisibility(View.VISIBLE);
                     diff_acc_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_diff_acc);
                 } else {
                     ed_diff_acc.setVisibility(View.GONE);
                     diff_acc_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4729,6 +4853,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (soaring_ceiling.getVisibility() == View.GONE) {
                     soaring_ceiling.setVisibility(View.VISIBLE);
                     soaring_ceiling_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(soaring_ceiling);
                 } else {
                     soaring_ceiling.setVisibility(View.GONE);
                     soaring_ceiling_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4738,6 +4863,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (add_profile_layout.getVisibility() == View.GONE) {
                     add_profile_layout.setVisibility(View.VISIBLE);
                     add_profile_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(count_profile);
                 } else {
                     add_profile_layout.setVisibility(View.GONE);
                     add_profile_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4747,6 +4873,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_in_cut_shop.getVisibility() == View.GONE) {
                     ed_in_cut_shop.setVisibility(View.VISIBLE);
                     in_cut_shop_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_in_cut_shop);
                 } else {
                     ed_in_cut_shop.setVisibility(View.GONE);
                     in_cut_shop_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4756,6 +4883,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_in_cut.getVisibility() == View.GONE) {
                     ed_in_cut.setVisibility(View.VISIBLE);
                     in_cut_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_in_cut);
                 } else {
                     ed_in_cut.setVisibility(View.GONE);
                     in_cut_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4765,6 +4893,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (ed_drain_the_water.getVisibility() == View.GONE) {
                     ed_drain_the_water.setVisibility(View.VISIBLE);
                     drain_the_water_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(ed_drain_the_water);
                 } else {
                     ed_drain_the_water.setVisibility(View.GONE);
                     drain_the_water_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4801,6 +4930,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 if (add_diff_layout.getVisibility() == View.GONE) {
                     add_diff_layout.setVisibility(View.VISIBLE);
                     add_diff_hide.setBackgroundResource(R.drawable.rounded_button_question_2);
+                    requestFocusEditText(count_diffuzor);
                 } else {
                     add_diff_layout.setVisibility(View.GONE);
                     add_diff_hide.setBackgroundResource(R.drawable.rounded_button_question);
@@ -4818,7 +4948,22 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        return false;
+    }
+
+    void requestFocusEditText(EditText editText) {
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
     void calculation() {
+
+        delete_comp = false;
 
         //------------------------------------- РАСЧЕТ СТОИМОСТИ КОМПЛЕКТУЮЩИХ -------------------------------------//
 
@@ -4844,7 +4989,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         }
 
         //люстры
-
         if (lustr.getText().toString().equals("") || lustr.getText().toString().equals("0") ||
                 lustr.getText().toString().equals("0.0")) {
             n12 = 0;
@@ -5162,8 +5306,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 save = String.valueOf(sbb);
 
-                Log.d("mLog", save);
-
                 for (int i = 1; i < cou + 1; i++) {
 
                     cut_data += "Полотно" + i + ": ";
@@ -5254,15 +5396,15 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 original_sketch += "||" + SAVED_CODE + "||" + SAVED_ALFAVIT;
             }
 
-            Integer end_n3 = null;
+            String end_n3 = "";
             if (calc_image.length() < 10) {
                 id_n3 = null;
-                end_n3 = null;
+                end_n3 = "";
             } else {
                 if (id_n3 == 0) {
-                    end_n3 = Integer.valueOf(n3);
+                    end_n3 = n3;
                 } else {
-                    end_n3 = id_n3;
+                    end_n3 = String.valueOf(id_n3);
                 }
             }
 
@@ -5353,7 +5495,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
 
             //из меню
-            delete_comp = false;
             if (dealer_calc.equals("true")) {
                 if (chertezh_bool) {
                     chertezh_bool = false;
@@ -5397,7 +5538,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         max_name = user_id_int + 1;
                     }
 
-                    Log.d("mLog","max_name " + max_name);
+                    Log.d("mLog", "max_name " + max_name);
 
                     Calendar date_cr = new GregorianCalendar();
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
@@ -5411,6 +5552,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_DEALER_ID, user_id);
                     values.put(DBHelper.KEY_MANAGER_ID, "");
                     values.put(DBHelper.KEY_CREATED, date);
+                    values.put(DBHelper.KEY_DELETED_BY_USER, "0");
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, null, values);
 
                     values = new ContentValues();
@@ -5473,6 +5615,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_TRANSPORT, "1");
                     values.put(DBHelper.KEY_DISTANCE, "0");
                     values.put(DBHelper.KEY_DISTANCE_COL, "1");
+                    values.put(DBHelper.KEY_DELETED_BY_USER, "0");
 
                     String change_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     values.put(DBHelper.KEY_CHANGE_TIME, change_time);
@@ -5536,7 +5679,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
                         sync(Integer.valueOf(id_calculation));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Log.d("mLog", String.valueOf(e));
                     }
                 }

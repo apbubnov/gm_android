@@ -3,6 +3,7 @@ package ru.ejevikaapp.gm_android.Fragments;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,10 +42,12 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
@@ -57,11 +61,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.ejevikaapp.gm_android.ActivityEstimate;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
+import ru.ejevikaapp.gm_android.Class.Extra_class;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
+import ru.ejevikaapp.gm_android.Class.Svetiln_class;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
@@ -90,7 +98,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     Calendar dateAndTime = new GregorianCalendar();
     Calendar dateAndTime2 = Calendar.getInstance();
     TextView name_cl, contact_cl, notes_cl, notes_gm_chief, notes_gm_calc, ed_discount, edit_transport_1, edit_transport_21,
-            edit_transport_22, c_address, advertisement;
+            edit_transport_22, c_address, advertisement, add_client_call;
+
+    EditText add_client_call_note;
 
     ScrollView view_general_inform;
     String id_cl;
@@ -107,12 +117,16 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     String distance = "";
     String time_h = "", time_brig, id_b, id_z;
 
-    Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj;
+    Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj, btn_history;
+
+    ImageButton btn_client_call;
+
     static DBHelper dbHelper;
     View view;
     TextView DateTime, S_and_P, DateTime_mount, currentDateTime;
     int discount = 0, count_calc = 0, bt_i = 0, ch_i = 0;
     ArrayList id_calcul = new ArrayList();
+    ArrayList id_calcul_deleted = new ArrayList();
     double total = 0, sum_transport = 0.0;
     static RequestQueue requestQueue;
 
@@ -146,7 +160,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
     ListView list_work;
 
-    TextView addressText;
+    TextView addressText, last_history, last_history_time;
 
     int day_week, year, day, dday, month, max_day;
     TextView calendar_month;
@@ -220,11 +234,15 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         notes_gm_chief = (TextView) view.findViewById(R.id.notes_gm_chief);
         notes_gm_calc = (TextView) view.findViewById(R.id.notes_gm_calc);
 
+        last_history = (TextView) view.findViewById(R.id.last_history);
+        last_history_time = (TextView) view.findViewById(R.id.last_history_time);
+
         c_address = (TextView) view.findViewById(R.id.c_address);
         c_address.setOnClickListener(this);
-
         advertisement = (TextView) view.findViewById(R.id.advertisement);
         advertisement.setOnClickListener(this);
+        add_client_call = (TextView) view.findViewById(R.id.add_client_call);
+        add_client_call.setOnClickListener(this);
 
         edit_transport_1 = (EditText) view.findViewById(R.id.edit_transport_1);
         edit_transport_1.setVisibility(View.GONE);
@@ -318,6 +336,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             }
         });
 
+        add_client_call_note = (EditText) view.findViewById(R.id.add_client_call_note);
+
         DateTime = (TextView) view.findViewById(R.id.data_cl);
         DateTime.setOnClickListener(this);
 
@@ -346,6 +366,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         save_proj.setOnClickListener(this);
         open_notes = (Button) view.findViewById(R.id.open_notes);
         open_notes.setOnClickListener(this);
+        btn_history = (Button) view.findViewById(R.id.btn_history);
+        btn_history.setOnClickListener(this);
 
         dbHelper = new DBHelper(getActivity());
         db = dbHelper.getReadableDatabase();
@@ -353,7 +375,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         sqlQuewy = "SELECT client_name "
                 + "FROM rgzbn_gm_ceiling_clients" +
                 " WHERE _id = ?";
-
         c = db.rawQuery(sqlQuewy, new String[]{id_cl});
         if (c != null) {
             if (c.moveToFirst()) {
@@ -368,15 +389,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         sqlQuewy = "SELECT phone "
                 + "FROM rgzbn_gm_ceiling_clients_contacts" +
                 " WHERE client_id = ?";
-
         c = db.rawQuery(sqlQuewy, new String[]{id_cl});
-
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
                     phone = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     btn(phone);
-
                 } while (c.moveToNext());
             }
         }
@@ -470,16 +488,21 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         for (int j = 0; count_calc > j; j++) {
             final CheckBox chb = CheckBoxList.get(j);
-
-            Log.d("mLog", "cc = " + CheckBoxList.size());
             chb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("mLog", " тут ");
                     if (chb.isChecked()) {
                         id_calcul.add(chb.getId());
                         count_calc++;
-                        Log.d("mLog", "count_calc2 ");
+                        for (int in = 0; id_calcul_deleted.size() > in; in++) {
+                            String str1 = String.valueOf(chb.getId());
+                            String str2 = String.valueOf(id_calcul_deleted.get(in));
+                            int str3 = str1.compareTo(str2);
+                            if (str3 == 0) {
+                                id_calcul_deleted.remove(in);
+                                break;
+                            }
+                        }
                         calc(id_calcul);
                     } else {
                         for (int in = 0; count_calc > in; in++) {
@@ -487,8 +510,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             String str2 = String.valueOf(id_calcul.get(in));
                             int str3 = str1.compareTo(str2);
                             if (str3 == 0) {
+                                id_calcul_deleted.add(chb.getId());
                                 id_calcul.remove(in);
-                                Log.d("mLog", "count_calc3 ");
                                 calc(id_calcul);
                                 count_calc--;
                                 break;
@@ -580,6 +603,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
                                                                 new String[]{id_cl});
 
+                                                        HelperClass.sendHistory("Изменено имя клиента с " + name_cl +
+                                                                " на " + name.getText().toString(), getActivity(), id_cl);
+
                                                         values = new ContentValues();
                                                         values.put(DBHelper.KEY_ID_OLD, id_cl);
                                                         values.put(DBHelper.KEY_ID_NEW, "0");
@@ -620,7 +646,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 break;
                         }
 
-
                     }
                 });
                 builder.setCancelable(false);
@@ -634,7 +659,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         edit_address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 String[] array = {"Изменить", "Построить маршрут"};
 
@@ -744,7 +768,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 }
 
                                 str = str.substring(0, str.length() - 1);
-                                if (str.equals("null")){
+                                if (str.equals("null")) {
                                     addressEdit.setText("");
                                 } else {
                                     addressEdit.setText(str);
@@ -791,6 +815,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                             full_address += ", код: " + code;
                                                         }
 
+                                                        HelperClass.sendHistory("Изменен адрес с " + c_address +
+                                                                " на " + full_address, getActivity(), id_cl);
+
                                                         DBHelper dbHelper = new DBHelper(getActivity());
                                                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                                                         ContentValues values = new ContentValues();
@@ -831,7 +858,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 startActivity(mapIntent);
                                 break;
                         }
-
 
                     }
                 });
@@ -900,11 +926,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                         DBHelper dbHelper = new DBHelper(getActivity());
                                         SQLiteDatabase db = dbHelper.getWritableDatabase();
                                         ContentValues values = new ContentValues();
-                                        Log.d("mLog", "vybor = " + id_z);
                                         values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date_zamera + " " + time_h + ":00");
                                         values.put(DBHelper.KEY_PROJECT_CALCULATOR, id_z);
                                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
                                                 new String[]{id_project});
+
+                                        HelperClass.sendHistory("Изменена дата и время замера на " + date_zamera + " " + time_h + ":00",
+                                                getActivity(), id_cl);
 
                                         values = new ContentValues();
                                         values.put(DBHelper.KEY_ID_OLD, id_project);
@@ -980,6 +1008,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                 max_id_contac = user_id_int * 100000 + 1;
                                             }
 
+                                            HelperClass.sendHistory("Номер добавлен " + phone.getText().toString(), getActivity(), id_cl);
+
                                             values.put(DBHelper.KEY_ID, max_id_contac);
                                             values.put(DBHelper.KEY_CLIENT_ID, id_cl);
                                             values.put(DBHelper.KEY_PHONE, phone.getText().toString());
@@ -1015,6 +1045,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             }
         });
 
+        history();
+
         return view;
     }
 
@@ -1029,13 +1061,36 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
     }
 
-    void calc(ArrayList id_calcul) {
-
-        for (int i = 0; i < id_calcul.size(); i++) {
-        }
+    void history() {
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String sqlQuewy = "select date_time, text "
+                + "FROM rgzbn_gm_ceiling_client_history " +
+                "where client_id = ?";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{id_cl});
+        if (c != null) {
+            if (c.moveToLast()) {
+                String date_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                String text = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                last_history.setText(text);
+                last_history_time.setText(date_time);
+            }
+        }
+        c.close();
+    }
+
+    void calc(ArrayList id_calcul) {
+
+        dbHelper = new DBHelper(getActivity());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        for (int id = 0; id_calcul_deleted.size() > id; id++) {
+            Log.d("mLog", "deleted = " + id_calcul_deleted.get(id));
+        }
+
         double s = 0.0;
         double p = 0.0;
         double tmp = 0;     // компоненты со скидкой
@@ -1048,6 +1103,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         double total_d = 0;
 
         double dis = 0;
+        Double avg = 0.0;
 
         String sqlQuewy;
         Cursor c;
@@ -1081,20 +1137,29 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             dis = 0;
                         }
 
-                        tmp_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                        Double avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                        avg = avg * ((100 - dis) / 100);
-                        tmp += avg;
+                        try {
+                            tmp_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                            avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                            avg = avg * ((100 - dis) / 100);
+                            tmp += avg;
+                        } catch (Exception e) {
+                        }
 
-                        tmp2_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
-                        avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
-                        avg = avg * ((100 - dis) / 100);
-                        tmp2 += avg;
+                        try {
+                            tmp2_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                            avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                            avg = avg * ((100 - dis) / 100);
+                            tmp2 += avg;
+                        } catch (Exception e) {
+                        }
 
-                        tmp3_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
-                        avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
-                        avg = avg * ((100 - dis) / 100);
-                        tmp3 += avg;
+                        try {
+                            tmp3_d += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
+                            avg = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
+                            avg = avg * ((100 - dis) / 100);
+                            tmp3 += avg;
+                        } catch (Exception e) {
+                        }
 
                     } while (c.moveToNext());
                 }
@@ -1231,10 +1296,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             c.close();
         }
 
-        if (discount > 0) {
-            sum_transport = sum_transport / 100 * (100 - discount);
-        }
-
         final_transport_sum.setText(String.valueOf((Math.round(sum_transport) * 100.0) / 100));
 
         total += sum_transport;
@@ -1242,7 +1303,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         if (discount > 0) {
             final_amount_disc.setText("Итого/ \n" + "  - %");
-            final_amount.setText(String.valueOf((Math.round(total_d) * 100.0) / 100) + "/ \n" + String.valueOf((Math.round(total) * 100.0) / 100));
+            final_amount.setText(String.valueOf((Math.round(total_d) * 100.0) / 100)
+                    + "/ \n" + String.valueOf((Math.round(total) * 100.0) / 100));
         } else {
             final_amount.setText(String.valueOf(Math.round(total_d * 100) / 100));
         }
@@ -1431,6 +1493,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
                         String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(3)));
 
+                        Log.d("mLog", idd);
+
                         double n5 = 0;
                         sqlQuewy = "select n5 "
                                 + "FROM rgzbn_gm_ceiling_calculations " +
@@ -1608,6 +1672,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                             values.put(DBHelper.KEY_STATUS, "1");
                                                             db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
+                                                            HelperClass.sendHistory("Телефон изменён " + btnn.getText().toString(), getActivity(), id_cl);
+
                                                             getActivity().finish();
                                                             Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
                                                             startActivity(intent);
@@ -1664,6 +1730,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                     cc.close();
 
                                                     db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "_id = ?", new String[]{id_phone});
+
+                                                    HelperClass.sendHistory("Удалён номер клиента " + btnn.getText().toString(), getActivity(), id_cl);
 
                                                     getActivity().finish();
                                                     Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
@@ -1723,6 +1791,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                     cc.close();
 
                                     db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, "_id = ?", new String[]{id_phone});
+
+                                    HelperClass.sendHistory("Удалён номер клиента " + btnn.getText().toString(), getActivity(), id_cl);
 
                                     getActivity().finish();
                                     Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
@@ -1799,7 +1869,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             case R.id.advertisement:
 
                 DBHelper dbHelper = new DBHelper(getActivity());
-                 db = dbHelper.getWritableDatabase();
+                db = dbHelper.getWritableDatabase();
                 final ArrayList<Select_work> sel_work = new ArrayList<>();
                 final ArrayList<Integer> id_api_phones = new ArrayList<>();
 
@@ -2151,7 +2221,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     str += retval + ",";
                 }
                 str = str.substring(0, str.length() - 1);
-                if (str.equals("null")){
+                if (str.equals("null")) {
                     addressEdit.setText("");
                 } else {
                     addressEdit.setText(str);
@@ -2458,8 +2528,170 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     notes.setVisibility(View.GONE);
                 }
                 break;
+
+            case R.id.btn_history:
+                li = LayoutInflater.from(context);
+                promptsView = li.inflate(R.layout.layout_history_client, null);
+                mDialogBuilder = new AlertDialog.Builder(context);
+                mDialogBuilder.setView(promptsView);
+
+                final ListView list_history = (ListView) promptsView.findViewById(R.id.list_history);
+                final EditText ed_history = (EditText) promptsView.findViewById(R.id.ed_history);
+                final ImageButton btn_history = (ImageButton) promptsView.findViewById(R.id.btn_history);
+
+                final SQLiteDatabase finalDb3 = db;
+                btn_history.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String str_history = ed_history.getText().toString();
+                        if (str_history.length() > 0) {
+
+                            HelperClass.sendHistory(str_history, getActivity(), id_cl);
+
+                            ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
+                            HashMap<String, String> map;
+
+                            String sqlQuewy = "select  date_time, text "
+                                    + "FROM rgzbn_gm_ceiling_client_history " +
+                                    "where client_id = ?";
+                            Cursor c = finalDb3.rawQuery(sqlQuewy, new String[]{String.valueOf(id_cl)});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        String date_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+                                        String text = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                                        map = new HashMap<>();
+                                        map.put("time", date_time);
+                                        map.put("title", text);
+                                        arrayList.add(map);
+
+                                    } while (c.moveToNext());
+                                }
+                            }
+
+                            SimpleAdapter adapter = new SimpleAdapter(getActivity(), arrayList, android.R.layout.simple_list_item_2,
+                                    new String[]{"title", "time"},
+                                    new int[]{android.R.id.text1, android.R.id.text2});
+
+                            list_history.setAdapter(adapter);
+
+                            ed_history.setText("");
+
+                            history();
+                        }
+                    }
+                });
+
+                ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
+                HashMap<String, String> map;
+
+                sqlQuewy = "select  date_time, text "
+                        + "FROM rgzbn_gm_ceiling_client_history " +
+                        "where client_id = ?";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_cl)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            String date_time = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+                            String text = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                            map = new HashMap<>();
+                            map.put("time", date_time);
+                            map.put("title", text);
+                            arrayList.add(map);
+
+                        } while (c.moveToNext());
+                    }
+                }
+
+                SimpleAdapter adapter = new SimpleAdapter(getActivity(), arrayList, android.R.layout.simple_list_item_2,
+                        new String[]{"title", "time"},
+                        new int[]{android.R.id.text1, android.R.id.text2});
+                list_history.setAdapter(adapter);
+
+                alertDialog = mDialogBuilder.create();
+                alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+                alertDialog.show();
+                break;
+
+            case R.id.add_client_call:
+                setTime(add_client_call);
+                setDate(add_client_call);
+
+                btn_client_call = (ImageButton) view.findViewById(R.id.btn_client_call);
+                final SQLiteDatabase finalDb4 = db;
+                btn_client_call.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (add_client_call.getText().toString().length() > 0) {
+
+                            HelperClass.sendHistory("Добавлен звонок на " + add_client_call.getText().toString(), getActivity(), id_cl);
+
+                            add_client_call.setText("");
+                            add_client_call_note.setText("");
+
+                            history();
+                        }
+                    }
+                });
+                break;
         }
     }
+
+    private void setInitialDateTimeCall() {
+        add_client_call.setText(add_client_call.getText().toString() + " " +
+                DateUtils.formatDateTime(getActivity(),
+                        dateAndTime.getTimeInMillis(),
+                        DateUtils.FORMAT_SHOW_TIME));
+    }
+
+    public void setDate(View v) {
+        final Calendar cal = Calendar.getInstance();
+        int mYear = cal.get(Calendar.YEAR);
+        int mMonth = cal.get(Calendar.MONTH);
+        int mDay = cal.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        if (monthOfYear < 9) {
+                            String editTextDateParam = dayOfMonth + ".0" + (monthOfYear + 1) + "." + year;
+                            add_client_call.setText(editTextDateParam);
+                        } else {
+                            String editTextDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
+                            add_client_call.setText(editTextDateParam);
+                        }
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
+    }
+
+    public void setTime(View v) {
+        new TimePickerDialog(getActivity(), call_time,
+                dateAndTime.get(Calendar.HOUR_OF_DAY),
+                dateAndTime.get(Calendar.MINUTE), true)
+                .show();
+    }
+
+    DatePickerDialog.OnDateSetListener call_date = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            dateAndTime.set(Calendar.YEAR, year);
+            dateAndTime.set(Calendar.MONTH, monthOfYear);
+            dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            setInitialDateTimeCall();
+        }
+    };
+
+    TimePickerDialog.OnTimeSetListener call_time = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            dateAndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            dateAndTime.set(Calendar.MINUTE, minute);
+            setInitialDateTimeCall();
+        }
+    };
 
     private void loadAddress() throws IOException {
         String input = addressEdit.getText().toString();
@@ -2790,15 +3022,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         @Override
         public void onClick(View v) {
             int id = v.getId();
-
             int id_calc = estimate.get(id);
 
-            Log.d("mLog", "getEst = " + id + " " + id_calc);
             Intent intent;
             intent = new Intent(getActivity(), ActivityEstimate.class);
             intent.putExtra("id_calculation", String.valueOf(id_calc));
             startActivity(intent);
-
         }
     };
 
@@ -3003,6 +3232,95 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         SQLiteDatabase db;
         db = dbHelper.getWritableDatabase();
 
+        if (id_calcul_deleted.size() > 0) {
+
+            int max_id_proj = 0;
+            try {
+                String sqlQuewy = "select MAX(_id) "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where _id>? and _id<?";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.valueOf(dealer_id) * 100000),
+                        String.valueOf(Integer.valueOf(dealer_id) * 100000 + 99999)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            max_id_proj = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                            max_id_proj++;
+                        } while (c.moveToNext());
+                    }
+                }
+            } catch (Exception e) {
+                max_id_proj = Integer.valueOf(dealer_id) * 100000 + 1;
+            }
+
+            for (int id = 0; id_calcul_deleted.size() > id; id++) {
+
+                String sqlQuewy = "select * "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where _id = ?";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{id_project});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        ContentValues contentValues = new ContentValues();
+
+                        for (int j = 0; j < HelperClass.countColumns(getActivity(), "rgzbn_gm_ceiling_projects"); j++) {
+                            String columnName = c.getColumnName(c.getColumnIndex(c.getColumnName(j)));
+                            String value = c.getString(c.getColumnIndex(c.getColumnName(j)));
+
+                            Log.d("mLog", "columnName " + columnName + " value " + value);
+
+                            if (columnName.equals("project_status")) {
+                                value = "3";
+                                contentValues.put(columnName, value);
+                            } else if (columnName.equals("project_mounting_date")) {
+                                value = "0000-00-00 00:00:00";
+                                contentValues.put(columnName, value);
+                            } else if (columnName.equals("gm_calculator_note")) {
+                                value = "Не вошедшие в договор №" + id_project;
+                                contentValues.put(columnName, value);
+                            } else if (columnName.equals("project_verdict")) {
+                                value = "0";
+                                contentValues.put(columnName, value);
+                            } else if (columnName.equals("_id")) {
+                            } else {
+                                contentValues.put(columnName, value);
+                            }
+                        }
+
+                        contentValues.put("_id", max_id_proj);
+                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, contentValues);
+
+                        contentValues = new ContentValues();
+                        contentValues.put(DBHelper.KEY_ID_OLD, max_id_proj);
+                        contentValues.put(DBHelper.KEY_ID_NEW, 0);
+                        contentValues.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
+                        contentValues.put(DBHelper.KEY_SYNC, "0");
+                        contentValues.put(DBHelper.KEY_TYPE, "send");
+                        contentValues.put(DBHelper.KEY_STATUS, "1");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, contentValues);
+
+                    }
+                }
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(DBHelper.KEY_PROJECT_ID, max_id_proj);
+                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, contentValues, "_id = ? and project_id = ?",
+                        new String[]{String.valueOf(id_calcul_deleted.get(id)), id_project});
+
+                contentValues = new ContentValues();
+                contentValues.put(DBHelper.KEY_ID_OLD, String.valueOf(id_calcul_deleted.get(id)));
+                contentValues.put(DBHelper.KEY_ID_NEW, 0);
+                contentValues.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_calculations");
+                contentValues.put(DBHelper.KEY_SYNC, "0");
+                contentValues.put(DBHelper.KEY_TYPE, "send");
+                contentValues.put(DBHelper.KEY_STATUS, "1");
+                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, contentValues);
+
+                HelperClass.sendHistory("Не вошедшие в договор № " + id_project +
+                        " потолки перемещены в проект № " + max_id_proj, getActivity(), id_cl);
+            }
+        }
+
         ContentValues values;
         if (id_b == null) {
             values = new ContentValues();
@@ -3014,6 +3332,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             values.put(DBHelper.KEY_PROJECT_SUM, (Math.round(total) * 100.0) / 100);
             values.put(DBHelper.KEY_PROJECT_STATUS, "4");
             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
+
+            HelperClass.sendHistory("По проекту № " + id_project + " заключен договор", getActivity(), id_cl);
         } else {
             values = new ContentValues();
             values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, date_mount + time_brig + ":00");
@@ -3026,6 +3346,12 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             values.put(DBHelper.KEY_PROJECT_SUM, (Math.round(total) * 100.0) / 100);
             values.put(DBHelper.KEY_PROJECT_STATUS, "5");
             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
+
+            String callDate = date_mount + time_brig;
+            HelperClass.sendHistory("По проекту № " + id_project + " заключен договор", getActivity(), id_cl);
+            HelperClass.sendHistory("Проект № " + id_project + " назначен монтаж на " + date_mount + time_brig + ":00", getActivity(), id_cl);
+            HelperClass.sendHistory("Добавлен новый звонок по причине: Уточнить готов ли клиент к монтажу ", getActivity(), id_cl);
+            HelperClass.sendCallback("Уточнить готов ли клиент к монтажу ", getActivity(), id_cl, callDate);
         }
 
         values = new ContentValues();
@@ -3076,6 +3402,52 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         values.put(DBHelper.KEY_STATUS, "1");
         db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
+        try {
+            int max_id_recoil = 0;
+            try {
+                String sqlQuewy = "select MAX(_id) "
+                        + "FROM rgzbn_gm_ceiling_recoil_map_project " +
+                        "where _id>? and _id<?";
+                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                        String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            max_id_recoil = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                            max_id_recoil++;
+                        } while (c.moveToNext());
+                    }
+                }
+            } catch (Exception e) {
+                max_id_recoil = Integer.parseInt(dealer_id) * 100000 + 1;
+            }
+
+            Log.d("mLog", "max_id_recoil " + max_id_recoil);
+
+            date = HelperClass.now_date(getActivity());
+            String sum = total_sum.getText().toString();
+
+            values = new ContentValues();
+            values.put(DBHelper.KEY_ID, max_id_recoil);
+            values.put(DBHelper.KEY_RECOIL_ID, dealer_id);
+            values.put(DBHelper.KEY_PROJECT_ID, id_project);
+            values.put(DBHelper.KEY_DATE_TIME, date);
+            values.put(DBHelper.KEY_SUM, "-" + sum);
+            values.put(DBHelper.KEY_COMMENT, "");
+            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_RECOIL_MAP_PROJECT, null, values);
+
+            values = new ContentValues();
+            values.put(DBHelper.KEY_ID_OLD, max_id_recoil);
+            values.put(DBHelper.KEY_ID_NEW, 0);
+            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_recoil_map_project");
+            values.put(DBHelper.KEY_SYNC, "0");
+            values.put(DBHelper.KEY_TYPE, "send");
+            values.put(DBHelper.KEY_STATUS, "1");
+            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+        } catch (Exception e) {
+            Log.d("mLog", "error " + e);
+        }
+
         Toast toast = Toast.makeText(getActivity(), "Проект направлен в запущенные", Toast.LENGTH_SHORT);
         toast.show();
 
@@ -3086,6 +3458,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "1");
         ed.commit();
+
 
     }
 
@@ -3239,7 +3612,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             for (int j = 0; j < COLUMNS; j++) {
                 if ((j == first_day_int || flag) && dday < max_day) {
 
-                    for (int id_b = 0; id_brigade.size() > id_b; id_b++) {
+                    //for (int id_b = 0; id_brigade.size() > id_b; id_b++) {
                         Button btn = new Button(getActivity());
                         dday++;
                         String mount_day;
@@ -3279,8 +3652,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         } else {
                             sqlQuewy = "select _id, read_by_mounter "
                                     + "FROM rgzbn_gm_ceiling_projects " +
-                                    "where project_mounter = ? and project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
-                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_brigade.get(id_b), mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
+                                    "where  project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{ mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
                             if (cc != null) {
                                 if (cc.moveToFirst()) {
                                     do {
@@ -3303,7 +3676,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             btn.setOnClickListener(getDateMount);
                             tableRow.addView(btn, j);
                         }
-                    }
+                    //}
+
                 } else {
                     Button btn = new Button(getActivity());
                     btn.setText("");
@@ -3421,7 +3795,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 " WHERE _id = ?";
 
         Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
-        double tmp = 0;     // компоненты
+        Double tmp = 0.0;     // компоненты
         double tmp2 = 0;    // канвас
         double tmp3 = 0;    // монтаж
         double dis = 0.0;
@@ -3430,16 +3804,26 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 do {
                     S = c.getString(c.getColumnIndex(c.getColumnName(0)));
                     P = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
-                    tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
-                    tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
+
+                    try {
+                        tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                    } catch (Exception e) {
+                    }
+                    try {
+                        tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                    } catch (Exception e) {
+                    }
+                    try {
+                        tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
+                    } catch (Exception e) {
+                    }
                     try {
                         if (c.getString(c.getColumnIndex(c.getColumnName(5))).equals("")) {
                             dis = 0.0;
                         } else {
                             dis = Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(5))));
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         dis = 0.0;
                     }
                 } while (c.moveToNext());
