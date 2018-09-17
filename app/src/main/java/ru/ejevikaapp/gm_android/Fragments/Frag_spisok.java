@@ -68,7 +68,6 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     ListView list_clients;
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
-    SharedPreferences SP;
     String SAVED_ID = "", user_id;
     View view;
 
@@ -134,19 +133,14 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     @Override
     public void onResume() {
         super.onResume();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                client_mas.clear();
-                clients();
-            }
-        }, 1000);
+        client_mas.clear();
+        clients();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+        SharedPreferences SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
         SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "");
         ed.commit();
@@ -154,14 +148,14 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
     void clients() {
 
-        SP = this.getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
+        SharedPreferences SP = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");
 
-        SP = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
+        SP = getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         String dealer_id = SP.getString("", "");
 
         // если зашёл после выбора клиента (Дилер)
-        SP = this.getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
+        SP = getActivity().getSharedPreferences("activity_client", MODE_PRIVATE);
         activity_client = SP.getString("", "");
 
         LinearLayout layout_history = (LinearLayout) view.findViewById(R.id.layout_history);
@@ -417,7 +411,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                 Frag_client_schedule_class selectedid = client_mas.get(position);
                 String p_id = selectedid.getId();
 
-                SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
+                SharedPreferences SP = getActivity().getSharedPreferences("id_project_spisok", MODE_PRIVATE);
                 SharedPreferences.Editor ed = SP.edit();
                 ed.putString("", String.valueOf(p_id));
                 ed.commit();

@@ -553,7 +553,7 @@ function save_data(){
     AndroidFunction.func_elem_jform_n5(elem_jform_n5.value);
     AndroidFunction.func_elem_jform_n9(elem_jform_n9.value);
 
-	// добавить p_usadki_final
+    AndroidFunction.func_elem_jform_p_usadki_final(p_usadki_final);
 
     AndroidFunction.func_elem_jform_square_obrezkov(square_obrezkov);
 

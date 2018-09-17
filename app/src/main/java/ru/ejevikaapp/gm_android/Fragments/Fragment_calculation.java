@@ -84,7 +84,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             add_profile_hide, in_cut_hide, in_cut_shop_hide, drain_the_water_hide, diff_acc_hide, height_hide, add_other_comp_hide, add_other_mount_hide,
             general_hide, layout_wall;
 
-    Button  mounting_hide, buguette_help, vstavka_help, lustr_help, svetiln_help, cabling_help, karniz_help, pipes_help, bond_beam_help, separator_help,
+    Button mounting_hide, buguette_help, vstavka_help, lustr_help, svetiln_help, cabling_help, karniz_help, pipes_help, bond_beam_help, separator_help,
             mount_wall_help, mount_granite_help, wall_help, fasteners_help, fire_help, add_vent_help, diff_acc_help, soaring_ceiling_help,
             add_profile_help, in_cut_help, in_cut_shop_help, drain_the_water_help, height_help, add_other_comp_help, add_other_mount_help,
             add_diff_help, mounting_help, name_help;
@@ -135,6 +135,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
     String SAVED_PT_P = "";
     String SAVED_CODE = "";
     String SAVED_ALFAVIT = "";
+    String p_usadki = "";
 
     Integer user_id_int, id_n3 = 0;
 
@@ -859,9 +860,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
         }
 
-        Log.d("mLog", " ___ id_calculation ___ " + id_calculation);
-        Log.d("mLog", " ___ id_project ___ " + id_project);
-
         fixtures();
         ecola();
         cornice();
@@ -1010,22 +1008,28 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 SAVED_KP = SPI.getString("", "");
             }
 
-            SPI = getActivity().getSharedPreferences("SAVED_WP", MODE_PRIVATE);
+            SPI = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
             if (SPI.getString("", "").equals("")) {
             } else {
                 SAVED_WP = SPI.getString("", "");
             }
 
-            SPI = getActivity().getSharedPreferences("SAVED_DP", MODE_PRIVATE);
+            SPI = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
             if (SPI.getString("", "").equals("")) {
             } else {
                 SAVED_DP = SPI.getString("", "");
             }
 
-            SPI = getActivity().getSharedPreferences("SAVED_PT_P", MODE_PRIVATE);
+            SPI = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
             if (SPI.getString("", "").equals("")) {
             } else {
                 SAVED_PT_P = SPI.getString("", "");
+            }
+
+            SPI = getActivity().getSharedPreferences("p_usadki_final", MODE_PRIVATE);
+            if (SPI.getString("", "").equals("")) {
+            } else {
+                p_usadki = SPI.getString("", "");
             }
 
             SPI = getActivity().getSharedPreferences("SAVED_CODE", MODE_PRIVATE);
@@ -1057,11 +1061,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             } catch (Exception e) {
             }
 
-            try{
+            /*
+            try {
                 SPI = getActivity().getSharedPreferences("seam", MODE_PRIVATE);
                 int seam = Integer.valueOf(SPI.getString("", ""));
-                Log.d("mLog", "seam = " + seam);
-                if (seam > 1){
+                if (seam > 1) {
                     final Context context = getActivity();
                     AlertDialog.Builder ad = new AlertDialog.Builder(context);
                     ad.setTitle("Потолок со швом. Изменить раскрой вручную?");  // заголовок
@@ -1069,8 +1073,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         public void onClick(DialogInterface dialog, int arg1) {
 
                             Intent intent = new Intent(getActivity(), Activity_draft.class);
+                            intent.putExtra("redactor", "1");
                             startActivity(intent);
 
+                            sPref = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
+                            String walls_points = sPref.getString("", "");
                         }
                     });
                     ad.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -1082,8 +1089,9 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     ad.show();
                 }
 
-            }catch (Exception e){
+            } catch (Exception e) {
             }
+            */
 
         } else bool_resume = true;
 
@@ -1117,7 +1125,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             id_project = String.valueOf(max_id_proj);
 
-            Log.d("mLog", "id_project " + id_project);
         }
 
         SPSO = getActivity().getSharedPreferences("color_title_id", MODE_PRIVATE);
@@ -1324,17 +1331,17 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ed.putString("", "");
         ed.commit();
 
-        SP = getActivity().getSharedPreferences("SAVED_WP", MODE_PRIVATE);
+        SP = getActivity().getSharedPreferences("draft_walls_points", MODE_PRIVATE);
         ed = SP.edit();
         ed.putString("", "");
         ed.commit();
 
-        SP = getActivity().getSharedPreferences("SAVED_DP", MODE_PRIVATE);
+        SP = getActivity().getSharedPreferences("draft_diags_points", MODE_PRIVATE);
         ed = SP.edit();
         ed.putString("", "");
         ed.commit();
 
-        SP = getActivity().getSharedPreferences("SAVED_PT_P", MODE_PRIVATE);
+        SP = getActivity().getSharedPreferences("draft_pt_points", MODE_PRIVATE);
         ed = SP.edit();
         ed.putString("", "");
         ed.commit();
@@ -1370,6 +1377,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ed.commit();
 
         SP = getActivity().getSharedPreferences("end_draft", MODE_PRIVATE);
+        ed = SP.edit();
+        ed.putString("", "");
+        ed.commit();
+
+        SP = getActivity().getSharedPreferences("seam", MODE_PRIVATE);
         ed = SP.edit();
         ed.putString("", "");
         ed.commit();
@@ -4131,8 +4143,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                             int priceIndex = c.getInt(c.getColumnIndex(c.getColumnName(0)));
                             float widthIndex = c.getFloat(c.getColumnIndex(c.getColumnName(1)));
 
-                            Log.d("mLog", String.valueOf(widthIndex) + "  " + priceIndex);
-
                             float width = widthIndex * 100;
                             int price = priceIndex;
                             str += "{\"width\":" + (Math.round(width) + "," + "\"price\":" + price + "},");
@@ -4258,6 +4268,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     toast.show();
 
                     intent = new Intent(getActivity(), Activity_draft.class);
+                    intent.putExtra("redactor", "0");
                     startActivity(intent);
                 }
 
@@ -4294,6 +4305,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         ed.commit();
 
                         intent = new Intent(getActivity(), Activity_draft.class);
+                        intent.putExtra("redactor", "0");
                         startActivity(intent);
 
                         if (id_project == null || dealer_calc.equals("true")) {
@@ -4323,6 +4335,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     ed.commit();
 
                     intent = new Intent(getActivity(), Activity_draft.class);
+                    intent.putExtra("redactor", "0");
                     startActivity(intent);
 
                     if (id_project == null || dealer_calc.equals("true")) {
@@ -5306,7 +5319,11 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
                 save = String.valueOf(sbb);
 
+                Log.d("mLog", "cou = " + cou);
+
                 for (int i = 1; i < cou + 1; i++) {
+
+                    Log.d("mLog", "i = " + i);
 
                     cut_data += "Полотно" + i + ": ";
 
@@ -5329,8 +5346,10 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
 
                     cut_data = cut_data.substring(0, cut_data.length() - 1);
-                    cut_data += "; ";
+                    cut_data += "| ";
                 }
+
+                cut_data += "||" + p_usadki;
 
                 try {
                     save = "{wp:" + SAVED_WP + "}";
@@ -5471,6 +5490,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                 } else if (double_chertezh_bool) {
                     db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, values, "_id = ?", new String[]{id_calculation});
                     getActivity().finish();
+
                 } else if (!double_chertezh_bool) {
                     values.put(DBHelper.KEY_ID, id_calculation);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALCULATIONS, null, values);
@@ -5596,10 +5616,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_PROJECT_INFO, "");
                     values.put(DBHelper.KEY_PROJECT_CALCULATION_DATE, date);
                     values.put(DBHelper.KEY_PROJECT_CALCULATOR, user_id);
-                    values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, "0000-00-00 00:00:00");
-                    values.put(DBHelper.KEY_PROJECT_MOUNTING_START, "0000-00-00 00:00:00");
-                    values.put(DBHelper.KEY_PROJECT_MOUNTING_END, "0000-00-00 00:00:00");
-                    values.put(DBHelper.KEY_PROJECT_MOUNTER, "null");
                     values.put(DBHelper.KEY_CREATED, date);
                     values.put(DBHelper.KEY_CREATED_BY, user_id);
                     values.put(DBHelper.KEY_MODIFIED_BY, user_id);
@@ -5617,13 +5633,12 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     values.put(DBHelper.KEY_DISTANCE_COL, "1");
                     values.put(DBHelper.KEY_DELETED_BY_USER, "0");
 
+                    values.put(DBHelper.KEY_ID, id_project);
                     String change_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     values.put(DBHelper.KEY_CHANGE_TIME, change_time);
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
 
                     values = new ContentValues();
-                    values.put(DBHelper.KEY_ID_OLD, id_project);
-                    values.put(DBHelper.KEY_ID_NEW, 0);
                     values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
                     values.put(DBHelper.KEY_SYNC, "0");
                     values.put(DBHelper.KEY_TYPE, "send");
@@ -5673,6 +5688,52 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         values.put(DBHelper.KEY_ID_OLD, max_id_proj_history);
                         values.put(DBHelper.KEY_ID_NEW, 0);
                         values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_history");
+                        values.put(DBHelper.KEY_SYNC, "0");
+                        values.put(DBHelper.KEY_TYPE, "send");
+                        values.put(DBHelper.KEY_STATUS, "1");
+                        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                        sync(Integer.valueOf(id_calculation));
+                    } catch (Exception e) {
+                        Log.d("mLog", String.valueOf(e));
+                    }
+
+                    try {
+                        int max_id_proj_mounters = 0;
+                        try {
+                            sqlQuewy = "select MAX(_id) "
+                                    + "FROM rgzbn_gm_ceiling_projects_mounters " +
+                                    "where _id>? and _id<?";
+                            c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(user_id_int), String.valueOf(user_id_int + 99999)});
+                            if (c != null) {
+                                if (c.moveToFirst()) {
+                                    do {
+                                        max_id_proj_mounters = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                        max_id_proj_mounters++;
+                                    } while (c.moveToNext());
+                                }
+                            }
+                        } catch (Exception e) {
+                            max_id_proj_mounters = user_id_int + 1;
+                        }
+
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID, max_id_proj_mounters);
+                        values.put(DBHelper.KEY_PROJECT_ID, id_project);
+                        values.put(DBHelper.KEY_MOUNTER_ID, "null");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_TYPE, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        values.put(DBHelper.KEY_DATE_TIME, "0000-00-00 00:00:00");
+                        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, null, values);
+
+                        values = new ContentValues();
+                        values.put(DBHelper.KEY_ID_OLD, max_id_proj_mounters);
+                        values.put(DBHelper.KEY_ID_NEW, 0);
+                        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_mounters");
                         values.put(DBHelper.KEY_SYNC, "0");
                         values.put(DBHelper.KEY_TYPE, "send");
                         values.put(DBHelper.KEY_STATUS, "1");

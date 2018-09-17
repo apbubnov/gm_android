@@ -17,6 +17,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -115,7 +116,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     String transport = "";
     String distance_col = "";
     String distance = "";
-    String time_h = "", time_brig, id_b, id_z;
+    String time_h = "", time_brig, id_b, id_z, callBackDate;
 
     Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj, btn_history;
 
@@ -603,7 +604,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                                         db.update(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS, values, "_id = ?",
                                                                 new String[]{id_cl});
 
-                                                        HelperClass.sendHistory("Изменено имя клиента с " + name_cl +
+                                                        HelperClass.sendHistory("Изменено имя клиента с " + name_cl.getText().toString() +
                                                                 " на " + name.getText().toString(), getActivity(), id_cl);
 
                                                         values = new ContentValues();
@@ -1058,6 +1059,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         SharedPreferences.Editor ed = SP.edit();
         ed.putString("", "");
         ed.commit();
+
+        getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+
+        SystemClock.sleep(1000);
 
     }
 
@@ -2630,6 +2635,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                             HelperClass.sendHistory("Добавлен звонок на " + add_client_call.getText().toString(), getActivity(), id_cl);
 
+                            HelperClass.sendCallback(add_client_call_note.getText().toString(), getActivity(), id_cl, callBackDate);
+
                             add_client_call.setText("");
                             add_client_call_note.setText("");
 
@@ -2646,6 +2653,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 DateUtils.formatDateTime(getActivity(),
                         dateAndTime.getTimeInMillis(),
                         DateUtils.FORMAT_SHOW_TIME));
+        callBackDate += " " + DateUtils.formatDateTime(getActivity(), dateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME);
+
+        Log.d("mLog", callBackDate);
     }
 
     public void setDate(View v) {
@@ -2657,13 +2667,16 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        callBackDate = "";
                         if (monthOfYear < 9) {
-                            String editTextDateParam = dayOfMonth + ".0" + (monthOfYear + 1) + "." + year;
+                            String editTextDateParam = dayOfMonth + "-0" + (monthOfYear + 1) + "-" + year;
                             add_client_call.setText(editTextDateParam);
                         } else {
-                            String editTextDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
+                            String editTextDateParam = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
                             add_client_call.setText(editTextDateParam);
                         }
+                        callBackDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        Log.d("mLog", callBackDate);
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
@@ -3613,69 +3626,69 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 if ((j == first_day_int || flag) && dday < max_day) {
 
                     //for (int id_b = 0; id_brigade.size() > id_b; id_b++) {
-                        Button btn = new Button(getActivity());
-                        dday++;
-                        String mount_day;
+                    Button btn = new Button(getActivity());
+                    dday++;
+                    String mount_day;
 
-                        if (dday < 10 && month < 10) {
-                            mount_day = year + "-0" + (month + 1) + "-0" + dday;
-                        } else if (dday < 10 && month > 9) {
-                            mount_day = year + "-" + (month + 1) + "-0" + dday;
-                        } else if (dday > 9 && month < 10) {
-                            mount_day = year + "-0" + (month + 1) + "-" + dday;
-                        } else {
-                            mount_day = year + "-" + (month + 1) + "-" + dday;
-                        }
+                    if (dday < 10 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-0" + dday;
+                    } else if (dday < 10 && month > 9) {
+                        mount_day = year + "-" + (month + 1) + "-0" + dday;
+                    } else if (dday > 9 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-" + dday;
+                    } else {
+                        mount_day = year + "-" + (month + 1) + "-" + dday;
+                    }
 
-                        if (dday == btn_id && btn_id != 0) {
-                            flag = true;
-                            btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
-                            btn.setTextColor(Color.BLACK);
-                            count++;
-                            BtnList.add(btn);
-                            btn.setId(dday - 1);
-                            btn.setText(String.valueOf(dday));
-                            btn.setLayoutParams(tableParams);
-                            btn.setOnClickListener(getDateMount);
-                            tableRow.addView(btn, j);
-                        } else if (today.equals(mount_day)) {
-                            count++;
-                            flag = true;
-                            btn.setBackgroundResource(R.drawable.calendar_today);
-                            btn.setTextColor(Color.BLACK);
-                            BtnList_mount_zamer.add(btn);
-                            btn.setId(dday - 1);
-                            btn.setText(String.valueOf(dday));
-                            btn.setLayoutParams(tableParams);
-                            btn.setOnClickListener(getDateMount);
-                            tableRow.addView(btn, j);
-                        } else {
-                            sqlQuewy = "select _id, read_by_mounter "
-                                    + "FROM rgzbn_gm_ceiling_projects " +
-                                    "where  project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
-                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{ mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
-                            if (cc != null) {
-                                if (cc.moveToFirst()) {
-                                    do {
-                                        btn.setBackgroundResource(R.drawable.calendar_btn_blue);
-                                        btn.setTextColor(Color.BLACK);
-                                    } while (cc.moveToNext());
-                                } else {
-                                    btn.setBackgroundResource(R.drawable.calendar_btn);
+                    if (dday == btn_id && btn_id != 0) {
+                        flag = true;
+                        btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    } else if (today.equals(mount_day)) {
+                        count++;
+                        flag = true;
+                        btn.setBackgroundResource(R.drawable.calendar_today);
+                        btn.setTextColor(Color.BLACK);
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    } else {
+                        sqlQuewy = "select _id, read_by_mounter "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where  project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
                                     btn.setTextColor(Color.BLACK);
-                                }
+                                } while (cc.moveToNext());
+                            } else {
+                                btn.setBackgroundResource(R.drawable.calendar_btn);
+                                btn.setTextColor(Color.BLACK);
                             }
-                            cc.close();
-
-                            count++;
-                            flag = true;
-                            BtnList_mount_zamer.add(btn);
-                            btn.setId(dday - 1);
-                            btn.setText(String.valueOf(dday));
-                            btn.setLayoutParams(tableParams);
-                            btn.setOnClickListener(getDateMount);
-                            tableRow.addView(btn, j);
                         }
+                        cc.close();
+
+                        count++;
+                        flag = true;
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    }
                     //}
 
                 } else {

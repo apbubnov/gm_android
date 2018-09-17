@@ -430,34 +430,34 @@
                 android:id="@+id/add_client_call"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_gravity="center"
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:hint="Добавить звонок"
-                android:textColor="#000000"
-                android:paddingLeft="5dp"
-                android:layout_gravity="center"
-                android:gravity="center|left"
                 android:background="@drawable/edit_text_style"
-                android:onClick="add_client_call"/>
+                android:gravity="center|left"
+                android:hint="Добавить звонок"
+                android:onClick="add_client_call"
+                android:paddingLeft="5dp"
+                android:textColor="#000000" />
 
             <EditText
                 android:id="@+id/add_client_call_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:layout_weight="1"
-                android:hint="Введите примечание"
                 android:layout_gravity="center"
-                android:paddingLeft="5dp"
-                android:gravity="center|left"
-                android:textSize="15dp"
                 android:layout_marginRight="5dp"
-                android:background="@drawable/edit_text_style" />
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_style"
+                android:gravity="center|left"
+                android:hint="Введите примечание"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:textSize="15dp" />
 
             <ImageButton
                 android:id="@+id/btn_client_call"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@drawable/white_btn_blue_text"
                 android:scaleType="fitCenter"

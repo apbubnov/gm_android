@@ -124,7 +124,6 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
             list_clients = (ListView) view.findViewById(R.id.list_client);
             clients("");
         } catch (Exception e) {
-            Log.d("mLog", String.valueOf(e));
         }
     }
 

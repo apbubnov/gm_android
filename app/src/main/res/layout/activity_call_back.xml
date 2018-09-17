@@ -1,0 +1,129 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/backgroun"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="Выбрать с  "
+            android:textColor="#000" />
+
+        <TextView
+            android:id="@+id/first_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_style"
+            android:gravity="center|left"
+            android:hint="дд.мм.гггг"
+            android:onClick="firstSetDate"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="right"
+            android:text=" по  "
+            android:textColor="#000" />
+
+        <TextView
+            android:id="@+id/second_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_style"
+            android:gravity="center|left"
+            android:hint="дд.мм.гггг"
+            android:onClick="SecondSetDate"
+            android:paddingLeft="5dp"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/show"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button"
+            android:text=" Показать "
+            android:textColor="#ffffff"
+            android:textSize="12dp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/show_all"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/rounded_button"
+        android:padding="5dp"
+        android:text="  Показать все  "
+        android:textColor="#ffffff" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="7dp"
+        android:stretchColumns="*">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow>
+            <TextView
+                android:text="ФИО"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_span="2"
+                android:minLines="2"
+                android:textColor="#000"/>
+            <TextView
+                android:text="Дата"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_span="2"
+                android:textColor="#000"
+                android:minLines="2"/>
+            <TextView
+                android:text="Примечание"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_span="2"
+                android:textColor="#000"
+                android:minLines="2"/>
+        </TableRow>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <ListView
+            android:id="@+id/list_client"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></ListView>
+
+    </TableLayout>
+</LinearLayout>

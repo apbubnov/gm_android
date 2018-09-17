@@ -186,6 +186,8 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         price.setTypeface(fontAwesomeFont);
         Button analytics = (Button) view.findViewById(R.id.analytics);
         analytics.setTypeface(fontAwesomeFont);
+        Button btn_call = (Button) view.findViewById(R.id.btn_call);
+        btn_call.setTypeface(fontAwesomeFont);
 
         String user_name = "";
 
@@ -211,6 +213,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
         btn_add_zamer.setOnClickListener(this);
         price.setOnClickListener(this);
         analytics.setOnClickListener(this);
+        btn_call.setOnClickListener(this);
 
         sum_us();
     }
@@ -256,6 +259,10 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
                 break;
             case R.id.price:
                 intent = new Intent(getActivity(), ActivityPrice.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_call:
+                intent = new Intent(getActivity(), CallBack.class);
                 startActivity(intent);
                 break;
             case R.id.analytics:

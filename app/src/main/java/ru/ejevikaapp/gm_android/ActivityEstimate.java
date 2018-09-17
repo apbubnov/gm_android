@@ -400,27 +400,6 @@ public class ActivityEstimate extends AppCompatActivity {
         }
         cursor.close();
 
-        sqlQuewy = "SELECT * "
-         + "FROM rgzbn_gm_ceiling_fixtures" +
-         " WHERE calculation_id = ?";
-        cursor = db.rawQuery(sqlQuewy, new String[]{id_calculation});
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int vidIndex = cursor.getColumnIndex(cursor.getColumnName(3));
-                int kol_voIndex = cursor.getColumnIndex(cursor.getColumnName(2));
-
-                do {
-                    String vid_c = cursor.getString(vidIndex);
-                    if (vid_c.equals("2")) {
-                        circle_count += cursor.getInt(kol_voIndex);
-                    } else if (vid_c.equals("3")) {
-                        square_count += cursor.getInt(kol_voIndex);
-                    }
-                } while (cursor.moveToNext());
-            }
-        }
-        cursor.close();
-
     }
 
     @Override

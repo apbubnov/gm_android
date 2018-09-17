@@ -1,7 +1,12 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.TaskStackBuilder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,14 +17,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ru.ejevikaapp.gm_android.ActivityOnlineVersion;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.DBHelper;
@@ -63,6 +72,7 @@ import ru.ejevikaapp.gm_android.Fragments.FragmentAllProjects;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
 import ru.ejevikaapp.gm_android.MainActivity;
 import ru.ejevikaapp.gm_android.R;
+import ru.ejevikaapp.gm_android.ServiceCallBack;
 import ru.ejevikaapp.gm_android.Service_Sync;
 import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
@@ -116,6 +126,7 @@ public class Dealer_office extends AppCompatActivity {
         if (id == R.id.exit) {
             stopService(new Intent(Dealer_office.this, Service_Sync.class));
             stopService(new Intent(Dealer_office.this, Service_Sync_Import.class));
+            stopService(new Intent(Dealer_office.this, ServiceCallBack.class));
 
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
@@ -132,7 +143,18 @@ public class Dealer_office extends AppCompatActivity {
             ed.putString("", "");
             ed.commit();
 
+            SP = getSharedPreferences("version", MODE_PRIVATE);
+            ed = SP.edit();
+            ed.putString("", "");
+            ed.commit();
+
             Intent intent = new Intent(Dealer_office.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return true;
+        } else if (id == R.id.online) {
+
+            Intent intent = new Intent(Dealer_office.this, ActivityOnlineVersion.class);
             startActivity(intent);
             finish();
             return true;
@@ -534,6 +556,9 @@ public class Dealer_office extends AppCompatActivity {
         super.onResume();
 
         startService(new Intent(this, Service_Sync.class));
+        startService(new Intent(this, ServiceCallBack.class));
+        ServiceCallBack.Alarm.setAlarm(Dealer_office.this);
+
         SharedPreferences SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
         String entryCalcDealer = SP.getString("", "");
 

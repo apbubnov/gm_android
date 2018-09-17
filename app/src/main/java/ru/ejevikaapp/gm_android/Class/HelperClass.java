@@ -84,7 +84,7 @@ public class HelperClass {
         return bool;
     }
 
-    public static String now_date(Context context){
+    public static String now_date(Context context) {
 
         Calendar date_cr = new GregorianCalendar();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -93,7 +93,7 @@ public class HelperClass {
         return date;
     }
 
-    public static String now_date_two(Context context){
+    public static String now_date_two(Context context) {
 
         Calendar date_cr = new GregorianCalendar();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
@@ -103,12 +103,12 @@ public class HelperClass {
         int day = Integer.parseInt(df.format(date_cr.getTime()));
 
         df = new SimpleDateFormat("HH:mm:ss");
-        String date = month + "-"+day + " " + df.format(date_cr.getTime());
+        String date = month + "-" + day + " " + df.format(date_cr.getTime());
 
         return date;
     }
 
-    public static void sendHistory(String text, Context context, String id_client){
+    public static void sendHistory(String text, Context context, String id_client) {
 
         dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -144,17 +144,17 @@ public class HelperClass {
         values.put(DBHelper.KEY_TEXT, text);
         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENT_HISTORY, null, values);
 
-        //values = new ContentValues();
-        //values.put(DBHelper.KEY_ID_OLD, max_id);
-        //values.put(DBHelper.KEY_ID_NEW, "0");
-        //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_client_history");
-        //values.put(DBHelper.KEY_SYNC, "0");
-        //values.put(DBHelper.KEY_TYPE, "send");
-        //values.put(DBHelper.KEY_STATUS, "1");
-        //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+        values = new ContentValues();
+        values.put(DBHelper.KEY_ID_OLD, max_id);
+        values.put(DBHelper.KEY_ID_NEW, "0");
+        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_client_history");
+        values.put(DBHelper.KEY_SYNC, "0");
+        values.put(DBHelper.KEY_TYPE, "send");
+        values.put(DBHelper.KEY_STATUS, "1");
+        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
     }
 
-    public  static void sendCallback(String comment, Context context, String id_client, String callDate){
+    public static void sendCallback(String comment, Context context, String id_client, String callDate) {
 
         dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -181,37 +181,39 @@ public class HelperClass {
             max_id = Integer.parseInt(dealer_id) * 100000 + 1;
         }
 
-        String date = "";
-        if (callDate.equals("")) {
-            date = HelperClass.now_date(context);
-        } else {
-            date = HelperClass.now_date_two(context);
-        }
+        //String date = "";
+        //if (callDate.equals("")) {
+        //    date = HelperClass.now_date(context);
+        //} else {
+        //    date = HelperClass.now_date_two(context);
+        //}
+
+        Log.d("mLog", "callDate " + callDate);
 
         ContentValues values = new ContentValues();
         values.put(DBHelper.KEY_ID, max_id);
         values.put(DBHelper.KEY_CLIENT_ID, id_client);
-        values.put(DBHelper.KEY_DATE_TIME, date);
+        values.put(DBHelper.KEY_DATE_TIME, callDate);
         values.put(DBHelper.KEY_COMMENT, comment);
         values.put(DBHelper.KEY_MANAGER_ID, "");
         values.put(DBHelper.KEY_NOTIFY, "");
         db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CALLBACK, null, values);
 
-        //values = new ContentValues();
-        //values.put(DBHelper.KEY_ID_OLD, max_id);
-        //values.put(DBHelper.KEY_ID_NEW, "0");
-        //values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_callback");
-        //values.put(DBHelper.KEY_SYNC, "0");
-        //values.put(DBHelper.KEY_TYPE, "send");
-        //values.put(DBHelper.KEY_STATUS, "1");
-        //db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+        values = new ContentValues();
+        values.put(DBHelper.KEY_ID_OLD, max_id);
+        values.put(DBHelper.KEY_ID_NEW, "0");
+        values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_callback");
+        values.put(DBHelper.KEY_SYNC, "0");
+        values.put(DBHelper.KEY_TYPE, "send");
+        values.put(DBHelper.KEY_STATUS, "1");
+        db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
     }
 
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     public static boolean validateMail(String emailStr) {
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
         return matcher.find();
     }
 
@@ -310,6 +312,8 @@ public class HelperClass {
         for (int i = 0; i < cou; i++) {
             results.add(0);
         }
+
+        Log.d("mLog", "dealer_id_str = " + dealer_id_str);
 
         sqlQuewy = "select * "
                 + "FROM rgzbn_gm_ceiling_mount " +
@@ -1385,9 +1389,25 @@ public class HelperClass {
                     dealer_comp_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(2))));
                     dealer_mount_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(3))));
                 } while (c.moveToNext());
+            } else {
+                c = db.rawQuery(sqlQuewy, new String[]{"1"});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            gm_can_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(4))));
+                            gm_comp_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(5))));
+                            gm_mount_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(6))));
+
+                            dealer_can_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(1))));
+                            dealer_comp_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(2))));
+                            dealer_mount_marg = Integer.valueOf(c.getString(c.getColumnIndex(c.getColumnName(3))));
+                        } while (c.moveToNext());
+                    }
+                }
             }
         }
         c.close();
+
 
         if (n31 > 0) {
             ContentValues values = new ContentValues();
@@ -1624,6 +1644,8 @@ public class HelperClass {
                 if (canvases_price) {
                     price = new_price("canvases", dealer_id_str, id_n3, price, context);
                 }
+
+                Log.d("mLog", "ERROR = " + price + " " + dealer_can_marg);
 
                 canvases_data.set(0, texture + ", " + canvases + ", " + wf);                         // название
                 canvases_data.set(1, Double.valueOf(S));                                             // кол-во
@@ -2589,7 +2611,11 @@ public class HelperClass {
                     String total_with_gm_dealer_margin = String.valueOf(Double.parseDouble(quantity) * Double.parseDouble(price_with_gm_dealer_margin));
 
                     String price_with_dealer_margin = String.valueOf(margin(Double.parseDouble(k.getString(k.getColumnIndex(k.getColumnName(5)))), dealer_mount_marg));
-                    String total_with_dealer_margin = String.valueOf(Double.parseDouble(quantity) * Double.parseDouble(price_with_dealer_margin));
+                    String total_with_dealer_margin = String.valueOf(Math.round((Double.parseDouble(quantity) * Double.parseDouble(price_with_dealer_margin)) * 100.0) / 100.0);
+
+                    //String dealer_total = String.valueOf(Math.round((Double.parseDouble(dealer_price) * quantity) * 100.0) / 100.0);
+
+                    Log.d("mLog", "dealer_price = " + total_with_dealer_margin);
 
                     ContentValues values = new ContentValues();
                     values.put(dbHelper.KEY_PRICE_WITH_GM_MARGIN, price_with_gm_margin);

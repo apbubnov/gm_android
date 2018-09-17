@@ -534,12 +534,12 @@ public class Service_Sync_Import extends Service {
                             }
 
                             JSONArray rgzbn_gm_ceiling_projects = jsonObject.getJSONArray("rgzbn_gm_ceiling_projects");
-                            Log.d(TAG, String.valueOf(rgzbn_gm_ceiling_projects));
 
                             for (int i = 0; i < rgzbn_gm_ceiling_projects.length(); i++) {
 
                                 values = new ContentValues();
                                 org.json.JSONObject porject_tmp = rgzbn_gm_ceiling_projects.getJSONObject(i);
+                                Log.d(TAG, "project " + String.valueOf(porject_tmp));
                                 count = 0;
 
                                 try {
@@ -553,10 +553,6 @@ public class Service_Sync_Import extends Service {
                                     String client_id = porject_tmp.getString("client_id");
                                     String project_info = porject_tmp.getString("project_info");
                                     String project_status = porject_tmp.getString("project_status");
-                                    String project_mounting_date = porject_tmp.getString("project_mounting_date");
-                                    String project_mounting_start = porject_tmp.getString("project_mounting_start");
-                                    String project_mounting_end = porject_tmp.getString("project_mounting_end");
-                                    String project_mounter = porject_tmp.getString("project_mounter");
                                     String project_note = porject_tmp.getString("project_note");
                                     String gm_calculator_note = porject_tmp.getString("gm_calculator_note");
                                     String dealer_calculator_note = porject_tmp.getString("dealer_calculator_note");
@@ -615,10 +611,6 @@ public class Service_Sync_Import extends Service {
                                     values.put(DBHelper.KEY_CLIENT_ID, client_id);
                                     values.put(DBHelper.KEY_PROJECT_INFO, project_info);
                                     values.put(DBHelper.KEY_PROJECT_STATUS, project_status);
-                                    values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, project_mounting_date);
-                                    values.put(DBHelper.KEY_PROJECT_MOUNTING_START, project_mounting_start);
-                                    values.put(DBHelper.KEY_PROJECT_MOUNTING_END, project_mounting_end);
-                                    values.put(DBHelper.KEY_PROJECT_MOUNTER, project_mounter);
                                     values.put(DBHelper.KEY_PROJECT_NOTE, project_note);
                                     values.put(DBHelper.KEY_GM_CALCULATOR_NOTE, gm_calculator_note);
                                     values.put(DBHelper.KEY_DEALER_CALCULATOR_NOTE, dealer_calculator_note);
@@ -688,8 +680,7 @@ public class Service_Sync_Import extends Service {
 
                                     if (count == 0) {
 
-                                        if (project_status.equals("0")) {
-                                        } else if (project_status.equals("1")) {
+                                        if (project_status.equals("0") || project_status.equals("1")) {
 
                                             count_project1++;
 
@@ -736,9 +727,9 @@ public class Service_Sync_Import extends Service {
                                                             .setTicker("У Вас новый замер")
                                                             .setWhen(System.currentTimeMillis())
                                                             .setDefaults(Notification.DEFAULT_ALL)
-                                                            .setSmallIcon(R.raw.gm_ico2)
+                                                            .setSmallIcon(R.raw.itc_icon)
                                                             .setContentIntent(resultPendingIntent)
-                                                            .setContentTitle("ГМ")
+                                                            .setContentTitle("IT-Ceiling")
                                                             .setContentText("У Вас новый замер (" + count_project1 + ")");
                                             Notification notification = builder.build();
 
@@ -763,6 +754,67 @@ public class Service_Sync_Import extends Service {
                                         }
                                     }
                                 } catch (Exception e) {
+                                    Log.d(TAG,"Error " + e);
+                                }
+                            }
+
+                            JSONArray rgzbn_gm_ceiling_projects_mounts = jsonObject.getJSONArray("rgzbn_gm_ceiling_projects_mounts");
+
+                            for (int i = 0; i < rgzbn_gm_ceiling_projects_mounts.length(); i++) {
+
+                                count = 0;
+                                values = new ContentValues();
+                                org.json.JSONObject porject_tmp = rgzbn_gm_ceiling_projects_mounts.getJSONObject(i);
+
+                                String id = porject_tmp.getString("id");
+                                String project_id = porject_tmp.getString("project_id");
+                                String mounter_id = porject_tmp.getString("mounter_id");
+                                String date_time = porject_tmp.getString("date_time");
+                                String type = porject_tmp.getString("type");
+                                String mount_start = porject_tmp.getString("mount_start");
+                                String mount_end = porject_tmp.getString("mount_end");
+                                String change_time = porject_tmp.getString("change_time");
+
+                                String sqlQuewy = "SELECT * "
+                                        + "FROM rgzbn_gm_ceiling_cornice" +
+                                        " WHERE _id = ?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{id});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+
+                                            values.put(DBHelper.KEY_PROJECT_ID, project_id);
+                                            values.put(DBHelper.KEY_MOUNTER_ID, mounter_id);
+                                            values.put(DBHelper.KEY_DATE_TIME, date_time);
+                                            values.put(DBHelper.KEY_TYPE, type);
+                                            values.put(DBHelper.KEY_MOUNT_START, mount_start);
+                                            values.put(DBHelper.KEY_MOUNT_END, mount_end);
+                                            values.put(DBHelper.KEY_CHANGE_TIME, change_time);
+                                            db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, values, "_id = ?", new String[]{id});
+                                            count++;
+                                            Date change = ft.parse(change_time);
+                                            if (change_max.getTime() < change.getTime()) {
+                                                change_max = change;
+                                            }
+                                        } while (c.moveToNext());
+                                    }
+                                }
+                                c.close();
+
+                                if (count == 0) {
+                                    values.put(DBHelper.KEY_ID, id);
+                                    values.put(DBHelper.KEY_PROJECT_ID, project_id);
+                                    values.put(DBHelper.KEY_MOUNTER_ID, mounter_id);
+                                    values.put(DBHelper.KEY_DATE_TIME, date_time);
+                                    values.put(DBHelper.KEY_TYPE, type);
+                                    values.put(DBHelper.KEY_MOUNT_START, mount_start);
+                                    values.put(DBHelper.KEY_MOUNT_END, mount_end);
+                                    values.put(DBHelper.KEY_CHANGE_TIME, change_time);
+                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, null, values);
+                                    Date change = ft.parse(change_time);
+                                    if (change_max.getTime() < change.getTime()) {
+                                        change_max = change;
+                                    }
                                 }
                             }
 

@@ -22,6 +22,7 @@
         android:inputType="number"
         android:layout_height="40dp"
         android:textColor="#000000"
+        android:maxLength="2"
         android:layout_marginTop="10dp"
         android:id="@+id/canvases_margin"/>
 
@@ -37,6 +38,7 @@
         android:gravity="center"
         android:inputType="number"
         android:layout_height="40dp"
+        android:maxLength="2"
         android:textColor="#000000"
         android:layout_marginTop="13dp"
         android:id="@+id/components_margin"/>
@@ -53,6 +55,7 @@
         android:inputType="number"
         android:layout_height="40dp"
         android:layout_marginTop="13dp"
+        android:maxLength="2"
         android:textColor="#000000"
         android:id="@+id/mounting_margin"/>
     <TextView

@@ -3,22 +3,17 @@ package ru.ejevikaapp.gm_android;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -37,7 +32,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,11 +62,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     org.json.simple.JSONObject jsonMaterial = new org.json.simple.JSONObject();
     org.json.simple.JSONObject jsonMounters = new org.json.simple.JSONObject();
     org.json.simple.JSONObject jsonDealer = new org.json.simple.JSONObject();
-
     String jsonAuth = "", material = "", mounters = "", dealer = "", yourDealer = "";
-
     int usergroup = 0;
-
     String domen;
 
     @Override
@@ -80,22 +71,71 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbHelper = new DBHelper(MainActivity.this);
-        db = dbHelper.getReadableDatabase();
-
-        requestQueue = Volley.newRequestQueue(MainActivity.this);
+        String offline = "0";
+        try {
+            offline = getIntent().getExtras().get("offline").toString();
+        } catch (Exception e) {
+        }
 
         SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
         String user_id = SP_end.getString("", "");
 
-        ArrayList group_id = new ArrayList();
+        SP_end = this.getSharedPreferences("version", MODE_PRIVATE);
+        String version = SP_end.getString("", "");
 
+        if (version.equals("offline")) {
+            offlineVersion();
+        } else if (version.equals("online")){
+            Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
+            startActivity(intent);
+            finish();
+        } else {
+            if (user_id.equals("")) {
+                if (offline.equals("1")) {
+                    offlineVersion();
+                } else {
+                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setItems(array, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int item) {
+                            // TODO Auto-generated method stub
+                            switch (item) {
+                                case 0:
+                                    Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
+                                    startActivity(intent);
+                                    finish();
+                                    break;
+                                case 1:
+                                    offlineVersion();
+                                    break;
+                            }
+                        }
+                    });
+
+                    builder.setCancelable(false);
+                    builder.create();
+                    builder.show();
+                }
+            } else {
+                offlineVersion();
+            }
+        }
+
+    }
+
+    void offlineVersion() {
+
+        dbHelper = new DBHelper(MainActivity.this);
+        db = dbHelper.getReadableDatabase();
+        requestQueue = Volley.newRequestQueue(MainActivity.this);
+        SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
+        String user_id = SP_end.getString("", "");
+        ArrayList group_id = new ArrayList();
         String sqlQuewy = "SELECT group_id "
                 + "FROM rgzbn_user_usergroup_map" +
                 " WHERE user_id = ?";
-
         Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
@@ -173,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         dbHelper = new DBHelper(this);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-
     }
 
     @Override
@@ -396,6 +435,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     void send(String res, String user_id, String ob) {
 
+        SharedPreferences SP = getSharedPreferences("version", MODE_PRIVATE);
+        SharedPreferences.Editor ed = SP.edit();
+        ed.putString("", "offline");
+        ed.commit();
+
         ArrayList group_id = new ArrayList();
 
         ContentValues values = new ContentValues();
@@ -507,8 +551,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         for (int g = 0; group_id.size() > g; g++) {
             if (group_id.get(g).equals("11")) { // монтажная бригада
                 usergroup = 11;
-                SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
-                SharedPreferences.Editor ed = SP.edit();
+                SP = getSharedPreferences("user_id", MODE_PRIVATE);
+                ed = SP.edit();
                 ed.putString("", user_id);
                 ed.commit();
 
@@ -598,8 +642,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     JSONObject jsonObject = new JSONObject(res);
                     user_id = jsonObject.getString("id");
 
-                    SharedPreferences SP = getSharedPreferences("gager_id", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
+                    SP = getSharedPreferences("gager_id", MODE_PRIVATE);
+                    ed = SP.edit();
                     ed.putString("", user_id);
                     ed.commit();
 
@@ -737,8 +781,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     JSONObject jsonObject = new JSONObject(res);
                     user_id = jsonObject.getString("id");
 
-                    SharedPreferences SP = getSharedPreferences("gager_id", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
+                    SP = getSharedPreferences("gager_id", MODE_PRIVATE);
+                    ed = SP.edit();
                     ed.putString("", user_id);
                     ed.commit();
 
@@ -1355,7 +1399,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         org.json.JSONObject dat = new org.json.JSONObject(res);
 
                         JSONArray id_array = dat.getJSONArray("rgzbn_users");
-                        Log.d("responce", "USERS = "  + String.valueOf(id_array));
+                        Log.d("responce", "USERS = " + String.valueOf(id_array));
                         for (int i = 0; i < id_array.length(); i++) {
 
                             count_m = 0;

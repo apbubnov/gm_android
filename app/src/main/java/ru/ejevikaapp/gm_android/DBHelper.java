@@ -10,7 +10,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 22;
+    public static final int DATABASE_VERSION = 23;
     public static final String DATABASE_NAME = "srv112238_test1";
 
     private Context mContext;
@@ -387,6 +387,17 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_RECOIL_ID = "recoil_id";
     public static final String KEY_SUM = "sum";
 
+    public static final String TABLE_RGZBN_GM_CEILING_CUTTINGS = "rgzbn_gm_ceiling_cuttings";
+    public static final String KEY_READY = "ready";
+    public static final String KEY_DATA = "data";
+    public static final String KEY_CANVAS_AREA = "canvas_area";
+
+    public static final String TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS = "rgzbn_gm_ceiling_projects_mounts";
+    public static final String KEY_MOUNT_START = "mount_start";
+    public static final String KEY_MOUNT_END = "mount_end";
+
+    public static final String TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES = "rgzbn_gm_ceiling_mounts_types";
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.mContext = context;
@@ -515,8 +526,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects (_id INTEGER, " +
                 "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
-                "client_id INTEGER, project_info TEXT, project_status INTEGER, project_mounting_date TEXT, " +
-                "project_mounting_start TEXT, project_mounting_end TEXT, project_mounter INTEGER, project_note TEXT, " +
+                "client_id INTEGER, project_info TEXT, project_status INTEGER, project_note TEXT, " +
                 "gm_calculator_note TEXT, dealer_calculator_note TEXT, gm_manager_note TEXT, gm_chief_note TEXT, " +
                 "dealer_chief_note TEXT, dealer_manager_note TEXT, buh_note TEXT, project_calculation_date TEXT, " +
                 "project_calculator INTEGER, who_calculate TEXT, project_verdict INTEGER, project_discount INTEGER, " +
@@ -579,6 +589,27 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_recoil_map_project (_id INTEGER, recoil_id INTEGER, project_id INTEGER, sum TEXT, " +
                 "date_time TEXT, comment TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_cuttings (_id INTEGER, ready INTEGER, data TEXT, canvas_area TEXT, " +
+                "date_time TEXT, comment TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects_mounts (_id INTEGER, project_id INTEGER, mounter_id INTEGER, date_time TEXT, type TEXT, " +
+                "mount_start TEXT, mount_end TEXT, change_time TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_mounts_types (_id INTEGER, title TEXT)");
+
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.KEY_ID, 1);
+        values.put(DBHelper.KEY_TITLE, "Полный монтаж");
+        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+        values.put(DBHelper.KEY_ID, 2);
+        values.put(DBHelper.KEY_TITLE, "Обагечивание");
+        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+        values.put(DBHelper.KEY_ID, 3);
+        values.put(DBHelper.KEY_TITLE, "Натяжка");
+        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+        values.put(DBHelper.KEY_ID, 4);
+        values.put(DBHelper.KEY_TITLE, "Вставка");
+        db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
     }
 
     @Override
@@ -784,6 +815,57 @@ public class DBHelper extends SQLiteOpenHelper {
             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title = ?", new String[]{"mount"});
 
             db.execSQL("ALTER TABLE  rgzbn_gm_ceiling_mounters_map ADD COLUMN _id INTEGER");
+        }
+
+        if (oldVersion < 23) { //15.06
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_cuttings (_id INTEGER, ready INTEGER, data TEXT, canvas_area TEXT, " +
+                    "date_time TEXT, comment TEXT)");
+
+        }
+
+        if (oldVersion < 24) { //14.09
+
+            db.execSQL("DROP TABLE IF EXISTS rgzbn_gm_ceiling_projects");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects (_id INTEGER, " +
+                    "ordering INTEGER, state TEXT, checked_out INTEGER, checked_out_time TEXT, created_by INTEGER, modified_by INTEGER, " +
+                    "client_id INTEGER, project_info TEXT, project_status INTEGER, project_note TEXT, " +
+                    "gm_calculator_note TEXT, dealer_calculator_note TEXT, gm_manager_note TEXT, gm_chief_note TEXT, " +
+                    "dealer_chief_note TEXT, dealer_manager_note TEXT, buh_note TEXT, project_calculation_date TEXT, " +
+                    "project_calculator INTEGER, who_calculate TEXT, project_verdict INTEGER, project_discount INTEGER, " +
+                    "created TEXT, closed TEXT, project_check TEXT, sum_check TEXT, cost_check TEXT, spend_check TEXT, " +
+                    "mounting_check TEXT, new_project_sum TEXT, new_project_spend TEXT, new_project_mounting TEXT, new_extra_spend TEXT, " +
+                    "gm_canvases_margin INTEGER, gm_components_margin INTEGER, gm_mounting_margin INTEGER, dealer_canvases_margin INTEGER, " +
+                    "dealer_components_margin INTEGER, dealer_mounting_margin INTEGER, project_sum TEXT, salary_sum TEXT, extra_spend TEXT, " +
+                    "penalty TEXT, bonus TEXT, calculated_by INTEGER, approved_by INTEGER, checked_by INTEGER, read_by_manager INTEGER, api_phone_id TEXT DEFAULT NULL, " +
+                    "read_by_mounter TEXT, change_time TEXT, new_mount_sum TEXT, new_material_sum TEXT, transport TEXT, distance TEXT, distance_col TEXT, deleted_by_user INTEGER)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_projects_mounts (_id INTEGER, project_id INTEGER, mounter_id INTEGER, date_time TEXT, type TEXT, " +
+                    "mount_start TEXT, mount_end TEXT, change_time TEXT)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS rgzbn_gm_ceiling_mounts_types (_id INTEGER, title TEXT)");
+
+            ContentValues values = new ContentValues();
+            values.put(DBHelper.KEY_ID, 1);
+            values.put(DBHelper.KEY_TITLE, "Полный монтаж");
+            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+            values.put(DBHelper.KEY_ID, 2);
+            values.put(DBHelper.KEY_TITLE, "Обагечивание");
+            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+            values.put(DBHelper.KEY_ID, 3);
+            values.put(DBHelper.KEY_TITLE, "Натяжка");
+            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+            values.put(DBHelper.KEY_ID, 4);
+            values.put(DBHelper.KEY_TITLE, "Вставка");
+            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_MOUNTS_TYPES, null, values);
+
+            SharedPreferences SP_end = mContext.getSharedPreferences("user_id", MODE_PRIVATE);
+            String user_id = SP_end.getString("", "");
+            values = new ContentValues();
+            values.put(DBHelper.KEY_CHANGE_TIME, String.valueOf("0000-00-00 00:00:00"));
+            db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "user_id = ?", new String[]{user_id});
+
         }
     }
 }

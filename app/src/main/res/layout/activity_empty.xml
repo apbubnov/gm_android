@@ -8,11 +8,11 @@
     tools:context="ru.ejevikaapp.gm_android.Dealer.Activity_empty">
 
     <fragment
-        android:layout_margin="10dp"
         android:id="@+id/fragment_empty_activity"
         android:name="ru.ejevikaapp.gm_android.Fragments.Frag_spisok"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="5dp"
         tools:layout="@layout/frag_spisok">
     </fragment>
 

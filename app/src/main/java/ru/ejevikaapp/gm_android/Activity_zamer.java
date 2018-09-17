@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.CalendarContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -1080,14 +1081,20 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 values.put(DBHelper.KEY_STATUS, "1");
                                 db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
 
-
                                 Toast toast = Toast.makeText(this,
                                         "Замер добавлен", Toast.LENGTH_SHORT);
                                 toast.show();
 
                                 startService(new Intent(this, Service_Sync.class));
-
-                                finish();
+                                try {
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            finish();
+                                        }
+                                    }, 1000);
+                                }catch (Exception e){
+                                }
 
                             } catch (NullPointerException e) {
                                 Toast toast = Toast.makeText(this,

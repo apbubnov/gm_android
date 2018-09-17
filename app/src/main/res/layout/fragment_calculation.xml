@@ -16,6 +16,7 @@
         android:layout_height="fill_parent"
         android:fillViewport="true">
 
+
         <LinearLayout
             android:id="@+id/frag_calcul"
             android:layout_width="match_parent"
@@ -45,14 +46,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="7"
+                        android:layout_gravity="center"
                         android:layout_weight="1"
                         android:text="Выберите фактуру полотна" />
 
                     <Button
                         android:id="@+id/canvas_help"
                         android:layout_width="50dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_span="1"
+                        android:layout_gravity="center"
                         android:background="@drawable/rounded_button_question"
                         android:stateListAnimator="@null"
                         android:text="\?"
@@ -97,14 +100,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="7"
+                        android:layout_gravity="center"
                         android:layout_weight="1"
                         android:text="Выберите производителя" />
 
                     <Button
                         android:id="@+id/texture_help"
                         android:layout_width="50dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_span="1"
+                        android:layout_gravity="center"
                         android:background="@drawable/rounded_button_question"
                         android:stateListAnimator="@null"
                         android:text="\?"
@@ -183,8 +188,9 @@
             <LinearLayout
                 android:id="@+id/general_hide"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button_question"
+                android:baselineAligned="false"
                 android:clickable="true"
                 android:gravity="center"
                 android:onClick="general_hide"
@@ -192,9 +198,11 @@
 
                 <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
                     android:adjustViewBounds="true"
+                    android:gravity="center"
                     android:paddingBottom="8dp"
                     android:paddingTop="8dp"
                     android:src="@drawable/screwdriver" />
@@ -202,7 +210,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_margin="5dp"
+                    android:gravity="center"
                     android:text="ДОБАВИТЬ МОНТАЖ И КОМПЛЕКТУЮЩИЕ"
                     android:textColor="#ffffff" />
             </LinearLayout>
@@ -252,7 +262,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -261,7 +271,8 @@
                         <LinearLayout
                             android:id="@+id/buguette_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -271,7 +282,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -289,8 +300,8 @@
                         <Button
                             android:id="@+id/buguette_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -348,7 +359,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -357,7 +368,8 @@
                         <LinearLayout
                             android:id="@+id/vstavka_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -367,7 +379,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -385,8 +397,8 @@
                         <Button
                             android:id="@+id/vstavka_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -457,7 +469,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -466,7 +478,8 @@
                         <LinearLayout
                             android:id="@+id/lustr_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -476,7 +489,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -494,8 +507,8 @@
                         <Button
                             android:id="@+id/lustr_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -532,7 +545,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -541,7 +554,8 @@
                         <LinearLayout
                             android:id="@+id/svetiln_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -551,7 +565,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -569,8 +583,8 @@
                         <Button
                             android:id="@+id/svetiln_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -642,6 +656,7 @@
                                 android:background="@drawable/edit_text_style"
                                 android:hint="Кол-во"
                                 android:inputType="number"
+                                android:gravity="center"
                                 android:maxLength="3"
                                 android:paddingLeft="5dp" />
 
@@ -650,6 +665,7 @@
                                 style="@style/spinner_style"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
+                                android:gravity="center"
                                 android:layout_span="3" />
 
                             <Spinner
@@ -658,6 +674,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
+                                android:gravity="center"
                                 android:layout_span="3" />
 
                         </TableRow>
@@ -783,7 +800,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -792,7 +809,8 @@
                         <LinearLayout
                             android:id="@+id/cabling_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -802,7 +820,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -820,8 +838,8 @@
                         <Button
                             android:id="@+id/cabling_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -855,7 +873,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -864,7 +882,8 @@
                         <LinearLayout
                             android:id="@+id/karniz_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -874,7 +893,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -892,8 +911,8 @@
                         <Button
                             android:id="@+id/karniz_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1061,7 +1080,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1070,7 +1089,8 @@
                         <LinearLayout
                             android:id="@+id/pipes_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1080,7 +1100,8 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1090,7 +1111,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
                                 android:layout_margin="5dp"
+                                android:gravity="center"
                                 android:text="ДОБАВИТЬ ВХОДЯЩИЕ В ПОТОЛОК"
                                 android:textColor="#ffffff" />
                         </LinearLayout>
@@ -1098,8 +1121,8 @@
                         <Button
                             android:id="@+id/pipes_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1206,7 +1229,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1215,7 +1238,8 @@
                         <LinearLayout
                             android:id="@+id/bond_beam_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1225,7 +1249,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1243,8 +1267,8 @@
                         <Button
                             android:id="@+id/bond_beam_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1268,7 +1292,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1277,7 +1301,8 @@
                         <LinearLayout
                             android:id="@+id/separator_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1287,7 +1312,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1305,8 +1330,8 @@
                         <Button
                             android:id="@+id/separator_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1330,7 +1355,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1339,7 +1364,8 @@
                         <LinearLayout
                             android:id="@+id/mount_wall_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1349,7 +1375,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1367,8 +1393,8 @@
                         <Button
                             android:id="@+id/mount_wall_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1379,10 +1405,10 @@
                 </TableLayout>
 
                 <LinearLayout
+                    android:id="@+id/layout_wall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:id="@+id/layout_wall"
                     android:visibility="gone">
 
                     <TextView
@@ -1402,7 +1428,7 @@
                         android:hint="м."
                         android:inputType="numberDecimal"
                         android:paddingLeft="5dp"
-                        android:textColor="#000000"/>
+                        android:textColor="#000000" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -1421,12 +1447,12 @@
                         android:hint="м."
                         android:inputType="numberDecimal"
                         android:paddingLeft="5dp"
-                        android:textColor="#000000"/>
+                        android:textColor="#000000" />
                 </LinearLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1435,7 +1461,8 @@
                         <LinearLayout
                             android:id="@+id/wall_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1445,7 +1472,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1463,8 +1490,8 @@
                         <Button
                             android:id="@+id/wall_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1488,7 +1515,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1497,7 +1524,8 @@
                         <LinearLayout
                             android:id="@+id/fasteners_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1507,7 +1535,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1525,8 +1553,8 @@
                         <Button
                             android:id="@+id/fasteners_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1550,7 +1578,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1559,7 +1587,8 @@
                         <LinearLayout
                             android:id="@+id/fire_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1569,7 +1598,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1587,8 +1616,8 @@
                         <Button
                             android:id="@+id/fire_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1612,7 +1641,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1621,7 +1650,8 @@
                         <LinearLayout
                             android:id="@+id/add_vent_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1631,7 +1661,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1649,8 +1679,8 @@
                         <Button
                             android:id="@+id/add_vent_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1762,7 +1792,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1771,7 +1801,8 @@
                         <LinearLayout
                             android:id="@+id/add_diff_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1781,7 +1812,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1799,8 +1830,8 @@
                         <Button
                             android:id="@+id/add_diff_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1896,7 +1927,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1905,7 +1936,8 @@
                         <LinearLayout
                             android:id="@+id/soaring_ceiling_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1915,7 +1947,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1933,8 +1965,8 @@
                         <Button
                             android:id="@+id/soaring_ceiling_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -1958,7 +1990,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -1967,7 +1999,8 @@
                         <LinearLayout
                             android:id="@+id/add_profile_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -1977,7 +2010,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -1995,8 +2028,8 @@
                         <Button
                             android:id="@+id/add_profile_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2093,7 +2126,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2102,7 +2135,8 @@
                         <LinearLayout
                             android:id="@+id/in_cut_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2112,7 +2146,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2123,6 +2157,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_margin="5dp"
+                                android:gravity="center"
                                 android:text="ВНУТРЕННИЙ ВЫРЕЗ (НА МЕСТЕ)"
                                 android:textColor="#ffffff" />
                         </LinearLayout>
@@ -2130,8 +2165,8 @@
                         <Button
                             android:id="@+id/in_cut_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2155,7 +2190,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2164,7 +2199,8 @@
                         <LinearLayout
                             android:id="@+id/in_cut_shop_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2174,7 +2210,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2192,8 +2228,8 @@
                         <Button
                             android:id="@+id/in_cut_shop_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2217,7 +2253,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2226,7 +2262,8 @@
                         <LinearLayout
                             android:id="@+id/drain_the_water_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2236,7 +2273,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2254,8 +2291,8 @@
                         <Button
                             android:id="@+id/drain_the_water_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2280,7 +2317,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2289,7 +2326,8 @@
                         <LinearLayout
                             android:id="@+id/height_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2299,7 +2337,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2317,8 +2355,8 @@
                         <Button
                             android:id="@+id/height_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2355,7 +2393,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2364,7 +2402,8 @@
                         <LinearLayout
                             android:id="@+id/diff_acc_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2374,7 +2413,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2392,8 +2431,8 @@
                         <Button
                             android:id="@+id/diff_acc_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2417,7 +2456,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2426,7 +2465,8 @@
                         <LinearLayout
                             android:id="@+id/add_other_comp_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2436,7 +2476,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2454,8 +2494,8 @@
                         <Button
                             android:id="@+id/add_other_comp_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2552,7 +2592,7 @@
 
                 <TableLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:stretchColumns="0,3,5">
 
@@ -2561,7 +2601,8 @@
                         <LinearLayout
                             android:id="@+id/add_other_mount_hide"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:clickable="true"
@@ -2571,7 +2612,7 @@
 
                             <ImageView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="40dp"
                                 android:layout_marginLeft="5dp"
                                 android:adjustViewBounds="true"
                                 android:paddingBottom="8dp"
@@ -2589,8 +2630,8 @@
                         <Button
                             android:id="@+id/add_other_mount_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2698,6 +2739,7 @@
                             android:id="@+id/mounting_hide"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_marginRight="5dp"
                             android:layout_span="7"
                             android:background="@drawable/rounded_button_question"
                             android:text="Отменить монтаж"
@@ -2706,8 +2748,8 @@
                         <Button
                             android:id="@+id/mounting_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
                             android:layout_span="1"
                             android:background="@drawable/rounded_button_question"
                             android:stateListAnimator="@null"
@@ -2812,9 +2854,10 @@
                         <Button
                             android:id="@+id/name_help"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="40dp"
                             android:layout_marginLeft="5dp"
                             android:layout_span="1"
+                            android:layout_gravity="center"
                             android:background="@drawable/rounded_button"
                             android:stateListAnimator="@null"
                             android:text="\?"

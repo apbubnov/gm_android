@@ -252,7 +252,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         c.close();
 
         discount = 0;
-        sqlQuewy = "SELECT project_info, project_mounting_date, project_mounter, project_calculation_date, project_calculator "
+        sqlQuewy = "SELECT project_info, project_calculation_date, project_calculator "
                 + "FROM rgzbn_gm_ceiling_projects" +
                 " WHERE _id = ?";
 
@@ -284,57 +284,70 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                     out_format_time = new SimpleDateFormat("HH:mm");
 
-                    data_mounting.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                            + " - " + hours + ":00");
-                } catch (Exception e) {
-                }
-
-                String mount_id = c.getString(c.getColumnIndex(c.getColumnName(2)));
-
-                sqlQuewy = "SELECT name "
-                        + "FROM rgzbn_users" +
-                        " WHERE _id = ?";
-
-                Cursor c2 = db.rawQuery(sqlQuewy, new String[]{mount_id});
-
-                if (c2 != null) {
-                    if (c2.moveToFirst()) {
-                        fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
-                        project_mounter.setText(fio);
-                    }
-                }
-                c2.close();
-
-                mount_date = c.getString(c.getColumnIndex(c.getColumnName(3)));
-
-                try {
-                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    change_max = ft.parse(mount_date);
-
-                    out_format = new SimpleDateFormat("dd.MM.yyyy");
-                    out_format_minute = new SimpleDateFormat("HH");
-
-                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
-
-                    out_format_time = new SimpleDateFormat("HH:mm");
-
                     DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
                             + " - " + hours + ":00");
                 } catch (Exception e) {
                 }
 
-                String calculator_id = c.getString(c.getColumnIndex(c.getColumnName(4)));
+                String calculator_id = c.getString(c.getColumnIndex(c.getColumnName(2)));
 
                 sqlQuewy = "SELECT name "
                         + "FROM rgzbn_users" +
                         " WHERE _id = ?";
 
-                c2 = db.rawQuery(sqlQuewy, new String[]{calculator_id});
+                Cursor c2 = db.rawQuery(sqlQuewy, new String[]{calculator_id});
 
                 if (c2 != null) {
                     if (c2.moveToFirst()) {
                         fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
                         project_calculator.setText(fio);
+                    }
+                }
+                c2.close();
+
+            }
+        }
+        c.close();
+
+        sqlQuewy = "SELECT date_time, mounter_id "
+                + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                " WHERE project_id = ?";
+        c = db.rawQuery(sqlQuewy, new String[]{id_project});
+        if (c != null) {
+            if (c.moveToFirst()) {
+
+                SimpleDateFormat out_format = null;
+                SimpleDateFormat out_format_time = null;
+                SimpleDateFormat out_format_minute = null;
+                Date change_max = null;
+                Date minute = null;
+
+                int hours = 0;
+
+                mount_date = c.getString(c.getColumnIndex(c.getColumnName(0)));
+
+                try {
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    change_max = ft.parse(mount_date);
+                    out_format = new SimpleDateFormat("dd.MM.yyyy");
+                    out_format_minute = new SimpleDateFormat("HH");
+                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                    out_format_time = new SimpleDateFormat("HH:mm");
+                    data_mounting.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                            + " - " + hours + ":00");
+                } catch (Exception e) {
+                }
+
+                String mount_id = c.getString(c.getColumnIndex(c.getColumnName(1)));
+
+                sqlQuewy = "SELECT name "
+                        + "FROM rgzbn_users" +
+                        " WHERE _id = ?";
+                Cursor c2 = db.rawQuery(sqlQuewy, new String[]{mount_id});
+                if (c2 != null) {
+                    if (c2.moveToFirst()) {
+                        fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
+                        project_mounter.setText(fio);
                     }
                 }
                 c2.close();
@@ -1273,18 +1286,20 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         ImageView image = new ImageView(getActivity());
         image.setLayoutParams(ViewParams);
 
-        if (imag.length() > 10) {
-            try {
-                Sharp.loadString(imag)
-                        .into(image);
-                mainC2.addView(image);
-            } catch (Exception e) {
+        try {
+            if (imag.length() > 10) {
+                try {
+                    Sharp.loadString(imag)
+                            .into(image);
+                    mainC2.addView(image);
+                } catch (Exception e) {
+                }
+            } else {
+                View view = new View(getActivity());
+                view.setLayoutParams(ViewParams);
+                mainC2.addView(view);
             }
-        } else {
-            View view = new View(getActivity());
-            view.setLayoutParams(ViewParams);
-            mainC2.addView(view);
-
+        }catch (Exception e){
         }
 
 

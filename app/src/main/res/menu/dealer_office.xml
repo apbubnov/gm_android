@@ -26,6 +26,12 @@
     </item>
 
     <item
+        android:id="@+id/online"
+        android:title="Online версия"
+        app:showAsAction="never">
+    </item>
+
+    <item
         android:id="@+id/exit"
         android:title="Выход"
         app:showAsAction="never">

@@ -165,8 +165,29 @@
         <activity
             android:name=".Dealer.ListOfMeasurers"
             android:label="Замерщики" />
-        <activity android:name=".Dealer.MeasurerDay"
-            android:label="Замеры"/>
+        <activity
+            android:name=".Dealer.MeasurerDay"
+            android:label="Замеры" />
+        <activity
+            android:name=".Dealer.CallBack"
+            android:label="Звонки" />
+
+        <receiver
+            android:name=".ServiceCallBack$Alarm"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="net.multipi.ALARM" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".ServiceCallBack"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ActivityOnlineVersion"
+            android:theme="@style/AppTheme.NoActionBar" ></activity>
     </application>
 
 </manifest>

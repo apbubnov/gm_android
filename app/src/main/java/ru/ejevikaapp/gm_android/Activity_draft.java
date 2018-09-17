@@ -26,7 +26,9 @@ public class Activity_draft extends AppCompatActivity {
     public class myJavaScriptInterface {
         Context mContext;
 
-        /** Instantiate the interface and set the context */
+        /**
+         * Instantiate the interface and set the context
+         */
         myJavaScriptInterface(Context c) {
             mContext = c;
         }
@@ -125,7 +127,7 @@ public class Activity_draft extends AppCompatActivity {
 
         @JavascriptInterface
         public void func_elem_jform_walls_points(String walls_points) {
-            SPW = getSharedPreferences("SAVED_WP", MODE_PRIVATE);
+            SPW = getSharedPreferences("draft_walls_points", MODE_PRIVATE);
             SharedPreferences.Editor ed = SPW.edit();
             ed.putString("", walls_points);
             ed.commit();
@@ -133,7 +135,7 @@ public class Activity_draft extends AppCompatActivity {
 
         @JavascriptInterface
         public void func_elem_jform_diags_points(String diags_points) {
-            SPW = getSharedPreferences("SAVED_DP", MODE_PRIVATE);
+            SPW = getSharedPreferences("draft_diags_points", MODE_PRIVATE);
             SharedPreferences.Editor ed = SPW.edit();
             ed.putString("", diags_points);
             ed.commit();
@@ -141,7 +143,7 @@ public class Activity_draft extends AppCompatActivity {
 
         @JavascriptInterface
         public void func_elem_jform_pt_points(String pt_points) {
-            SPW = getSharedPreferences("SAVED_PT_P", MODE_PRIVATE);
+            SPW = getSharedPreferences("draft_pt_points", MODE_PRIVATE);
             SharedPreferences.Editor ed = SPW.edit();
             ed.putString("", pt_points);
             ed.commit();
@@ -152,6 +154,14 @@ public class Activity_draft extends AppCompatActivity {
             SPW = getSharedPreferences("SAVED_CODE", MODE_PRIVATE);
             SharedPreferences.Editor ed = SPW.edit();
             ed.putString("", code);
+            ed.commit();
+        }
+
+        @JavascriptInterface
+        public void func_elem_jform_p_usadki_final(String p_usadki_final) {
+            SPW = getSharedPreferences("p_usadki_final", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SPW.edit();
+            ed.putString("", p_usadki_final);
             ed.commit();
         }
 
@@ -250,14 +260,14 @@ public class Activity_draft extends AppCompatActivity {
         sPref = this.getSharedPreferences("draft_auto", MODE_PRIVATE);
         auto = sPref.getString("", "");
 
-        Log.d("mLog", "________________" );
-        Log.d("mLog", "canvases " + canvases );
+        Log.d("mLog", "________________");
+        Log.d("mLog", "canvases " + canvases);
         Log.d("mLog", "textures " + textures);
         Log.d("mLog", "diags_points " + diags_points);
-        Log.d("mLog", "walls_points  " + walls_points );
+        Log.d("mLog", "walls_points  " + walls_points);
         Log.d("mLog", "pt_points " + pt_points);
         Log.d("mLog", "auto " + auto);
-        Log.d("mLog", "________________" );
+        Log.d("mLog", "________________");
 
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -266,7 +276,17 @@ public class Activity_draft extends AppCompatActivity {
             mWebView.setWebContentsDebuggingEnabled(true);
         }
 
-        mWebView.loadUrl("file:///android_asset/index.html");
+        String redactor = getIntent().getStringExtra("redactor");
+        if (redactor.equals("0")) {
+            mWebView.loadUrl("file:///android_asset/index.html");
+        } else if (redactor.equals("1")) {
+            mWebView.loadUrl("file:///android_asset/indexRedactor.html");
+            SPW = getSharedPreferences("seam", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SPW.edit();
+            ed.putString("", "0");
+            ed.commit();
+        }
+
         mWebView.setWebChromeClient(new WebChromeClient());
 
         mWebView.addJavascriptInterface(new myJavaScriptInterface(this),

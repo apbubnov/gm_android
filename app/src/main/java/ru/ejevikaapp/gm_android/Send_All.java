@@ -29,6 +29,8 @@ import org.json.JSONArray;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.ejevikaapp.gm_android.Class.HelperClass;
+
 public class Send_All extends Service {
     private static final String TAG = "responce_send_all";
     static DBHelper dbHelper;
@@ -170,6 +172,7 @@ public class Send_All extends Service {
                 dbHelper = new DBHelper(context);
                 SQLiteDatabase db = dbHelper.getReadableDatabase();
                 String change_time = "0000-00-00 00:00:00";
+
 
                 String sqlQuewy = "SELECT change_time "
                         + "FROM history_import_to_server" +
