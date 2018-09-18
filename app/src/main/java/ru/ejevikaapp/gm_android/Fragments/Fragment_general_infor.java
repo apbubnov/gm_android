@@ -33,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -104,19 +105,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     EditText add_client_call_note;
 
     ScrollView view_general_inform;
-    String id_cl;
-    String id_project;
-    String phone;
-    String fio;
-    String pro_info;
-    String calc_date;
-    String dealer_id;
-    String S;
-    String P;
-    String transport = "";
-    String distance_col = "";
-    String distance = "";
-    String time_h = "", time_brig, id_b, id_z, callBackDate;
+    String id_cl, id_project, phone, fio, pro_info, calc_date, dealer_id, S, P, transport = "",
+            distance_col = "", distance = "", time_h = "", time_brig, id_b, id_z, callBackDate;
 
     Button new_calc, open_notes, contract, leave, btn_transport_ok, btn_discount_ok, save_proj, btn_history;
 
@@ -125,7 +115,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     static DBHelper dbHelper;
     View view;
     TextView DateTime, S_and_P, DateTime_mount, currentDateTime;
-    int discount = 0, count_calc = 0, bt_i = 0, ch_i = 0;
+    int discount = 0, count_calc = 0, bt_i = 0, ch_i = 0, typeMount;
     ArrayList id_calcul = new ArrayList();
     ArrayList id_calcul_deleted = new ArrayList();
     double total = 0, sum_transport = 0.0;
@@ -158,6 +148,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     ArrayList<Select_work> sel_work = new ArrayList<>();
     ArrayList<String> name_zamer_id = new ArrayList<String>();
     ArrayList<Integer> estimate = new ArrayList<Integer>();
+    ArrayList<String> checkTypeMount = new ArrayList<>();
+
+    RadioButton radioButton_mount, radioButton_mount2;
+    CheckBox checkBoxType2, checkBoxType3, checkBoxType4;
 
     ListView list_work;
 
@@ -429,21 +423,24 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                     int hours = 0;
 
-                    try {
-                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        change_max = ft.parse(calc_date);
+                    if (calc_date.equals("0000-00-00 00:00:00")) {
+                    } else {
+                        try {
+                            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            change_max = ft.parse(calc_date);
 
-                        out_format = new SimpleDateFormat("dd.MM.yyyy");
-                        out_format_minute = new SimpleDateFormat("HH");
+                            out_format = new SimpleDateFormat("dd.MM.yyyy");
+                            out_format_minute = new SimpleDateFormat("HH");
 
-                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                            hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
-                        out_format_time = new SimpleDateFormat("HH:mm");
+                            out_format_time = new SimpleDateFormat("HH:mm");
 
-                        DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                                + " - " + hours + ":00");
+                            DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                                    + " - " + hours + ":00");
 
-                    } catch (Exception e) {
+                        } catch (Exception e) {
+                        }
                     }
 
                     String note = c.getString(c.getColumnIndex(c.getColumnName(2)));
@@ -1476,7 +1473,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         time_free.clear();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Log.d("mLog", date_mount + " " + id_b);
         int count = 0;
         for (int i = 9; i < 21; i++) {
             String date_mount1 = "";
@@ -1485,32 +1481,43 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             } else {
                 date_mount1 = date_mount + " " + i + ":00:00";
             }
-            String sqlQuewy = "select _id, project_info, project_mounting_date, project_mounter "
-                    + "FROM rgzbn_gm_ceiling_projects " +
-                    "where project_mounting_date = '" + date_mount1 + "' and project_mounter =?";
+            String sqlQuewy = "select project_id, date_time, mounter_id "
+                    + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                    "where date_time = '" + date_mount1 + "' and mounter_id =?";
             Cursor c = db.rawQuery(sqlQuewy, new String[]{id_b});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
 
-                        String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(3)));
-
-                        Log.d("mLog", idd);
+                        String project_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(2)));
 
                         double n5 = 0;
                         sqlQuewy = "select n5 "
                                 + "FROM rgzbn_gm_ceiling_calculations " +
                                 "where project_id = ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{idd});
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_id});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
                                     String n5_str = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                     n5 += Double.parseDouble(n5_str);
 
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                        String project_info = "";
+                        sqlQuewy = "select project_info "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where _id = ?";
+                        cc = db.rawQuery(sqlQuewy, new String[]{project_id});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    project_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
                                 } while (cc.moveToNext());
                             }
                         }
@@ -1524,7 +1531,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             if (cc.moveToFirst()) {
                                 do {
                                     String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                    sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
+                                    sel_work.add(new Select_work(project_id, i + ":00 - " + (i + 1) + ":00",
                                             project_info, name, String.valueOf(n5)));
                                     count++;
                                 } while (cc.moveToNext());
@@ -2333,7 +2340,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                 break;
             case R.id.save_proj:
                 dog();
-
+                Log.d("mLog", " date = " + date_mount + time_brig + ":00");
                 break;
             case R.id.leave:
                 getActivity().finish();
@@ -2761,6 +2768,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
         max_day = 0;
         String month_str = "";
 
+        checkTypeMount.add("1");
+
         if (month == 0) {
             max_day = 31;
             calendar_month.setText("Январь");
@@ -3091,6 +3100,69 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             data_mount.setText(mount_day);
             date_mount = mount_day;
 
+            final CheckBox checkBoxType2 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType2);
+            final CheckBox checkBoxType3 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType3);
+            final CheckBox checkBoxType4 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType4);
+
+            final LinearLayout linearCheckBox = (LinearLayout) promptsView2.findViewById(R.id.linearCheckBox);
+
+            checkTypeMount.clear();
+            checkTypeMount.add("1");
+
+            RadioGroup radios_b = (RadioGroup) promptsView2.findViewById(R.id.radios_b);
+            radios_b.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int id) {
+                    switch (id) {
+                        case R.id.radioButton_mount:
+                            linearCheckBox.setVisibility(View.GONE);
+                            checkTypeMount.clear();
+                            checkTypeMount.add("1");
+                            checkBoxType2.setChecked(false);
+                            checkBoxType3.setChecked(false);
+                            checkBoxType4.setChecked(false);
+                            break;
+                        case R.id.radioButton_mount2:
+                            linearCheckBox.setVisibility(View.VISIBLE);
+                            checkTypeMount.clear();
+                            break;
+                    }
+                }
+            });
+
+            checkBoxType2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        checkTypeMount.add("2");
+                    } else if (!isChecked) {
+                        checkTypeMount.remove("2");
+                    }
+                }
+            });
+
+            checkBoxType3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        checkTypeMount.add("3");
+                    } else if (!isChecked) {
+                        checkTypeMount.remove("3");
+                    }
+                }
+            });
+
+            checkBoxType4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        checkTypeMount.add("4");
+                    } else if (!isChecked) {
+                        checkTypeMount.remove("4");
+                    }
+                }
+            });
+
             ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, name_brigade);
             sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sp_brigade.setAdapter(sp_adapter);
@@ -3349,8 +3421,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             HelperClass.sendHistory("По проекту № " + id_project + " заключен договор", getActivity(), id_cl);
         } else {
             values = new ContentValues();
-            values.put(DBHelper.KEY_PROJECT_MOUNTING_DATE, date_mount + time_brig + ":00");
-            values.put(DBHelper.KEY_PROJECT_MOUNTER, id_b);
             values.put(DBHelper.KEY_PROJECT_NOTE, String.valueOf(notes_cl.getText()));
             values.put(DBHelper.KEY_GM_CALCULATOR_NOTE, String.valueOf(notes_gm_calc.getText()));
             values.put(DBHelper.KEY_GM_CHIEF_NOTE, String.valueOf(notes_gm_chief.getText()));
@@ -3359,6 +3429,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             values.put(DBHelper.KEY_PROJECT_SUM, (Math.round(total) * 100.0) / 100);
             values.put(DBHelper.KEY_PROJECT_STATUS, "5");
             db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?", new String[]{id_project});
+
+            Log.d("mLog", " date 2 = " + date_mount + time_brig + ":00");
 
             String callDate = date_mount + time_brig;
             HelperClass.sendHistory("По проекту № " + id_project + " заключен договор", getActivity(), id_cl);
@@ -3457,6 +3529,57 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             values.put(DBHelper.KEY_TYPE, "send");
             values.put(DBHelper.KEY_STATUS, "1");
             db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+        } catch (Exception e) {
+            Log.d("mLog", "error " + e);
+        }
+
+        try {
+            for (String type : checkTypeMount) {
+
+                int max_id_project_mount = 0;
+                try {
+                    String sqlQuewy = "select MAX(_id) "
+                            + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                            "where _id>? and _id<?";
+                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                            String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            do {
+                                max_id_project_mount = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                max_id_project_mount++;
+                            } while (c.moveToNext());
+                        }
+                    }
+                } catch (Exception e) {
+                    max_id_project_mount = Integer.parseInt(dealer_id) * 100000 + 1;
+                }
+
+                date = HelperClass.now_date(getActivity());
+
+                Log.d("mLog", " date 3 = " + date_mount + time_brig + ":00");
+
+                values = new ContentValues();
+                values.put(DBHelper.KEY_ID, max_id_project_mount);
+                values.put(DBHelper.KEY_PROJECT_ID, id_project);
+                values.put(DBHelper.KEY_MOUNTER_ID, id_b);
+                values.put(DBHelper.KEY_DATE_TIME, date_mount + time_brig + ":00");
+                values.put(DBHelper.KEY_TYPE, type);
+                values.put(DBHelper.KEY_MOUNT_START, "null");
+                values.put(DBHelper.KEY_MOUNT_END, "null");
+                values.put(DBHelper.KEY_CHANGE_TIME, date);
+                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, null, values);
+
+                values = new ContentValues();
+                values.put(DBHelper.KEY_ID_OLD, max_id_project_mount);
+                values.put(DBHelper.KEY_ID_NEW, 0);
+                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_mounts");
+                values.put(DBHelper.KEY_SYNC, "0");
+                values.put(DBHelper.KEY_TYPE, "send");
+                values.put(DBHelper.KEY_STATUS, "1");
+                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+            }
         } catch (Exception e) {
             Log.d("mLog", "error " + e);
         }
@@ -3663,10 +3786,11 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         btn.setOnClickListener(getDateMount);
                         tableRow.addView(btn, j);
                     } else {
-                        sqlQuewy = "select _id, read_by_mounter "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where  project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
+                        sqlQuewy = "select * "
+                                + "FROM rgzbn_gm_ceiling_projects as pr " +
+                                "INNER JOIN rgzbn_gm_ceiling_projects_mounts as pr_m  " +
+                                "where  pr_m.date_time > ? and pr_m.date_time < ? and (pr.read_by_mounter=? or pr.read_by_mounter=?) and (pr.project_status>?)";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null", "3"});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {

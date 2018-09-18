@@ -41,12 +41,12 @@ public class Service_Sync extends Service {
             components_fixtures = "[", components_corn = "[", components_ecola = "[", components_hoods = "[", components_pipes = "[", check_project = "[", check_calculation = "[",
             components_profil = "[", check_components_diffusers = "[", check_components_fixtures = "[", check_components_corn = "[", check_components_ecola = "[",
             check_components_hoods = "[", check_components_pipes = "[", check_components_profil = "[", check_History = "[", check_ApiPhones = "[", checkClientHistory = "[",
-            checkCallback = "[", checkRecoil = "[";
+            checkCallback = "[", checkRecoil = "[", checkProjectMount = "[";
 
     static String jsonProjects = "[", jsonCalc = "[", jsonImage = "[", jsonClient = "[", jsonClient_Contacts = "[", jsonFixtures = "[", jsonEcola = "[", jsonCornice = "[",
             jsonPipes = "[", jsonHoods = "[", jsonDiffusers = "[", global_results = "[", check_client = "[", check_clients_contacts = "[", check_users = "[", jsonUsers = "[",
             jsonUserGroup = "[", jsonMounters = "[", check_mounters = "[", mounters_map = "[", jsonDealer_info = "[", jsonMount = "[", jsonHistory = "[", jsonApiPhones = "[",
-            jsonClientHistory = "[", jsonCallback = "[", jsonDelete = "[", jsonDeleteTable = "[", jsonRecoil = "[";
+            jsonClientHistory = "[", jsonCallback = "[", jsonDelete = "[", jsonDeleteTable = "[", jsonRecoil = "[", jsonProjectMount = "[";
 
     static org.json.simple.JSONObject jsonObjectClient = new org.json.simple.JSONObject();
     static org.json.simple.JSONObject jsonObjectClient_Contacts = new org.json.simple.JSONObject();
@@ -1852,6 +1852,90 @@ public class Service_Sync extends Service {
                 new SendApiPhones().execute();
             }
 
+            Log.d(TAG, "--------------------------МОНТАЖНЫЕ РАБОТЫ------------------------");
+            //клиент send
+            jsonProjectMount = "[";
+            sqlQuewy = "SELECT id_old "
+                    + "FROM history_send_to_server " +
+                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=? and status=?";
+            cursor = db.rawQuery(sqlQuewy,
+                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                            "send", "0", "rgzbn_gm_ceiling_projects_mounts", "1"});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        String id_old = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                        try {
+                            sqlQuewy = "SELECT * "
+                                    + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                                    "where _id = ?";
+                            cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(id_old)});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        JSONObject jsonObjectClient = new JSONObject();
+                                        for (int j = 0; j < HelperClass.countColumns(ctx, "rgzbn_gm_ceiling_projects_mounts"); j++) {
+                                            String status = cursor.getColumnName(cursor.getColumnIndex(cursor.getColumnName(j)));
+                                            String status1 = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(j)));
+
+                                            if (j == 0) {
+                                                status = "android_id";
+                                            }
+                                            if (status1 == null || (status1.equals("null"))) {
+                                            } else {
+                                                jsonObjectClient.put(status, status1);
+                                            }
+                                        }
+                                        jsonProjectMount += String.valueOf(jsonObjectClient) + ",";
+                                    } while (cursor.moveToNext());
+                                } else {
+                                    db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
+                                            "id_old = ? and name_table = ? and sync = 0 and type = 'send' ",
+                                            new String[]{String.valueOf(id_old), "rgzbn_gm_ceiling_projects_mounts"});
+                                }
+                            }
+                            cursor.close();
+                        } catch (Exception e) {
+                            Log.d(TAG, String.valueOf(e));
+                        }
+                    } while (cursor.moveToNext());
+                } else {
+                    checkProjectMount = "[";
+                    sqlQuewy = "SELECT id_new "
+                            + "FROM history_send_to_server " +
+                            "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                    cursor = db.rawQuery(sqlQuewy,
+                            new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                    "check", "0", "rgzbn_gm_ceiling_api_phones"});
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            do {
+                                try {
+                                    jsonObjectUsers = new JSONObject();
+                                    String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                    jsonObjectUsers.put("id", id_new);
+                                    checkProjectMount += String.valueOf(jsonObjectUsers) + ",";
+                                } catch (Exception e) {
+                                }
+                            } while (cursor.moveToNext());
+                        }
+                    }
+                    checkProjectMount = checkProjectMount.substring(0, checkProjectMount.length() - 1) + "]";
+                    if (checkProjectMount.equals("]")) {
+                    } else {
+                        new CheckProjectMount().execute();
+                    }
+                    cursor.close();
+                }
+            }
+
+            cursor.close();
+            jsonProjectMount = jsonProjectMount.substring(0, jsonProjectMount.length() - 1) + "]";
+            if (jsonProjectMount.equals("]")) {
+            } else {
+                new SendProjectMount().execute();
+            }
+
             Log.d(TAG, "--------------------------DELETE------------------------");
             //клиент send
             jsonDelete = "[";
@@ -2466,6 +2550,7 @@ public class Service_Sync extends Service {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     parameters.put("rgzbn_gm_ceiling_client_history", jsonClientHistory);
+                    Log.d(TAG, "rgzbn_gm_ceiling_client_history " + jsonClientHistory);
                     return parameters;
                 }
             };
@@ -4433,7 +4518,6 @@ public class Service_Sync extends Service {
         }
     }
 
-
     static class SendApiPhones extends AsyncTask<Void, Void, Void> {
 
         String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
@@ -4617,6 +4701,189 @@ public class Service_Sync extends Service {
         }
     }
 
+    static class SendProjectMount extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.addDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    if (res.equals("")) {
+
+                    } else {
+                        SQLiteDatabase db;
+                        db = dbHelper.getWritableDatabase();
+
+                        try {
+                            org.json.JSONObject dat = new org.json.JSONObject(res);
+                            JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_projects_mounts");
+                            for (int i = 0; i < id_array.length(); i++) {
+                                org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                                String old_id = client_contact.getString("old_id");
+                                String new_id = client_contact.getString("new_id");
+
+                                ContentValues values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, values, "_id = ?", new String[]{old_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_SYNC, "1");
+                                db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_old = ? and type=? and sync=? and name_table=? and id_new=?",
+                                        new String[]{String.valueOf(old_id), "send", "0", "rgzbn_gm_ceiling_projects_mounts", "0"});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID, new_id);
+                                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, values, "_id = ?",
+                                        new String[]{String.valueOf(old_id)});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, old_id);
+                                values.put(DBHelper.KEY_ID_NEW, new_id);
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_mounts");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "check");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                            }
+
+                            checkProjectMount = "[";
+                            String sqlQuewy = "SELECT id_new "
+                                    + "FROM history_send_to_server " +
+                                    "where ((id_old>=? and id_old<=?) or (id_old<=?)) and type=? and sync=? and name_table=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy,
+                                    new String[]{String.valueOf(gager_id_int), String.valueOf(gager_id_int + 999999), String.valueOf(999999),
+                                            "check", "0", "rgzbn_gm_ceiling_projects_mounts"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        try {
+                                            jsonObjectUsers = new JSONObject();
+                                            String id_new = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                                            jsonObjectUsers.put("id", id_new);
+                                            checkProjectMount += String.valueOf(jsonObjectUsers) + ",";
+                                        } catch (Exception e) {
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            checkProjectMount = checkProjectMount.substring(0, checkProjectMount.length() - 1) + "]";
+                            if (checkProjectMount.equals("]")) {
+                            } else {
+                                new CheckProjectMount().execute();
+                            }
+                            cursor.close();
+
+                        } catch (Exception e) {
+                        }
+                        //ctx.startService(new Intent(ctx, Service_Sync.class));
+                    }
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_projects_mounts", jsonProjectMount);
+                    Log.d(TAG, "rgzbn_gm_ceiling_projects_mounts " + jsonProjectMount);
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
+
+    static class CheckProjectMount extends AsyncTask<Void, Void, Void> {
+
+        String insertUrl = "http://" + domen + ".gm-vrn.ru/index.php?option=com_gm_ceiling&amp;task=api.CheckDataFromAndroid";
+        Map<String, String> parameters = new HashMap<String, String>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            // try {
+
+            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String res) {
+
+                    Log.d(TAG, "rgzbn_gm_ceiling_projects_mounts = " + res);
+
+                    if (res.equals("") || res.equals("\u041e\u0448\u0438\u0431\u043a\u0430!")) {
+                    }
+                    SQLiteDatabase db;
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    try {
+                        org.json.JSONObject dat = new org.json.JSONObject(res);
+                        JSONArray id_array = dat.getJSONArray("rgzbn_gm_ceiling_projects_mounts");
+                        for (int i = 0; i < dat.length(); i++) {
+
+                            org.json.JSONObject client_contact = id_array.getJSONObject(i);
+                            String new_id = client_contact.getString("new_android_id");
+
+                            String sqlQuewy = "SELECT * "
+                                    + "FROM history_send_to_server " +
+                                    "where id_new = ? and type=? and name_table=? and sync=?";
+                            Cursor cursor = db.rawQuery(sqlQuewy, new String[]{String.valueOf(new_id), "check", "rgzbn_gm_ceiling_projects_mounts", "0"});
+                            if (cursor != null) {
+                                if (cursor.moveToFirst()) {
+                                    do {
+
+                                        values = new ContentValues();
+                                        values.put(DBHelper.KEY_SYNC, "1");
+                                        db.update(DBHelper.HISTORY_SEND_TO_SERVER, values, "id_new = ? and name_table=? and sync=?",
+                                                new String[]{new_id, "rgzbn_gm_ceiling_projects_mounts", "0"});
+
+                                    } while (cursor.moveToNext());
+                                }
+                            }
+                            cursor.close();
+                        }
+                    } catch (Exception e) {
+                    }
+
+                    delete();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }) {
+                @Override
+
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    parameters.put("rgzbn_gm_ceiling_projects_mounts", checkProjectMount);
+
+                    Log.d(TAG, "rgzbn_gm_ceiling_api_phones " + parameters);
+
+                    return parameters;
+                }
+            };
+            requestQueue.add(request);
+            return null;
+        }
+    }
 
     static class SendRecoilMapProject extends AsyncTask<Void, Void, Void> {
 

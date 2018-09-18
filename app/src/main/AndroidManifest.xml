@@ -186,8 +186,7 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ActivityOnlineVersion"
-            android:theme="@style/AppTheme.NoActionBar" ></activity>
+        <activity android:name=".ActivityOnlineVersion"></activity>
     </application>
 
 </manifest>
