@@ -206,7 +206,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
             sqlQuewy = "SELECT client_id "
                     + "FROM rgzbn_gm_ceiling_projects " +
-                    "where project_calculator = ? and project_status = 1 " +
+                    "where project_calculator = ? and (project_status = 1 or project_status = 1)" +
                     "group by client_id ";
             c = db.rawQuery(sqlQuewy, new String[]{user_id});
             if (c != null) {

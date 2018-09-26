@@ -1,112 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <TextView
-        android:layout_margin="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:minLines="2"
-        android:gravity="center"
-        android:id="@+id/data_mount"
-        android:textColor="#000000"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="@style/text_style_spisok"
-        android:textSize="17dp"
-        android:id="@+id/text2"
-        android:text="Выберите бригаду"/>
-
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:id="@+id/sp_brigade"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        style="@style/spinner_style">
-    </Spinner>
-
-    <TableLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:stretchColumns="*"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/table_la"
-        android:layout_marginBottom="5dp">
-    <TableRow>
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:textSize="12dp"
-            android:gravity="center|top"
+        <TextView
+            android:id="@+id/data_mount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
             android:minLines="2"
+            android:textColor="#000000"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/text2"
             style="@style/text_style_spisok"
-            android:visibility="gone"
-            />
-        <TextView android:layout_width="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Выберите бригаду"
+            android:textSize="17dp" />
+
+        <Spinner
+            android:id="@+id/sp_brigade"
+            style="@style/spinner_style"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"></Spinner>
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/table_la"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:stretchColumns="*">
+
+            <TableRow>
+
+                <TextView
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:gravity="center|top"
+                    android:minLines="2"
+                    android:textSize="12dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="3"
+                    android:gravity="center"
+                    android:text="Время"
+                    android:textSize="12dp" />
+
+                <TextView
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="3"
+                    android:gravity="center"
+                    android:text="Адрес"
+                    android:textSize="12dp" />
+
+                <TextView
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_span="3"
+                    android:gravity="center"
+                    android:text="Периметр"
+                    android:textSize="12dp" />
+            </TableRow>
+        </TableLayout>
+
+        <ListView
+            android:id="@+id/list_work"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></ListView>
+
+        <TextView
+            android:id="@+id/text3"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="Выберите время начала монтажа"
+            android:textSize="17dp" />
+
+        <Spinner
+            android:id="@+id/sp_brigade_free"
+            style="@style/spinner_style"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"></Spinner>
+
+        <TextView
+            android:id="@+id/text4"
+            style="@style/text_style_spisok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="Выберите вид монтажа"
+            android:textSize="17dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Время"
-            android:textSize="12dp"
-            android:layout_span="3"
-            style="@style/text_style_spisok"
-            />
+            android:orientation="vertical">
 
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Адрес"
-            android:textSize="12dp"
-            android:layout_span="3"
-            style="@style/text_style_spisok"
-            />
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radios_b"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Периметр"
-            android:textSize="12dp"
-            android:layout_span="3"
-            android:layout_marginLeft="5dp"
-            style="@style/text_style_spisok"
-            />
-    </TableRow>
-    </TableLayout>
+                <RadioButton
+                    android:id="@+id/radioButton_mount"
+                    style="@style/text_style_spisok"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Полный монтаж" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_work">
-    </ListView>
+                <RadioButton
+                    android:id="@+id/radioButton_mount2"
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Поэтапный монтаж" />
+            </RadioGroup>
 
-    <TextView
-        android:layout_marginTop="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="@style/text_style_spisok"
-        android:textSize="17dp"
-        android:id="@+id/text3"
-        android:text="Выберите время начала монтажа"/>
+            <LinearLayout
+                android:id="@+id/linearCheckBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:id="@+id/sp_brigade_free"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        style="@style/spinner_style">
-    </Spinner>
+                <CheckBox
+                    android:id="@+id/checkBoxType2"
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Обагечивание" />
 
-</LinearLayout>
+                <CheckBox
+                    android:id="@+id/checkBoxType3"
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Натяжка" />
+
+                <CheckBox
+                    android:id="@+id/checkBoxType4"
+                    style="@style/text_style_spisok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Вставка" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>

@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,12 +64,13 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import ru.ejevikaapp.gm_android.ActivityEstimate;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
+import ru.ejevikaapp.gm_android.Class.Extra_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
+import ru.ejevikaapp.gm_android.Class.Svetiln_class;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
@@ -85,6 +87,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.pixplicity.sharp.Sharp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -426,25 +429,21 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
                     int hours = 0;
 
-                    if (calc_date.equals("0000-00-00 00:00:00")){
-                        DateTime.setText("-");
-                    } else {
-                        try {
-                            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            change_max = ft.parse(calc_date);
+                    try {
+                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        change_max = ft.parse(calc_date);
 
-                            out_format = new SimpleDateFormat("dd.MM.yyyy");
-                            out_format_minute = new SimpleDateFormat("HH");
+                        out_format = new SimpleDateFormat("dd.MM.yyyy");
+                        out_format_minute = new SimpleDateFormat("HH");
 
-                            hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
-                            out_format_time = new SimpleDateFormat("HH:mm");
+                        out_format_time = new SimpleDateFormat("HH:mm");
 
-                            DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                                    + " - " + hours + ":00");
+                        DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                                + " - " + hours + ":00");
 
-                        } catch (Exception e) {
-                        }
+                    } catch (Exception e) {
                     }
 
                     String note = c.getString(c.getColumnIndex(c.getColumnName(2)));
@@ -1486,43 +1485,32 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             } else {
                 date_mount1 = date_mount + " " + i + ":00:00";
             }
-            String sqlQuewy = "select project_id, date_time, mounter_id "
-                    + "FROM rgzbn_gm_ceiling_projects_mounts " +
-                    "where date_time = '" + date_mount1 + "' and mounter_id =?";
+            String sqlQuewy = "select _id, project_info, project_mounting_date, project_mounter "
+                    + "FROM rgzbn_gm_ceiling_projects " +
+                    "where project_mounting_date = '" + date_mount1 + "' and project_mounter =?";
             Cursor c = db.rawQuery(sqlQuewy, new String[]{id_b});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
 
-                        String project_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                        String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(3)));
+
+                        Log.d("mLog", idd);
 
                         double n5 = 0;
                         sqlQuewy = "select n5 "
                                 + "FROM rgzbn_gm_ceiling_calculations " +
                                 "where project_id = ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_id});
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{idd});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
                                     String n5_str = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                     n5 += Double.parseDouble(n5_str);
 
-                                } while (cc.moveToNext());
-                            }
-                        }
-                        cc.close();
-
-                        String project_info = "";
-                        sqlQuewy = "select project_info "
-                                + "FROM rgzbn_gm_ceiling_projects " +
-                                "where _id = ?";
-                        cc = db.rawQuery(sqlQuewy, new String[]{project_id});
-                        if (cc != null) {
-                            if (cc.moveToFirst()) {
-                                do {
-                                    project_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
                                 } while (cc.moveToNext());
                             }
                         }
@@ -1536,7 +1524,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             if (cc.moveToFirst()) {
                                 do {
                                     String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                    sel_work.add(new Select_work(project_id, i + ":00 - " + (i + 1) + ":00",
+                                    sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
                                             project_info, name, String.valueOf(n5)));
                                     count++;
                                 } while (cc.moveToNext());
@@ -2644,7 +2632,9 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     @Override
                     public void onClick(View v) {
                         if (add_client_call.getText().toString().length() > 0) {
+
                             HelperClass.sendHistory("Добавлен звонок на " + add_client_call.getText().toString(), getActivity(), id_cl);
+
                             HelperClass.sendCallback(add_client_call_note.getText().toString(), getActivity(), id_cl, callBackDate);
 
                             add_client_call.setText("");
@@ -2659,14 +2649,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
     }
 
     private void setInitialDateTimeCall() {
+        add_client_call.setText(add_client_call.getText().toString() + " " +
+                DateUtils.formatDateTime(getActivity(),
+                        dateAndTime.getTimeInMillis(),
+                        DateUtils.FORMAT_SHOW_TIME));
+        callBackDate += " " + DateUtils.formatDateTime(getActivity(), dateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.UK);
-        String date = sdf.format(dateAndTime.getTime());
-
-        add_client_call.setText(add_client_call.getText().toString() + " " + date);
-
-        callBackDate += " " + date;
-
+        Log.d("mLog", callBackDate);
     }
 
     public void setDate(View v) {
@@ -2687,6 +2676,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             add_client_call.setText(editTextDateParam);
                         }
                         callBackDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                        Log.d("mLog", callBackDate);
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
@@ -3673,11 +3663,10 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                         btn.setOnClickListener(getDateMount);
                         tableRow.addView(btn, j);
                     } else {
-                        sqlQuewy = "select * "
-                                + "FROM rgzbn_gm_ceiling_projects as pr " +
-                                "INNER JOIN rgzbn_gm_ceiling_projects_mounts as pr_m  " +
-                                "where  pr_m.date_time > ? and pr_m.date_time < ? and (pr.read_by_mounter=? or pr.read_by_mounter=?) and (pr.project_status>?)";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null", "3"});
+                        sqlQuewy = "select _id, read_by_mounter "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where  project_mounting_date > ? and project_mounting_date < ? and (read_by_mounter=? or read_by_mounter=?)";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00", "0", "null"});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
