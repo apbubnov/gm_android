@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
+import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.Activity_zamer;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
@@ -285,8 +286,9 @@ public class FragmentAllProjects extends Fragment implements View.OnClickListene
                 ed.commit();
 
                 String c_id = "";
+                int pStatus = 0;
 
-                String sqlQuewy = "SELECT client_id "
+                String sqlQuewy = "SELECT client_id, project_status "
                         + "FROM rgzbn_gm_ceiling_projects" +
                         " WHERE _id = ?";
 
@@ -295,6 +297,7 @@ public class FragmentAllProjects extends Fragment implements View.OnClickListene
                     if (cursor.moveToFirst()) {
                         do {
                             c_id = cursor.getString(cursor.getColumnIndex(cursor.getColumnName(0)));
+                            pStatus = cursor.getInt(cursor.getColumnIndex(cursor.getColumnName(1)));
                         } while (cursor.moveToNext());
                     }
                 }
@@ -305,8 +308,13 @@ public class FragmentAllProjects extends Fragment implements View.OnClickListene
                 ed.putString("", String.valueOf(c_id));
                 ed.commit();
 
-                Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
-                startActivity(intent);
+                if (pStatus<5) {
+                    Intent intent = new Intent(getActivity(), Activity_inform_proj.class);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getActivity(), Activity_inform_zapysch.class);
+                    startActivity(intent);
+                }
             }
         });
 

@@ -3,6 +3,7 @@ package ru.ejevikaapp.gm_android;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -14,6 +15,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -34,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.ejevikaapp.gm_android.Dealer.Activity_empty;
 
@@ -41,7 +46,7 @@ public class Service_Sync_Import extends Service {
     private static final String TAG = "responce_import";
     static DBHelper dbHelper;
 
-    static String sync_import = "", user_id = "", change_time_global, version_send = "";
+    static String sync_import = "", user_id = "", change_time_global;
 
     static org.json.simple.JSONObject jsonSync_Import = new org.json.simple.JSONObject();
     static org.json.simple.JSONObject jsonVersion = new org.json.simple.JSONObject();
@@ -67,13 +72,15 @@ public class Service_Sync_Import extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.v(TAG, "Service started!");
 
+        startForeground(100, new NotificationCompat.Builder(this).build());
+
         SharedPreferences SP = this.getSharedPreferences("link", MODE_PRIVATE);
         domen = SP.getString("", "");
 
         int count = 0;
 
         dbHelper = new DBHelper(this);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String sqlQuewy = "SELECT * "
                 + "FROM history_send_to_server";
@@ -88,8 +95,6 @@ public class Service_Sync_Import extends Service {
         c.close();
 
         if (count == 0) {
-            ctx = this.getApplicationContext();
-            requestQueue = Volley.newRequestQueue(this.getApplicationContext());
 
             SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
             String dealer_id = SP.getString("", "");
@@ -97,14 +102,31 @@ public class Service_Sync_Import extends Service {
             SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
             user_id = SP_end.getString("", "");
 
-            String change_time = "";
+            ctx = this.getApplicationContext();
+            requestQueue = Volley.newRequestQueue(this.getApplicationContext());
 
+            /*
+            final Timer myTimer = new Timer(); // Создаем таймер
+            final Handler uiHandler = new Handler();
+
+            myTimer.schedule(new TimerTask() { // Определяем задачу
+                @Override
+                public void run() {
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                        }
+                    });
+                }
+            }, 0L, 60L * 1000);
+            */
+
+            String change_time = "";
             sqlQuewy = "SELECT change_time "
                     + "FROM history_import_to_server" +
                     " WHERE user_id = ?";
-
             c = db.rawQuery(sqlQuewy, new String[]{user_id});
-
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
@@ -124,7 +146,6 @@ public class Service_Sync_Import extends Service {
                 if (c.moveToFirst()) {
                     do {
                         usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
-
                     } while (c.moveToNext());
                 }
             }
@@ -155,6 +176,7 @@ public class Service_Sync_Import extends Service {
     }
 
     public static boolean isRunning(Context ctx) {
+        Log.d(TAG,"run");
         ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (Service_Sync_Import.class.getName().equals(service.service.getClassName())) {
@@ -278,6 +300,7 @@ public class Service_Sync_Import extends Service {
             alarmManager.cancel(sender);
         }
     }
+
 
     static class ImportDate extends AsyncTask<Void, Void, Void> {
 
@@ -719,23 +742,47 @@ public class Service_Sync_Import extends Service {
                                                     }
                                                 }
 
-                                            PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
-                                                    PendingIntent.FLAG_UPDATE_CURRENT);
-                                            NotificationCompat.Builder builder =
-                                                    new NotificationCompat.Builder(ctx)
-                                                            .setAutoCancel(true)
-                                                            .setTicker("У Вас новый замер")
-                                                            .setWhen(System.currentTimeMillis())
-                                                            .setDefaults(Notification.DEFAULT_ALL)
-                                                            .setSmallIcon(R.raw.itc_icon)
-                                                            .setContentIntent(resultPendingIntent)
-                                                            .setContentTitle("IT-Ceiling")
-                                                            .setContentText("У Вас новый замер (" + count_project1 + ")");
-                                            Notification notification = builder.build();
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                int notifyID = 1;
+                                                String CHANNEL_ID = "my_channel_01";
+                                                CharSequence name = "1";
+                                                int importance = NotificationManager.IMPORTANCE_HIGH;
+                                                NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+                                                Notification notification = new Notification.Builder(ctx)
+                                                        .setAutoCancel(true)
+                                                        .setTicker("У Вас новый замер")
+                                                        .setWhen(System.currentTimeMillis())
+                                                        .setDefaults(Notification.DEFAULT_ALL)
+                                                        .setSmallIcon(R.raw.itc)
+                                                        .setContentTitle("IT-Ceiling")
+                                                        .setContentText("У Вас новый замер (" + count_project1 + ")")
+                                                        .setChannelId(CHANNEL_ID)
+                                                        .build();
 
-                                            NotificationManager notificationManager = (NotificationManager) ctx
-                                                    .getSystemService(Context.NOTIFICATION_SERVICE);
-                                            notificationManager.notify(1, notification);
+                                                NotificationManager mNotificationManager =
+                                                        (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                                                mNotificationManager.createNotificationChannel(mChannel);
+
+                                                mNotificationManager.notify(notifyID, notification);
+                                            } else {
+                                                PendingIntent resultPendingIntent = PendingIntent.getActivity(ctx, 0, resultIntent,
+                                                        PendingIntent.FLAG_UPDATE_CURRENT);
+                                                NotificationCompat.Builder builder =
+                                                        new NotificationCompat.Builder(ctx)
+                                                                .setAutoCancel(true)
+                                                                .setTicker("У Вас новый замер")
+                                                                .setWhen(System.currentTimeMillis())
+                                                                .setDefaults(Notification.DEFAULT_ALL)
+                                                                .setSmallIcon(R.raw.itc_icon)
+                                                                .setContentIntent(resultPendingIntent)
+                                                                .setContentTitle("IT-Ceiling")
+                                                                .setContentText("У Вас новый замер (" + count_project1 + ")");
+                                                Notification notification = builder.build();
+
+                                                NotificationManager notificationManager = (NotificationManager) ctx
+                                                        .getSystemService(Context.NOTIFICATION_SERVICE);
+                                                notificationManager.notify(1, notification);
+                                            }
 
                                             values.put(DBHelper.KEY_ID, id);
                                             db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, null, values);
@@ -754,7 +801,7 @@ public class Service_Sync_Import extends Service {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    Log.d(TAG,"Error " + e);
+                                    Log.d(TAG, "Error " + e);
                                 }
                             }
 

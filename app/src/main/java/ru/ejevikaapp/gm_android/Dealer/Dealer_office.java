@@ -1,6 +1,7 @@
 package ru.ejevikaapp.gm_android.Dealer;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -25,6 +26,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
@@ -551,13 +553,12 @@ public class Dealer_office extends AppCompatActivity {
     }
 
 
+    @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected void onResume() {
         super.onResume();
 
         startService(new Intent(this, Service_Sync.class));
-        startService(new Intent(this, ServiceCallBack.class));
-        ServiceCallBack.Alarm.setAlarm(Dealer_office.this);
 
         SharedPreferences SP = getSharedPreferences("entryCalcDealer", MODE_PRIVATE);
         String entryCalcDealer = SP.getString("", "");
@@ -588,6 +589,11 @@ public class Dealer_office extends AppCompatActivity {
 
         SP = getSharedPreferences("first_entry", MODE_PRIVATE);
         final String first_entry = SP.getString("", "");
+
+        if (ServiceCallBack.isRunning(this)){
+        } else {
+            startService(new Intent(this, ServiceCallBack.class));
+        }
 
         SP = getSharedPreferences("user_id", MODE_PRIVATE);
         user_id = SP.getString("", "");

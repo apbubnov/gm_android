@@ -1,21 +1,29 @@
 package ru.ejevikaapp.gm_android;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,7 +48,7 @@ import java.util.Map;
 import ru.ejevikaapp.gm_android.Crew.Activity_crew;
 import ru.ejevikaapp.gm_android.Dealer.Dealer_office;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener {
+public class MainActivity extends AppCompatActivity implements OnClickListener, TextView.OnEditorActionListener {
 
     EditText login, password;
     Button btn_vhod;
@@ -71,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
         String offline = "0";
         try {
             offline = getIntent().getExtras().get("offline").toString();
@@ -94,7 +103,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 if (offline.equals("1")) {
                     offlineVersion();
                 } else {
-                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)"};
+                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)",
+                    "Регистрация"};
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setItems(array, new DialogInterface.OnClickListener() {
                         @Override
@@ -108,6 +118,74 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                     break;
                                 case 1:
                                     offlineVersion();
+                                    break;
+                                case 2:
+                                    intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
+                                    startActivity(intent);
+                                    break;
+                            }
+                        }
+                    });
+
+                    builder.setCancelable(false);
+                    builder.create();
+                    builder.show();
+                }
+            } else {
+                offlineVersion();
+            }
+        }
+        */
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String offline = "0";
+        try {
+            offline = getIntent().getExtras().get("offline").toString();
+        } catch (Exception e) {
+        }
+
+        SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
+        String user_id = SP_end.getString("", "");
+
+        SP_end = this.getSharedPreferences("version", MODE_PRIVATE);
+        String version = SP_end.getString("", "");
+
+        if (version.equals("offline") && !user_id.equals("")) {
+            offlineVersion();
+        } else if (version.equals("online")){
+            Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
+            startActivity(intent);
+            finish();
+        } else {
+            if (user_id.equals("")) {
+                if (offline.equals("1")) {
+                    offlineVersion();
+                } else {
+
+                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)",
+                            "Регистрация"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setItems(array, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int item) {
+                            // TODO Auto-generated method stub
+                            switch (item) {
+                                case 0:
+                                    Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
+                                    startActivity(intent);
+                                    finish();
+                                    break;
+                                case 1:
+                                    offlineVersion();
+                                    break;
+                                case 2:
+                                    intent = new Intent(MainActivity.this, RegistrationActivity.class);
+                                    startActivity(intent);
                                     break;
                             }
                         }
@@ -164,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             for (int g = 0; group_id.size() > g; g++) {
                 if (group_id.get(g).equals("11")) {
 
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+                    //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
@@ -177,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                 } else if (group_id.get(g).equals("21") || group_id.get(g).equals("22")) {
 
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
@@ -189,8 +266,20 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     break;
                 } else if (group_id.get(g).equals("14")) {
 
-                    Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                        //Service_Sync_Import.isRunning(this);
+                        //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+                        //startForegroundService(new Intent(MainActivity.this, Service_Sync_Import.class));
+
+                        Service_Sync_Import.PollReceiver.scheduleAlarms(this);
+                        Toast.makeText(this, "OREO", Toast.LENGTH_LONG).show();
+
+                    } else {
+                        //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
+                    }
+
+                    //startService(new Intent(MainActivity.this, Service_Sync_Import.class));
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -203,10 +292,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 }
             }
 
-        registration = (TextView) findViewById(R.id.registration);
-        registration.setOnClickListener(this);
+        //registration = (TextView) findViewById(R.id.registration);
+        //registration.setOnClickListener(this);
         login = (EditText) findViewById(R.id.login);
         password = (EditText) findViewById(R.id.password);
+        password.setOnEditorActionListener(this);
 
         btn_vhod = (Button) findViewById(R.id.btn_vhod);
         btn_vhod.setOnClickListener(this);
@@ -216,42 +306,54 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     }
 
     @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            vhod();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onClick(View v) {
         Intent intent;
         switch (v.getId()) {
             case R.id.btn_vhod:
-
-                if (login.getText().toString().equals("") || password.getText().toString().equals("")) {
-                    Toast toast = Toast.makeText(getApplicationContext(),
-                            "Введите данные", Toast.LENGTH_SHORT);
-                    toast.show();
-                } else {
-                    jsonObjectAuth.put("username", login.getText().toString());
-                    jsonObjectAuth.put("password", password.getText().toString());
-                    jsonAuth = String.valueOf(jsonObjectAuth);
-
-                    mProgressDialog = new ProgressDialog(MainActivity.this);
-                    mProgressDialog.setMessage("Проверяем...");
-                    mProgressDialog.setIndeterminate(false);
-                    mProgressDialog.show();
-
-                    SharedPreferences SP = getSharedPreferences("link", MODE_PRIVATE);
-                    SharedPreferences.Editor ed = SP.edit();
-                    ed.putString("", "calc");
-                    ed.commit();
-
-                    domen = "calc";
-
-                    new SendAuthorization().execute();
-                }
-
+                vhod();
                 break;
-            case R.id.registration:
-                intent = new Intent(MainActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-                break;
+            //case R.id.registration:
+            //    intent = new Intent(MainActivity.this, RegistrationActivity.class);
+            //    startActivity(intent);
+            //    break;
         }
     }
+
+    void vhod(){
+        if (login.getText().toString().equals("") || password.getText().toString().equals("")) {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Введите данные", Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            jsonObjectAuth.put("username", login.getText().toString());
+            jsonObjectAuth.put("password", password.getText().toString());
+            jsonAuth = String.valueOf(jsonObjectAuth);
+
+            mProgressDialog = new ProgressDialog(MainActivity.this);
+            mProgressDialog.setMessage("Проверяем...");
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.show();
+
+            SharedPreferences SP = getSharedPreferences("link", MODE_PRIVATE);
+            SharedPreferences.Editor ed = SP.edit();
+            ed.putString("", "calc");
+            ed.commit();
+
+            domen = "calc";
+
+            new SendAuthorization().execute();
+        }
+    }
+
 
     class SendAuthorization extends AsyncTask<Void, Void, Void> {
 

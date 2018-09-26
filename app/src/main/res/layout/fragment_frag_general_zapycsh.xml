@@ -270,72 +270,20 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="10dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#000000"
-                    android:textSize="15dp"
-                    android:gravity="center|left"
-                    android:text="Дата и время монтажа"
-                    android:layout_weight="2"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="15dp"
-                    android:gravity="left|center"
-                    android:layout_gravity="center"
-                    android:id="@+id/data_mounting"
-                    android:layout_weight="1"/>
-
-                <ImageButton
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:scaleType="fitCenter" />
-            </LinearLayout>
-
-            <View
+            <TextView
+                android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
-                android:background="#000000"
-                android:layout_height="1dp"
-                android:layout_marginTop="10dp"/>
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:textSize="17dp"
+                android:textColor="#000000"
+                android:text="Монтаж"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#000000"
-                    android:textSize="15dp"
-                    android:gravity="center|left"
-                    android:text="Монтажная бригада"
-                    android:layout_weight="2"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="15dp"
-                    android:layout_gravity="center"
-                    android:id="@+id/project_mounter"
-                    android:layout_weight="1"/>
-
-                <ImageButton
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/white_btn_blue_text"
-                    android:scaleType="fitCenter" />
-            </LinearLayout>
+            <ru.ejevikaapp.gm_android.Class.NonScrollListView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/listMounts"
+                android:layout_marginTop="5dp"/>
 
             <View
                 android:layout_width="wrap_content"

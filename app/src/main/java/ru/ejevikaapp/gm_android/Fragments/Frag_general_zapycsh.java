@@ -38,6 +38,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amigold.fundapter.BindDictionary;
+import com.amigold.fundapter.FunDapter;
+import com.amigold.fundapter.extractors.StringExtractor;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -60,6 +63,8 @@ import java.util.List;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
+import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
+import ru.ejevikaapp.gm_android.Class.NonScrollListView;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
@@ -104,6 +109,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     String date_zam = df.format(dateAndTime.getTime());
     LinearLayout.LayoutParams titleViewParams, titleViewParams2;
 
+    NonScrollListView listMounts;
+
     Button btn, completedProject;
     private List<Button> BtnList = new ArrayList<Button>();
     private List<TextView> CheckBoxList = new ArrayList<TextView>();
@@ -113,6 +120,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     LinearLayout.LayoutParams lin_calc;
     LinearLayout mainL, mainC, mainC2, mainL2;
+
+    ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     public Frag_general_zapycsh() {
         // Required empty public constructor
@@ -154,8 +163,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         final_transport = (TextView) view.findViewById(R.id.final_transport);
         final_transport_sum = (TextView) view.findViewById(R.id.final_transport_sum);
-        data_mounting = (TextView) view.findViewById(R.id.data_mounting);
-        project_mounter = (TextView) view.findViewById(R.id.project_mounter);
+        //data_mounting = (TextView) view.findViewById(R.id.data_mounting);
+        //project_mounter = (TextView) view.findViewById(R.id.project_mounter);
         project_calculator = (TextView) view.findViewById(R.id.project_calculator);
         advertisement = (TextView) view.findViewById(R.id.advertisement);
 
@@ -273,20 +282,24 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                 mount_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
 
-                try {
-                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    change_max = ft.parse(mount_date);
+                if(mount_date.equals("0000-00-00 00:00:00")){
 
-                    out_format = new SimpleDateFormat("dd.MM.yyyy");
-                    out_format_minute = new SimpleDateFormat("HH");
+                } else {
+                    try {
+                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        change_max = ft.parse(mount_date);
 
-                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                        out_format = new SimpleDateFormat("dd.MM.yyyy");
+                        out_format_minute = new SimpleDateFormat("HH");
 
-                    out_format_time = new SimpleDateFormat("HH:mm");
+                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
-                    DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                            + " - " + hours + ":00");
-                } catch (Exception e) {
+                        out_format_time = new SimpleDateFormat("HH:mm");
+
+                        DateTime.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                                + " - " + hours + ":00");
+                    } catch (Exception e) {
+                    }
                 }
 
                 String calculator_id = c.getString(c.getColumnIndex(c.getColumnName(2)));
@@ -326,16 +339,20 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                 mount_date = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                try {
-                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    change_max = ft.parse(mount_date);
-                    out_format = new SimpleDateFormat("dd.MM.yyyy");
-                    out_format_minute = new SimpleDateFormat("HH");
-                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
-                    out_format_time = new SimpleDateFormat("HH:mm");
-                    data_mounting.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                            + " - " + hours + ":00");
-                } catch (Exception e) {
+                if(mount_date.equals("0000-00-00 00:00:00")){
+
+                } else {
+                    try {
+                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        change_max = ft.parse(mount_date);
+                        out_format = new SimpleDateFormat("dd.MM.yyyy");
+                        out_format_minute = new SimpleDateFormat("HH");
+                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                        out_format_time = new SimpleDateFormat("HH:mm");
+                        //data_mounting.setText(String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                        // + " - " + hours + ":00");
+                    } catch (Exception e) {
+                    }
                 }
 
                 String mount_id = c.getString(c.getColumnIndex(c.getColumnName(1)));
@@ -347,7 +364,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 if (c2 != null) {
                     if (c2.moveToFirst()) {
                         fio = c2.getString(c2.getColumnIndex(c2.getColumnName(0)));
-                        project_mounter.setText(fio);
+                        //project_mounter.setText(fio);
                     }
                 }
                 c2.close();
@@ -682,6 +699,83 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
             }
         });
+
+        listMounts = (NonScrollListView)view.findViewById(R.id.listMounts);
+
+        client_mas.clear();
+        String mounter_name = "";
+        String date_time = "";
+        String type = "";
+
+        sqlQuewy = "SELECT mounter_id, date_time, type "
+                + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                "where project_id = ?";
+        c = db.rawQuery(sqlQuewy, new String[]{id_project});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    String mounter_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    date_time = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    String type_id = c.getString(c.getColumnIndex(c.getColumnName(2)));
+
+                    sqlQuewy = "SELECT name "
+                            + "FROM rgzbn_users " +
+                            "where _id = ?";
+                    Cursor c_2 = db.rawQuery(sqlQuewy, new String[]{mounter_id});
+                    if (c_2 != null) {
+                        if (c_2.moveToFirst()) {
+                            do {
+                                mounter_name = c_2.getString(c_2.getColumnIndex(c_2.getColumnName(0)));
+                            } while (c_2.moveToNext());
+                        }
+                    }
+                    c_2.close();
+
+                    sqlQuewy = "SELECT title "
+                            + "FROM rgzbn_gm_ceiling_mounts_types " +
+                            "where _id = ?";
+                    c_2 = db.rawQuery(sqlQuewy, new String[]{type_id});
+                    if (c_2 != null) {
+                        if (c_2.moveToFirst()) {
+                            do {
+                                type = c_2.getString(c_2.getColumnIndex(c_2.getColumnName(0)));
+                            } while (c_2.moveToNext());
+                        }
+                    }
+                    c_2.close();
+
+                    Frag_client_schedule_class fc = new Frag_client_schedule_class(date_time, type,
+                            mounter_name, null, null, null);
+                    client_mas.add(fc);
+
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
+
+        dict.addStringField(R.id.firstColumn, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getId();
+            }
+        });
+        dict.addStringField(R.id.secondColumn, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getFio();
+            }
+        });
+        dict.addStringField(R.id.thirdColumn, new StringExtractor<Frag_client_schedule_class>() {
+            @Override
+            public String getStringValue(Frag_client_schedule_class nc, int position) {
+                return nc.getAddress();
+            }
+        });
+
+        FunDapter adapter = new FunDapter(getActivity(), client_mas, R.layout.list3columns, dict);
+        listMounts.setAdapter(adapter);
 
         id_calc();
 

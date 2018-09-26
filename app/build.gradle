@@ -6,13 +6,13 @@ android {
         config {
             keyAlias 'it-ceiling_key'
             keyPassword 'b0lx9fqg'
-            storeFile file('E:/it-ceiling_key.jks')
+            storeFile file('C:/AndroidProjects/gm_android/it-ceiling_key.jks')
             storePassword 'b0lx9fqg'
         }
         release {
             keyAlias 'it-ceiling_key'
             keyPassword 'b0lx9fqg'
-            storeFile file('E:/it-ceiling_key.jks')
+            storeFile file('C:/AndroidProjects/gm_android/it-ceiling_key.jks')
             storePassword 'b0lx9fqg'
         }
     }
@@ -21,9 +21,9 @@ android {
         applicationId "ru.ejevikaapp.gm_android"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 28
+        versionCode 29
 
-        versionName '1.0.0917'
+        versionName '1.0.0920'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
     }
@@ -47,13 +47,14 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:support-compat:25.2.0'
+    implementation 'com.android.support:support-compat:26.0.+'
+    implementation "com.android.support:appcompat-v7:26.0.+"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation 'com.android.support:design:25.4.0'
-    implementation 'com.android.support:support-v4:25.4.0'
+    implementation 'com.android.support:design:26.0.+'
+    implementation 'com.android.support:support-v4:26.0.+'
     implementation 'org.jsoup:jsoup:1.8.3'
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation 'com.github.amigold.fundapter:library:1.0'
@@ -66,7 +67,7 @@ dependencies {
     //передача данных
     implementation 'io.nlopez.smartlocation:library:3.3.3'
     implementation 'cn.zhaiyifan:rememberedittext:0.9.0'
-    implementation 'com.android.support:support-v4:25.0.0'
+    //implementation 'com.android.support:support-v4:25.0.0'
     implementation 'net.danlew:android.joda:2.9.9.1'
     implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     implementation files('libs/svg-android.jar')

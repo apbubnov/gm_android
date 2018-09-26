@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -32,10 +35,12 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.Volley;
 
+import org.apache.http.cookie.Cookie;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Dealer.Activity_analytics;
@@ -71,6 +76,7 @@ public class ActivityOnlineVersion extends AppCompatActivity {
         }
 
         webView = (WebView) findViewById(R.id.webView);
+        webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setJavaScriptEnabled(true);
         if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
             webView.setWebContentsDebuggingEnabled(true);
@@ -79,6 +85,15 @@ public class ActivityOnlineVersion extends AppCompatActivity {
         dialog = new ProgressDialog(this);
         dialog.setMessage("Загрузка ... ");
         dialog.show();
+
+        CookieSyncManager.createInstance(webView.getContext());
+        CookieSyncManager.getInstance().sync();
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        }else {
+            CookieManager.getInstance().setAcceptCookie(true);
+        }
 
         webView.loadUrl("http://"+domen+".gm-vrn.ru/index.php?option=com_gm_ceiling&view=mainpage&type=dealermainpage");
 

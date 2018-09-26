@@ -189,7 +189,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                             do {
                                 String p_info = "";
                                 String phone = "";
-                                String created = "";
+                                String project_calculation_date = "";
                                 String fio = "";
                                 String project_status = "";
                                 String project_status_title = "";
@@ -204,7 +204,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                     if (cursor_1.moveToFirst()) {
                                         do {
                                             p_info = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(0)));
-                                            created = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
+                                            project_calculation_date = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(1)));
                                             project_status = cursor_1.getString(cursor_1.getColumnIndex(cursor_1.getColumnName(2)));
 
                                         } while (cursor_1.moveToNext());
@@ -231,7 +231,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                 }
 
                                 Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
-                                        p_info, created, project_status_title, null);
+                                        p_info, project_calculation_date, project_status_title, null);
                                 client_mas.add(fc);
 
                             } while (k.moveToNext());
@@ -388,6 +388,7 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                         } while (cursor_1.moveToNext());
                                     }
                                 }
+                                cursor_1.close();
 
                                 sqlQuewy = "SELECT title "
                                         + "FROM rgzbn_gm_ceiling_status " +
@@ -403,36 +404,48 @@ public class Frag_g3_zapusch extends Fragment implements SwipeRefreshLayout.OnRe
                                         } while (cursor_2.moveToNext());
                                     }
                                 }
+                                cursor_2.close();
 
                                 SimpleDateFormat out_format = null;
                                 SimpleDateFormat out_format_time = null;
                                 SimpleDateFormat out_format_minute = null;
                                 Date change_max = null;
                                 int hours = 0;
-                                try {
-                                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    change_max = ft.parse(project_calculation_date);
 
-                                    out_format = new SimpleDateFormat("dd.MM.yyyy");
-                                    out_format_minute = new SimpleDateFormat("HH");
+                                Log.d("mLog", "p_info " + p_info);
 
-                                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
-
-                                    out_format_time = new SimpleDateFormat("HH:mm");
-
-                                } catch (Exception e) {
+                                if (p_info.equals("null") || p_info.equals("")) {
+                                    p_info = "-";
                                 }
 
-                                if (p_info.equals("null")) {
-                                    p_info = "";
-                                }
+                                if (project_calculation_date.equals("0000-00-00 00:00:00")) {
 
-                                Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
-                                        p_info,
-                                        String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
-                                                + " - " + hours + ":00",
-                                        project_status_title, null);
-                                client_mas.add(fc);
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
+                                            p_info, "-", project_status_title, null);
+                                    client_mas.add(fc);
+
+                                } else {
+                                    try {
+                                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        change_max = ft.parse(project_calculation_date);
+
+                                        out_format = new SimpleDateFormat("dd.MM.yyyy");
+                                        out_format_minute = new SimpleDateFormat("HH");
+
+                                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+
+                                        out_format_time = new SimpleDateFormat("HH:mm");
+
+                                    } catch (Exception e) {
+                                    }
+
+                                    Frag_client_schedule_class fc = new Frag_client_schedule_class(k.getString(kdIndex), fio,
+                                            p_info,
+                                            String.valueOf(out_format.format(change_max) + " " + out_format_time.format(change_max))
+                                                    + " - " + hours + ":00",
+                                            project_status_title, null);
+                                    client_mas.add(fc);
+                                }
 
                             } while (k.moveToNext());
                         }

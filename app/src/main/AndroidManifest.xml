@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +20,6 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -80,16 +81,23 @@
 
         <receiver
             android:name=".Service_Sync_Import$Alarm"
-            android:exported="true">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="net.multipi.ALARM" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".Service_Sync_Import"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
         <service
             android:name=".Send_All"
             android:enabled="true"
@@ -152,26 +160,34 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.Activity_price_canvases"
-            android:label="Прайс полотен" />
+            android:label="Прайс полотен"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.Activity_price_components"
-            android:label="Прайс компонентов" />
+            android:label="Прайс компонентов"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.Activity_price_mounting"
-            android:label="Прайс монтажных работ" />
+            android:label="Прайс монтажных работ"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.ActivitySumUsers"
-            android:label="Детализация счета" />
+            android:label="Детализация счета"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.ListOfMeasurers"
-            android:label="Замерщики" />
+            android:label="Замерщики"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Dealer.MeasurerDay"
-            android:label="Замеры" />
+            android:label="Замеры"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Dealer.CallBack"
-            android:label="Звонки" />
+            android:label="Звонки"
+            android:screenOrientation="portrait" />
 
+        <!--
         <receiver
             android:name=".ServiceCallBack$Alarm"
             android:exported="true">
@@ -180,14 +196,14 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+    -->
 
         <service
             android:name=".ServiceCallBack"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ActivityOnlineVersion"
-            android:theme="@style/AppTheme.NoActionBar" ></activity>
+        <activity android:name=".ActivityOnlineVersion"></activity>
     </application>
 
 </manifest>

@@ -55,6 +55,7 @@
             android:ems="10"
             android:hint="Пароль"
             android:inputType="textPassword"
+            android:imeOptions="actionDone"
             android:textColor="#43358c"
             android:textColorHint="#43358c" />
 
@@ -73,7 +74,7 @@
             android:background="@drawable/rounded_button"
             />
 
-        <TextView
+        <!--<TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="Регистрация"
@@ -82,6 +83,7 @@
             android:id="@+id/registration"
             android:clickable="true"
             android:gravity="center"/>
+            -->
     </LinearLayout>
 
     </ScrollView>

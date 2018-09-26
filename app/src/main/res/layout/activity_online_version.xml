@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ActivityOnlineVersion">
+    tools:context=".ActivityOnlineVersion"
+    android:id="@+id/container">
+
 
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/webView">
     </WebView>
+
 
 </android.support.constraint.ConstraintLayout>
