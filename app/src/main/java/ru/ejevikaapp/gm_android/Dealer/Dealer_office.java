@@ -130,6 +130,7 @@ public class Dealer_office extends AppCompatActivity {
             stopService(new Intent(Dealer_office.this, Service_Sync_Import.class));
             stopService(new Intent(Dealer_office.this, ServiceCallBack.class));
 
+
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
             ed.putString("", "");

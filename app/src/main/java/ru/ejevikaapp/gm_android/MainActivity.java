@@ -1,22 +1,21 @@
 package ru.ejevikaapp.gm_android;
 
-import android.app.AlarmManager;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Time;
 import android.util.Log;
@@ -36,19 +35,50 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.tasks.Task;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.ejevikaapp.gm_android.Crew.Activity_crew;
 import ru.ejevikaapp.gm_android.Dealer.Dealer_office;
 
-public class MainActivity extends AppCompatActivity implements OnClickListener, TextView.OnEditorActionListener {
+public class MainActivity extends AppCompatActivity implements OnClickListener, TextView.OnEditorActionListener,
+        GoogleApiClient.OnConnectionFailedListener {
 
     EditText login, password;
     Button btn_vhod;
@@ -74,10 +104,49 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
     int usergroup = 0;
     String domen;
 
+    private static final int SIGNED_IN = 0;
+    private static final int STATE_SIGNING_IN = 1;
+    private static final int STATE_IN_PROGRESS = 2;
+    private static final int RC_SIGN_IN = 0;
+    private GoogleApiClient mGoogleApiClient;
+    private int mSignInProgress;
+    private PendingIntent mSignInIntent;
+    private SignInButton mSignInButton;
+    private Button mSignOutButton;
+    private Button mRevokeButton;
+    private TextView mStatus;
+    private ConnectionResult mConnectionResult;
+    private static final int OUR_REQUEST_CODE = 49404;
+
+    GoogleSignInOptions GoogleSignInOptions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignOutButton = (Button) findViewById(R.id.sign_out_button);
+        //mRevokeButton = (Button) findViewById(R.id.revoke_access_button);
+        mStatus = (TextView) findViewById(R.id.statuslabel);
+//
+        //// Add click listeners for the buttons
+        mSignInButton.setOnClickListener(this);
+        mSignOutButton.setOnClickListener(this);
+        //mRevokeButton.setOnClickListener(this);
+//
+        //// Build a GoogleApiClient
+        //mGoogleApiClient = buildGoogleApiClient();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .build();
 
         /*
         String offline = "0";
@@ -157,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
         if (version.equals("offline") && !user_id.equals("")) {
             offlineVersion();
-        } else if (version.equals("online")){
+        } else if (version.equals("online")) {
             Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
             startActivity(intent);
             finish();
@@ -167,8 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                     offlineVersion();
                 } else {
 
-                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)",
-                            "Регистрация"};
+                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)"};
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setItems(array, new DialogInterface.OnClickListener() {
                         @Override
@@ -183,10 +251,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                                 case 1:
                                     offlineVersion();
                                     break;
-                                case 2:
-                                    intent = new Intent(MainActivity.this, RegistrationActivity.class);
-                                    startActivity(intent);
-                                    break;
+                                //case 2:
+                                //    intent = new Intent(MainActivity.this, RegistrationActivity.class);
+                                //    startActivity(intent);
+                                //    break;
                             }
                         }
                     });
@@ -242,8 +310,19 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
             for (int g = 0; group_id.size() > g; g++) {
                 if (group_id.get(g).equals("11")) {
 
-                    //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                    Timer myTimer = new Timer();
+                    final Handler uiHandler = new Handler();
+                    myTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            uiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                                }
+                            });
+                        }
+                    }, 0L, 60L * 1000);
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -255,7 +334,19 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
                 } else if (group_id.get(g).equals("21") || group_id.get(g).equals("22")) {
 
-                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                    Timer myTimer = new Timer();
+                    final Handler uiHandler = new Handler();
+                    myTimer.schedule(new TimerTask() { // Определяем задачу
+                        @Override
+                        public void run() {
+                            uiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                                }
+                            });
+                        }
+                    }, 0L, 60L * 1000);
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -266,20 +357,19 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                     break;
                 } else if (group_id.get(g).equals("14")) {
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-                        //Service_Sync_Import.isRunning(this);
-                        //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                        //startForegroundService(new Intent(MainActivity.this, Service_Sync_Import.class));
-
-                        Service_Sync_Import.PollReceiver.scheduleAlarms(this);
-                        Toast.makeText(this, "OREO", Toast.LENGTH_LONG).show();
-
-                    } else {
-                        //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                    }
-
-                    //startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                    Timer myTimer = new Timer();
+                    final Handler uiHandler = new Handler();
+                    myTimer.schedule(new TimerTask() { // Определяем задачу
+                        @Override
+                        public void run() {
+                            uiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                                }
+                            });
+                        }
+                    }, 0L, 60L * 1000);
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -292,8 +382,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                 }
             }
 
-        //registration = (TextView) findViewById(R.id.registration);
-        //registration.setOnClickListener(this);
+        registration = (TextView) findViewById(R.id.registration);
+        registration.setOnClickListener(this);
         login = (EditText) findViewById(R.id.login);
         password = (EditText) findViewById(R.id.password);
         password.setOnEditorActionListener(this);
@@ -301,10 +391,134 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
         btn_vhod = (Button) findViewById(R.id.btn_vhod);
         btn_vhod.setOnClickListener(this);
 
+
         dbHelper = new DBHelper(this);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
+
     }
 
+    /*
+    private GoogleApiClient buildGoogleApiClient() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .build();
+
+        return new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        //mSignInButton.setEnabled(false);
+        mSignOutButton.setEnabled(true);
+        mRevokeButton.setEnabled(true);
+
+        // Indicate that the sign in process is complete.
+        mSignInProgress = SIGNED_IN;
+        OptionalPendingResult opr =
+                Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+
+        opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+            @Override
+            public void onResult(@NonNull GoogleSignInResult result) {
+                if (result.isSuccess()) {
+                    try {
+                        GoogleSignInAccount account = result.getSignInAccount();
+                        mStatus.setText(String.format("Signed In to My App as %s", account.getEmail()));
+                    } catch (Exception ex) {
+                        String exception = ex.getLocalizedMessage();
+                        String exceptionString = ex.toString();
+                        // Note that you should log these errors in a ‘real' app to aid in debugging
+                    }
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (mSignInProgress != STATE_IN_PROGRESS) {
+            mSignInIntent = result.getResolution();
+            if (mSignInProgress == STATE_SIGNING_IN) {
+                resolveSignInError();
+            }
+        }
+        // Will implement shortly
+        onSignedOut();
+    }
+
+    private void resolveSignInError() {
+        if (mSignInIntent != null) {
+            try {
+                mSignInProgress = STATE_IN_PROGRESS;
+                mConnectionResult.startResolutionForResult(this, OUR_REQUEST_CODE);
+            } catch (IntentSender.SendIntentException e) {
+                mSignInProgress = STATE_SIGNING_IN;
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // You have a play services error -- inform the user
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case RC_SIGN_IN:
+                if (resultCode == RESULT_OK) {
+                    mSignInProgress = STATE_SIGNING_IN;
+                } else {
+                    mSignInProgress = SIGNED_IN;
+                }
+
+                if (!mGoogleApiClient.isConnecting()) {
+                    mGoogleApiClient.connect();
+                }
+                break;
+        }
+    }
+
+    private void onSignedOut() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.d("mLog", String.valueOf(status));
+                        // Update the UI to reflect that the user is signed out.
+                        mSignInButton.setEnabled(true);
+                        mSignOutButton.setEnabled(false);
+                        mRevokeButton.setEnabled(false);
+                        mStatus.setText("Signed out");
+                    }
+                });
+
+
+    }
+*/
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -321,14 +535,110 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
             case R.id.btn_vhod:
                 vhod();
                 break;
-            //case R.id.registration:
-            //    intent = new Intent(MainActivity.this, RegistrationActivity.class);
-            //    startActivity(intent);
-            //    break;
+            case R.id.registration:
+                intent = new Intent(MainActivity.this, RegistrationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.sign_in_button:
+                //mStatus.setText("Signing In");
+                //Intent signInIntent =
+                //        Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                //startActivityForResult(signInIntent, RC_SIGN_IN);
+
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+
+                break;
+            case R.id.sign_out_button:
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(Status status) {
+                                updateUI(false);
+                            }
+                        });
+                break;
+                /*
+            case R.id.revoke_access_button:
+                Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient);
+                mGoogleApiClient = buildGoogleApiClient();
+                mGoogleApiClient.connect();
+                break;
+                */
         }
     }
 
-    void vhod(){
+    private void updateUI(boolean signedIn) {
+        if (signedIn) {
+            mSignInButton.setVisibility(View.GONE);
+            mSignOutButton.setVisibility(View.VISIBLE);
+        } else {
+            mStatus.setText("out");
+            //Bitmap icon =                  BitmapFactory.decodeResource(getContext().getResources(),R.drawable.user_defaolt);
+            //imgProfilePic.setImageBitmap(ImageHelper.getRoundedCornerBitmap(getContext(),icon, 200, 200, 200, false, false, false, false));
+            mSignInButton.setVisibility(View.VISIBLE);
+            mSignOutButton.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.getSignInAccount());
+        if (result.isSuccess()) {
+            // Signed in successfolly, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            Log.d(TAG, String.valueOf(acct.getAccount()));
+            Log.d(TAG, String.valueOf(acct.getDisplayName()));
+            Log.d(TAG, String.valueOf(acct.getFamilyName()));
+            Log.d(TAG, String.valueOf(acct.getGivenName()));
+            Log.d(TAG, String.valueOf(acct.getGrantedScopes()));
+            mStatus.setText(acct.getEmail());
+            //Similarly you can get the email and photourl using acct.getEmail() and  acct.getPhotoUrl()
+
+            //if(acct.getPhotoUrl() != noll)
+            //    new LoadProfileImage(imgProfilePic).execute(acct.getPhotoUrl().toString());
+
+            updateUI(true);
+        } else {
+            // Signed out, show unauthenticated UI.
+            updateUI(false);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+
+            Log.d(TAG, "Got cached sign-in");
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+
+            //showProgressDialog();
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(GoogleSignInResult googleSignInResult) {
+                    //hideProgressDialog();
+                    handleSignInResult(googleSignInResult);
+                }
+            });
+        }
+    }
+
+    void vhod() {
         if (login.getText().toString().equals("") || password.getText().toString().equals("")) {
             Toast toast = Toast.makeText(getApplicationContext(),
                     "Введите данные", Toast.LENGTH_SHORT);
@@ -352,6 +662,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
             new SendAuthorization().execute();
         }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
 

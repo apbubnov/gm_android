@@ -105,23 +105,6 @@ public class Service_Sync_Import extends Service {
             ctx = this.getApplicationContext();
             requestQueue = Volley.newRequestQueue(this.getApplicationContext());
 
-            /*
-            final Timer myTimer = new Timer(); // Создаем таймер
-            final Handler uiHandler = new Handler();
-
-            myTimer.schedule(new TimerTask() { // Определяем задачу
-                @Override
-                public void run() {
-                    uiHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-
-                        }
-                    });
-                }
-            }, 0L, 60L * 1000);
-            */
-
             String change_time = "";
             sqlQuewy = "SELECT change_time "
                     + "FROM history_import_to_server" +
@@ -192,6 +175,7 @@ public class Service_Sync_Import extends Service {
         Log.v(TAG, "Service stopped!");
     }
 
+    /*
     public static class Alarm extends BroadcastReceiver {
 
         public static final String ALARM_EVENT = "net.multipi.ALARM";
@@ -300,7 +284,7 @@ public class Service_Sync_Import extends Service {
             alarmManager.cancel(sender);
         }
     }
-
+    */
 
     static class ImportDate extends AsyncTask<Void, Void, Void> {
 

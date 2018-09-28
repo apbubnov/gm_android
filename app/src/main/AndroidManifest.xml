@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
@@ -79,6 +81,7 @@
 
         <activity android:name=".Activity_zamer" />
 
+        <!--
         <receiver
             android:name=".Service_Sync_Import$Alarm"
             android:exported="true"
@@ -91,6 +94,7 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
+        -->
 
         <service
             android:name=".Service_Sync_Import"
@@ -204,6 +208,11 @@
             android:exported="true" />
 
         <activity android:name=".ActivityOnlineVersion"></activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

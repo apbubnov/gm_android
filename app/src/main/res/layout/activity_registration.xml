@@ -112,7 +112,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
-            android:text="После нажатия на кнопку Зарегистрироваться, вам на почту придёт логин, пароль и инструкция по пользованию. В ближайшее время с вами свяжутся наши специалисты"
+            android:text="После нажатия на кнопку Зарегистрироваться, вам на почту придёт логин, пароль и инструкция по пользованию."
             android:textSize="12dp" />
+
     </LinearLayout>
 </ScrollView>
