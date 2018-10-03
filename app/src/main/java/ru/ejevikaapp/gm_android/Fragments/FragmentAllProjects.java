@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +32,11 @@ import java.util.Date;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.Activity_zamer;
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
-import ru.ejevikaapp.gm_android.Dealer.Dealer_office;
 import ru.ejevikaapp.gm_android.R;
-import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -91,7 +89,9 @@ public class FragmentAllProjects extends Fragment implements View.OnClickListene
     @Override
     public void onRefresh() {
         if (HelperClass.isOnline(getActivity())) {
-            getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
+            Intent intent = new Intent(getActivity(),AlarmImportData.class);
+            AlarmImportData alarmImportData = new AlarmImportData();
+            alarmImportData.onReceive(getActivity(),intent);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

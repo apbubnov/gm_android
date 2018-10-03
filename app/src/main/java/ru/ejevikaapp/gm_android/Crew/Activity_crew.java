@@ -7,14 +7,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.MainActivity;
 import ru.ejevikaapp.gm_android.R;
+import ru.ejevikaapp.gm_android.Send_All;
 import ru.ejevikaapp.gm_android.Service_Sync;
-import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 public class Activity_crew extends AppCompatActivity implements View.OnClickListener {
 
     Button calendar_work, exit;
+    AlarmImportData alarmImportData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,8 @@ public class Activity_crew extends AppCompatActivity implements View.OnClickList
 
         exit = (Button)findViewById(R.id.exit);
         exit.setOnClickListener(this);
+
+        alarmImportData = new AlarmImportData();
     }
 
     @Override
@@ -37,7 +41,7 @@ public class Activity_crew extends AppCompatActivity implements View.OnClickList
             case R.id.exit:
 
                 stopService(new Intent(this, Service_Sync.class));
-                stopService(new Intent(this, Service_Sync_Import.class));
+                alarmImportData.CancelAlarm(this);
 
                 SharedPreferences SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
                 SharedPreferences.Editor ed = SP.edit();

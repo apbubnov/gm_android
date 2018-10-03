@@ -2,12 +2,6 @@ package ru.ejevikaapp.gm_android.Dealer;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.app.TaskStackBuilder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,11 +19,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,12 +29,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amigold.fundapter.BindDictionary;
-import com.amigold.fundapter.FunDapter;
-import com.amigold.fundapter.extractors.StringExtractor;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -51,32 +39,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ru.ejevikaapp.gm_android.ActivityOnlineVersion;
+import ru.ejevikaapp.gm_android.AlarmCallBack;
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
-import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Fragments.FragmentAllProjects;
 import ru.ejevikaapp.gm_android.Fragments.Fragment_calculation;
 import ru.ejevikaapp.gm_android.MainActivity;
 import ru.ejevikaapp.gm_android.R;
-import ru.ejevikaapp.gm_android.ServiceCallBack;
 import ru.ejevikaapp.gm_android.Service_Sync;
-import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 public class Dealer_office extends AppCompatActivity {
 
@@ -85,6 +63,15 @@ public class Dealer_office extends AppCompatActivity {
     RequestQueue requestQueue;
     EditText email, name;
     AlertDialog dialog;
+
+    String TAG = "keyToPass";
+
+    private static long back_pressed;
+
+    private AlarmImportData alarmImportData;
+    private AlarmCallBack alarmCallBack;
+
+    private String keyToPassword = "false";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -120,6 +107,17 @@ public class Dealer_office extends AppCompatActivity {
         return true;
     }
 
+
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + 2000 > System.currentTimeMillis())
+            super.onBackPressed();
+        else
+            Toast.makeText(getBaseContext(), "Нажмите ещё раз, для того чтобы выйти",
+                    Toast.LENGTH_SHORT).show();
+        back_pressed = System.currentTimeMillis();
+    }
+
     @SuppressLint("ResourceType")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -127,9 +125,8 @@ public class Dealer_office extends AppCompatActivity {
 
         if (id == R.id.exit) {
             stopService(new Intent(Dealer_office.this, Service_Sync.class));
-            stopService(new Intent(Dealer_office.this, Service_Sync_Import.class));
-            stopService(new Intent(Dealer_office.this, ServiceCallBack.class));
-
+            alarmCallBack.CancelAlarm(this);
+            alarmImportData.CancelAlarm(this);
 
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
@@ -585,15 +582,17 @@ public class Dealer_office extends AppCompatActivity {
         SharedPreferences SP = getSharedPreferences("link", MODE_PRIVATE);
         domen = SP.getString("", "");
 
+        alarmImportData = new AlarmImportData();
+        alarmCallBack = new AlarmCallBack();
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         SP = getSharedPreferences("first_entry", MODE_PRIVATE);
         final String first_entry = SP.getString("", "");
 
-        if (ServiceCallBack.isRunning(this)){
-        } else {
-            startService(new Intent(this, ServiceCallBack.class));
+        if (alarmCallBack != null) {
+            alarmCallBack.SetAlarm(this);
         }
 
         SP = getSharedPreferences("user_id", MODE_PRIVATE);
@@ -608,201 +607,10 @@ public class Dealer_office extends AppCompatActivity {
             builder.setTitle("Подсказка")
                     .setMessage("В правом верхнем углу есть кнопка, если на неё нажать, то вы увидите скрытое меню")
                     .setCancelable(false)
-                    .setNegativeButton("Спасибо",
+                    .setNegativeButton("Ясно",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialog, int id) {
 
-                                    /*
-                                    if (first_entry.equals("")) {
-                                        final ArrayList<Select_work> sel_work = new ArrayList<>();
-                                        final ArrayList<Integer> id_api_phones = new ArrayList<>();
-
-                                        final Context context = Dealer_office.this;
-                                        LayoutInflater li = LayoutInflater.from(context);
-                                        promptsView = li.inflate(R.layout.add_api_phones, null);
-                                        AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
-                                        mDialogBuilder.setView(promptsView);
-                                        final EditText ed_api_phones = (EditText) promptsView.findViewById(R.id.ed_api_phones);
-                                        Button btn_api_phones = (Button) promptsView.findViewById(R.id.btn_add_api_phones);
-                                        final ListView list_api_phones = (ListView) promptsView.findViewById(R.id.list_api_phones);
-
-                                        String sqlQuewy = "select _id, name "
-                                                + "FROM rgzbn_gm_ceiling_api_phones " +
-                                                "where dealer_id = ?";
-                                        Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-                                        if (c != null) {
-                                            if (c.moveToFirst()) {
-                                                do {
-
-                                                    String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                                    String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
-
-                                                    sel_work.add(new Select_work(idd, null, user_id, name, null));
-
-                                                } while (c.moveToNext());
-                                            }
-                                            c.close();
-                                        }
-
-                                        BindDictionary<Select_work> dict = new BindDictionary<>();
-                                        dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
-                                            @Override
-                                            public String getStringValue(Select_work nc, int position) {
-                                                return nc.getName();
-                                            }
-                                        });
-
-                                        final FunDapter adapter_f = new FunDapter(Dealer_office.this, sel_work, R.layout.list_1column, dict);
-                                        list_api_phones.setAdapter(adapter_f);
-
-                                        btn_api_phones.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-
-                                                if (ed_api_phones.getText().toString().length() > 0) {
-
-                                                    sel_work.clear();
-
-                                                    int max_id = 0;
-                                                    try {
-                                                        String sqlQuewy = "select MAX(_id) "
-                                                                + "FROM rgzbn_gm_ceiling_api_phones " +
-                                                                "where _id>? and _id<?";
-                                                        Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(user_id) * 100000),
-                                                                String.valueOf(Integer.parseInt(user_id) * 100000 + 999999)});
-                                                        if (c != null) {
-                                                            if (c.moveToFirst()) {
-                                                                do {
-                                                                    max_id = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                                                    max_id++;
-                                                                } while (c.moveToNext());
-                                                            }
-                                                        }
-                                                    } catch (Exception e) {
-                                                        max_id = Integer.parseInt(user_id) * 100000 + 1;
-                                                    }
-
-                                                    id_api_phones.add(max_id);
-                                                    ContentValues values = new ContentValues();
-                                                    values.put(DBHelper.KEY_ID, max_id);
-                                                    values.put(DBHelper.KEY_NAME, ed_api_phones.getText().toString());
-                                                    values.put(DBHelper.KEY_NUMBER, "");
-                                                    values.put(DBHelper.KEY_DESCRIPTION, "");
-                                                    values.put(DBHelper.KEY_SITE, "");
-                                                    values.put(DBHelper.KEY_DEALER_ID, user_id);
-                                                    db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES, null, values);
-
-                                                    values = new ContentValues();
-                                                    values.put(DBHelper.KEY_ID_OLD, max_id);
-                                                    values.put(DBHelper.KEY_ID_NEW, "0");
-                                                    values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_api_phones");
-                                                    values.put(DBHelper.KEY_SYNC, "0");
-                                                    values.put(DBHelper.KEY_TYPE, "send");
-                                                    values.put(DBHelper.KEY_STATUS, "0");
-                                                    db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                                                    String sqlQuewy = "select _id, name "
-                                                            + "FROM rgzbn_gm_ceiling_api_phones " +
-                                                            "where dealer_id = ?";
-                                                    Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-                                                    if (c != null) {
-                                                        if (c.moveToFirst()) {
-                                                            do {
-
-                                                                String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                                                                String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                                                                sel_work.add(new Select_work(idd, null, user_id, name, null));
-
-                                                            } while (c.moveToNext());
-                                                        }
-                                                        c.close();
-                                                    }
-
-                                                    BindDictionary<Select_work> dict = new BindDictionary<>();
-                                                    dict.addStringField(R.id.name_column, new StringExtractor<Select_work>() {
-                                                        @Override
-                                                        public String getStringValue(Select_work nc, int position) {
-                                                            return nc.getName();
-                                                        }
-                                                    });
-
-                                                    final FunDapter adapter_f = new FunDapter(Dealer_office.this,
-                                                            sel_work, R.layout.list_1column, dict);
-                                                    list_api_phones.setAdapter(adapter_f);
-                                                    ed_api_phones.setText("");
-
-                                                } else {
-                                                    Toast.makeText(getApplicationContext(), "Введите название рекламы",
-                                                            Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                        });
-
-                                        final AlertDialog Alertdialog = new AlertDialog.Builder(context)
-                                                .setView(promptsView)
-                                                .setTitle("Добавить рекламу")
-                                                .setMessage("По рекламе вы сможете следить за своей аналитикой")
-                                                .setPositiveButton(android.R.string.ok, null)
-                                                .setNegativeButton("Не сейчас", null)
-                                                .setCancelable(false)
-                                                .create();
-
-                                        Alertdialog.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                                            @Override
-                                            public void onShow(DialogInterface dialogInterface) {
-
-                                                Button button = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                                                button.setOnClickListener(new View.OnClickListener() {
-
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        // TODO Do something
-
-                                                        // изменить в send_to_history колонки на status = 1
-
-                                                        for (int i = 0; id_api_phones.size() > i; i++) {
-                                                            ContentValues values = new ContentValues();
-                                                            values.put(DBHelper.KEY_STATUS, "1");
-                                                            db.update(DBHelper.HISTORY_SEND_TO_SERVER, values,
-                                                                    "id_old = ? and name_table = ? and sync = ? and status = ?",
-                                                                    new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
-                                                        }
-                                                        Alertdialog.dismiss();
-                                                        loadFragment(Fragment_calculation.newInstance());
-                                                        startService(new Intent(Dealer_office.this, Service_Sync.class));
-                                                    }
-                                                });
-
-                                                Button button_negative = ((AlertDialog) Alertdialog).getButton(AlertDialog.BUTTON_NEGATIVE);
-                                                button_negative.setOnClickListener(new View.OnClickListener() {
-
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        // TODO Do something
-
-                                                        // запонимать id которые добавлял, и удалить их из всех таблиц
-
-                                                        for (int i = 0; id_api_phones.size() > i; i++) {
-                                                            db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_API_PHONES,
-                                                                    "_id = ?", new String[]{String.valueOf(id_api_phones.get(i))});
-
-                                                            db.delete(DBHelper.HISTORY_SEND_TO_SERVER,
-                                                                    "id_old = ? and name_table = ? and sync = ? and status = ?",
-                                                                    new String[]{String.valueOf(id_api_phones.get(i)), "rgzbn_gm_ceiling_api_phones", "0", "0"});
-                                                        }
-
-                                                        Alertdialog.dismiss();
-                                                        loadFragment(Fragment_calculation.newInstance());
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                        Alertdialog.show();
-
-                                    }
-                                    */
                                 }
                             });
 
@@ -821,6 +629,151 @@ public class Dealer_office extends AppCompatActivity {
         ed.putString("", "0");
         ed.commit();
 
+        try {
+            Bundle arguments = getIntent().getExtras();
+            keyToPassword = arguments.get("keyToPassword").toString();
+
+        } catch (Exception e) {
+        }
+
+        if (keyToPassword.equals("true")) {
+            ChangePass();
+        }
+
+    }
+
+
+    void ChangePass() {
+        try {
+            requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+            final Context context = this;
+            LayoutInflater li = LayoutInflater.from(context);
+            promptsView = li.inflate(R.layout.layout_profile_dealer, null);
+            AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(context);
+            mDialogBuilder.setView(promptsView);
+            //final EditText pass = (EditText) promptsView.findViewById(R.id.ed_password);
+            email = (EditText) promptsView.findViewById(R.id.ed_email);
+            name = (EditText) promptsView.findViewById(R.id.ed_name);
+            final EditText ed_oldPassword = (EditText) promptsView.findViewById(R.id.ed_oldPassword);
+            final EditText ed_newPassword1 = (EditText) promptsView.findViewById(R.id.ed_newPassword1);
+            final EditText ed_newPassword2 = (EditText) promptsView.findViewById(R.id.ed_newPassword2);
+            final ImageView ava = (ImageView) promptsView.findViewById(R.id.ed_ava);
+            final TextView labelName = (TextView) promptsView.findViewById(R.id.labelName);
+            final TextView ed_password_text = (TextView) promptsView.findViewById(R.id.ed_password_text);
+
+            ava.setVisibility(View.GONE);
+            name.setVisibility(View.GONE);
+            email.setVisibility(View.GONE);
+            ed_password_text.setVisibility(View.GONE);
+            labelName.setVisibility(View.GONE);
+
+            DBHelper dbHelper = new DBHelper(this);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            String username = "";
+
+            String sqlQuewy = "SELECT username "
+                    + "FROM rgzbn_users" +
+                    " WHERE _id = ?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        username = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+            ed_oldPassword.setText(username);
+            ed_oldPassword.setEnabled(false);
+
+            dialog = new AlertDialog.Builder(context)
+                    .setView(promptsView)
+                    .setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setTitle("Измените пароль. ")
+                    .setMessage("Если Вы не хотите сейчас его изменять, можете сделать это потом. Временный пароль указан ниже.")
+                    .create();
+
+            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+
+                    Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                    button.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            // TODO Do something
+
+                            if (ed_oldPassword.getText().toString().length() < 1 &&
+                                    ed_newPassword1.getText().toString().length() < 1 &&
+                                    ed_newPassword2.getText().toString().length() < 1) {
+
+                                DBHelper dbHelper = new DBHelper(Dealer_office.this);
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                ContentValues values = new ContentValues();
+                                //values.put(DBHelper.KEY_MIN_SUM, userInput.getText().toString());  тут будет пароль
+                                values.put(DBHelper.KEY_EMAIL, email.getText().toString());
+                                values.put(DBHelper.KEY_NAME, name.getText().toString());
+                                db.update(DBHelper.TABLE_USERS, values, "_id = ?",
+                                        new String[]{user_id});
+
+                                values = new ContentValues();
+                                values.put(DBHelper.KEY_ID_OLD, user_id);
+                                values.put(DBHelper.KEY_ID_NEW, "0");
+                                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_users");
+                                values.put(DBHelper.KEY_SYNC, "0");
+                                values.put(DBHelper.KEY_TYPE, "send");
+                                values.put(DBHelper.KEY_STATUS, "1");
+                                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                                //startService(new Intent(Dealer_office.this, Service_Sync.class));
+
+                                dialog.dismiss();
+
+                            } else {
+                                if (HelperClass.isOnline(Dealer_office.this)) {
+
+                                    if (ed_newPassword1.getText().toString().length() > 5 &&
+                                            ed_newPassword2.getText().toString().length() > 5) {
+                                        if (ed_newPassword1.getText().toString().equals(ed_newPassword2.getText().toString())) {
+
+                                            JSONObject jsonObject = new JSONObject();
+                                            try {
+                                                jsonObject.put("old_password", ed_oldPassword.getText().toString());
+                                                jsonObject.put("password", ed_newPassword1.getText().toString());
+                                                jsonObject.put("user_id", user_id);
+                                            } catch (JSONException e) {
+                                            }
+
+                                            jsonPassword = String.valueOf(jsonObject);
+                                            new ChangePwd().execute();
+
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Новые пароли не совпадают",
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Длина пароля должна быть больше 5 символов",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Не удалось проверить старый пароль(нет интернета)",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            dialog.show();
+        } catch (Exception e) {
+            Log.d(TAG, "ChangePass: exception " + e);
+        }
     }
 
     @Override

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -43,17 +42,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_zamer;
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
-import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
 import ru.ejevikaapp.gm_android.Service_Sync;
-import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -84,6 +81,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
     String activity_client;
 
+    AlarmImportData alarmImportData;
+
     public Frag_spisok() {
 
         ctx = this.getContext();
@@ -110,14 +109,17 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
         client_mas.clear();
         list_clients = (ListView) view.findViewById(R.id.list_client);
         clients();
-
+        alarmImportData = new AlarmImportData();
         return view;
     }
 
     @Override
     public void onRefresh() {
         if (HelperClass.isOnline(getActivity())) {
-            getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
+
+            Intent intent = new Intent(getActivity(),AlarmImportData.class);
+            alarmImportData.onReceive(getActivity(),intent);
+
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -24,6 +25,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -32,9 +34,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +54,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.pixplicity.sharp.Sharp;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +73,7 @@ import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.NonScrollListView;
+import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
@@ -122,6 +131,26 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     LinearLayout mainL, mainC, mainC2, mainL2;
 
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
+
+    int day_week, year, day, dday, month, max_day;
+    String id_z, id_b,time_brig;
+    NonScrollListView list_work;
+    View promptsView2;
+    TableLayout tableLayout;
+
+    TextView calendar_month;
+
+    private List<Button> BtnList_mount_zamer = new ArrayList<Button>();
+    ArrayList<Select_work> sel_work = new ArrayList<>();
+    ArrayList<String> name_zamer_id = new ArrayList<String>();
+    ArrayList<String> name_brigade = new ArrayList<String>();
+    ArrayList<String> id_brigade = new ArrayList<String>();
+    ArrayList<String> time_free = new ArrayList<String>();
+
+    String date_zamera = df.format(dateAndTime.getTime());
+    String date_mount = df.format(dateAndTime.getTime());
+
+    String TAG = "mLog";
 
     public Frag_general_zapycsh() {
         // Required empty public constructor
@@ -282,7 +311,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                 mount_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
 
-                if(mount_date.equals("0000-00-00 00:00:00")){
+                if (mount_date.equals("0000-00-00 00:00:00")) {
 
                 } else {
                     try {
@@ -339,7 +368,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                 mount_date = c.getString(c.getColumnIndex(c.getColumnName(0)));
 
-                if(mount_date.equals("0000-00-00 00:00:00")){
+                if (mount_date.equals("0000-00-00 00:00:00")) {
 
                 } else {
                     try {
@@ -700,7 +729,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             }
         });
 
-        listMounts = (NonScrollListView)view.findViewById(R.id.listMounts);
+        listMounts = (NonScrollListView) view.findViewById(R.id.listMounts);
 
         client_mas.clear();
         String mounter_name = "";
@@ -781,6 +810,11 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         transport();
         calc(id_calcul);
+
+
+        calendar_month = (TextView) view.findViewById(R.id.calendar_month);
+        tableLayout = (TableLayout) view.findViewById(R.id.tableLayout);
+        cal_preview_mount(0);
 
         return view;
     }
@@ -1293,22 +1327,22 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     s += Double.parseDouble(S);
                     p += Double.parseDouble(P);
 
-                    if(c.getString(c.getColumnIndex(c.getColumnName(2))) == null){
+                    if (c.getString(c.getColumnIndex(c.getColumnName(2))) == null) {
                     } else {
                         tmp += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(2))));
                     }
 
-                    if(c.getString(c.getColumnIndex(c.getColumnName(3))) == null){
+                    if (c.getString(c.getColumnIndex(c.getColumnName(3))) == null) {
                     } else {
                         tmp2 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(3))));
                     }
 
-                    if(c.getString(c.getColumnIndex(c.getColumnName(4))) == null){
+                    if (c.getString(c.getColumnIndex(c.getColumnName(4))) == null) {
                     } else {
                         tmp3 += Double.parseDouble(c.getString(c.getColumnIndex(c.getColumnName(4))));
                     }
 
-                    if(c.getString(c.getColumnIndex(c.getColumnName(5))) == null){
+                    if (c.getString(c.getColumnIndex(c.getColumnName(5))) == null) {
                     } else {
                         dis = c.getString(c.getColumnIndex(c.getColumnName(5)));
                     }
@@ -1393,7 +1427,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 view.setLayoutParams(ViewParams);
                 mainC2.addView(view);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
         }
 
 
@@ -1707,4 +1741,534 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 break;
         }
     }
+
+    void cal_preview_mount(int btn_id) {
+
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+        dday = 0;
+        max_day = 0;
+        String month_str = "";
+
+        if (month == 0) {
+            max_day = 31;
+            calendar_month.setText("Январь");
+        } else if (month == 1) {
+            if ((year % 4) == 0) {
+                max_day = 29;
+            } else {
+                max_day = 28;
+            }
+            calendar_month.setText("Февраль");
+        } else if (month == 2) {
+            max_day = 31;
+            calendar_month.setText("Март");
+        } else if (month == 3) {
+            max_day = 30;
+            calendar_month.setText("Апрель");
+        } else if (month == 4) {
+            max_day = 31;
+            calendar_month.setText("Май");
+        } else if (month == 5) {
+            max_day = 30;
+            calendar_month.setText("Июнь");
+        } else if (month == 6) {
+            max_day = 31;
+            calendar_month.setText("Июль");
+        } else if (month == 7) {
+            max_day = 31;
+            calendar_month.setText("Август");
+        } else if (month == 8) {
+            max_day = 30;
+            calendar_month.setText("Сентябрь");
+        } else if (month == 9) {
+            max_day = 31;
+            calendar_month.setText("Октябрь");
+        } else if (month == 10) {
+            max_day = 30;
+            calendar_month.setText("Ноябрь");
+        } else if (month == 11) {
+            max_day = 31;
+            calendar_month.setText("Декабрь");
+        }
+
+        calendar_month.setText(calendar_month.getText().toString() + " " + year);
+
+        JodaTimeAndroid.init(getActivity());
+        DateTime dt = new DateTime(year, month + 1, 1, 0, 0, 0, 0);
+        String first_day = dt.toString("E");
+
+        int first_day_int = 0;
+        if (first_day.equals("пн")) {
+            first_day_int = 0;
+        } else if (first_day.equals("вт")) {
+            first_day_int = 1;
+        } else if (first_day.equals("ср")) {
+            first_day_int = 2;
+        } else if (first_day.equals("чт")) {
+            first_day_int = 3;
+        } else if (first_day.equals("пт")) {
+            first_day_int = 4;
+        } else if (first_day.equals("сб")) {
+            first_day_int = 5;
+        } else if (first_day.equals("вс")) {
+            first_day_int = 6;
+        }
+
+        int count = 0;
+        name_brigade = new ArrayList<String>();
+        id_brigade = new ArrayList<String>();
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        sel_work.clear();
+
+        String sqlQuewy = "select _id, name "
+                + "FROM rgzbn_users ";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                    sqlQuewy = "select group_id "
+                            + "FROM rgzbn_user_usergroup_map " +
+                            "where user_id = ?";
+                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
+                    if (cc != null) {
+                        if (cc.moveToFirst()) {
+                            do {
+                                String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                if (group_id.equals("11")) {
+                                    count++;
+                                    name_brigade.add(name);
+                                    id_brigade.add(id);
+                                }
+                            } while (cc.moveToNext());
+                        }
+                    }
+                    cc.close();
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        if (count == 0) {
+            SharedPreferences SPI = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
+            String user_id = SPI.getString("", "");
+
+            SharedPreferences SP_end = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
+            String user_name = SP_end.getString("", "");
+
+            name_brigade.add(user_name);
+            id_brigade.add(user_id);
+        }
+
+        int ROWS = 6;
+        int COLUMNS = 7;
+        boolean flag = false;
+        dbHelper = new DBHelper(getActivity());
+
+        for (int i = 0; i < ROWS; i++) {
+
+            count = 0;
+            TableRow tableRow = new TableRow(getActivity());
+
+            TableRow.LayoutParams tableParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT, 4f);
+
+            for (int j = 0; j < COLUMNS; j++) {
+                if ((j == first_day_int || flag) && dday < max_day) {
+
+                    //for (int id_b = 0; id_brigade.size() > id_b; id_b++) {
+                    Button btn = new Button(getActivity());
+                    dday++;
+                    String mount_day;
+
+                    if (dday < 10 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-0" + dday;
+                    } else if (dday < 10 && month > 9) {
+                        mount_day = year + "-" + (month + 1) + "-0" + dday;
+                    } else if (dday > 9 && month < 10) {
+                        mount_day = year + "-0" + (month + 1) + "-" + dday;
+                    } else {
+                        mount_day = year + "-" + (month + 1) + "-" + dday;
+                    }
+
+                    if (dday == btn_id && btn_id != 0) {
+                        flag = true;
+                        btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                        btn.setTextColor(Color.BLACK);
+                        count++;
+                        BtnList.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    } else if (today.equals(mount_day)) {
+                        count++;
+                        flag = true;
+                        btn.setBackgroundResource(R.drawable.calendar_today);
+                        btn.setTextColor(Color.BLACK);
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    } else {
+                        sqlQuewy = "select * "
+                                + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                                "where  date_time > ? and date_time < ? ";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00"});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn_blue);
+                                    btn.setTextColor(Color.BLACK);
+                                } while (cc.moveToNext());
+                            } else {
+                                btn.setBackgroundResource(R.drawable.calendar_btn);
+                                btn.setTextColor(Color.BLACK);
+                            }
+                        }
+                        cc.close();
+
+                        count++;
+                        flag = true;
+                        BtnList_mount_zamer.add(btn);
+                        btn.setId(dday - 1);
+                        btn.setText(String.valueOf(dday));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMount);
+                        tableRow.addView(btn, j);
+                    }
+
+                } else {
+                    Button btn = new Button(getActivity());
+                    btn.setText("");
+                    btn.setBackgroundResource(R.drawable.calendar_other_month);
+                    btn.setLayoutParams(tableParams);
+                    tableRow.addView(btn, j);
+                }
+
+
+            }
+            tableLayout.addView(tableRow, i);
+        }
+    }
+
+    void date() {
+
+        dbHelper = new DBHelper(getActivity());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int count = 0;
+
+        sel_work.clear();
+
+        String sqlQuewy = "select _id "
+                + "FROM rgzbn_users ";
+        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    sqlQuewy = "select * "
+                            + "FROM rgzbn_user_usergroup_map " +
+                            "where user_id = ? and (group_id = 22 or group_id = 21)";
+                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
+                    if (cc != null) {
+                        if (cc.moveToFirst()) {
+                            count++;
+                            name_zamer_id.add(id);
+                        }
+                    }
+                    cc.close();
+                } while (c.moveToNext());
+            }
+        }
+        c.close();
+
+        if (count == 0) {
+            count++;
+            name_zamer_id.add(dealer_id);
+        }
+
+        for (int i = 9; i < 21; i++) {
+            for (int j = 0; count > j; j++) {
+                String date_zamera1 = date_zamera + " " + i + ":00:00";
+
+                sqlQuewy = "select _id, project_info, project_calculation_date, project_calculator "
+                        + "FROM rgzbn_gm_ceiling_projects " +
+                        "where project_calculation_date = '" + date_zamera1 + "' and project_calculator = ?";
+                c = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        do {
+                            String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                            String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                            String project_calculation_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                            String project_calculator = c.getString(c.getColumnIndex(c.getColumnName(3)));
+
+                            Log.d("mLog", idd + " " + project_calculation_date + " " + project_calculator);
+                            sqlQuewy = "select name, _id "
+                                    + "FROM rgzbn_users " +
+                                    "where _id = ?";
+                            Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_calculator});
+                            if (cc != null) {
+                                if (cc.moveToFirst()) {
+                                    do {
+                                        String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                        String id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                        sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
+                                                project_info, name, null));
+
+                                    } while (cc.moveToNext());
+                                }
+                            }
+                            cc.close();
+
+                        } while (c.moveToNext());
+                    } else {
+
+                        String name = "";
+                        String id = "";
+                        sqlQuewy = "select name, _id "
+                                + "FROM rgzbn_users " +
+                                "where _id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{name_zamer_id.get(j)});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    id = cc.getString(cc.getColumnIndex(cc.getColumnName(1)));
+
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                        sel_work.add(new Select_work(id, i + ":00 - " + (i + 1) + ":00",
+                                "", name, null));
+                    }
+                }
+                c.close();
+            }
+        }
+    }
+
+    View.OnClickListener getDateMount = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int editId = v.getId();
+            final Button btnn = BtnList_mount_zamer.get(editId);
+            int day = Integer.parseInt(btnn.getText().toString());
+            String mount_day;
+
+            if (day < 10 && month < 10) {
+                mount_day = year + "-0" + (month + 1) + "-0" + day;
+            } else if (day < 10 && month > 9) {
+                mount_day = year + "-" + (month + 1) + "-0" + day;
+            } else if (day > 9 && month < 10) {
+                mount_day = year + "-0" + (month + 1) + "-" + day;
+            } else {
+                mount_day = year + "-" + (month + 1) + "-" + day;
+            }
+
+            LayoutInflater li = LayoutInflater.from(getActivity());
+            promptsView2 = li.inflate(R.layout.layout_edit_mount, null);
+            final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+            mDialogBuilder.setView(promptsView2)
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                    tableLayout.removeAllViews();
+                                    @SuppressLint("ResourceType") int getid = btnn.getId() + 1;
+                                    cal_preview_mount(getid);
+                                    btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+
+                                }
+                            });
+
+            list_work = (NonScrollListView) promptsView2.findViewById(R.id.list_work);
+            Spinner sp_brigade = (Spinner) promptsView2.findViewById(R.id.sp_brigade);
+            TextView data_mount = (TextView) promptsView2.findViewById(R.id.data_mount);
+            data_mount.setText(mount_day);
+            date_mount = mount_day;
+
+            ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, name_brigade);
+            sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            sp_brigade.setAdapter(sp_adapter);
+
+            sp_brigade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent,
+                                           View itemSelected, int selectedItemPosition, long selectedId) {
+
+                    String pos = String.valueOf(selectedItemPosition);
+                    id_b = id_brigade.get(Integer.valueOf(pos));
+
+                    brigade();
+
+                }
+
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+
+            final AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+            alertDialog.show();
+
+            BindDictionary<Select_work> dict = new BindDictionary<>();
+            dict.addStringField(R.id.c_time, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getTime();
+                }
+            });
+            dict.addStringField(R.id.c_address, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getAddres();
+                }
+            });
+            dict.addStringField(R.id.c_name, new StringExtractor<Select_work>() {
+                @Override
+                public String getStringValue(Select_work nc, int position) {
+                    return nc.getName();
+                }
+            });
+
+            final FunDapter adapter = new FunDapter(getActivity(), sel_work, R.layout.select_work_l, dict);
+            list_work.setAdapter(adapter);
+
+        }
+    };
+
+    void brigade() {
+
+        sel_work.clear();
+        time_free.clear();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Log.d("mLog", date_mount + " " + id_b);
+        int count = 0;
+        for (int i = 9; i < 21; i++) {
+            String date_mount1 = "";
+            if (i == 9) {
+                date_mount1 = date_mount + " 0" + i + ":00:00";
+            } else {
+                date_mount1 = date_mount + " " + i + ":00:00";
+            }
+            String sqlQuewy = "select _id, project_info, project_mounting_date, project_mounter "
+                    + "FROM rgzbn_gm_ceiling_projects " +
+                    "where project_mounting_date = '" + date_mount1 + "' and project_mounter =?";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{id_b});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+
+                        String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(3)));
+
+                        Log.d("mLog", idd);
+
+                        double n5 = 0;
+                        sqlQuewy = "select n5 "
+                                + "FROM rgzbn_gm_ceiling_calculations " +
+                                "where project_id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{idd});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    String n5_str = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    n5 += Double.parseDouble(n5_str);
+
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                        sqlQuewy = "select name "
+                                + "FROM rgzbn_users " +
+                                "where _id = ?";
+                        cc = db.rawQuery(sqlQuewy, new String[]{project_mounter});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                    sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
+                                            project_info, name, String.valueOf(n5)));
+                                    count++;
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                    } while (c.moveToNext());
+                } else {
+
+                    time_free.add(" " + i + ":00");
+
+                }
+                c.close();
+            }
+        }
+
+        final Spinner sp_brigade_free = (Spinner) promptsView2.findViewById(R.id.sp_brigade_free);
+        ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, time_free);
+        sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp_brigade_free.setAdapter(sp_adapter);
+
+        sp_brigade_free.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent,
+                                       View itemSelected, int selectedItemPosition, long selectedId) {
+                time_brig = sp_brigade_free.getSelectedItem().toString();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        if (count == 0) {
+            sel_work.add(new Select_work(null, null,
+                    null, null, null));
+        }
+
+        BindDictionary<Select_work> dict = new BindDictionary<>();
+        dict.addStringField(R.id.c_time, new StringExtractor<Select_work>() {
+            @Override
+            public String getStringValue(Select_work nc, int position) {
+                return nc.getTime();
+            }
+        });
+        dict.addStringField(R.id.c_address, new StringExtractor<Select_work>() {
+            @Override
+            public String getStringValue(Select_work nc, int position) {
+                return nc.getAddres();
+            }
+        });
+        dict.addStringField(R.id.c_name, new StringExtractor<Select_work>() {
+            @Override
+            public String getStringValue(Select_work nc, int position) {
+                return nc.getN5();
+            }
+        });
+
+        final FunDapter adapter_f = new FunDapter(getActivity(), sel_work, R.layout.select_work_l, dict);
+
+        list_work.setAdapter(adapter_f);
+
+    }
+
 }

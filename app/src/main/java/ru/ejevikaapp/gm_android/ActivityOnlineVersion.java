@@ -52,6 +52,8 @@ public class ActivityOnlineVersion extends AppCompatActivity {
     WebView webView;
     ProgressDialog dialog;
 
+    private static long back_pressed;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +118,16 @@ public class ActivityOnlineVersion extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_online_version, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + 2000 > System.currentTimeMillis())
+            super.onBackPressed();
+        else
+            Toast.makeText(getBaseContext(), "Нажмите ещё раз, для того чтобы выйти",
+                    Toast.LENGTH_SHORT).show();
+        back_pressed = System.currentTimeMillis();
     }
 
     @SuppressLint("ResourceType")

@@ -44,7 +44,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
     DBHelper dbHelper;
     static RequestQueue requestQueue;
     static String data = "";
-    static String domen = "calc";
+    static String domen = "test1";
     static JSONObject jsonData = new JSONObject();
     ProgressDialog pd;
 
@@ -68,6 +68,7 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
     @Override
@@ -150,6 +151,33 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
 
                     if (new_id.equals("")) {
                     } else {
+
+                        SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
+                        SharedPreferences.Editor ed = SP.edit();
+                        ed.putString("", new_id);
+                        ed.commit();
+
+
+                        SP = getSharedPreferences("dealer_id", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", new_id);
+                        ed.commit();
+
+                        SP = getSharedPreferences("gager_id", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", new_id);
+                        ed.commit();
+
+                        SP = getSharedPreferences("name_user", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", name.getText().toString());
+                        ed.commit();
+
+                        SP = getSharedPreferences("link", MODE_PRIVATE);
+                        ed = SP.edit();
+                        ed.putString("", "calc");
+                        ed.commit();
+
                         res = "спасибо за регистрацию";
                         finish();
                     }

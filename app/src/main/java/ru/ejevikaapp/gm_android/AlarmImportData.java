@@ -1,12 +1,10 @@
 package ru.ejevikaapp.gm_android;
 
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,10 +14,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
+import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -32,18 +31,23 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ru.ejevikaapp.gm_android.Dealer.Activity_empty;
 
-public class Service_Sync_Import extends Service {
+import static android.content.Context.MODE_PRIVATE;
+
+public class AlarmImportData extends BroadcastReceiver {
+
     private static final String TAG = "responce_import";
+
+    final public static String ONE_TIME = "onetime";
+
     static DBHelper dbHelper;
 
     static String sync_import = "", user_id = "", change_time_global;
@@ -59,27 +63,39 @@ public class Service_Sync_Import extends Service {
 
     static int count_project1 = 0;
 
-    public Service_Sync_Import() {
-    }
-
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    public void onReceive(Context context, Intent intent) {
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(TAG, "Service started!");
+        Log.d(TAG, "start");
 
-        startForeground(100, new NotificationCompat.Builder(this).build());
+        //PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        //PowerManager.WakeLock wl= pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"YOUR TAG");
 
-        SharedPreferences SP = this.getSharedPreferences("link", MODE_PRIVATE);
+        //wl.acquire();
+
+        ////Здесь можно делать обработку.
+        //Bundle extras= intent.getExtras();
+        //StringBuilder msgStr=new StringBuilder();
+
+        //if(extras!=null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
+        ////проверяем параметр ONE_TIME, если это одиночный будильник,
+        ////выводим соответствующее сообщение.
+        //    msgStr.append("Одноразовый будильник: ");
+        //}
+        //Format formatter=new SimpleDateFormat("hh:mm:ss a");
+        //msgStr.append(formatter.format(new Date()));
+
+        //Toast.makeText(context, msgStr, Toast.LENGTH_LONG).show();
+
+        ////Разблокируем поток.
+        //wl.release();
+
+        SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
         domen = SP.getString("", "");
 
         int count = 0;
 
-        dbHelper = new DBHelper(this);
+        dbHelper = new DBHelper(context);
         final SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String sqlQuewy = "SELECT * "
@@ -96,14 +112,14 @@ public class Service_Sync_Import extends Service {
 
         if (count == 0) {
 
-            SP = this.getSharedPreferences("dealer_id", MODE_PRIVATE);
+            SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
             String dealer_id = SP.getString("", "");
 
-            SharedPreferences SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
+            SharedPreferences SP_end = context.getSharedPreferences("user_id", MODE_PRIVATE);
             user_id = SP_end.getString("", "");
 
-            ctx = this.getApplicationContext();
-            requestQueue = Volley.newRequestQueue(this.getApplicationContext());
+            ctx = context.getApplicationContext();
+            requestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
             String change_time = "";
             sqlQuewy = "SELECT change_time "
@@ -155,136 +171,25 @@ public class Service_Sync_Import extends Service {
             }
 
         }
-        return super.onStartCommand(intent, flags, startId);
+
     }
 
-    public static boolean isRunning(Context ctx) {
-        Log.d(TAG,"run");
-        ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (Service_Sync_Import.class.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
+    public void SetAlarm(Context context) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmImportData.class);
+        intent.putExtra(ONE_TIME, Boolean.FALSE);//Задаем параметр интента
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
+        //Устанавливаем интервал срабатывания в 5 секунд.
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.v(TAG, "Service stopped!");
+    public void CancelAlarm(Context context)
+    {
+        Intent intent=new Intent(context, AlarmImportData.class);
+        PendingIntent sender= PendingIntent.getBroadcast(context,0, intent,0);
+        AlarmManager alarmManager=(AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(sender);//Отменяем будильник, связанный с интентом данного класса
     }
-
-    /*
-    public static class Alarm extends BroadcastReceiver {
-
-        public static final String ALARM_EVENT = "net.multipi.ALARM";
-        public static final int ALARM_INTERVAL_SEC = 1;
-        String sqlQuewy;
-        Cursor cursor;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.v(TAG, "Alarm received: " + intent.getAction());
-
-            SharedPreferences SP = context.getSharedPreferences("link", MODE_PRIVATE);
-            domen = SP.getString("", "");
-
-            requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-
-            int count = 0;
-
-            dbHelper = new DBHelper(context);
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-            try {
-                String sqlQuewy = "SELECT * "
-                        + "FROM history_send_to_server";
-                Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            count++;
-                        } while (c.moveToNext());
-                    }
-                }
-                c.close();
-            } catch (Exception e) {
-                count = 0;
-            }
-
-            if (!isRunning(context)) {
-            } else if (count == 0) {
-                Log.v(TAG, "don't start service: already running...");
-
-                SP = context.getSharedPreferences("dealer_id", MODE_PRIVATE);
-                String dealer_id = SP.getString("", "");
-
-                SharedPreferences SP_end = context.getSharedPreferences("user_id", MODE_PRIVATE);
-                user_id = SP_end.getString("", "");
-
-                sqlQuewy = "SELECT change_time "
-                        + "FROM history_import_to_server" +
-                        " WHERE user_id = ?";
-                Cursor c = db.rawQuery(sqlQuewy, new String[]{user_id});
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            change_time_global = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        } while (c.moveToNext());
-                    }
-                }
-                c.close();
-
-                String usergroup = "";
-                sqlQuewy = "SELECT group_id "
-                        + "FROM rgzbn_user_usergroup_map" +
-                        " WHERE user_id = ?";
-                c = db.rawQuery(sqlQuewy, new String[]{user_id});
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        do {
-                            usergroup = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        } while (c.moveToNext());
-                    }
-                }
-                c.close();
-
-                if (usergroup.equals("14")) {
-                    jsonSync_Import.put("change_time", change_time_global);
-                    jsonSync_Import.put("dealer_id", user_id);
-                    sync_import = String.valueOf(jsonSync_Import);
-
-                    if (user_id.equals("")) {
-                    } else {
-                        new ImportDate().execute();
-                    }
-                } else if (usergroup.equals("22") || usergroup.equals("21")) {
-                    jsonSync_Import.put("change_time", change_time_global);
-                    jsonSync_Import.put("project_calculator", user_id);
-                    sync_import = String.valueOf(jsonSync_Import);
-
-                    if (user_id.equals("")) {
-                    } else {
-                        new ImportDate().execute();
-                    }
-                }
-            }
-        }
-
-        public static void setAlarm(Context context) {
-            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            PendingIntent pi = PendingIntent.getBroadcast(context, 0, new Intent(ALARM_EVENT), 0);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000 * ALARM_INTERVAL_SEC, pi);
-        }
-
-        public static void cancelAlarm(Context context) {
-            PendingIntent sender = PendingIntent.getBroadcast(context, 0, new Intent(ALARM_EVENT), 0);
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(sender);
-        }
-    }
-    */
 
     static class ImportDate extends AsyncTask<Void, Void, Void> {
 

@@ -97,12 +97,6 @@
         -->
 
         <service
-            android:name=".Service_Sync_Import"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
-        <service
             android:name=".Send_All"
             android:enabled="true"
             android:exported="true" />
@@ -202,12 +196,16 @@
         </receiver>
     -->
 
-        <service
-            android:name=".ServiceCallBack"
-            android:enabled="true"
-            android:exported="true" />
+        <activity android:name=".ActivityOnlineVersion"
+            android:screenOrientation="portrait" >
 
-        <activity android:name=".ActivityOnlineVersion"></activity>
+        </activity>
+
+        <receiver android:name=".AlarmImportData">
+        </receiver>
+
+        <receiver android:name=".AlarmCallBack">
+        </receiver>
 
         <meta-data
             android:name="com.google.android.gms.version"

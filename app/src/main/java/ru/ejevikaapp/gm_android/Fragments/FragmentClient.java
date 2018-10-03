@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,13 +28,12 @@ import com.amigold.fundapter.extractors.StringExtractor;
 import java.util.ArrayList;
 
 import ru.ejevikaapp.gm_android.Activity_add_client;
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
-import ru.ejevikaapp.gm_android.Dealer.Activity_client;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
-import ru.ejevikaapp.gm_android.Service_Sync_Import;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -100,7 +97,10 @@ public class FragmentClient extends Fragment implements View.OnClickListener, Sw
     @Override
     public void onRefresh() {
         if (HelperClass.isOnline(getActivity())) {
-            getActivity().startService(new Intent(getActivity(), Service_Sync_Import.class));
+
+            Intent intent = new Intent(getActivity(),AlarmImportData.class);
+            AlarmImportData alarmImportData = new AlarmImportData();
+            alarmImportData.onReceive(getActivity(),intent);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

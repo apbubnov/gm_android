@@ -28,6 +28,7 @@ public class Gager_office extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     String user_id;
+    AlarmImportData alarmImportData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,8 @@ public class Gager_office extends AppCompatActivity
                 Frag_c,
                 Frag_c.getTag()
         ).commit();
+
+        alarmImportData = new AlarmImportData();
     }
 
     @Override
@@ -104,7 +107,8 @@ public class Gager_office extends AppCompatActivity
 
                             db.delete(DBHelper.HISTORY_SEND_TO_SERVER, null, null);
 
-                            startService(new Intent(getApplicationContext(), Service_Sync_Import.class));
+                            Intent intent = new Intent(Gager_office.this, AlarmImportData.class);
+                            alarmImportData.onReceive(Gager_office.this,intent);
 
                         }
                     })
@@ -149,7 +153,7 @@ public class Gager_office extends AppCompatActivity
         } else if (id == R.id.exit) {
 
             stopService(new Intent(Gager_office.this, Service_Sync.class));
-            stopService(new Intent(Gager_office.this, Service_Sync_Import.class));
+            alarmImportData.CancelAlarm(this);
             SharedPreferences SP = getSharedPreferences("user_id", MODE_PRIVATE);
             SharedPreferences.Editor ed = SP.edit();
             ed.putString("", "");

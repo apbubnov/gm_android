@@ -51,6 +51,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.JsonObject;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -120,11 +121,13 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
     GoogleSignInOptions GoogleSignInOptions;
 
+    private AlarmImportData alarmImportData;
+    private boolean newUser = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -145,10 +148,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
         mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        /*
+        alarmImportData = new AlarmImportData();
+
+
         String offline = "0";
         try {
             offline = getIntent().getExtras().get("offline").toString();
@@ -163,69 +168,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
         if (version.equals("offline")) {
             offlineVersion();
-        } else if (version.equals("online")){
-            Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
-            startActivity(intent);
-            finish();
-        } else {
-            if (user_id.equals("")) {
-                if (offline.equals("1")) {
-                    offlineVersion();
-                } else {
-                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)",
-                    "Регистрация"};
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setItems(array, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int item) {
-                            // TODO Auto-generated method stub
-                            switch (item) {
-                                case 0:
-                                    Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
-                                    startActivity(intent);
-                                    finish();
-                                    break;
-                                case 1:
-                                    offlineVersion();
-                                    break;
-                                case 2:
-                                    intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
-                                    startActivity(intent);
-                                    break;
-                            }
-                        }
-                    });
-
-                    builder.setCancelable(false);
-                    builder.create();
-                    builder.show();
-                }
-            } else {
-                offlineVersion();
-            }
-        }
-        */
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        String offline = "0";
-        try {
-            offline = getIntent().getExtras().get("offline").toString();
-        } catch (Exception e) {
-        }
-
-        SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
-        String user_id = SP_end.getString("", "");
-
-        SP_end = this.getSharedPreferences("version", MODE_PRIVATE);
-        String version = SP_end.getString("", "");
-
-        if (version.equals("offline") && !user_id.equals("")) {
-            offlineVersion();
         } else if (version.equals("online")) {
             Intent intent = new Intent(MainActivity.this, ActivityOnlineVersion.class);
             startActivity(intent);
@@ -235,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                 if (offline.equals("1")) {
                     offlineVersion();
                 } else {
-
-                    String[] array = {"Online версия(Требуется интернет)", "Offline версия(Требуется интернет при авторизации)"};
+                    String[] array = {"Online версия(Требуется интернет)",
+                            "Offline версия(Требуется интернет при авторизации)"};
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setItems(array, new DialogInterface.OnClickListener() {
                         @Override
@@ -251,10 +193,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                                 case 1:
                                     offlineVersion();
                                     break;
-                                //case 2:
-                                //    intent = new Intent(MainActivity.this, RegistrationActivity.class);
-                                //    startActivity(intent);
-                                //    break;
                             }
                         }
                     });
@@ -266,6 +204,42 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
             } else {
                 offlineVersion();
             }
+        }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SP_end = this.getSharedPreferences("user_id", MODE_PRIVATE);
+        String user_id = SP_end.getString("", "");
+
+        SP_end = this.getSharedPreferences("name_user", MODE_PRIVATE);
+        String name = SP_end.getString("", "");
+
+        SP_end = this.getSharedPreferences("link", MODE_PRIVATE);
+        domen = SP_end.getString("", "");
+
+        JSONObject jsonUser = new JSONObject();
+        JSONObject jsonGroup = new JSONObject();
+        try {
+            jsonUser.put("id", user_id);
+            jsonUser.put("dealer_id", user_id);
+            jsonUser.put("name", name);
+            jsonGroup.put("14", "14");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (!user_id.equals("")) {
+            newUser = true;
+            mProgressDialog = new ProgressDialog(MainActivity.this);
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setMessage("Загружаем");
+            mProgressDialog.show();
+            send(String.valueOf(jsonUser), user_id, String.valueOf(jsonGroup));
         }
 
     }
@@ -310,19 +284,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
             for (int g = 0; group_id.size() > g; g++) {
                 if (group_id.get(g).equals("11")) {
 
-                    Timer myTimer = new Timer();
-                    final Handler uiHandler = new Handler();
-                    myTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            uiHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
-                                }
-                            });
-                        }
-                    }, 0L, 60L * 1000);
+                    if (alarmImportData != null) {
+                        alarmImportData.SetAlarm(this);
+                    }
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -334,19 +298,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
                 } else if (group_id.get(g).equals("21") || group_id.get(g).equals("22")) {
 
-                    Timer myTimer = new Timer();
-                    final Handler uiHandler = new Handler();
-                    myTimer.schedule(new TimerTask() { // Определяем задачу
-                        @Override
-                        public void run() {
-                            uiHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
-                                }
-                            });
-                        }
-                    }, 0L, 60L * 1000);
+
+                    if (alarmImportData != null) {
+                        alarmImportData.SetAlarm(this);
+                    }
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -357,19 +312,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                     break;
                 } else if (group_id.get(g).equals("14")) {
 
-                    Timer myTimer = new Timer();
-                    final Handler uiHandler = new Handler();
-                    myTimer.schedule(new TimerTask() { // Определяем задачу
-                        @Override
-                        public void run() {
-                            uiHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startService(new Intent(MainActivity.this, Service_Sync_Import.class));
-                                }
-                            });
-                        }
-                    }, 0L, 60L * 1000);
+                    if (alarmImportData != null) {
+                        alarmImportData.SetAlarm(this);
+                    }
 
                     Send_All.Alarm.setAlarm(MainActivity.this);
                     startService(new Intent(MainActivity.this, Send_All.class));
@@ -814,7 +759,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                             send(res, user_id, ob);
                         }
 
-                        Log.d("responce", user_id);
                     } catch (Exception e) {
 
                         mProgressDialog.dismiss();
@@ -966,6 +910,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
         boolean bool = true;
         for (int g = 0; group_id.size() > g; g++) {
+            Log.d(TAG, "send: " + group_id.get(g));
             if (group_id.get(g).equals("11")) { // монтажная бригада
                 usergroup = 11;
                 SP = getSharedPreferences("user_id", MODE_PRIVATE);
@@ -1187,7 +1132,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                 break;
             } else if (group_id.get(g).equals("14")) {    // дилер
                 try {
-
                     values = new ContentValues();
                     values.put(DBHelper.KEY_USER_ID, user_id);
                     values.put(DBHelper.KEY_GROUP_ID, "14");
@@ -1318,6 +1262,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
 
                     break;
                 } catch (Exception e) {
+                    Log.d(TAG, "send: exception " + e);
                 }
             }
         }
@@ -2432,6 +2377,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                             jsonDealer.put("change_time", "0000-00-00 00:00:00");
                             dealer = String.valueOf(jsonDealer);
                             new Send_Dealer().execute();
+                            return;
                         }
 
                         if (usergroup == 22) {
@@ -2443,10 +2389,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
 
                             Send_All.Alarm.setAlarm(MainActivity.this);
-                            //startService(new Intent(MainActivity.this, Send_All.class));
 
-                            //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                            startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                            if (alarmImportData != null) {
+                                alarmImportData.SetAlarm(MainActivity.this);
+                            }
 
                             Intent intent = new Intent(MainActivity.this, Gager_office.class);
                             startActivity(intent);
@@ -2463,12 +2409,16 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
                             db.update(DBHelper.HISTORY_IMPORT_TO_SERVER, values, "title=?", new String[]{"dealer"});
 
                             Send_All.Alarm.setAlarm(MainActivity.this);
-                            //startService(new Intent(MainActivity.this, Send_All.class));
 
-                            //Service_Sync_Import.Alarm.setAlarm(MainActivity.this);
-                            startService(new Intent(MainActivity.this, Service_Sync_Import.class));
+                            if (alarmImportData != null) {
+                                alarmImportData.SetAlarm(MainActivity.this);
+                            }
 
+                            Log.d(TAG, "onResponse: !!!!!!!!!!!!!!!!!!!!!!!! ");
                             Intent intent = new Intent(MainActivity.this, Dealer_office.class);
+                            if (newUser) {
+                                intent.putExtra("keyToPassword", "true");
+                            }
                             startActivity(intent);
                             finish();
 
