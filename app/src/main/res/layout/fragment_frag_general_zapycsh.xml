@@ -412,7 +412,8 @@
             </LinearLayout>
 
             <TextView
-                style="@style/text_style_spisok"
+                android:textColor="#000"
+                android:textSize="17dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"

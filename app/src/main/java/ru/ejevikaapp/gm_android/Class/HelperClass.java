@@ -8,6 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -217,12 +222,61 @@ public class HelperClass {
         return matcher.find();
     }
 
+    public static String phone_edit(String phone) {
+
+        String str1 = phone.substring(0, 2);
+        String str2 = phone;
+        if (str1.equals("7")) {
+
+        } else if (str1.equals("+8") || str1.equals("+7")) {
+            str2 = phone.substring(2, phone.length());
+            str2 = "7" + str2;
+        } else {
+            str2 = phone.substring(1, phone.length());
+            str2 = "7" + str2;
+        }
+
+        return str2;
+    }
+
+    public static void setListViewHeightBasedOnChildren(final ListView listView) {
+
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewTreeObserver vto = listView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int height = listView.getMeasuredHeight();
+                int width = listView.getMeasuredWidth();
+
+            }
+        });
+
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
+
     static DBHelper dbHelper;
 
-    static ArrayList<Double> component_count = new ArrayList();    // component_option
+    static ArrayList <Double> component_count = new ArrayList();    // component_option
     static ArrayList canvases_data = new ArrayList();
     static ArrayList mounting_data = new ArrayList();
-    static ArrayList<Integer> results = new ArrayList();
+    static ArrayList <Integer> results = new ArrayList();
     static ArrayList component_item = new ArrayList();
 
     static int items_9, items_5, items_11, items_vstavka_bel, items_vstavka, items_10, items_16, items_556, items_4, items_58, items_3,

@@ -71,7 +71,6 @@ import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Class.Extra_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
-import ru.ejevikaapp.gm_android.Class.Svetiln_class;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_for_spisok;
 import ru.ejevikaapp.gm_android.R;
@@ -88,7 +87,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.pixplicity.sharp.Sharp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -165,6 +163,8 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
     ArrayList<String> name_brigade = new ArrayList<String>();
     ArrayList<String> id_brigade = new ArrayList<String>();
+
+    private String TAG = "responce";
 
     public Fragment_general_infor() {
     }
@@ -1551,7 +1551,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
 
         final Spinner sp_brigade_free = (Spinner) promptsView2.findViewById(R.id.sp_brigade_free);
         ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, time_free);
-        sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_brigade_free.setAdapter(sp_adapter);
 
         sp_brigade_free.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2975,7 +2974,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                                 }
                             });
             list_work = (ListView) promptsView2.findViewById(R.id.list_work);
-            setListViewHeightBasedOnChildren(list_work);
+            HelperClass.setListViewHeightBasedOnChildren(list_work);
             TextView day_zamer = (TextView) promptsView2.findViewById(R.id.day_zamer);
             day_zamer.setText(mount_day);
             date_zamera = mount_day;
@@ -3094,7 +3093,7 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                             });
 
             list_work = (ListView) promptsView2.findViewById(R.id.list_work);
-            setListViewHeightBasedOnChildren(list_work);
+            HelperClass.setListViewHeightBasedOnChildren(list_work);
             Spinner sp_brigade = (Spinner) promptsView2.findViewById(R.id.sp_brigade);
             TextView data_mount = (TextView) promptsView2.findViewById(R.id.data_mount);
             data_mount.setText(mount_day);
@@ -3164,7 +3163,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             });
 
             ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, name_brigade);
-            sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sp_brigade.setAdapter(sp_adapter);
 
             sp_brigade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -3705,14 +3703,13 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
                     Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
                     if (cc != null) {
                         if (cc.moveToFirst()) {
-                            do {
-                                String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                if (group_id.equals("11")) {
-                                    count++;
-                                    name_brigade.add(name);
-                                    id_brigade.add(id);
-                                }
-                            } while (cc.moveToNext());
+                            String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                            if (group_id.equals("11")) {
+                                count++;
+                                Log.d(TAG, "name: " + name);
+                                name_brigade.add(name);
+                                id_brigade.add(id);
+                            }
                         }
                     }
                     cc.close();
@@ -3827,37 +3824,6 @@ public class Fragment_general_infor extends Fragment implements View.OnClickList
             }
             tableLayout.addView(tableRow, i);
         }
-    }
-
-    public static void setListViewHeightBasedOnChildren(final ListView listView) {
-
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewTreeObserver vto = listView.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int height = listView.getMeasuredHeight();
-                int width = listView.getMeasuredWidth();
-
-            }
-        });
-
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 
     @SuppressLint("ResourceType")

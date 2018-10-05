@@ -9,9 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -20,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -57,16 +54,9 @@ import java.util.GregorianCalendar;
 import ru.ejevikaapp.gm_android.Activity_color;
 import ru.ejevikaapp.gm_android.Activity_draft;
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
-import ru.ejevikaapp.gm_android.Activity_zamer;
-import ru.ejevikaapp.gm_android.Class.Diffuzor_class;
 import ru.ejevikaapp.gm_android.Class.Extra_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
-import ru.ejevikaapp.gm_android.Class.Kupit_Svetlin_class;
-import ru.ejevikaapp.gm_android.Class.Kupit_cornice;
-import ru.ejevikaapp.gm_android.Class.Profile_class;
-import ru.ejevikaapp.gm_android.Class.Svetiln_class;
-import ru.ejevikaapp.gm_android.Class.Truby_class;
-import ru.ejevikaapp.gm_android.Class.Ventil_class;
+import ru.ejevikaapp.gm_android.Class.ForAdapterClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.Dealer.Activity_margin;
 import ru.ejevikaapp.gm_android.R;
@@ -1440,7 +1430,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         ListView list_comp = (ListView) view.findViewById(R.id.list_comp);
         list_comp.setAdapter(Fun_adapter);
-        setListViewHeightBasedOnChildren(list_comp);
+        HelperClass.setListViewHeightBasedOnChildren(list_comp);
 
         final int[] j = {0};
         final String final_extra_comp = extra_components;
@@ -1608,7 +1598,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         ListView list_mount = (ListView) view.findViewById(R.id.list_mount);
         list_mount.setAdapter(Fun_adapter);
-        setListViewHeightBasedOnChildren(list_mount);
+        HelperClass.setListViewHeightBasedOnChildren(list_mount);
 
         final int[] j = {0};
         final String final_extra_comp = extra_mounting;
@@ -1748,7 +1738,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         ArrayList s_v = new ArrayList();
         final ArrayList s_d = new ArrayList();
 
-        final ArrayList<Svetiln_class> svet_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> svet_mas = new ArrayList<>();
 
         Log.d("fixtures", "fix");
         dbHelper[0] = new DBHelper(getActivity());
@@ -1921,8 +1911,8 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
                         fix_c[0].close();
 
-                        Svetiln_class fix_class = new Svetiln_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                                cursor.getString(kol_voIndex), vid, diam);
+                        ForAdapterClass fix_class = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                                cursor.getString(kol_voIndex), vid, diam, null);
                         svet_mas.add(fix_class);
                     } while (cursor.moveToNext());
                 }
@@ -1941,24 +1931,24 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             }
             cursor.close();
 
-            BindDictionary<Svetiln_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<Svetiln_class>() {
+            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Svetiln_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_vid, new StringExtractor<Svetiln_class>() {
+            dict.addStringField(R.id.tv_vid, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Svetiln_class nc, int position) {
-                    return nc.getVid();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Svetiln_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Svetiln_class nc, int position) {
-                    return nc.getDiametr();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getSdType();
                 }
             });
 
@@ -1966,13 +1956,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             list_svetilnik = (ListView) view.findViewById(R.id.list_svetilnik);
             list_svetilnik.setAdapter(Fun_adapter);
-            setListViewHeightBasedOnChildren(list_svetilnik);
+            HelperClass.setListViewHeightBasedOnChildren(list_svetilnik);
 
             list_svetilnik.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {        // УДАЛЕНИЕ
 
-                    Svetiln_class selectedid = svet_mas.get(position);
+                    ForAdapterClass selectedid = svet_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -2102,7 +2092,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         final String[] select_lampa = new String[1];
         String id_calc = null;
 
-        final ArrayList<Kupit_Svetlin_class> svet_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> svet_mas = new ArrayList<>();
 
         ArrayList s_c = new ArrayList();
         ArrayList s_l = new ArrayList();
@@ -2295,32 +2285,32 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                     c[0].close();
 
-                    Kupit_Svetlin_class c_ecola = new Kupit_Svetlin_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex), illum, lamp_ecola);
+                    ForAdapterClass c_ecola = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), illum, lamp_ecola, null);
                     svet_mas.add(c_ecola);
 
                 } while (cursor.moveToNext());
             }
             cursor.close();
 
-            BindDictionary<Kupit_Svetlin_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<Kupit_Svetlin_class>() {
+            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_Svetlin_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_vid, new StringExtractor<Kupit_Svetlin_class>() {
+            dict.addStringField(R.id.tv_vid, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_Svetlin_class nc, int position) {
-                    return nc.getColor();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Kupit_Svetlin_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_Svetlin_class nc, int position) {
-                    return nc.getLampa();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getSdType();
                 }
             });
 
@@ -2328,13 +2318,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             ListView list_ecola = (ListView) view.findViewById(R.id.list_ecola);
             list_ecola.setAdapter(adapter);
-            setListViewHeightBasedOnChildren(list_ecola);
+            HelperClass.setListViewHeightBasedOnChildren(list_ecola);
 
             list_ecola.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Kupit_Svetlin_class selectedid = svet_mas.get(position);
+                    ForAdapterClass selectedid = svet_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -2466,7 +2456,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         final String[] select_lampa = new String[1];
         String id_calc;
 
-        final ArrayList<Kupit_cornice> svet_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> svet_mas = new ArrayList<>();
 
         final Integer[] type = new Integer[1];
         final Integer[] length = new Integer[1];
@@ -2661,32 +2651,32 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                     c[0].close();
 
-                    Kupit_cornice kc = new Kupit_cornice(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex), type_str, length_str);
+                    ForAdapterClass kc = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), type_str, length_str, null);
                     svet_mas.add(kc);
 
                 } while (cursor.moveToNext());
             }
             cursor.close();
 
-            BindDictionary<Kupit_cornice> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<Kupit_cornice>() {
+            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_cornice nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_vid, new StringExtractor<Kupit_cornice>() {
+            dict.addStringField(R.id.tv_vid, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_cornice nc, int position) {
-                    return nc.getType();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Kupit_cornice>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Kupit_cornice nc, int position) {
-                    return nc.getLength();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getSdType();
                 }
             });
 
@@ -2695,13 +2685,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
             list_cornice = (ListView) view.findViewById(R.id.list_cornice);
             list_cornice.setAdapter(adapter);
 
-            setListViewHeightBasedOnChildren(list_cornice);
+            HelperClass.setListViewHeightBasedOnChildren(list_cornice);
 
             list_cornice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Kupit_cornice selectedid = svet_mas.get(position);
+                    ForAdapterClass selectedid = svet_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -2838,7 +2828,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         final Integer[] count = new Integer[1];
         final Integer[] size = new Integer[1];
 
-        final ArrayList<Truby_class> truby_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> truby_mas = new ArrayList<>();
 
         String diametr;
 
@@ -2951,26 +2941,26 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                     c.close();
 
-                    Truby_class t = new Truby_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex), pipes);
+                    ForAdapterClass t = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), pipes, null, null);
                     truby_mas.add(t);
                 } while (cursor.moveToNext());
             }
 
             cursor.close();
 
-            BindDictionary<Truby_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_count, new StringExtractor<Truby_class>() {
+            dict.addStringField(R.id.tv_count, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Truby_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Truby_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Truby_class nc, int position) {
-                    return nc.getDiametr();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
 
@@ -2978,13 +2968,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             list_pipes = (ListView) view.findViewById(R.id.list_pipes);
             list_pipes.setAdapter(adapter);
-            setListViewHeightBasedOnChildren(list_pipes);
+            HelperClass.setListViewHeightBasedOnChildren(list_pipes);
 
             list_pipes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Truby_class selectedid = truby_mas.get(position);
+                    ForAdapterClass selectedid = truby_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -3113,7 +3103,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         final Integer[] size = new Integer[1];
 
-        final ArrayList<Profile_class> truby_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> truby_mas = new ArrayList<>();
 
         dbHelper[0] = new DBHelper(getActivity());
         final SQLiteDatabase db = dbHelper[0].getWritableDatabase();
@@ -3221,26 +3211,26 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                     c.close();
 
-                    Profile_class t = new Profile_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex), pipes);
+                    ForAdapterClass t = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), pipes, null, null);
                     truby_mas.add(t);
                 } while (cursor.moveToNext());
             }
 
             cursor.close();
 
-            BindDictionary<Profile_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_count, new StringExtractor<Profile_class>() {
+            dict.addStringField(R.id.tv_count, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Profile_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Profile_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Profile_class nc, int position) {
-                    return nc.getDiametr();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
 
@@ -3248,13 +3238,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             list_profile = (ListView) view.findViewById(R.id.list_profile);
             list_profile.setAdapter(adapter);
-            setListViewHeightBasedOnChildren(list_profile);
+            HelperClass.setListViewHeightBasedOnChildren(list_profile);
 
             list_profile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Profile_class selectedid = truby_mas.get(position);
+                    ForAdapterClass selectedid = truby_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -3388,7 +3378,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
         final Integer[] type = new Integer[1];
         final Integer[] size = new Integer[1];
 
-        final ArrayList<Ventil_class> vent_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> vent_mas = new ArrayList<>();
 
         dbHelper[0] = new DBHelper(getActivity());
         final SQLiteDatabase db = dbHelper[0].getWritableDatabase();
@@ -3573,32 +3563,31 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                     }
                     c[0].close();
 
-                    Ventil_class vent = new Ventil_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex),
-                            type_str, size_str);
+                    ForAdapterClass vent = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), type_str, size_str, null);
                     vent_mas.add(vent);
                 } while (cursor.moveToNext());
             }
             cursor.close();
 
-            BindDictionary<Ventil_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<Ventil_class>() {
+            dict.addStringField(R.id.tv_kol_vo, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Ventil_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_vid, new StringExtractor<Ventil_class>() {
+            dict.addStringField(R.id.tv_vid, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Ventil_class nc, int position) {
-                    return nc.getType();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Ventil_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Ventil_class nc, int position) {
-                    return nc.getRazmer();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getSdType();
                 }
             });
 
@@ -3606,13 +3595,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             list_hoods = (ListView) view.findViewById(R.id.list_hoods);
             list_hoods.setAdapter(adapter);
-            setListViewHeightBasedOnChildren(list_hoods);
+            HelperClass.setListViewHeightBasedOnChildren(list_hoods);
 
             list_hoods.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Ventil_class selectedid = vent_mas.get(position);
+                    ForAdapterClass selectedid = vent_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -3743,7 +3732,7 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         final Integer[] size = new Integer[1];
 
-        final ArrayList<Diffuzor_class> diff_mas = new ArrayList<>();
+        final ArrayList<ForAdapterClass> diff_mas = new ArrayList<>();
 
         dbHelper[0] = new DBHelper(getActivity());
         final SQLiteDatabase db = dbHelper[0].getWritableDatabase();
@@ -3854,25 +3843,25 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
                         }
                     }
                     c.close();
-                    Diffuzor_class d = new Diffuzor_class(cursor.getString(kdIndex), cursor.getString(kidIndex),
-                            cursor.getString(kol_voIndex), diff);
+                    ForAdapterClass d = new ForAdapterClass(cursor.getString(kdIndex), cursor.getString(kidIndex),
+                            cursor.getString(kol_voIndex), diff, null, null);
                     diff_mas.add(d);
                 } while (cursor.moveToNext());
             }
             cursor.close();
 
-            BindDictionary<Diffuzor_class> dict = new BindDictionary<>();
+            BindDictionary<ForAdapterClass> dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.tv_count, new StringExtractor<Diffuzor_class>() {
+            dict.addStringField(R.id.tv_count, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Diffuzor_class nc, int position) {
-                    return nc.getKol_vo();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.tv_diam, new StringExtractor<Diffuzor_class>() {
+            dict.addStringField(R.id.tv_diam, new StringExtractor<ForAdapterClass>() {
                 @Override
-                public String getStringValue(Diffuzor_class nc, int position) {
-                    return nc.getRazmer();
+                public String getStringValue(ForAdapterClass nc, int position) {
+                    return nc.getFtType();
                 }
             });
 
@@ -3880,13 +3869,13 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
             list_diffuzor = (ListView) view.findViewById(R.id.list_diffuzor);
             list_diffuzor.setAdapter(adapter);
-            setListViewHeightBasedOnChildren(list_diffuzor);
+            HelperClass.setListViewHeightBasedOnChildren(list_diffuzor);
 
             list_diffuzor.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                    Diffuzor_class selectedid = diff_mas.get(position);
+                    ForAdapterClass selectedid = diff_mas.get(position);
                     final String s_id = selectedid.getId();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -4001,24 +3990,6 @@ public class Fragment_calculation extends Fragment implements View.OnClickListen
 
         btn_add_diffuzor.setOnClickListener(on_click);
 
-    }
-
-    public void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            if (listItem instanceof ViewGroup)
-                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
     }
 
     @Override

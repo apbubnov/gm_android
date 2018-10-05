@@ -25,7 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import ru.ejevikaapp.gm_android.Class.HelperClass;
-import ru.ejevikaapp.gm_android.Class.classEstimate;
+import ru.ejevikaapp.gm_android.Class.ClassEstimate;
 
 public class ActivityEstimate extends AppCompatActivity {
 
@@ -195,7 +195,7 @@ public class ActivityEstimate extends AppCompatActivity {
 
         String[] subStr;
         FunDapter Fun_adapter;
-        BindDictionary<classEstimate> dict = new BindDictionary<>();
+        BindDictionary<ClassEstimate> dict = new BindDictionary<>();
 
         if (components.equals("")) {
             LinearLayout linearComp = (LinearLayout) findViewById(R.id.linearComp);
@@ -204,7 +204,7 @@ public class ActivityEstimate extends AppCompatActivity {
 
             ListView listComponents = (ListView) findViewById(R.id.listComponents);
 
-            final ArrayList<classEstimate> estimate_mas = new ArrayList<>();
+            final ArrayList<ClassEstimate> estimate_mas = new ArrayList<>();
 
             subStr = components.split(" \\| ");
 
@@ -233,33 +233,33 @@ public class ActivityEstimate extends AppCompatActivity {
                     }
                 }
 
-                classEstimate fix_class = new classEstimate(title1, title2, title3, title4);
+                ClassEstimate fix_class = new ClassEstimate(title1, title2, title3, title4);
                 estimate_mas.add(fix_class);
             }
 
             dict = new BindDictionary<>();
 
-            dict.addStringField(R.id.name, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.name, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getName();
                 }
             });
-            dict.addStringField(R.id.price, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.price, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getPrice();
                 }
             });
-            dict.addStringField(R.id.count, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.count, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.totalPrice, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.totalPrice, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getTotalPrice();
                 }
             });
@@ -297,7 +297,7 @@ public class ActivityEstimate extends AppCompatActivity {
             LinearLayout linearMount = (LinearLayout) findViewById(R.id.linearMount);
             linearMount.setVisibility(View.GONE);
         } else {
-            final ArrayList<classEstimate> estimate_mount = new ArrayList<>();
+            final ArrayList<ClassEstimate> estimate_mount = new ArrayList<>();
             subStr = mounters.split(" \\| ");
             for (int j = 0; j < subStr.length; j++) {
 
@@ -324,31 +324,31 @@ public class ActivityEstimate extends AppCompatActivity {
                     }
                 }
 
-                classEstimate fix_class = new classEstimate(title1, title2, title3, title4);
+                ClassEstimate fix_class = new ClassEstimate(title1, title2, title3, title4);
                 estimate_mount.add(fix_class);
             }
 
-            dict.addStringField(R.id.name, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.name, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getName();
                 }
             });
-            dict.addStringField(R.id.price, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.price, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getPrice();
                 }
             });
-            dict.addStringField(R.id.count, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.count, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getCount();
                 }
             });
-            dict.addStringField(R.id.totalPrice, new StringExtractor<classEstimate>() {
+            dict.addStringField(R.id.totalPrice, new StringExtractor<ClassEstimate>() {
                 @Override
-                public String getStringValue(classEstimate nc, int position) {
+                public String getStringValue(ClassEstimate nc, int position) {
                     return nc.getTotalPrice();
                 }
             });

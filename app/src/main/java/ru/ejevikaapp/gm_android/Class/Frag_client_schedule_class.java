@@ -12,7 +12,8 @@ public class Frag_client_schedule_class {
     String status;
     String create;
 
-    public Frag_client_schedule_class(String _id, String _fio, String _address, String _id_client, String _status, String _create){
+    public Frag_client_schedule_class(String _id, String _fio, String _address, String _id_client,
+                                      String _status, String _create){
         this.id= _id;
         this.fio= _fio;
         this.address= _address;

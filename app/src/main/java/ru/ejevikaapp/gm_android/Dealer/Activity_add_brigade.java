@@ -27,7 +27,7 @@ import com.amigold.fundapter.extractors.StringExtractor;
 import java.util.ArrayList;
 
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
-import ru.ejevikaapp.gm_android.Class.phone_edit;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 
@@ -164,7 +164,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
         BindDictionary<Frag_client_schedule_class> dict = new BindDictionary<>();
         FunDapter adapter = new FunDapter(this, mount_mas, R.layout.clients_item4, dict);
         list_mount.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(list_mount);
+        HelperClass.setListViewHeightBasedOnChildren(list_mount);
 
     }
 
@@ -238,7 +238,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
         FunDapter adapter = new FunDapter(this, mount_mas, R.layout.clients_item4, dict);
 
         list_mount.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(list_mount);
+        HelperClass.setListViewHeightBasedOnChildren(list_mount);
 
     }
 
@@ -359,8 +359,7 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
                     values.put(DBHelper.KEY_ID, max_id_brigade);
                     values.put(DBHelper.KEY_NAME, name.getText().toString());
                     try {
-                        phone_edit pe = new phone_edit();
-                        values.put(DBHelper.KEY_USERNAME, pe.edit(phone.getText().toString()));
+                        values.put(DBHelper.KEY_USERNAME, HelperClass.phone_edit(phone.getText().toString()));
                     } catch (Exception e) {
                     }
                     values.put(DBHelper.KEY_EMAIL, mail.getText().toString());
@@ -476,28 +475,6 @@ public class Activity_add_brigade extends AppCompatActivity implements View.OnCl
             }
         }
 
-    }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.AT_MOST);
-        int totalHeight = 0;
-        View view = null;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0) {
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 
 }

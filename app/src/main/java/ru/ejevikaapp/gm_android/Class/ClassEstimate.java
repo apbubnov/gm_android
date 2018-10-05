@@ -4,13 +4,13 @@ package ru.ejevikaapp.gm_android.Class;
  * Created by Dmitry on 07.04.2018.
  */
 
-public class classEstimate {
+public class ClassEstimate {
     String name;
     String count;
     String price;
     String totalPrice;
 
-    public classEstimate(String _name, String _count, String _price, String _totalPrice){
+    public ClassEstimate(String _name, String _count, String _price, String _totalPrice){
         this.name = _name;
         this.count = _count;
         this.price = _price;

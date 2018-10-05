@@ -8,12 +8,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,7 +26,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.pixplicity.sharp.Sharp;
+import com.pixplicity.sharp.SharpDrawable;
 
 import org.json.JSONObject;
 
@@ -31,6 +38,7 @@ import ru.ejevikaapp.gm_android.DBHelper;
 import ru.ejevikaapp.gm_android.R;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.net.NetworkInfo.DetailedState.IDLE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,7 +52,8 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
 
     private int pageNumber;
 
-    ImageView image, id_polotna;
+    SubsamplingScaleImageView image;
+    ImageView id_polotna;
 
     DBHelper dbHelper;
 
@@ -102,7 +111,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         id_pagenumber = (TextView) view.findViewById(R.id.id_pagenumber);
         id_pagenumber.setText(String.valueOf(pageNumber));
 
-        image = (ImageView) view.findViewById(R.id.id_image);
+        image = (SubsamplingScaleImageView) view.findViewById(R.id.id_image);
         id_polotna = (ImageView) view.findViewById(R.id.id_polotna);
 
         dbHelper = new DBHelper(getActivity());
@@ -110,9 +119,7 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         String sqlQuewy = "SELECT calc_image "
                 + "FROM rgzbn_gm_ceiling_calculations" +
                 " WHERE _id = ?";
-
         Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(pageNumber)});
-
         if (c != null) {
             if (c.moveToFirst()) {
                 do {
@@ -122,12 +129,14 @@ public class Fragment_inform_proj extends Fragment implements View.OnClickListen
         }
         c.close();
 
+        ImageView imageView = new ImageView(getActivity());
         try {
             Sharp.loadString(imag)
                     .into(image);
         } catch (Exception e) {
             linear_head.setVisibility(View.GONE);
         }
+
 
         sqlQuewy = "SELECT n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n16, n17, n18, n19, n20, n21, n24, n25, " +
                 "dop_krepezh, n27, color, n28, n30, n31, n32, height, extra_components, extra_mounting "

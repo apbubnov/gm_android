@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import ru.ejevikaapp.gm_android.Class.phone_edit;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 
 
 public class Activity_add_client extends AppCompatActivity implements View.OnClickListener{
@@ -140,8 +140,7 @@ public class Activity_add_client extends AppCompatActivity implements View.OnCli
                     values.put(DBHelper.KEY_ID, max_id_contac);
                     values.put(DBHelper.KEY_CLIENT_ID, max_id);
                     try {
-                        phone_edit pe = new phone_edit();
-                        values.put(DBHelper.KEY_PHONE, pe.edit(number));
+                        values.put(DBHelper.KEY_PHONE, HelperClass.phone_edit(number));
                     } catch (Exception e) {
                     }
                     db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);

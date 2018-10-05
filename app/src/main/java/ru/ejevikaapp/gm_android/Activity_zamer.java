@@ -72,8 +72,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.Select_work;
-import ru.ejevikaapp.gm_android.Class.phone_edit;
 import ru.ejevikaapp.gm_android.Crew.Activity_calendar;
 import ru.ejevikaapp.gm_android.Crew.Activity_mounting_day;
 
@@ -624,7 +624,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 }
                             });
             list_work = (ListView) promptsView.findViewById(R.id.list_work);
-            setListViewHeightBasedOnChildren(list_work);
+            HelperClass.setListViewHeightBasedOnChildren(list_work);
             TextView day_zamer = (TextView) promptsView.findViewById(R.id.day_zamer);
             day_zamer.setText(mount_day);
             date_zamera = mount_day;
@@ -688,33 +688,6 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
 
         }
     };
-
-    public void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.AT_MOST);
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-
-            if (listItem != null) {
-                // This next line is needed before you call measure or else you won't get measured height at all. The listitem needs to be drawn first to know the height.
-                listItem.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-                listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-                totalHeight += listItem.getMeasuredHeight();
-
-            }
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
-    }
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
@@ -948,8 +921,7 @@ public class Activity_zamer extends AppCompatActivity implements View.OnClickLis
                                 values.put(DBHelper.KEY_ID, max_id_contac);
                                 values.put(DBHelper.KEY_CLIENT_ID, max_id);
                                 try {
-                                    phone_edit pe = new phone_edit();
-                                    values.put(DBHelper.KEY_PHONE, pe.edit(phone));
+                                    values.put(DBHelper.KEY_PHONE, HelperClass.phone_edit(phone));
                                 } catch (Exception e) {
                                 }
                                 db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_CLIENTS_CONTACTS, null, values);

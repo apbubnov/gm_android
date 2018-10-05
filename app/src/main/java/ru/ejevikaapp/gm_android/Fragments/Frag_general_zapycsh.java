@@ -29,6 +29,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -52,6 +54,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.vision.text.Line;
 import com.pixplicity.sharp.Sharp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -67,11 +70,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
+import ru.ejevikaapp.gm_android.Class.ForAdapterClass;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
+import ru.ejevikaapp.gm_android.Class.HelperClass;
 import ru.ejevikaapp.gm_android.Class.NonScrollListView;
 import ru.ejevikaapp.gm_android.Class.Select_work;
 import ru.ejevikaapp.gm_android.DBHelper;
@@ -88,10 +94,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     TextView name_cl, contact_cl, address_cl, notes_cl, ed_discount, data_cl, project_calculator, project_mounter, advertisement;
 
     String id_cl, id_project, phone, fio, pro_info, mount_date = "", dealer_id, item, S, P, transport = "", distance_col = "", distance = "", calc_date = "";
-
-    String time_h = "";
-
-    Button btn_transport_ok;
 
     DBHelper dbHelper;
     View view;
@@ -125,27 +127,29 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     private List<TextView> CheckBoxList = new ArrayList<TextView>();
     int i = 0;
 
-    RadioButton rb_transport_0, rb_transport_1, rb_transport_2;
-
     LinearLayout.LayoutParams lin_calc;
     LinearLayout mainL, mainC, mainC2, mainL2;
 
     ArrayList<Frag_client_schedule_class> client_mas = new ArrayList<>();
 
     int day_week, year, day, dday, month, max_day;
-    String id_z, id_b,time_brig;
-    NonScrollListView list_work;
+    String id_z, id_b, time_brig, mount_day;
+    ListView list_work;
     View promptsView2;
-    TableLayout tableLayout;
+    TableLayout tableLayout, tableLayoutSelectMount;
+    final ArrayList<ForAdapterClass> mount_mas = new ArrayList<>();
 
     TextView calendar_month;
 
     private List<Button> BtnList_mount_zamer = new ArrayList<Button>();
+    private List<Button> BtnList_mount_brigade = new ArrayList<Button>();
     ArrayList<Select_work> sel_work = new ArrayList<>();
     ArrayList<String> name_zamer_id = new ArrayList<String>();
     ArrayList<String> name_brigade = new ArrayList<String>();
     ArrayList<String> id_brigade = new ArrayList<String>();
     ArrayList<String> time_free = new ArrayList<String>();
+    HashMap<String, String> checkTypeMount = new HashMap<>();
+    AlertDialog alertDialogMountsTime;
 
     String date_zamera = df.format(dateAndTime.getTime());
     String date_mount = df.format(dateAndTime.getTime());
@@ -186,6 +190,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
         SPI = this.getActivity().getSharedPreferences("dealer_id", MODE_PRIVATE);
         dealer_id = SPI.getString("", "");
+
+        list_work = (NonScrollListView) view.findViewById(R.id.list_work);
 
         id_proj = (TextView) view.findViewById(R.id.id_proj);
         id_proj.setText("Проект №" + id_project);
@@ -811,6 +817,19 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         transport();
         calc(id_calcul);
 
+
+        Calendar cl = Calendar.getInstance();
+        day_week = cl.get(Calendar.DAY_OF_WEEK);
+        year = cl.get(Calendar.YEAR);
+        day = cl.get(Calendar.DAY_OF_MONTH);
+        month = cl.get(Calendar.MONTH);
+        calendar_month = (TextView) view.findViewById(R.id.calendar_month);
+        tableLayout = (TableLayout) view.findViewById(R.id.tableLayout);
+
+        ImageButton calendar_minus = (ImageButton) view.findViewById(R.id.calendar_minus);
+        calendar_minus.setOnClickListener(this);
+        ImageButton calendar_plus = (ImageButton) view.findViewById(R.id.calendar_plus);
+        calendar_plus.setOnClickListener(this);
 
         calendar_month = (TextView) view.findViewById(R.id.calendar_month);
         tableLayout = (TableLayout) view.findViewById(R.id.tableLayout);
@@ -1739,6 +1758,26 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 getActivity().startService(new Intent(getActivity(), Service_Sync.class));
 
                 break;
+            case R.id.calendar_minus:
+                month--;
+                if (month < 0) {
+                    month = 11;
+                    year--;
+                }
+                tableLayout.removeAllViews();
+                cal_preview_mount(0);
+
+                break;
+
+            case R.id.calendar_plus:
+                month++;
+                if (month == 12) {
+                    month = 0;
+                    year++;
+                }
+                tableLayout.removeAllViews();
+                cal_preview_mount(0);
+                break;
         }
     }
 
@@ -1816,52 +1855,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         }
 
         int count = 0;
-        name_brigade = new ArrayList<String>();
-        id_brigade = new ArrayList<String>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         sel_work.clear();
-
-        String sqlQuewy = "select _id, name "
-                + "FROM rgzbn_users ";
-        Cursor c = db.rawQuery(sqlQuewy, new String[]{});
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                    String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                    sqlQuewy = "select group_id "
-                            + "FROM rgzbn_user_usergroup_map " +
-                            "where user_id = ?";
-                    Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
-                    if (cc != null) {
-                        if (cc.moveToFirst()) {
-                            do {
-                                String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                if (group_id.equals("11")) {
-                                    count++;
-                                    name_brigade.add(name);
-                                    id_brigade.add(id);
-                                }
-                            } while (cc.moveToNext());
-                        }
-                    }
-                    cc.close();
-                } while (c.moveToNext());
-            }
-        }
-        c.close();
-
-        if (count == 0) {
-            SharedPreferences SPI = getActivity().getSharedPreferences("user_id", MODE_PRIVATE);
-            String user_id = SPI.getString("", "");
-
-            SharedPreferences SP_end = getActivity().getSharedPreferences("name_user", MODE_PRIVATE);
-            String user_name = SP_end.getString("", "");
-
-            name_brigade.add(user_name);
-            id_brigade.add(user_id);
-        }
 
         int ROWS = 6;
         int COLUMNS = 7;
@@ -1916,8 +1912,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                         btn.setLayoutParams(tableParams);
                         btn.setOnClickListener(getDateMount);
                         tableRow.addView(btn, j);
+
                     } else {
-                        sqlQuewy = "select * "
+                        String sqlQuewy = "select * "
                                 + "FROM rgzbn_gm_ceiling_projects_mounts " +
                                 "where  date_time > ? and date_time < ? ";
                         Cursor cc = db.rawQuery(sqlQuewy, new String[]{mount_day + " 08:00:00", mount_day + " 22:00:00"});
@@ -1957,6 +1954,337 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             tableLayout.addView(tableRow, i);
         }
     }
+
+    View.OnClickListener getDateMount = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int editId = v.getId();
+            final Button btnn = BtnList_mount_zamer.get(editId);
+            int day = Integer.parseInt(btnn.getText().toString());
+            name_brigade = new ArrayList<String>();
+            id_brigade = new ArrayList<String>();
+            int count = 0;
+            int count_time = 0;
+            final ArrayList<ForAdapterClass> arrayList = new ArrayList<>();
+
+            for (int i = 0; i < mount_mas.size(); i++) {
+                arrayList.add(mount_mas.get(i));
+            }
+
+            mount_mas.clear();
+
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            if (day < 10 && month < 9) {
+                mount_day = year + "-0" + (month + 1) + "-0" + day;
+            } else if (day < 10 && month > 8) {
+                mount_day = year + "-" + (month + 1) + "-0" + day;
+            } else if (day > 9 && month < 9) {
+                mount_day = year + "-0" + (month + 1) + "-" + day;
+            } else {
+                mount_day = year + "-" + (month + 1) + "-" + day;
+            }
+
+
+            LayoutInflater li = LayoutInflater.from(getActivity());
+            promptsView2 = li.inflate(R.layout.layout_select_mount, null);
+            final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+            mDialogBuilder.setView(promptsView2)
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                    tableLayout.removeAllViews();
+                                    @SuppressLint("ResourceType") int getid = btnn.getId() + 1;
+                                    cal_preview_mount(getid);
+                                    btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+
+                                }
+                            });
+
+            alertDialogMountsTime = mDialogBuilder.create();
+            alertDialogMountsTime.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+            alertDialogMountsTime.show();
+
+            tableLayoutSelectMount = (TableLayout) promptsView2.findViewById(R.id.tableLayoutSelectMount);
+
+            String sqlQuewy = "select _id, name "
+                    + "FROM rgzbn_users ";
+            Cursor c = db.rawQuery(sqlQuewy, new String[]{});
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        String id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        String name = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        sqlQuewy = "select group_id "
+                                + "FROM rgzbn_user_usergroup_map " +
+                                "where user_id = ?";
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{id});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                String group_id = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
+                                if (group_id.equals("11")) {
+                                    count++;
+                                    name_brigade.add(name);
+                                    id_brigade.add(id);
+                                }
+                            }
+                        }
+                        cc.close();
+                    } while (c.moveToNext());
+                }
+            }
+            c.close();
+
+            for (int i = 0; i < 13; i++) {
+                TableRow tableRow = new TableRow(getActivity());
+                TableRow.LayoutParams tableParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                        TableRow.LayoutParams.WRAP_CONTENT, 4f);
+
+                for (int j = 0; j < count; j++) {
+                    if (i == 0) {
+                        Button btn = new Button(getActivity());
+                        btn.setBackgroundResource(R.drawable.calendar_btn);
+                        btn.setTextColor(Color.BLACK);
+                        btn.setText(name_brigade.get(j));
+                        btn.setLayoutParams(tableParams);
+                        tableRow.addView(btn, j);
+                    } else {
+                        if (arrayList.size() > 0 && arrayList.get(count_time).getTdType() != null) {
+                            Log.d(TAG, "onClick: " + i + 8 + ":00");
+                            Button btn = new Button(getActivity());
+                            btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                            btn.setTextColor(Color.BLACK);
+                            btn.setId(count_time);
+                            BtnList_mount_brigade.add(btn);
+                            btn.setText(i + 8 + ":00");
+                            btn.setLayoutParams(tableParams);
+                            btn.setOnClickListener(getDateMountBrigade);
+                            tableRow.addView(btn, j);
+
+                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                    null,
+                                    null,
+                                    mount_day + " " + (i + 8) + ":00",
+                                    id_brigade.get(j),
+                                    arrayList.get(count_time).getTdType());
+                            mount_mas.add(fix_class);
+                        } else {
+                            Button btn = new Button(getActivity());
+                            btn.setBackgroundResource(R.drawable.calendar_btn);
+                            btn.setTextColor(Color.BLACK);
+                            btn.setId(count_time);
+                            BtnList_mount_brigade.add(btn);
+                            btn.setText(i + 8 + ":00");
+                            btn.setLayoutParams(tableParams);
+                            btn.setOnClickListener(getDateMountBrigade);
+                            tableRow.addView(btn, j);
+
+                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                    null,
+                                    null,
+                                    mount_day + " " + (i + 8) + ":00",
+                                    id_brigade.get(j),
+                                    null);
+                            mount_mas.add(fix_class);
+                        }
+
+                        count_time++;
+                    }
+                }
+                tableLayoutSelectMount.addView(tableRow, i);
+            }
+        }
+    };
+
+    View.OnClickListener getDateMountBrigade = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            int editId = v.getId();
+            final Button btnn = BtnList_mount_brigade.get(editId);
+            final int btnId = btnn.getId();
+            final String tmp1 = mount_mas.get(btnId).getId();
+            final String tmp2 = mount_mas.get(btnId).getFtType();
+            final String tmp3 = mount_mas.get(btnId).getSdType();
+            LayoutInflater li = LayoutInflater.from(getActivity());
+            promptsView2 = li.inflate(R.layout.layout_edit_mount, null);
+
+            final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
+            mDialogBuilder.setView(promptsView2)
+                    .setNegativeButton("Отмена",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
+                    .setPositiveButton("OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    tableLayoutSelectMount.removeAllViews();
+
+                                    getDateMount.onClick(BtnList_mount_zamer.get(dday - 1));
+
+                                }
+                            });
+
+            final AlertDialog alertDialog = mDialogBuilder.create();
+            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
+            alertDialog.show();
+
+            LinearLayout formMounter = (LinearLayout) promptsView2.findViewById(R.id.formMounter);
+            formMounter.setVisibility(View.GONE);
+
+            final CheckBox checkBoxType2 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType2);
+            final CheckBox checkBoxType3 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType3);
+            final CheckBox checkBoxType4 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType4);
+
+            final LinearLayout linearCheckBox = (LinearLayout) promptsView2.findViewById(R.id.linearCheckBox);
+
+            RadioGroup radios_b = (RadioGroup) promptsView2.findViewById(R.id.radios_b);
+
+            RadioButton radioButton_mount = (RadioButton)view.findViewById(R.id.radioButton_mount);
+            RadioButton radioButton_mount2 = (RadioButton)view.findViewById(R.id.radioButton_mount2);
+
+            for (int i = 0; i < mount_mas.size(); i++) {
+                if (mount_mas.get(i).getTdType() != null) {
+                    switch (mount_mas.get(i).getTdType()) {
+                        case "1":
+                            radios_b.check(R.id.radioButton_mount);
+                            Log.d(TAG, "RADIOBTN: 1"  );
+                            //radioButton_mount2.setEnabled(false);
+                            break;
+                        case "2":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount.setEnabled(false);
+                            checkBoxType2.setChecked(true);
+                            break;
+                        case "3":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount.setEnabled(false);
+                            checkBoxType3.setChecked(true);
+                            break;
+                        case "4":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount.setEnabled(false);
+                            checkBoxType4.setChecked(true);
+                            break;
+                    }
+                }
+            }
+
+            radios_b.clearCheck();
+            radios_b.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int id) {
+                    switch (id) {
+                        case R.id.radioButton_mount:
+                            linearCheckBox.setVisibility(View.GONE);
+                            checkTypeMount.clear();
+                            checkBoxType2.setChecked(false);
+                            checkBoxType3.setChecked(false);
+                            checkBoxType4.setChecked(false);
+
+                            ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                    null,
+                                    null,
+                                    tmp2,
+                                    tmp3,
+                                    "1");
+                            mount_mas.set(btnId, fix_class);
+                            break;
+                        case R.id.radioButton_mount2:
+                            linearCheckBox.setVisibility(View.VISIBLE);
+                            checkTypeMount.clear();
+                            fix_class = new ForAdapterClass(tmp1,
+                                    null,
+                                    null,
+                                    tmp2,
+                                    tmp3,
+                                    null);
+                            mount_mas.set(btnId, fix_class);
+                            break;
+                    }
+                }
+            });
+
+            checkBoxType2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                "2");
+                        mount_mas.set(btnId, fix_class);
+                    } else if (!isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                null);
+                        mount_mas.set(btnId, fix_class);
+                    }
+                }
+            });
+
+            checkBoxType3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                "3");
+                        mount_mas.set(btnId, fix_class);
+                    } else if (!isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                null);
+                        mount_mas.set(btnId, fix_class);
+                    }
+                }
+            });
+
+            checkBoxType4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                "4");
+                        mount_mas.set(btnId, fix_class);
+                    } else if (!isChecked) {
+                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
+                                null,
+                                null,
+                                tmp2,
+                                tmp3,
+                                null);
+                        mount_mas.set(btnId, fix_class);
+                    }
+                }
+            });
+
+        }
+    };
 
     void date() {
 
@@ -2058,108 +2386,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         }
     }
 
-    View.OnClickListener getDateMount = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int editId = v.getId();
-            final Button btnn = BtnList_mount_zamer.get(editId);
-            int day = Integer.parseInt(btnn.getText().toString());
-            String mount_day;
-
-            if (day < 10 && month < 10) {
-                mount_day = year + "-0" + (month + 1) + "-0" + day;
-            } else if (day < 10 && month > 9) {
-                mount_day = year + "-" + (month + 1) + "-0" + day;
-            } else if (day > 9 && month < 10) {
-                mount_day = year + "-0" + (month + 1) + "-" + day;
-            } else {
-                mount_day = year + "-" + (month + 1) + "-" + day;
-            }
-
-            LayoutInflater li = LayoutInflater.from(getActivity());
-            promptsView2 = li.inflate(R.layout.layout_edit_mount, null);
-            final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
-            mDialogBuilder.setView(promptsView2)
-                    .setNegativeButton("Отмена",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            })
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-
-                                    tableLayout.removeAllViews();
-                                    @SuppressLint("ResourceType") int getid = btnn.getId() + 1;
-                                    cal_preview_mount(getid);
-                                    btnn.setBackgroundResource(R.drawable.calendar_btn_yellow);
-
-                                }
-                            });
-
-            list_work = (NonScrollListView) promptsView2.findViewById(R.id.list_work);
-            Spinner sp_brigade = (Spinner) promptsView2.findViewById(R.id.sp_brigade);
-            TextView data_mount = (TextView) promptsView2.findViewById(R.id.data_mount);
-            data_mount.setText(mount_day);
-            date_mount = mount_day;
-
-            ArrayAdapter<String> sp_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, name_brigade);
-            sp_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            sp_brigade.setAdapter(sp_adapter);
-
-            sp_brigade.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                public void onItemSelected(AdapterView<?> parent,
-                                           View itemSelected, int selectedItemPosition, long selectedId) {
-
-                    String pos = String.valueOf(selectedItemPosition);
-                    id_b = id_brigade.get(Integer.valueOf(pos));
-
-                    brigade();
-
-                }
-
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-
-            final AlertDialog alertDialog = mDialogBuilder.create();
-            alertDialog.getWindow().setBackgroundDrawableResource(R.color.colorWhite);
-            alertDialog.show();
-
-            BindDictionary<Select_work> dict = new BindDictionary<>();
-            dict.addStringField(R.id.c_time, new StringExtractor<Select_work>() {
-                @Override
-                public String getStringValue(Select_work nc, int position) {
-                    return nc.getTime();
-                }
-            });
-            dict.addStringField(R.id.c_address, new StringExtractor<Select_work>() {
-                @Override
-                public String getStringValue(Select_work nc, int position) {
-                    return nc.getAddres();
-                }
-            });
-            dict.addStringField(R.id.c_name, new StringExtractor<Select_work>() {
-                @Override
-                public String getStringValue(Select_work nc, int position) {
-                    return nc.getName();
-                }
-            });
-
-            final FunDapter adapter = new FunDapter(getActivity(), sel_work, R.layout.select_work_l, dict);
-            list_work.setAdapter(adapter);
-
-        }
-    };
-
     void brigade() {
 
         sel_work.clear();
         time_free.clear();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Log.d("mLog", date_mount + " " + id_b);
         int count = 0;
         for (int i = 9; i < 21; i++) {
             String date_mount1 = "";
@@ -2168,32 +2400,43 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             } else {
                 date_mount1 = date_mount + " " + i + ":00:00";
             }
-            String sqlQuewy = "select _id, project_info, project_mounting_date, project_mounter "
-                    + "FROM rgzbn_gm_ceiling_projects " +
-                    "where project_mounting_date = '" + date_mount1 + "' and project_mounter =?";
+            String sqlQuewy = "select project_id, date_time, mounter_id "
+                    + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                    "where date_time = '" + date_mount1 + "' and mounter_id =?";
             Cursor c = db.rawQuery(sqlQuewy, new String[]{id_b});
             if (c != null) {
                 if (c.moveToFirst()) {
                     do {
 
-                        String idd = c.getString(c.getColumnIndex(c.getColumnName(0)));
-                        String project_info = c.getString(c.getColumnIndex(c.getColumnName(1)));
-                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(2)));
-                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(3)));
-
-                        Log.d("mLog", idd);
+                        String project_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                        String project_mounting_date = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                        String project_mounter = c.getString(c.getColumnIndex(c.getColumnName(2)));
 
                         double n5 = 0;
                         sqlQuewy = "select n5 "
                                 + "FROM rgzbn_gm_ceiling_calculations " +
                                 "where project_id = ?";
-                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{idd});
+                        Cursor cc = db.rawQuery(sqlQuewy, new String[]{project_id});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
                                     String n5_str = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
                                     n5 += Double.parseDouble(n5_str);
 
+                                } while (cc.moveToNext());
+                            }
+                        }
+                        cc.close();
+
+                        String project_info = "";
+                        sqlQuewy = "select project_info "
+                                + "FROM rgzbn_gm_ceiling_projects " +
+                                "where _id = ?";
+                        cc = db.rawQuery(sqlQuewy, new String[]{project_id});
+                        if (cc != null) {
+                            if (cc.moveToFirst()) {
+                                do {
+                                    project_info = c.getString(c.getColumnIndex(c.getColumnName(0)));
                                 } while (cc.moveToNext());
                             }
                         }
@@ -2207,7 +2450,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                             if (cc.moveToFirst()) {
                                 do {
                                     String name = cc.getString(cc.getColumnIndex(cc.getColumnName(0)));
-                                    sel_work.add(new Select_work(idd, i + ":00 - " + (i + 1) + ":00",
+                                    sel_work.add(new Select_work(project_id, i + ":00 - " + (i + 1) + ":00",
                                             project_info, name, String.valueOf(n5)));
                                     count++;
                                 } while (cc.moveToNext());

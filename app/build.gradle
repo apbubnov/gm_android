@@ -76,6 +76,8 @@ dependencies {
     implementation files('libs/svg-android.jar')
     implementation files('libs/androidsvg-1.2.1.jar')
     implementation 'com.pixplicity.sharp:library:1.1.0'
-    implementation 'com.android.support:multidex:1.0.3'
     // svg чертеж
+    implementation 'com.android.support:multidex:1.0.3'
+
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0' // для зуум картинки(додумать)
 }
