@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -148,7 +149,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
     ArrayList<String> name_brigade = new ArrayList<String>();
     ArrayList<String> id_brigade = new ArrayList<String>();
     ArrayList<String> time_free = new ArrayList<String>();
-    HashMap<String, String> checkTypeMount = new HashMap<>();
     AlertDialog alertDialogMountsTime;
 
     String date_zamera = df.format(dateAndTime.getTime());
@@ -1985,7 +1985,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 mount_day = year + "-" + (month + 1) + "-" + day;
             }
 
-
             LayoutInflater li = LayoutInflater.from(getActivity());
             promptsView2 = li.inflate(R.layout.layout_select_mount, null);
             final AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -2056,44 +2055,48 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                         btn.setLayoutParams(tableParams);
                         tableRow.addView(btn, j);
                     } else {
-                        if (arrayList.size() > 0 && arrayList.get(count_time).getTdType() != null) {
-                            Log.d(TAG, "onClick: " + i + 8 + ":00");
-                            Button btn = new Button(getActivity());
-                            btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
-                            btn.setTextColor(Color.BLACK);
-                            btn.setId(count_time);
-                            BtnList_mount_brigade.add(btn);
-                            btn.setText(i + 8 + ":00");
-                            btn.setLayoutParams(tableParams);
-                            btn.setOnClickListener(getDateMountBrigade);
-                            tableRow.addView(btn, j);
+                        Button btn = new Button(getActivity());
+                        boolean bool = true;
 
-                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
-                                    null,
-                                    null,
-                                    mount_day + " " + (i + 8) + ":00",
-                                    id_brigade.get(j),
-                                    arrayList.get(count_time).getTdType());
-                            mount_mas.add(fix_class);
+                        if (arrayList.size() != 0) {
+                            for (int m = 0; m < arrayList.size(); m++) {
+                                if (arrayList.get(m).getFtType().equals((i + 8) + ":00") &&
+                                        arrayList.get(m).getSdType().equals(id_brigade.get(j)) &&
+                                        arrayList.get(m).getTdType() != null) {
+                                    btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                                    ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                            null,
+                                            mount_day + " ",
+                                            (i + 8) + ":00",
+                                            id_brigade.get(j),
+                                            arrayList.get(m).getTdType());
+                                    mount_mas.add(fix_class);
+                                    count_time++;
+                                    bool = false;
+                                }
+                            }
                         } else {
-                            Button btn = new Button(getActivity());
                             btn.setBackgroundResource(R.drawable.calendar_btn);
-                            btn.setTextColor(Color.BLACK);
-                            btn.setId(count_time);
-                            BtnList_mount_brigade.add(btn);
-                            btn.setText(i + 8 + ":00");
-                            btn.setLayoutParams(tableParams);
-                            btn.setOnClickListener(getDateMountBrigade);
-                            tableRow.addView(btn, j);
-
-                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
-                                    null,
-                                    null,
-                                    mount_day + " " + (i + 8) + ":00",
-                                    id_brigade.get(j),
-                                    null);
-                            mount_mas.add(fix_class);
                         }
+                        if (bool) {
+                            btn.setBackgroundResource(R.drawable.calendar_btn);
+                        }
+
+                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                null,
+                                mount_day + " ",
+                                (i + 8) + ":00",
+                                id_brigade.get(j),
+                                null);
+                        mount_mas.add(fix_class);
+
+                        btn.setTextColor(Color.BLACK);
+                        btn.setId(count_time);
+                        BtnList_mount_brigade.add(btn);
+                        btn.setText(i + 8 + ":00" + "\n" + id_brigade.get(j));
+                        btn.setLayoutParams(tableParams);
+                        btn.setOnClickListener(getDateMountBrigade);
+                        tableRow.addView(btn, j);
 
                         count_time++;
                     }
@@ -2113,6 +2116,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             final String tmp1 = mount_mas.get(btnId).getId();
             final String tmp2 = mount_mas.get(btnId).getFtType();
             final String tmp3 = mount_mas.get(btnId).getSdType();
+            final String tmp4 = mount_mas.get(btnId).getCount();
+
+            final ArrayList<ForAdapterClass> arrayList = new ArrayList<>();
             LayoutInflater li = LayoutInflater.from(getActivity());
             promptsView2 = li.inflate(R.layout.layout_edit_mount, null);
 
@@ -2121,6 +2127,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     .setNegativeButton("Отмена",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+
+                                    mount_mas.clear();
+                                    for (int i = 0; i < arrayList.size(); i++) {
+                                        mount_mas.add(arrayList.get(i));
+                                    }
+
                                     dialog.cancel();
                                 }
                             })
@@ -2128,7 +2140,6 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     tableLayoutSelectMount.removeAllViews();
-
                                     getDateMount.onClick(BtnList_mount_zamer.get(dday - 1));
 
                                 }
@@ -2149,66 +2160,119 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
             RadioGroup radios_b = (RadioGroup) promptsView2.findViewById(R.id.radios_b);
 
-            RadioButton radioButton_mount = (RadioButton)view.findViewById(R.id.radioButton_mount);
-            RadioButton radioButton_mount2 = (RadioButton)view.findViewById(R.id.radioButton_mount2);
+            RadioButton radioButton_mount = (RadioButton) promptsView2.findViewById(R.id.radioButton_mount);
+            RadioButton radioButton_mount2 = (RadioButton) promptsView2.findViewById(R.id.radioButton_mount2);
 
+            radios_b.clearCheck();
             for (int i = 0; i < mount_mas.size(); i++) {
-                if (mount_mas.get(i).getTdType() != null) {
+                arrayList.add(mount_mas.get(i));
+                if (mount_mas.get(i).getTdType() != null &&
+                        mount_mas.get(i).getFtType().equals(String.valueOf(tmp2)) &&
+                        mount_mas.get(i).getSdType().equals(String.valueOf(tmp3))) { // если в этот день данные вида монтажа есть
                     switch (mount_mas.get(i).getTdType()) {
                         case "1":
                             radios_b.check(R.id.radioButton_mount);
-                            Log.d(TAG, "RADIOBTN: 1"  );
-                            //radioButton_mount2.setEnabled(false);
+                            radioButton_mount.setChecked(true);
+                            radioButton_mount2.setEnabled(false);
                             break;
                         case "2":
                             radios_b.check(R.id.radioButton_mount2);
-                            radioButton_mount.setEnabled(false);
+                            radioButton_mount2.setChecked(true);
                             checkBoxType2.setChecked(true);
+                            linearCheckBox.setVisibility(View.VISIBLE);
                             break;
                         case "3":
                             radios_b.check(R.id.radioButton_mount2);
-                            radioButton_mount.setEnabled(false);
+                            radioButton_mount2.setChecked(true);
                             checkBoxType3.setChecked(true);
+                            linearCheckBox.setVisibility(View.VISIBLE);
                             break;
                         case "4":
                             radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount2.setChecked(true);
+                            checkBoxType4.setChecked(true);
+                            linearCheckBox.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                } else if (mount_mas.get(i).getTdType() != null) {  // если в этот день нет данного вида монтажа, но есть в другие дни
+                    switch (mount_mas.get(i).getTdType()) {
+                        case "1":
+                            radios_b.check(R.id.radioButton_mount);
+                            radioButton_mount.setChecked(true);
+                            radioButton_mount.setEnabled(false);
+                            radioButton_mount2.setEnabled(false);
+                            break;
+                        case "2":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount2.setChecked(true);
+                            radioButton_mount.setEnabled(false);
+                            checkBoxType2.setChecked(true);
+                            checkBoxType2.setEnabled(false);
+                            linearCheckBox.setVisibility(View.VISIBLE);
+                            break;
+                        case "3":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount2.setChecked(true);
+                            radioButton_mount.setEnabled(false);
+                            checkBoxType3.setChecked(true);
+                            checkBoxType3.setEnabled(false);
+                            linearCheckBox.setVisibility(View.VISIBLE);
+                            break;
+                        case "4":
+                            radios_b.check(R.id.radioButton_mount2);
+                            radioButton_mount2.setChecked(true);
                             radioButton_mount.setEnabled(false);
                             checkBoxType4.setChecked(true);
+                            checkBoxType4.setEnabled(false);
+                            linearCheckBox.setVisibility(View.VISIBLE);
                             break;
                     }
                 }
             }
 
-            radios_b.clearCheck();
             radios_b.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int id) {
                     switch (id) {
                         case R.id.radioButton_mount:
                             linearCheckBox.setVisibility(View.GONE);
-                            checkTypeMount.clear();
                             checkBoxType2.setChecked(false);
                             checkBoxType3.setChecked(false);
                             checkBoxType4.setChecked(false);
-
                             ForAdapterClass fix_class = new ForAdapterClass(tmp1,
                                     null,
-                                    null,
+                                    tmp4,
                                     tmp2,
                                     tmp3,
                                     "1");
-                            mount_mas.set(btnId, fix_class);
+                            //mount_mas.set(btnId, fix_class);
+                            mount_mas.add(fix_class);
+
+                            int count = 0;
+                            for (int i = 0; mount_mas.size() > i; i++) {
+                                try {
+                                    if (mount_mas.get(i).getTdType().equals("2") ||
+                                            mount_mas.get(i).getTdType().equals("3") ||
+                                            mount_mas.get(i).getTdType().equals("4")) {
+                                        count = i;
+                                        mount_mas.remove(count);
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }
                             break;
                         case R.id.radioButton_mount2:
                             linearCheckBox.setVisibility(View.VISIBLE);
-                            checkTypeMount.clear();
-                            fix_class = new ForAdapterClass(tmp1,
-                                    null,
-                                    null,
-                                    tmp2,
-                                    tmp3,
-                                    null);
-                            mount_mas.set(btnId, fix_class);
+                            for (int i = 0; mount_mas.size() > i; i++) {
+                                try {
+                                    if (mount_mas.get(i).getTdType().equals("1")) {
+                                        count = i;
+                                        mount_mas.remove(count);
+                                        break;
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }
                             break;
                     }
                 }
@@ -2220,19 +2284,23 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     if (isChecked) {
                         ForAdapterClass fix_class = new ForAdapterClass(tmp1,
                                 null,
-                                null,
+                                tmp4,
                                 tmp2,
                                 tmp3,
                                 "2");
-                        mount_mas.set(btnId, fix_class);
+                        //mount_mas.set(btnId, fix_class);
+                        mount_mas.add(fix_class);
                     } else if (!isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
-                                null,
-                                tmp2,
-                                tmp3,
-                                null);
-                        mount_mas.set(btnId, fix_class);
+                        int count = 0;
+                        for (int i = 0; mount_mas.size() > i; i++) {
+                            try {
+                                if (mount_mas.get(i).getTdType().equals("2"))
+                                    count = i;
+                            } catch (Exception e) {
+                            }
+                        }
+                        mount_mas.remove(count);
+
                     }
                 }
             });
@@ -2243,19 +2311,22 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     if (isChecked) {
                         ForAdapterClass fix_class = new ForAdapterClass(tmp1,
                                 null,
-                                null,
+                                tmp4,
                                 tmp2,
                                 tmp3,
                                 "3");
-                        mount_mas.set(btnId, fix_class);
+                        //mount_mas.set(btnId, fix_class);
+                        mount_mas.add(fix_class);
                     } else if (!isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
-                                null,
-                                tmp2,
-                                tmp3,
-                                null);
-                        mount_mas.set(btnId, fix_class);
+                        int count = 0;
+                        for (int i = 0; mount_mas.size() > i; i++) {
+                            try {
+                                if (mount_mas.get(i).getTdType().equals("3"))
+                                    count = i;
+                            } catch (Exception e) {
+                            }
+                        }
+                        mount_mas.remove(count);
                     }
                 }
             });
@@ -2266,23 +2337,25 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     if (isChecked) {
                         ForAdapterClass fix_class = new ForAdapterClass(tmp1,
                                 null,
-                                null,
+                                tmp4,
                                 tmp2,
                                 tmp3,
                                 "4");
-                        mount_mas.set(btnId, fix_class);
+                        //mount_mas.set(btnId, fix_class);
+                        mount_mas.add(fix_class);
                     } else if (!isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
-                                null,
-                                tmp2,
-                                tmp3,
-                                null);
-                        mount_mas.set(btnId, fix_class);
+                        int count = 0;
+                        for (int i = 0; mount_mas.size() > i; i++) {
+                            try {
+                                if (mount_mas.get(i).getTdType().equals("4"))
+                                    count = i;
+                            } catch (Exception e) {
+                            }
+                        }
+                        mount_mas.remove(count);
                     }
                 }
             });
-
         }
     };
 
