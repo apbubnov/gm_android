@@ -41,7 +41,7 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
     DBHelper dbHelper;
     SQLiteDatabase db;
 
-    String user_id;
+    String user_id, TAG = "mLog";
 
     public Fragment_Home() {
         // Required empty public constructor
@@ -101,17 +101,19 @@ public class Fragment_Home extends Fragment implements View.OnClickListener {
             if (c.moveToFirst()) {
                 do {
                     String id_client = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                    Log.d(TAG, id_client);
                     if (HelperClass.associated_client(getActivity(), user_id, id_client)) {
 
                     } else {
 
-                        sqlQuewy = "SELECT project_info, project_status "
+                        sqlQuewy = "SELECT _id "
                                 + "FROM rgzbn_gm_ceiling_projects " +
-                                "where client_id = ? and project_status = 1";
+                                "where client_id = ? and (project_status = 1 or project_status = 0)";
                         Cursor cc = db.rawQuery(sqlQuewy, new String[]{id_client});
                         if (cc != null) {
                             if (cc.moveToFirst()) {
                                 do {
+                                    Log.d(TAG, cc.getString(cc.getColumnIndex(cc.getColumnName(0))));
                                     count_zamer++;
                                 } while (cc.moveToNext());
                             }

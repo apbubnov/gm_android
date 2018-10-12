@@ -117,8 +117,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
     public void onRefresh() {
         if (HelperClass.isOnline(getActivity())) {
 
-            Intent intent = new Intent(getActivity(),AlarmImportData.class);
-            alarmImportData.onReceive(getActivity(),intent);
+            Intent intent = new Intent(getActivity(), AlarmImportData.class);
+            alarmImportData.onReceive(getActivity(), intent);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -208,7 +208,7 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
 
             sqlQuewy = "SELECT client_id "
                     + "FROM rgzbn_gm_ceiling_projects " +
-                    "where project_calculator = ? and (project_status = 1 or project_status = 1)" +
+                    "where project_calculator = ? and (project_status = 1 or project_status = 0)" +
                     "group by client_id ";
             c = db.rawQuery(sqlQuewy, new String[]{user_id});
             if (c != null) {
@@ -231,10 +231,10 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
             if (activity_client.equals("")) {
                 sqlQuewy = "SELECT client_id "
                         + "FROM rgzbn_gm_ceiling_projects " +
-                        "where deleted_by_user = ? and project_status = ? " +
+                        "where deleted_by_user = 0 and (project_status = 1 or project_status = 0)" +
                         "group by client_id " +
                         "order by _id desc";
-                c = db.rawQuery(sqlQuewy, new String[]{"0", "1"});
+                c = db.rawQuery(sqlQuewy, new String[]{});
                 if (c != null) {
                     if (c.moveToFirst()) {
                         do {
@@ -247,8 +247,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                 for (int i = 0; client_project.size() > i; i++) {
                     sqlQuewy = "SELECT _id "
                             + "FROM rgzbn_gm_ceiling_clients " +
-                            "where dealer_id = ? and _id = ? and deleted_by_user = ?";
-                    c = db.rawQuery(sqlQuewy, new String[]{user_id, String.valueOf(client_project.get(i)), "0"});
+                            "where dealer_id = ? and _id = ? and deleted_by_user = 0";
+                    c = db.rawQuery(sqlQuewy, new String[]{user_id, String.valueOf(client_project.get(i))});
                     if (c != null) {
                         if (c.moveToFirst()) {
                             do {
@@ -277,8 +277,8 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
             if (activity_client.equals("")) {
                 sqlQuewy = "SELECT _id "
                         + "FROM rgzbn_gm_ceiling_projects" +
-                        " WHERE project_status = ? and client_id = ? ";
-                c = db.rawQuery(sqlQuewy, new String[]{"1", String.valueOf(client.get(g))});
+                        " WHERE (project_status = 1 or project_status = 0) and client_id = ? ";
+                c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(client.get(g))});
             } else {
                 sqlQuewy = "SELECT _id "
                         + "FROM rgzbn_gm_ceiling_projects" +
@@ -325,28 +325,32 @@ public class Frag_spisok extends Fragment implements View.OnClickListener, Swipe
                                 SimpleDateFormat out_format_minute;
                                 Date change_max = null;
                                 int hours = 0;
+                                String tempIdClient = "";
+                                String tempDate = "";
 
-                                try {
-                                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    change_max = ft.parse(project_calculation_date);
+                                if (project_calculation_date.equals("0000-00-00 00:00:00")) {
+                                } else {
+                                    try {
+                                        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        change_max = ft.parse(project_calculation_date);
 
-                                    out_format = new SimpleDateFormat("dd.MM.yyyy");
-                                    out_format_minute = new SimpleDateFormat("HH");
+                                        out_format = new SimpleDateFormat("dd.MM.yyyy");
+                                        out_format_minute = new SimpleDateFormat("HH");
 
-                                    hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
+                                        hours = Integer.parseInt(out_format_minute.format(change_max)) + 1;
 
-                                    out_format_time = new SimpleDateFormat("HH:mm");
+                                        out_format_time = new SimpleDateFormat("HH:mm");
 
-                                } catch (Exception e) {
+                                    } catch (Exception e) {
+                                    }
+
+                                    tempDate = String.valueOf(out_format.format(change_max)
+                                                    + "\n" + out_format_time.format(change_max))
+                                                    + " - " + hours + ":00";
+                                    tempIdClient = String.valueOf(client.get(g));
                                 }
 
                                 String tempId = k.getString(kdIndex);
-
-                                String tempDate =
-                                        String.valueOf(out_format.format(change_max)
-                                                + "\n" + out_format_time.format(change_max))
-                                                + " - " + hours + ":00";
-                                String tempIdClient = String.valueOf(client.get(g));
 
                                 /* Обработка адреса */
                                 p_info = p_info.replace("Воронеж, ", "");

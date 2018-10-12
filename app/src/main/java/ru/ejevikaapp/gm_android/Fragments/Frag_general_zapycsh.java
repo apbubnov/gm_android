@@ -14,8 +14,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -54,7 +52,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.vision.text.Line;
 import com.pixplicity.sharp.Sharp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -68,14 +65,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 
 import ru.ejevikaapp.gm_android.Activity_inform_proj;
 import ru.ejevikaapp.gm_android.Activity_inform_zapysch;
+import ru.ejevikaapp.gm_android.AlarmImportData;
 import ru.ejevikaapp.gm_android.Class.ForAdapterClass;
 import ru.ejevikaapp.gm_android.Class.Frag_client_schedule_class;
 import ru.ejevikaapp.gm_android.Class.HelperClass;
@@ -123,7 +118,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
     NonScrollListView listMounts;
 
-    Button btn, completedProject;
+    Button btn, saveProject;
     private List<Button> BtnList = new ArrayList<Button>();
     private List<TextView> CheckBoxList = new ArrayList<TextView>();
     int i = 0;
@@ -211,8 +206,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
         ed_discount = (TextView) view.findViewById(R.id.ed_discount);
         notes_cl = (TextView) view.findViewById(R.id.notes_cl);
 
-        completedProject = (Button) view.findViewById(R.id.completedProject);
-        completedProject.setOnClickListener(this);
+        saveProject = (Button) view.findViewById(R.id.saveProject);
+        saveProject.setOnClickListener(this);
 
         dbHelper = new DBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -766,18 +761,21 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     }
                     c_2.close();
 
-                    sqlQuewy = "SELECT title "
-                            + "FROM rgzbn_gm_ceiling_mounts_types " +
-                            "where _id = ?";
-                    c_2 = db.rawQuery(sqlQuewy, new String[]{type_id});
-                    if (c_2 != null) {
-                        if (c_2.moveToFirst()) {
-                            do {
-                                type = c_2.getString(c_2.getColumnIndex(c_2.getColumnName(0)));
-                            } while (c_2.moveToNext());
+
+                    if (type_id != null) {
+                        sqlQuewy = "SELECT title "
+                                + "FROM rgzbn_gm_ceiling_mounts_types " +
+                                "where _id = ?";
+                        c_2 = db.rawQuery(sqlQuewy, new String[]{type_id});
+                        if (c_2 != null) {
+                            if (c_2.moveToFirst()) {
+                                do {
+                                    type = c_2.getString(c_2.getColumnIndex(c_2.getColumnName(0)));
+                                } while (c_2.moveToNext());
+                            }
                         }
+                        c_2.close();
                     }
-                    c_2.close();
 
                     Frag_client_schedule_class fc = new Frag_client_schedule_class(date_time, type,
                             mounter_name, null, null, null);
@@ -1697,65 +1695,88 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
 
                 break;
 
-            case R.id.completedProject:
+            case R.id.saveProject:
 
                 DBHelper dbHelper = new DBHelper(getActivity());
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put(DBHelper.KEY_PROJECT_STATUS, "12");
-                db.update(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS, values, "_id = ?",
-                        new String[]{id_project});
+                ContentValues values;
 
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID_OLD, id_project);
-                values.put(DBHelper.KEY_ID_NEW, "0");
-                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects");
-                values.put(DBHelper.KEY_SYNC, "0");
-                values.put(DBHelper.KEY_TYPE, "send");
-                values.put(DBHelper.KEY_STATUS, "1");
-                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+                if (mount_mas.size() > 0) {
 
-                int max_id_proj_history = 0;
-                try {
-                    String sqlQuewy = "select MAX(_id) "
-                            + "FROM rgzbn_gm_ceiling_projects_history " +
-                            "where _id>? and _id<?";
-                    Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
-                            String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
-                    if (c != null) {
-                        if (c.moveToFirst()) {
-                            do {
-                                max_id_proj_history = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
-                                max_id_proj_history++;
-                            } while (c.moveToNext());
+                    db.delete(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, "project_id = ?", new String[]{id_project});
+
+                    for (int i = 0; i < mount_mas.size(); i++) {
+                        if (mount_mas.get(i).getCalculation_id().equals(id_project) &&
+                                !mount_mas.get(i).getTdType().equals("null")) {
+                            int maxIdProjectMounts = 0;
+                            try {
+                                String sqlQuewy = "select MAX(_id) "
+                                        + "FROM rgzbn_gm_ceiling_projects_mounts " +
+                                        "where _id>? and _id<?";
+                                Cursor c = db.rawQuery(sqlQuewy, new String[]{String.valueOf(Integer.parseInt(dealer_id) * 100000),
+                                        String.valueOf(Integer.parseInt(dealer_id) * 100000 + 99999)});
+                                if (c != null) {
+                                    if (c.moveToFirst()) {
+                                        do {
+                                            maxIdProjectMounts = Integer.parseInt(c.getString(c.getColumnIndex(c.getColumnName(0))));
+                                            maxIdProjectMounts++;
+                                        } while (c.moveToNext());
+                                    }
+                                }
+                            } catch (Exception e) {
+                                maxIdProjectMounts = Integer.parseInt(dealer_id) * 100000 + 1;
+                            }
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID, maxIdProjectMounts);
+                            values.put(DBHelper.KEY_PROJECT_ID, id_project);
+                            values.put(DBHelper.KEY_MOUNTER_ID, mount_mas.get(i).getSdType());
+                            values.put(DBHelper.KEY_DATE_TIME, mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType());
+                            values.put(DBHelper.KEY_TYPE, mount_mas.get(i).getTdType());
+                            values.put(DBHelper.KEY_MOUNT_START, "null");
+                            values.put(DBHelper.KEY_MOUNT_END, "null");
+                            values.put(DBHelper.KEY_CHANGE_TIME, HelperClass.now_date(getActivity()));
+                            db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_MOUNTS, null, values);
+
+                            values = new ContentValues();
+                            values.put(DBHelper.KEY_ID_OLD, maxIdProjectMounts);
+                            values.put(DBHelper.KEY_ID_NEW, "0");
+                            values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_mounts");
+                            values.put(DBHelper.KEY_SYNC, "0");
+                            values.put(DBHelper.KEY_TYPE, "send");
+                            values.put(DBHelper.KEY_STATUS, "1");
+                            db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
+
+                            String text = "";
+
+                            int type = Integer.parseInt(mount_mas.get(i).getTdType());
+                            switch (type) {
+                                case 1:
+                                    text = "Проект №" + id_project + " назначен на монтаж на " + mount_mas.get(i).getCount() +
+                                            " " + mount_mas.get(i).getFtType();
+                                    break;
+                                case 2:
+                                    text = "Проект №" + id_project + " назначен на монтаж. " + mount_mas.get(i).getCount() +
+                                            " " + mount_mas.get(i).getFtType() + " - Обагечивание;";
+                                    break;
+                                case 3:
+                                    text = "Проект №" + id_project + " назначен на монтаж на " + mount_mas.get(i).getCount() +
+                                            " " + mount_mas.get(i).getFtType() + " - Натяжка;";
+                                    break;
+                                case 4:
+                                    text = "Проект №" + id_project + " назначен на монтаж на " + mount_mas.get(i).getCount() +
+                                            " " + mount_mas.get(i).getFtType() + " - Вствка;";
+                                    break;
+                            }
+
+                            HelperClass.sendHistory(text, getActivity(), id_cl);
                         }
                     }
-                } catch (Exception e) {
-                    max_id_proj_history = Integer.parseInt(dealer_id) * 100000 + 1;
                 }
 
-                Calendar date_cr = new GregorianCalendar();
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                String date = df.format(date_cr.getTime());
-
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID, max_id_proj_history);
-                values.put(DBHelper.KEY_PROJECT_ID, id_project);
-                values.put(DBHelper.KEY_NEW_STATUS, "12");
-                values.put(DBHelper.KEY_DATE_OF_CHANGE, date);
-                db.insert(DBHelper.TABLE_RGZBN_GM_CEILING_PROJECTS_HISTORY, null, values);
-
-                values = new ContentValues();
-                values.put(DBHelper.KEY_ID_OLD, max_id_proj_history);
-                values.put(DBHelper.KEY_ID_NEW, 0);
-                values.put(DBHelper.KEY_NAME_TABLE, "rgzbn_gm_ceiling_projects_history");
-                values.put(DBHelper.KEY_SYNC, "0");
-                values.put(DBHelper.KEY_TYPE, "send");
-                values.put(DBHelper.KEY_STATUS, "1");
-                db.insert(DBHelper.HISTORY_SEND_TO_SERVER, null, values);
-
-                getActivity().finish();
-                getActivity().startService(new Intent(getActivity(), Service_Sync.class));
+                AlarmImportData alarmImportData = new AlarmImportData();
+                Intent intent = new Intent(getActivity(), AlarmImportData.class);
+                alarmImportData.onReceive(getActivity(), intent);
 
                 break;
             case R.id.calendar_minus:
@@ -1880,11 +1901,11 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     dday++;
                     String mount_day;
 
-                    if (dday < 10 && month < 10) {
+                    if (dday < 10 && month < 9) {
                         mount_day = year + "-0" + (month + 1) + "-0" + dday;
-                    } else if (dday < 10 && month > 9) {
+                    } else if (dday < 10 && month > 8) {
                         mount_day = year + "-" + (month + 1) + "-0" + dday;
-                    } else if (dday > 9 && month < 10) {
+                    } else if (dday > 9 && month < 9) {
                         mount_day = year + "-0" + (month + 1) + "-" + dday;
                     } else {
                         mount_day = year + "-" + (month + 1) + "-" + dday;
@@ -1966,14 +1987,22 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             int count = 0;
             int count_time = 0;
             final ArrayList<ForAdapterClass> arrayList = new ArrayList<>();
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            Log.d(TAG, "--------------START-------------- ");
 
             for (int i = 0; i < mount_mas.size(); i++) {
                 arrayList.add(mount_mas.get(i));
+                Log.d(TAG, "id: " + mount_mas.get(i).getId());
+                Log.d(TAG, "project: " + mount_mas.get(i).getCalculation_id());
+                Log.d(TAG, "date_time: " + mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType());
+                Log.d(TAG, "brigada: " + mount_mas.get(i).getSdType());
+                Log.d(TAG, "type: " + mount_mas.get(i).getTdType());
+                Log.d(TAG, "---------------------: ");
             }
 
+            dday = day;
             mount_mas.clear();
-
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             if (day < 10 && month < 9) {
                 mount_day = year + "-0" + (month + 1) + "-0" + day;
@@ -1984,6 +2013,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             } else {
                 mount_day = year + "-" + (month + 1) + "-" + day;
             }
+
+            Log.d(TAG, "mount_day: " + mount_day);
 
             LayoutInflater li = LayoutInflater.from(getActivity());
             promptsView2 = li.inflate(R.layout.layout_select_mount, null);
@@ -2047,44 +2078,132 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                         TableRow.LayoutParams.WRAP_CONTENT, 4f);
 
                 for (int j = 0; j < count; j++) {
+                    Button btn = new Button(getActivity());
+                    int count_minus = 0;
                     if (i == 0) {
-                        Button btn = new Button(getActivity());
-                        btn.setBackgroundResource(R.drawable.calendar_btn);
+                        btn = new Button(getActivity());
+                        btn.setBackgroundResource(R.drawable.calendar_other_month);
                         btn.setTextColor(Color.BLACK);
                         btn.setText(name_brigade.get(j));
                         btn.setLayoutParams(tableParams);
+                        btn.setEnabled(false);
                         tableRow.addView(btn, j);
                     } else {
-                        Button btn = new Button(getActivity());
+                        btn = new Button(getActivity());
                         boolean bool = true;
 
-                        if (arrayList.size() != 0) {
-                            for (int m = 0; m < arrayList.size(); m++) {
-                                if (arrayList.get(m).getFtType().equals((i + 8) + ":00") &&
-                                        arrayList.get(m).getSdType().equals(id_brigade.get(j)) &&
-                                        arrayList.get(m).getTdType() != null) {
-                                    btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
-                                    ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
-                                            null,
-                                            mount_day + " ",
-                                            (i + 8) + ":00",
-                                            id_brigade.get(j),
-                                            arrayList.get(m).getTdType());
-                                    mount_mas.add(fix_class);
-                                    count_time++;
-                                    bool = false;
-                                }
+                        sqlQuewy = "SELECT project_id, pm._id, pm.type, pm.date_time, pm.mounter_id " +
+                                "FROM rgzbn_gm_ceiling_projects_mounts AS pm " +
+                                "INNER JOIN rgzbn_gm_ceiling_projects AS p ON " +
+                                "p._id = pm.project_id " +
+                                "INNER JOIN rgzbn_gm_ceiling_clients AS cl ON " +
+                                "p.client_id = cl._id " +
+                                "WHERE cl.dealer_id = ? and pm.mounter_id = ? and pm.date_time LIKE ('%" + (i + 8) + ":00:00')";
+                        c = db.rawQuery(sqlQuewy, new String[]{dealer_id, id_brigade.get(j)});
+                        if (c != null) {
+                            if (c.moveToFirst()) {
+                                do {
+                                    String project_id = c.getString(c.getColumnIndex(c.getColumnName(0)));
+                                    String id = c.getString(c.getColumnIndex(c.getColumnName(1)));
+                                    String type = c.getString(c.getColumnIndex(c.getColumnName(2)));
+                                    String date_time = c.getString(c.getColumnIndex(c.getColumnName(3)));
+                                    String mounter_id = c.getString(c.getColumnIndex(c.getColumnName(4)));
+
+                                    String hours = " ";
+                                    if (i == 1) {
+                                        hours = " 0";
+                                    }
+
+                                    if (project_id.equals(id_project) && date_time.equals(mount_day + hours + (i + 8) + ":00:00")) {
+                                        btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+
+                                        int index = date_time.indexOf(" ");
+                                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                                project_id,
+                                                date_time.substring(0, index),
+                                                date_time.substring(index + 1, date_time.length() - 3),
+                                                mounter_id,
+                                                type);
+                                        mount_mas.add(fix_class);
+                                        btn.setId(count_time);
+                                        BtnList_mount_brigade.add(btn);
+                                        count_time++;
+
+                                    } else if (date_time.equals(mount_day + hours + (i + 8) + ":00:00")) {
+                                        btn.setBackgroundResource(R.drawable.calendar_other_month);
+
+                                        int index = date_time.indexOf(" ");
+                                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                                project_id,
+                                                date_time.substring(0, index),
+                                                date_time.substring(index + 1, date_time.length() - 3),
+                                                mounter_id,
+                                                type);
+                                        mount_mas.add(fix_class);
+                                        btn.setId(count_time);
+                                        BtnList_mount_brigade.add(btn);
+                                        count_time++;
+
+                                    } else if (project_id.equals(id_project)) {
+                                        int index = date_time.indexOf(" ");
+                                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                                project_id,
+                                                date_time.substring(0, index),
+                                                date_time.substring(index + 1, date_time.length() - 3),
+                                                mounter_id,
+                                                type);
+                                        mount_mas.add(fix_class);
+                                        btn.setId(count_time);
+                                        BtnList_mount_brigade.add(btn);
+                                        count_time++;
+                                    } else {
+                                        btn.setBackgroundResource(R.drawable.calendar_btn);
+                                    }
+                                } while (c.moveToNext());
                             }
-                        } else {
-                            btn.setBackgroundResource(R.drawable.calendar_btn);
+
+                            if (arrayList.size() != 0) {
+                                for (int m = 0; m < arrayList.size(); m++) {
+
+                                    if (arrayList.get(m).getTdType() != null) {
+
+                                        //Log.d(TAG, "date: " + arrayList.get(m).getCount() + " " + arrayList.get(m).getFtType() + " " + mount_day + " " + (i + 8) + ":00");
+                                        //Log.d(TAG, "brigade: " + arrayList.get(m).getSdType() + " " + id_brigade.get(j));
+                                        //Log.d(TAG, "project: " + arrayList.get(m).getCalculation_id() + " " + id_project);
+                                        //Log.d(TAG, "type: " + arrayList.get(m).getTdType());
+
+                                        if ((arrayList.get(m).getCount() + " " + arrayList.get(m).getFtType()).equals(mount_day + " " + (i + 8) + ":00") &&
+                                                arrayList.get(m).getSdType().equals(id_brigade.get(j)) &&
+                                                arrayList.get(m).getCalculation_id().equals(id_project)) {
+                                            btn.setBackgroundResource(R.drawable.calendar_btn_yellow);
+                                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
+                                                    id_project,
+                                                    mount_day,
+                                                    (i + 8) + ":00",
+                                                    id_brigade.get(j),
+                                                    arrayList.get(m).getTdType());
+                                            mount_mas.add(fix_class);
+                                            btn.setId(count_time);
+                                            BtnList_mount_brigade.add(btn);
+                                            count_time++;
+                                            bool = false;
+                                        }
+//
+                                    }
+                                }
+                            } else {
+                                btn.setBackgroundResource(R.drawable.calendar_btn);
+                            }
+                            if (bool) {
+                                btn.setBackgroundResource(R.drawable.calendar_btn);
+                            }
+
                         }
-                        if (bool) {
-                            btn.setBackgroundResource(R.drawable.calendar_btn);
-                        }
+                        c.close();
 
                         ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(count_time),
-                                null,
-                                mount_day + " ",
+                                id_project,
+                                mount_day,
                                 (i + 8) + ":00",
                                 id_brigade.get(j),
                                 null);
@@ -2093,7 +2212,7 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                         btn.setTextColor(Color.BLACK);
                         btn.setId(count_time);
                         BtnList_mount_brigade.add(btn);
-                        btn.setText(i + 8 + ":00" + "\n" + id_brigade.get(j));
+                        btn.setText(i + 8 + ":00 \n" + count_time);
                         btn.setLayoutParams(tableParams);
                         btn.setOnClickListener(getDateMountBrigade);
                         tableRow.addView(btn, j);
@@ -2103,6 +2222,15 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 }
                 tableLayoutSelectMount.addView(tableRow, i);
             }
+
+            //for (int i = 0; i < mount_mas.size(); i++) {
+            //    Log.d(TAG, "---------------------: ");
+            //    Log.d(TAG, "id: " + mount_mas.get(i).getId());
+            //    Log.d(TAG, "project: " + mount_mas.get(i).getCalculation_id());
+            //    Log.d(TAG, "date_time: " + mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType());
+            //    Log.d(TAG, "brigada: " + mount_mas.get(i).getSdType());
+            //    Log.d(TAG, "type: " + mount_mas.get(i).getTdType());
+            //}
         }
     };
 
@@ -2113,10 +2241,18 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             int editId = v.getId();
             final Button btnn = BtnList_mount_brigade.get(editId);
             final int btnId = btnn.getId();
+
             final String tmp1 = mount_mas.get(btnId).getId();
             final String tmp2 = mount_mas.get(btnId).getFtType();
             final String tmp3 = mount_mas.get(btnId).getSdType();
             final String tmp4 = mount_mas.get(btnId).getCount();
+            final String tmp5 = mount_mas.get(btnId).getCalculation_id();
+
+            Log.d(TAG, "tmp1: " + tmp1);
+            Log.d(TAG, "tmp2: " + tmp2);
+            Log.d(TAG, "tmp3: " + tmp3);
+            Log.d(TAG, "tmp4: " + tmp4);
+            Log.d(TAG, "tmp5: " + tmp5);
 
             final ArrayList<ForAdapterClass> arrayList = new ArrayList<>();
             LayoutInflater li = LayoutInflater.from(getActivity());
@@ -2127,21 +2263,28 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     .setNegativeButton("Отмена",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-
                                     mount_mas.clear();
                                     for (int i = 0; i < arrayList.size(); i++) {
                                         mount_mas.add(arrayList.get(i));
                                     }
-
                                     dialog.cancel();
                                 }
                             })
                     .setPositiveButton("OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+
+                                    //for (int i = 0; i < mount_mas.size(); i++) {
+                                    //    Log.d(TAG, "---------------------: ");
+                                    //    Log.d(TAG, "id: " + mount_mas.get(i).getId());
+                                    //    Log.d(TAG, "project: " + mount_mas.get(i).getCalculation_id());
+                                    //    Log.d(TAG, "date_time: " + mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType());
+                                    //    Log.d(TAG, "brigada: " + mount_mas.get(i).getSdType());
+                                    //    Log.d(TAG, "type: " + mount_mas.get(i).getTdType());
+                                    //}
+
                                     tableLayoutSelectMount.removeAllViews();
                                     getDateMount.onClick(BtnList_mount_zamer.get(dday - 1));
-
                                 }
                             });
 
@@ -2157,18 +2300,55 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
             final CheckBox checkBoxType4 = (CheckBox) promptsView2.findViewById(R.id.checkBoxType4);
 
             final LinearLayout linearCheckBox = (LinearLayout) promptsView2.findViewById(R.id.linearCheckBox);
+            final LinearLayout layRadioGroup = (LinearLayout) promptsView2.findViewById(R.id.layRadioGroup);
 
             RadioGroup radios_b = (RadioGroup) promptsView2.findViewById(R.id.radios_b);
 
             RadioButton radioButton_mount = (RadioButton) promptsView2.findViewById(R.id.radioButton_mount);
             RadioButton radioButton_mount2 = (RadioButton) promptsView2.findViewById(R.id.radioButton_mount2);
 
+            TextView text4 = (TextView) promptsView2.findViewById(R.id.text4);
+
             radios_b.clearCheck();
             for (int i = 0; i < mount_mas.size(); i++) {
+
                 arrayList.add(mount_mas.get(i));
-                if (mount_mas.get(i).getTdType() != null &&
+                if ((mount_mas.get(i).getTdType() != null) &&
+                        (((mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType()).equals(tmp4 + " " + tmp2)) ||
+                                ((mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType()).equals(tmp4 + " 0" + tmp2))) &&
+                        mount_mas.get(i).getSdType().equals(tmp3) &&
+                        !mount_mas.get(i).getCalculation_id().equals(id_project)) {
+                    switch (mount_mas.get(i).getTdType()) {
+                        case "1":
+                            layRadioGroup.setVisibility(View.GONE);
+                            text4.setTextColor(Color.BLACK);
+                            text4.setGravity(Gravity.CENTER);
+                            text4.setText(mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType() + "\n" + mount_mas.get(i).getCalculation_id());
+                            break;
+                        case "2":
+                            layRadioGroup.setVisibility(View.GONE);
+                            text4.setTextColor(Color.BLACK);
+                            text4.setGravity(Gravity.CENTER);
+                            text4.setText(mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType() + "\n" + mount_mas.get(i).getCalculation_id());
+                            break;
+                        case "3":
+                            layRadioGroup.setVisibility(View.GONE);
+                            text4.setTextColor(Color.BLACK);
+                            text4.setGravity(Gravity.CENTER);
+                            text4.setText(mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType() + "\n" + mount_mas.get(i).getCalculation_id());
+                            break;
+                        case "4":
+                            layRadioGroup.setVisibility(View.GONE);
+                            text4.setTextColor(Color.BLACK);
+                            text4.setGravity(Gravity.CENTER);
+                            text4.setText(mount_mas.get(i).getCount() + " " + mount_mas.get(i).getFtType() + "\n" + mount_mas.get(i).getCalculation_id());
+                            break;
+                    }
+                } else if (mount_mas.get(i).getTdType() != null &&
                         mount_mas.get(i).getFtType().equals(String.valueOf(tmp2)) &&
-                        mount_mas.get(i).getSdType().equals(String.valueOf(tmp3))) { // если в этот день данные вида монтажа есть
+                        mount_mas.get(i).getSdType().equals(String.valueOf(tmp3)) &&
+                        mount_mas.get(i).getCount().equals(tmp4) &&
+                        mount_mas.get(i).getCalculation_id().equals(id_project)) { // если в этот день данные вида монтажа есть
                     switch (mount_mas.get(i).getTdType()) {
                         case "1":
                             radios_b.check(R.id.radioButton_mount);
@@ -2194,7 +2374,8 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                             linearCheckBox.setVisibility(View.VISIBLE);
                             break;
                     }
-                } else if (mount_mas.get(i).getTdType() != null) {  // если в этот день нет данного вида монтажа, но есть в другие дни
+                } else if (mount_mas.get(i).getTdType() != null &&
+                        mount_mas.get(i).getCalculation_id().equals(id_project)) {  // если в этот день нет данного вида монтажа, но есть в другие дни
                     switch (mount_mas.get(i).getTdType()) {
                         case "1":
                             radios_b.check(R.id.radioButton_mount);
@@ -2239,13 +2420,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                             checkBoxType2.setChecked(false);
                             checkBoxType3.setChecked(false);
                             checkBoxType4.setChecked(false);
-                            ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                    null,
+                            ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(mount_mas.size()),
+                                    tmp5,
                                     tmp4,
                                     tmp2,
                                     tmp3,
                                     "1");
-                            //mount_mas.set(btnId, fix_class);
                             mount_mas.add(fix_class);
 
                             int count = 0;
@@ -2282,13 +2462,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
+                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(mount_mas.size()),
+                                tmp5,
                                 tmp4,
                                 tmp2,
                                 tmp3,
                                 "2");
-                        //mount_mas.set(btnId, fix_class);
                         mount_mas.add(fix_class);
                     } else if (!isChecked) {
                         int count = 0;
@@ -2309,13 +2488,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
+                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(mount_mas.size()),
+                                tmp5,
                                 tmp4,
                                 tmp2,
                                 tmp3,
                                 "3");
-                        //mount_mas.set(btnId, fix_class);
                         mount_mas.add(fix_class);
                     } else if (!isChecked) {
                         int count = 0;
@@ -2335,13 +2513,12 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        ForAdapterClass fix_class = new ForAdapterClass(tmp1,
-                                null,
+                        ForAdapterClass fix_class = new ForAdapterClass(String.valueOf(mount_mas.size()),
+                                tmp5,
                                 tmp4,
                                 tmp2,
                                 tmp3,
                                 "4");
-                        //mount_mas.set(btnId, fix_class);
                         mount_mas.add(fix_class);
                     } else if (!isChecked) {
                         int count = 0;
@@ -2356,7 +2533,9 @@ public class Frag_general_zapycsh extends Fragment implements View.OnClickListen
                     }
                 }
             });
+
         }
+
     };
 
     void date() {

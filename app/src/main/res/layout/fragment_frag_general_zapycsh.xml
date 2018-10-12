@@ -536,13 +536,13 @@
                 android:layout_height="wrap_content"></TableLayout>
 
             <Button
-                android:id="@+id/completedProject"
+                android:id="@+id/saveProject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="3dp"
                 android:background="@drawable/rounded_button"
-                android:text=" Выполнено "
+                android:text=" Сохранить "
                 android:textColor="#ffffff"
                 />
         </LinearLayout>
